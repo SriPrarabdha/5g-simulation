@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from simulator.macro import Simulator, load_scenario
+from simulator.macro import Simulator, controller_by_name, load_scenario
 
 
 def file_sha256(path: Path) -> str:
@@ -47,7 +47,7 @@ def atomic_json(path: Path, payload: dict[str, Any]) -> None:
 def shard_directory(output_root: Path, campaign_id: str, scenario_id: str, controller: str, seed: int) -> Path:
     return (
         output_root
-        / "schema_major=0"
+        / "schema_major=1"
         / f"campaign={campaign_id}"
         / f"scenario={scenario_id}"
         / f"controller={controller}"
@@ -61,21 +61,30 @@ def run_shard(
     campaign_id: str,
     seed: int,
     skip_existing: bool = False,
+    controller: str = "static",
 ) -> Path:
     project_root = Path(__file__).resolve().parent.parent
     base_config = load_scenario(manifest)
     config = replace(base_config, seed=seed)
-    simulator = Simulator(config)
+    simulator = Simulator(config, controller_by_name(controller))
     destination = shard_directory(output_root, campaign_id, config.scenario_id, simulator.controller.name, seed)
     run_path = destination / "run.jsonl"
     metadata_path = destination / "metadata.json"
+    parquet_path = destination / "run.parquet"
+    audits_path = destination / "selection-audits.parquet"
     manifest_digest = file_sha256(manifest)
 
-    if run_path.exists() or metadata_path.exists():
-        if not skip_existing or not run_path.is_file() or not metadata_path.is_file():
+    if run_path.exists() or parquet_path.exists() or audits_path.exists() or metadata_path.exists():
+        if not skip_existing or not run_path.is_file() or not parquet_path.is_file() or not audits_path.is_file() or not metadata_path.is_file():
             raise FileExistsError(f"refusing to overwrite shard: {destination}")
         existing = json.loads(metadata_path.read_text(encoding="utf-8"))
-        if existing.get("manifest_sha256") != manifest_digest or existing.get("run_file_sha256") != file_sha256(run_path):
+        if (
+            existing.get("manifest_sha256") != manifest_digest
+            or existing.get("run_file_sha256") != file_sha256(run_path)
+            or existing.get("parquet_file_sha256") != file_sha256(parquet_path)
+            or existing.get("selection_audits_sha256") != file_sha256(audits_path)
+            or existing.get("controller") != simulator.controller.name
+        ):
             raise FileExistsError(f"existing shard does not match this manifest or is incomplete: {destination}")
         return destination
 
@@ -84,6 +93,12 @@ def run_shard(
     temporary_run = destination / f".run.jsonl.{os.getpid()}.tmp"
     result.write_jsonl(temporary_run)
     os.replace(temporary_run, run_path)
+    temporary_parquet = destination / f".run.parquet.{os.getpid()}.tmp"
+    result.write_parquet(temporary_parquet)
+    os.replace(temporary_parquet, parquet_path)
+    temporary_audits = destination / f".selection-audits.parquet.{os.getpid()}.tmp"
+    result.write_selection_audits_parquet(temporary_audits)
+    os.replace(temporary_audits, audits_path)
 
     metadata = {
         "schema_version": "experiment-shard/1.0",
@@ -101,6 +116,10 @@ def run_shard(
         "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "run_file": run_path.name,
         "run_file_sha256": file_sha256(run_path),
+        "canonical_file": parquet_path.name,
+        "parquet_file_sha256": file_sha256(parquet_path),
+        "selection_audits_file": audits_path.name,
+        "selection_audits_sha256": file_sha256(audits_path),
         "summary": result.summary,
     }
     atomic_json(metadata_path, metadata)
@@ -114,6 +133,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--campaign-id", required=True)
     parser.add_argument("--seed", required=True, type=int)
     parser.add_argument("--skip-existing", action="store_true")
+    parser.add_argument(
+        "--controller",
+        choices=("static", "reactive", "forecast-capacity", "predictive", "oracle"),
+        default="static",
+    )
     return parser
 
 
@@ -122,6 +146,7 @@ def main() -> int:
     destination = run_shard(
         args.manifest, args.output_root, args.campaign_id, args.seed,
         skip_existing=args.skip_existing,
+        controller=args.controller,
     )
     print(destination)
     return 0

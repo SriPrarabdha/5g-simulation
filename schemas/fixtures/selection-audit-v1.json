@@ -1,0 +1,12 @@
+{
+  "schema_version": "selection-audit/1.0",
+  "timestamp": "2026-08-05T12:00:05Z",
+  "session_id_hash": "b7f783baed8297f0",
+  "session_hash_value": "9d9389cc503e",
+  "group": {"zone": "zone-a", "dnn": "internet", "snssai": "1-010203", "five_qi": null},
+  "eligible_upfs": ["upf-a", "upf-c"],
+  "requested_weights": {"upf-a": 0.6, "upf-c": 0.4},
+  "selected_upf": "upf-a",
+  "policy_id": "policy-0001",
+  "reason": "optimizer_weighted"
+}

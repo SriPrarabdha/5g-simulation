@@ -6,12 +6,19 @@ build-backend = "setuptools.build_meta"
 name = "cdot-upf-simulation"
 version = "0.1.0"
 description = "Deterministic macro simulation for predictive 5G UPF steering"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "pyarrow>=14",
+  "lightgbm>=4",
+  "duckdb>=1.1",
+]
 
 [project.scripts]
 cdot-sim = "simulator.macro.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["schemas*", "simulator*", "steering*"]
-
+include = ["schemas*", "simulator*", "steering*", "telemetry*", "forecasting*", "optimization*", "demo_api*"]

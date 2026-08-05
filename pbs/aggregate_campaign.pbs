@@ -12,10 +12,9 @@ source pbs/env.sh
 CAMPAIGN_ID="${CAMPAIGN_ID:-demo-v1}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-output/macro}"
 EXPECTED_SHARDS="${EXPECTED_SHARDS:-30}"
-CAMPAIGN_ROOT="$OUTPUT_ROOT/schema_major=0/campaign=$CAMPAIGN_ID"
+CAMPAIGN_ROOT="$OUTPUT_ROOT/schema_major=1/campaign=$CAMPAIGN_ID"
 
 "$PYTHON_BIN" -m experiments.aggregate_campaign \
     --root "$CAMPAIGN_ROOT" \
     --expected-shards "$EXPECTED_SHARDS" \
     --output "$CAMPAIGN_ROOT/campaign-summary.json"
-

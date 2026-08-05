@@ -4,6 +4,7 @@ import argparse
 import json
 
 from .config import load_scenario
+from .controllers import controller_by_name
 from .engine import Simulator
 
 
@@ -11,12 +12,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run a deterministic C-DOT UPF macro scenario")
     parser.add_argument("manifest", help="path to a JSON scenario manifest")
     parser.add_argument("--output", required=True, help="destination JSONL audit file")
+    parser.add_argument(
+        "--controller", choices=("static", "reactive", "forecast-capacity", "predictive", "oracle"), default="static",
+        help="placement controller to evaluate",
+    )
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    result = Simulator(load_scenario(args.manifest)).run()
+    result = Simulator(load_scenario(args.manifest), controller_by_name(args.controller)).run()
     result.write_jsonl(args.output)
     print(json.dumps(result.summary, indent=2, sort_keys=True))
     return 0
@@ -24,4 +29,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

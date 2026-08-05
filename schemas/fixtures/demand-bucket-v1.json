@@ -1,0 +1,25 @@
+{
+  "schema_version": "demand-bucket/1.0",
+  "window": {"start": "2026-08-05T11:50:00Z", "end": "2026-08-05T12:00:00Z"},
+  "group": {"zone": "zone-a", "dnn": "internet", "snssai": "1-010203", "five_qi": 9},
+  "upf_id": "upf-a",
+  "traffic": {
+    "offered_ul_bytes": 1000, "offered_dl_bytes": 2000,
+    "carried_ul_bytes": 900, "carried_dl_bytes": 1800,
+    "queued_ul_bytes": 50, "queued_dl_bytes": 100,
+    "dropped_ul_bytes": 25, "dropped_dl_bytes": 50,
+    "rejected_ul_bytes": 25, "rejected_dl_bytes": 50
+  },
+  "sessions": {
+    "active_mean": 100.5, "active_max": 120, "new": 20,
+    "surviving": 90, "departed": 10, "establishment_failures": 0
+  },
+  "qos": {"latency_p95_ms": 8.5, "latency_max_ms": 15.0},
+  "rate_statistics": {
+    "offered_ul": {"mean_mbps": 10.0, "p95_mbps": 12.0, "max_mbps": 15.0}
+  },
+  "data_quality": {
+    "missing_fraction": 0.0, "reset_count": 0, "restart_count": 0,
+    "restarted": false, "late_sample_count": 0, "validity_flags": []
+  }
+}

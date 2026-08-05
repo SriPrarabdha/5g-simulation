@@ -59,23 +59,36 @@ class UPFProfile:
 class ScenarioEvent:
     step: int
     event_type: str
-    upf_id: str
+    upf_id: str | None = None
+    group_id: str | None = None
     ul_factor: float | None = None
     dl_factor: float | None = None
     health: str | None = None
+    arrival_factor: float | None = None
+    zone: str | None = None
+    latency_ms: float | None = None
 
     def __post_init__(self) -> None:
         if self.step < 0:
             raise ValueError("event step must be non-negative")
-        if self.event_type not in {"capacity_factor", "health"}:
+        if self.event_type not in {"capacity_factor", "health", "arrival_factor", "path_latency"}:
             raise ValueError(f"unsupported event type: {self.event_type}")
         if self.event_type == "capacity_factor":
+            if not self.upf_id:
+                raise ValueError("capacity event requires upf_id")
             if self.ul_factor is None and self.dl_factor is None:
                 raise ValueError("capacity event requires a directional factor")
             if any(value is not None and value < 0 for value in (self.ul_factor, self.dl_factor)):
                 raise ValueError("capacity factors must be non-negative")
-        if self.event_type == "health" and self.health not in {"healthy", "degraded", "unavailable", "unknown"}:
-            raise ValueError("health event requires a valid state")
+        if self.event_type == "health":
+            if not self.upf_id or self.health not in {"healthy", "degraded", "unavailable", "unknown"}:
+                raise ValueError("health event requires upf_id and a valid state")
+        if self.event_type == "arrival_factor":
+            if not self.group_id or self.arrival_factor is None or self.arrival_factor < 0:
+                raise ValueError("arrival event requires group_id and a non-negative factor")
+        if self.event_type == "path_latency":
+            if not self.upf_id or not self.zone or self.latency_ms is None or self.latency_ms < 0:
+                raise ValueError("path-latency event requires upf_id, zone, and non-negative latency_ms")
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,6 +99,7 @@ class ScenarioConfig:
     steps: int
     step_seconds: int = 30
     decision_interval_steps: int = 20
+    primary_overload_metric: str = "overload_area_seconds.ul"
     groups: tuple[GroupProfile, ...] = field(default_factory=tuple)
     upfs: tuple[UPFProfile, ...] = field(default_factory=tuple)
     events: tuple[ScenarioEvent, ...] = field(default_factory=tuple)
@@ -96,6 +110,11 @@ class ScenarioConfig:
             raise ValueError("scenario identity, steps, and step_seconds must be positive")
         if self.decision_interval_steps <= 0:
             raise ValueError("decision_interval_steps must be positive")
+        if self.primary_overload_metric not in {
+            "overload_area_seconds.ul", "overload_area_seconds.dl",
+            "overload_duration_seconds.ul", "overload_duration_seconds.dl",
+        }:
+            raise ValueError("primary_overload_metric must select one directional overload metric")
         upf_ids = {upf.upf_id for upf in self.upfs}
         if len(upf_ids) != len(self.upfs) or not upf_ids:
             raise ValueError("UPF IDs must be unique and non-empty")
@@ -107,8 +126,10 @@ class ScenarioConfig:
             if unknown:
                 raise ValueError(f"group {group.key.selection_id} references unknown UPFs: {sorted(unknown)}")
         for event in self.events:
-            if event.upf_id not in upf_ids:
+            if event.upf_id is not None and event.upf_id not in upf_ids:
                 raise ValueError(f"event references unknown UPF: {event.upf_id}")
+            if event.group_id is not None and event.group_id not in group_ids:
+                raise ValueError(f"event references unknown group: {event.group_id}")
             if event.step >= self.steps:
                 raise ValueError("event step falls outside the scenario")
 
@@ -142,6 +163,7 @@ class ScenarioConfig:
             scenario_id=data["scenario_id"], seed=data["seed"], start_time=data["start_time"],
             steps=data["steps"], step_seconds=data.get("step_seconds", 30),
             decision_interval_steps=data.get("decision_interval_steps", 20),
+            primary_overload_metric=data.get("primary_overload_metric", "overload_area_seconds.ul"),
             groups=groups, upfs=upfs, events=events,
         )
 
@@ -149,4 +171,3 @@ class ScenarioConfig:
 def load_scenario(path: str | Path) -> ScenarioConfig:
     with Path(path).open(encoding="utf-8") as stream:
         return ScenarioConfig.from_dict(json.load(stream))
-

@@ -1,0 +1,23 @@
+{
+  "schema_version": "policy/1.0",
+  "policy_id": "policy-0001",
+  "policy_version": 1,
+  "created_at": "2026-08-05T12:00:00Z",
+  "validity": {"start": "2026-08-05T12:00:00Z", "end": "2026-08-05T12:10:00Z"},
+  "forecast_id": "forecast-0001",
+  "upf_state_time": "2026-08-05T12:00:00Z",
+  "solver": {"name": "highs", "status": "optimal", "runtime_ms": 4},
+  "constraint_slack": {
+    "ul_mbps_by_upf": {"upf-a": 0, "upf-c": 0},
+    "dl_mbps_by_upf": {"upf-a": 0, "upf-c": 0},
+    "sessions_by_upf": {"upf-a": 0, "upf-c": 0}
+  },
+  "groups": [
+    {
+      "key": {"zone": "zone-a", "dnn": "internet", "snssai": "1-010203", "five_qi": null},
+      "weights": {"upf-a": 0.6, "upf-c": 0.4}
+    }
+  ],
+  "fallback": {"used": false, "reason": null, "source_policy_id": null},
+  "validator_version": "independent-policy-validator/1.0"
+}

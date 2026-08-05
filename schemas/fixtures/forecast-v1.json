@@ -1,0 +1,24 @@
+{
+  "schema_version": "forecast/1.0",
+  "forecast_id": "forecast-0001",
+  "issued_at": "2026-08-05T12:00:00Z",
+  "source_window_end": "2026-08-05T12:00:00Z",
+  "target_window": {"start": "2026-08-05T12:00:00Z", "end": "2026-08-05T12:10:00Z"},
+  "horizon_steps": 1,
+  "group": {"zone": "zone-a", "dnn": "internet", "snssai": "1-010203", "five_qi": null},
+  "new_session_count": {"p50": 100, "p95": 130, "p90": 120},
+  "new_load_mbps": {
+    "ul": {"p50": 80, "p95": 110, "p90": 100},
+    "dl": {"p50": 200, "p95": 260, "p90": 240}
+  },
+  "existing_load_by_upf": [
+    {
+      "upf_id": "upf-a",
+      "surviving_sessions": {"p50": 400, "p95": 450, "p90": null},
+      "ul_mbps": {"p50": 60, "p95": 75, "p90": null},
+      "dl_mbps": {"p50": 150, "p95": 180, "p90": null}
+    }
+  ],
+  "model_version": "moving-average/6",
+  "quality_flags": []
+}

@@ -4,6 +4,10 @@
 **Date:** 5 August 2026
 **Status:** Implementation baseline for Demo v1
 
+> Repository implementation status is tracked in `README.md`. The macro/HPC
+> plane is implemented; the privileged high-fidelity plane and calibration
+> gates are not yet claimed complete.
+
 ## 1. Objective and scope
 
 Demo v1 has one testable objective:

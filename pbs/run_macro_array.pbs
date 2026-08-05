@@ -14,6 +14,7 @@ MANIFEST="${MANIFEST:-configs/demo_scenario.json}"
 CAMPAIGN_ID="${CAMPAIGN_ID:-demo-v1}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-output/macro}"
 SEED_START="${SEED_START:-1000}"
+CONTROLLER="${CONTROLLER:-static}"
 ARRAY_INDEX="${PBS_ARRAY_INDEX:?PBS_ARRAY_INDEX is required; submit this as a PBS array}"
 SEED=$((SEED_START + ARRAY_INDEX))
 
@@ -23,5 +24,5 @@ echo "campaign=$CAMPAIGN_ID manifest=$MANIFEST array_index=$ARRAY_INDEX seed=$SE
     --campaign-id "$CAMPAIGN_ID" \
     --seed "$SEED" \
     --output-root "$OUTPUT_ROOT" \
+    --controller "$CONTROLLER" \
     --skip-existing
-

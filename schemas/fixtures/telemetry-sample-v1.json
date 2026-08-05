@@ -1,0 +1,16 @@
+{
+  "schema_version": "telemetry-sample/1.0",
+  "sample_id": "sample-0001",
+  "event_time": "2026-08-05T12:00:00Z",
+  "received_time": "2026-08-05T12:00:01Z",
+  "source": {"type": "prometheus", "id": "upf-a"},
+  "metric": "n3_bytes_total",
+  "dimensions": {"upf_id": "upf-a", "interface": "n3", "direction": "ul"},
+  "value": 123456,
+  "unit": "bytes_total",
+  "is_counter": true,
+  "reset_epoch": 0,
+  "valid": true,
+  "validity_flags": [],
+  "restart_id": "boot-a"
+}

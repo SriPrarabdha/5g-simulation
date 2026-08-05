@@ -15,11 +15,13 @@ class Cohort:
     count: int
     ul_mbps_per_session: float
     dl_mbps_per_session: float
+    arrival_step: int
 
 
 @dataclass(slots=True)
 class DirectionResult:
     offered_bytes: float
+    new_session_offered_bytes: float
     carried_bytes: float
     queued_bytes: float
     dropped_bytes: float
@@ -50,6 +52,8 @@ class StepResult:
     policy_id: str
     group_arrivals: dict[str, int]
     group_rejections: dict[str, int]
+    unplaced_rejected_ul_bytes: float
+    unplaced_rejected_dl_bytes: float
     upfs: list[UPFStepResult]
 
     def to_dict(self) -> dict[str, Any]:
@@ -57,4 +61,3 @@ class StepResult:
         result["window_start"] = iso_utc(self.window_start)
         result["window_end"] = iso_utc(self.window_end)
         return result
-

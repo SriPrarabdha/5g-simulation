@@ -33,6 +33,13 @@ class PBSScriptTests(unittest.TestCase):
         self.assertIn("env/bin/python", content)
         self.assertIn("CONDA_ENV_NAME", content)
 
+    def test_campaign_scripts_use_canonical_schema_partition(self) -> None:
+        for name in ("aggregate_campaign.pbs", "check_build.pbs", "smoke_test.sh"):
+            with self.subTest(name=name):
+                content = (PBS_DIR / name).read_text(encoding="utf-8")
+                self.assertIn("schema_major=1", content)
+                self.assertNotIn("schema_major=0", content)
+
 
 if __name__ == "__main__":
     unittest.main()

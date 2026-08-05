@@ -1,0 +1,15 @@
+{
+  "schema_version": "upf-state/1.0",
+  "measurement_time": "2026-08-05T12:00:00Z",
+  "upf_id": "upf-a",
+  "capacity_mbps": {"ul": 240, "dl": 500},
+  "safe_utilization": {"ul": 0.8, "dl": 0.8},
+  "session_capacity": 5000,
+  "session_safe_utilization": 0.85,
+  "health": "healthy",
+  "zone": "zone-a",
+  "eligible_groups": ["zone-a|internet|1-010203"],
+  "path_latency_ms_by_zone": {"zone-a": 2, "zone-b": 15},
+  "state_ttl_seconds": 60,
+  "calibration_version": "packet-rusher-sweep/1"
+}

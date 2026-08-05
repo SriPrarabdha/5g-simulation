@@ -19,7 +19,9 @@ class CampaignTests(unittest.TestCase):
             self.assertNotEqual(first, second)
             self.assertTrue((first / "run.jsonl").is_file())
             self.assertTrue((first / "metadata.json").is_file())
-            summary = aggregate(root / "schema_major=0" / "campaign=unit-campaign", expected_shards=2)
+            self.assertTrue((first / "run.parquet").is_file())
+            self.assertTrue((first / "selection-audits.parquet").is_file())
+            summary = aggregate(root / "schema_major=1" / "campaign=unit-campaign", expected_shards=2)
             self.assertEqual(summary["seeds"], [10, 11])
             self.assertEqual(summary["shard_count"], 2)
 
@@ -38,7 +40,15 @@ class CampaignTests(unittest.TestCase):
             root = Path(directory)
             run_shard(manifest, root, "incomplete", 1)
             with self.assertRaisesRegex(CampaignError, "expected 2"):
-                aggregate(root / "schema_major=0" / "campaign=incomplete", expected_shards=2)
+                aggregate(root / "schema_major=1" / "campaign=incomplete", expected_shards=2)
+
+    def test_controller_is_explicit_in_partition_and_metadata(self) -> None:
+        manifest = Path("configs/demo_scenario.json")
+        with tempfile.TemporaryDirectory() as directory:
+            destination = run_shard(
+                manifest, Path(directory), "reactive-campaign", 7, controller="reactive"
+            )
+            self.assertIn("controller=reactive-threshold-v1", str(destination))
 
     def test_capability_probe_has_architecture_gate_fields(self) -> None:
         checks = probe()["checks"]
@@ -52,4 +62,3 @@ class CampaignTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

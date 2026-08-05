@@ -5,6 +5,7 @@
   "steps": 60,
   "step_seconds": 30,
   "decision_interval_steps": 20,
+  "primary_overload_metric": "overload_area_seconds.ul",
   "upfs": [
     {
       "upf_id": "upf-a", "zone": "zone-a",

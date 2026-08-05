@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import unittest
+import json
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from schemas import Capacity, ConstraintSlack, Fallback, Forecast, GroupKey, Policy, PolicyGroup
+from schemas import Capacity, ConstraintSlack, DemandBucket, Fallback, Forecast, GroupKey, Policy, PolicyGroup
 from schemas import Quantiles, SelectionAudit, SolverReport, TelemetrySample, TimeWindow, UPFState
 from steering import rendezvous_select
 
@@ -15,6 +17,20 @@ SELECTION_GROUP = GroupKey("zone-a", "internet", "1-010203")
 
 
 class ContractTests(unittest.TestCase):
+    def test_frozen_v1_schema_fixtures_round_trip(self) -> None:
+        fixtures = {
+            "telemetry-sample-v1.json": TelemetrySample,
+            "demand-bucket-v1.json": DemandBucket,
+            "forecast-v1.json": Forecast,
+            "upf-state-v1.json": UPFState,
+            "policy-v1.json": Policy,
+            "selection-audit-v1.json": SelectionAudit,
+        }
+        for filename, contract in fixtures.items():
+            with self.subTest(filename=filename):
+                payload = json.loads((Path("schemas/fixtures") / filename).read_text(encoding="utf-8"))
+                self.assertEqual(contract.from_dict(payload).to_dict(), payload)
+
     def test_telemetry_round_trip_preserves_wire_shape(self) -> None:
         sample = TelemetrySample(
             sample_id="s-1", event_time=NOW, received_time=NOW + timedelta(seconds=1),
@@ -69,6 +85,8 @@ class ContractTests(unittest.TestCase):
         repeated = [rendezvous_select(f"session-{i}", "p-1", weights)[0] for i in range(1000)]
         self.assertEqual(selected, repeated)
         self.assertLess(abs(selected.count("upf-a") / len(selected) - 0.7), 0.05)
+        first_window = selected[:100]
+        self.assertLessEqual(abs(first_window.count("upf-a") / 100 - 0.7), 0.10)
 
     @staticmethod
     def _policy(weights: dict[str, float]) -> Policy:

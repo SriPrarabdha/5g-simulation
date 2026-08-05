@@ -1,0 +1,57 @@
+{
+  "schema_version": "traffic-model-registry/1.0",
+  "generator_version": "synthetic-cohort/1.0",
+  "synthetic": true,
+  "frozen_at": "2026-08-05T00:00:00Z",
+  "resolution_seconds": 30,
+  "decision_bucket_seconds": 600,
+  "history_weeks": 16,
+  "nominal_ue_population": 30000,
+  "random_processes": {
+    "arrivals": {"distribution": "non_homogeneous_poisson", "unit": "sessions/30s", "range": [0.0, 180.0], "source": "scenario assumption"},
+    "latent_load": {"distribution": "AR(1) Gaussian innovation", "phi_range": [0.72, 0.94], "innovation_sigma_range": [0.03, 0.12], "source": "scenario assumption"},
+    "rate_multiplier": {"distribution": "lognormal", "sigma_range": [0.25, 1.1], "unit": "ratio", "source": "TR 25.933 shape; absolute scale unsupported"},
+    "human_burst_residual": {"distribution": "two-state Markov with heavy-tailed dwell", "on_multiplier_range": [1.4, 4.5], "source": "mobile communication measurements"},
+    "holding_time": {"distribution": "class-specific lognormal or bounded Pareto", "range_seconds": [10, 10800], "source": "TR 25.933 and scenario assumption"}
+  },
+  "seasonality": {
+    "basis": "daily and weekly Fourier terms",
+    "harmonics": {"daily": 4, "weekly": 2},
+    "residential_business_phase_offset_hours": [7.0, 11.0],
+    "source": "Telecom Italia Milan activity-envelope calibration only"
+  },
+  "mobility": {
+    "states": ["residential", "business", "metro", "stadium"],
+    "model": "time-varying origin/destination Markov transitions",
+    "conserves_population": true,
+    "source": "unsupported scenario assumption"
+  },
+  "classes": [
+    {"id": "streaming", "five_qi": 9, "dnn": "internet", "snssai": "1-010203", "ul_dl_ratio_range": [0.03, 0.18], "holding": "lognormal", "event_multiplier_range": [1.3, 3.2], "evidence": ["TS 23.501", "TR 26.925"]},
+    {"id": "social_live", "five_qi": 8, "dnn": "internet", "snssai": "1-010203", "ul_dl_ratio_range": [0.4, 2.8], "holding": "bounded Pareto", "event_multiplier_range": [2.5, 8.0], "evidence": ["large-event cellular measurements"]},
+    {"id": "gaming_voice", "five_qi": 3, "dnn": "internet", "snssai": "1-010203", "ul_dl_ratio_range": [0.45, 1.2], "holding": "lognormal", "event_multiplier_range": [1.1, 2.0], "evidence": ["TS 23.501", "TR 26.926"]},
+    {"id": "enterprise_web_file", "five_qi": 7, "dnn": "enterprise", "snssai": "1-112233", "ul_dl_ratio_range": [0.15, 0.8], "holding": "bounded Pareto", "event_multiplier_range": [0.45, 1.2], "evidence": ["TR 25.933"]},
+    {"id": "industrial_urllc", "five_qi": 82, "dnn": "factory", "snssai": "2-445566", "ul_dl_ratio_range": [0.8, 1.5], "holding": "persistent periodic", "event_multiplier_range": [0.95, 1.05], "evidence": ["TR 38.913", "TS 22.261"]},
+    {"id": "mmtc_sensors", "five_qi": 9, "dnn": "iot", "snssai": "3-778899", "ul_dl_ratio_range": [4.0, 20.0], "holding": "persistent periodic", "event_multiplier_range": [1.0, 5.0], "evidence": ["TR 38.913"]}
+  ],
+  "event_lifecycle": {
+    "phases": ["ingress_ramp", "kickoff", "match", "halftime_upload", "final_whistle", "egress_tail"],
+    "attendance_range": [12000, 65000],
+    "weather_multiplier_range": [0.8, 1.25],
+    "duration_minutes_range": [95, 145],
+    "source": "large-event cellular measurements; absolute values unsupported"
+  },
+  "faults": ["capacity_degradation", "upf_unavailable", "latency_increase", "telemetry_gap", "counter_reset", "restart"],
+  "accounting": ["offered", "admitted", "carried", "queued", "dropped", "rejected"],
+  "citations": [
+    "https://www.etsi.org/deliver/etsi_tr/138900_138999/138913/18.00.00_60/tr_138913v180000p.pdf",
+    "https://www.etsi.org/deliver/etsi_TS/123500_123599/123501/18.11.00_60/ts_123501v181100p.pdf",
+    "https://www.etsi.org/deliver/etsi_ts/122200_122299/122261/17.14.00_60/ts_122261v171400p.pdf",
+    "https://www.nature.com/articles/sdata201555",
+    "https://arxiv.org/abs/1101.0377",
+    "https://www.etsi.org/deliver/etsi_tr/125900_125999/125933/05.03.00_60/tr_125933v050300p.pdf",
+    "https://www.etsi.org/deliver/etsi_tr/126900_126999/126925/18.01.00_60/tr_126925v180100p.pdf",
+    "https://www.etsi.org/deliver/etsi_tr/126900_126999/126926/18.02.00_60/tr_126926v180200p.pdf",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC8153328/"
+  ]
+}

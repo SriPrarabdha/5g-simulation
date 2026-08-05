@@ -32,6 +32,38 @@ class SimulatorTests(unittest.TestCase):
             result.write_jsonl(second)
             self.assertEqual(first.read_bytes(), second.read_bytes())
             self.assertEqual(json.loads(first.read_text().splitlines()[0])["record_type"], "simulation_metadata")
+            self.assertTrue(any(
+                json.loads(line)["record_type"] == "selection_audit"
+                for line in first.read_text().splitlines()[1:]
+            ))
+
+    def test_parquet_output_has_canonical_schema_and_nested_upfs(self) -> None:
+        result = Simulator(ScenarioConfig.from_dict(self._scenario(10.0))).run()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "run.parquet"
+            result.write_parquet(path)
+            import pyarrow.parquet as pq
+            table = pq.read_table(path)
+            self.assertEqual(table.schema.metadata[b"schema_version"], b"simulation-step/1.0")
+            self.assertEqual(table.num_rows, len(result.steps))
+            self.assertEqual(len(table.column("upfs")[0].as_py()), 1)
+            audit_path = Path(directory) / "selection-audits.parquet"
+            result.write_selection_audits_parquet(audit_path)
+            audits = pq.read_table(audit_path)
+            self.assertEqual(audits.schema.metadata[b"schema_version"], b"selection-audit/1.0")
+            self.assertGreater(audits.num_rows, 0)
+
+    def test_crowd_and_link_events_are_applied_at_the_declared_step(self) -> None:
+        payload = self._scenario(100.0)
+        group_id = "zone-a|internet|1-1"
+        payload["events"] = [
+            {"step": 2, "event_type": "arrival_factor", "group_id": group_id, "arrival_factor": 5},
+            {"step": 2, "event_type": "path_latency", "upf_id": "upf-a", "zone": "zone-a", "latency_ms": 50},
+        ]
+        result = Simulator(ScenarioConfig.from_dict(payload)).run()
+        before = sum(result.steps[index].group_arrivals[group_id] for index in range(2))
+        after = sum(result.steps[index].group_arrivals[group_id] for index in range(2, 8))
+        self.assertGreater(after / 6, before / 2)
 
     @staticmethod
     def _scenario(capacity: float) -> dict:

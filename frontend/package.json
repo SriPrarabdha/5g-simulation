@@ -1,0 +1,24 @@
+{
+  "name": "cdot-closed-loop-console",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "echarts": "^5.6.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "~5.8.3"
+  }
+}
+
