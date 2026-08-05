@@ -1,2531 +1,755 @@
-# C-DOT UPF Traffic Management: Simulation, Synthetic Data Generation, and Closed-Loop Demo Architecture
+# C-DOT 5G Predictive UPF Steering: Simulation and Demo Architecture
 
-**Version:** 1.0  
-**Date:** 4 August 2026  
-**Purpose:** Technical implementation blueprint for generating realistic UPF traffic-management data on the C-DOT HPC cluster and demonstrating forecast-driven UPF traffic steering.
+**Version:** 2.0
+**Date:** 5 August 2026
+**Status:** Implementation baseline for Demo v1
 
----
+## 1. Objective and scope
 
-## 1. Executive Summary
+Demo v1 has one testable objective:
 
-The goal is to build an experimental platform that can be used **before sufficient C-DOT production history is available**, while remaining structurally compatible with the real C-DOT telemetry and control interfaces when they become available.
+> Predict demand for the immediately upcoming 10-minute window and steer newly established PDU sessions across eligible UPFs, demonstrating reduced overload against static and reactive baselines.
 
-The platform should answer two questions:
+The first release is a closed-loop engineering proof, not a production controller. It uses three UPFs, two zones, two DNNs, two slices, and at least two independently controllable groups. It does not migrate existing sessions or load-balance individual packets.
 
-1. **Simulation/data question:** Can we generate realistic time-series data containing per-UPF throughput, sessions, DNN/S-NSSAI/5QI/zone dimensions, topology, capacity, failures, compute metrics, and traffic events?
-2. **Closed-loop question:** Can a forecaster predict the next 10-minute demand window and an optimizer convert that forecast into a traffic-steering policy that prevents UPF overload?
+The C-DOT cluster is a scenario factory. Its 160 nodes run independent simulation, forecasting, optimization, and, where privileges permit, isolated high-fidelity replicas. The nodes are not combined into one distributed 5G network.
 
-The recommended design is **multi-fidelity** rather than one monolithic simulator:
+### 1.1 Success claim
 
-- **High-fidelity 5G-core testbed:** `free5GC` + `PacketRusher` or `UERANSIM` + multiple real software UPFs + Linux/eBPF/TC telemetry + Prometheus.
-- **Radio/traffic realism layer:** `ns-3 + 5G-LENA` for 5QI-aware traffic, RAN effects, mobility, QoS, mixed NGMN workloads, XR, HTTP, FTP, gaming, video and VoIP.
-- **Fast macro simulator:** a custom C++ simulator (recommended for the large campaign) or a Python/SimPy prototype that models sessions, flows, UPF capacities, queues, failures, locality, routing and control at 15–30 s or 10-minute granularity.
-- **HPC execution:** use the 160 standard nodes as an embarrassingly parallel scenario factory; use the 32 TB shared-memory node for global aggregation, very large state/graph experiments, large optimization jobs, or in-memory analysis.
-- **Closed-loop demo:** Prometheus → 10-minute feature aggregation → forecaster → optimizer → steering controller → SMF/UPF selection → new PDU sessions → telemetry feedback.
+For paired runs with identical scenario seeds, the predictive controller must:
 
-For the first demo, traffic steering should operate on **new PDU-session placement**, not arbitrary packet-by-packet load balancing and not live migration of already anchored sessions. This is the lowest-risk path to a technically correct 5G-aware demonstration.
+- reduce overload duration or overload area by at least 20% versus static placement;
+- show no regression versus the reactive baseline on the selected primary overload metric;
+- cause no increase in failed or rejected session establishments; and
+- publish only policies that pass all safety and validity checks.
 
----
+Results must also identify regimes in which low session churn makes new-session steering ineffective. Synthetic results demonstrate engineering feasibility only. Production claims require calibration and shadow evaluation against C-DOT telemetry.
 
-# Part I — What Exactly Must Be Simulated?
+### 1.2 Non-goals for v1
 
-## 2. Requirements Derived from the C-DOT Data Request
+- migration or re-anchoring of active PDU sessions;
+- packet-by-packet balancing across stateful UPFs;
+- treating CPU or memory utilization as a substitute for calibrated capacity;
+- assuming that 5QI is available to the SMF before UPF selection;
+- treating free5GC Traffic Influence as a general weighted load-balancing API;
+- treating 5G-LENA as the multi-UPF 5GC under test; or
+- joining cluster nodes into a single emulated mobile network.
 
-The supplied C-DOT data-request email defines a 10-minute decision cycle:
+## 2. Architecture
 
-1. Prometheus continues scraping telemetry at a fine interval, ideally **15–30 seconds**.
-2. Fine-grained values are aggregated into one value per metric/traffic group/10-minute bucket.
-3. A forecaster predicts the **next 10-minute demand window**.
-4. An optimizer uses predicted demand, UPF capacity, topology and eligibility constraints to produce a recommended distribution across UPFs.
+The system has two execution planes joined by versioned data contracts.
 
-The synthetic environment therefore needs to generate the same conceptual information expected from the real system.
+~~~text
+HIGH-FIDELITY PLANE
 
-### 2.1 Required telemetry
+PacketRusher ----> free5GC control plane ----> UPF-1 / UPF-2 / UPF-3 ----> DNs
+                       ^                         |
+UERANSIM smoke tests   |                         +--> N3/N6 telemetry
+                       |
+                 SMF selection hook
+                       ^
+                       |
+                  atomic policy
+
+MACRO/HPC PLANE
+
+scenario manifest --> 30 s session-cohort simulator --> canonical Parquet
+                                                        |
+                             bucket aggregation <--------+
+                                      |
+                                  forecast
+                                      |
+                                  HiGHS LP
+                                      |
+                               policy validator
+                                      |
+                          controller evaluation/audit
+~~~
+
+The same Forecast, UPFState, Policy, and SelectionAudit contracts are used in both planes. Only telemetry and enforcement adapters differ.
+
+## 3. Decision timing
+
+### 3.1 Normal one-step operation
+
+Let T be a UTC-aligned 10-minute boundary. At T:
+
+1. Close the completed bucket [T−10 min, T).
+2. Use only observations with event time earlier than T.
+3. Forecast demand for [T, T+10 min).
+4. Read a fresh UPFState, solve the allocation problem, and validate the result.
+5. Atomically activate the policy for [T, T+10 min).
+
+Steps 1–5 must complete within 60 seconds of T. The evaluation records each component's latency and total telemetry-to-policy latency. A late policy is rejected rather than silently applied to the wrong window.
+
+Prometheus scrapes every 30 seconds. The aggregator may use a short, fixed watermark allowance inside the 60-second budget, but it must never incorporate data from the target window into its forecast features.
+
+~~~text
+... [T-10 min, T) ................. [T, T+10 min) ...
+        completed bucket       forecast, solve, activate
+                                      <= 60 s
+~~~
+
+### 3.2 Deployments requiring a full-window actuation lead
+
+If the enforcement path needs ten minutes of lead time, the controller must explicitly use a two-step target:
+
+- at T, close [T−10 min, T);
+- forecast [T+10 min, T+20 min); and
+- publish the result with valid_from = T+10 min.
+
+The already published policy remains active for [T, T+10 min). Configuration must state forecast_horizon_steps = 2. The system must never label a two-step forecast as “next window” or silently skip [T, T+10 min).
+
+## 4. Demand, traffic, and session semantics
+
+The simulator and schemas keep the following quantities distinct:
+
+| Quantity | Meaning |
+|---|---|
+| Offered UL/DL demand | Bytes or bits applications attempt to send before UPF congestion |
+| Carried N3/N6 traffic | Traffic successfully forwarded across the measured interface |
+| Queued traffic | Offered work retained for later service |
+| Dropped traffic | Offered work discarded after admission or while queued |
+| Rejected traffic | Demand not admitted, including failed new sessions |
+| Active sessions | Sessions alive during the sample or bucket |
+| New sessions | Sessions established during the bucket |
+| Existing residual load | Next-window load from sessions anchored before the decision |
+
+Carried throughput is congestion-limited and is not a demand label. Offered demand must come from the traffic generator, application/session model, or an equivalent source-side measurement. The high-fidelity plane records both generator-side offered bytes and UPF-side carried bytes.
+
+For every controllable group g, the forecaster produces:
+
+- new-session arrivals Âg for the target window;
+- UL and DL bandwidth generated by those arrivals, D̂new,UL,g and D̂new,DL,g; and
+- UL/DL residual load plus surviving-session count for sessions already anchored to each UPF.
+
+The next-window load controllable by v1 is:
+
+\[
+\kappa =
+\frac{\sum_g(\hat D^{new,UL}_g+\hat D^{new,DL}_g)}
+{\sum_u(\hat R^{UL}_u+\hat R^{DL}_u)+
+ \sum_g(\hat D^{new,UL}_g+\hat D^{new,DL}_g)}
+\]
+
+Report κ overall and per group. It is a workload property, not a controller achievement.
+
+### 4.1 Session model
+
+Each generated session has:
+
+- stable, pseudonymous session identifier;
+- arrival time and lifetime;
+- zone/site, DNN, and S-NSSAI;
+- one or more QoS attributes, including 5QI when known;
+- time-varying offered UL/DL demand;
+- anchored UPF and establishment outcome; and
+- departure or failure time.
+
+The macro simulator advances in deterministic 30-second steps and represents sessions as cohorts when individual simulation is unnecessary. Cohorts preserve arrival time, lifetime distribution, group, anchored UPF, UL/DL demand distribution, and random-stream state. Congestion is applied only after offered demand is generated.
+
+Workloads include daily and weekly seasonality, stochastic bursts, crowd-event ramps, churn, long-lived sessions, UPF failures/capacity degradation, link degradation, and telemetry faults. Showcase crowd events must generate enough new sessions to make steering observable. Long-lived-session scenarios deliberately expose the v1 control limitation.
+
+## 5. Controllability and metadata
+
+### 5.1 Selection key
+
+The v1 UPF-selection group is:
+
+~~~text
+(zone/site, DNN, S-NSSAI)
+~~~
+
+This key is limited to information the selected SMF integration can observe before choosing a UPF. 5QI remains a traffic/QoS attribute and may be a forecasting dimension when reliable. It becomes part of the selection key only after an integration test proves that it is available at selection time for all relevant session paths.
+
+Topology configuration is the source of truth for group-to-UPF eligibility, locality, and latency limits. A group with no healthy eligible UPF is a structural infeasibility, not a zero-weight policy.
+
+### 5.2 Session and TEID metadata
+
+Maintain a time-versioned mapping from TEID and PDU-session identifiers to:
+
+- pseudonymous session identifier;
+- selected UPF and interfaces;
+- zone/site and gNB;
+- DNN and S-NSSAI;
+- QoS-flow attributes, including 5QI where observed;
+- mapping validity interval; and
+- policy ID used at establishment.
+
+Prometheus series use only bounded labels such as UPF, interface, direction, and health state. Do not export every session or every possible DNN/slice/zone/5QI combination. Detailed session, TEID, selection, and per-group records are written to partitioned Parquet and joined offline.
+
+## 6. Telemetry pipeline
+
+### 6.1 Raw collection
+
+Collect, at minimum:
+
+- cumulative N3/N6 UL/DL byte and packet counters;
+- generator-side offered UL/DL bytes;
+- carried, queued, dropped, and rejected bytes/packets;
+- active and newly established sessions;
+- session-establishment failures;
+- UPF health and restart identity;
+- directional effective capacity and session capacity; and
+- diagnostic CPU, memory, queue, and path-latency measurements.
+
+External interface or TC/eBPF telemetry is preferred where core-specific metric semantics are incomplete. CPU, memory, and queue metrics are model features and diagnostics until saturation testing establishes their relation to capacity.
+
+### 6.2 Counter reconstruction
+
+For two valid samples of a cumulative counter C at times ti−1 and ti:
+
+\[
+r_i = \frac{8(C_i-C_{i-1})}{t_i-t_{i-1}}
+\]
+
+The implementation must:
+
+1. sort and deduplicate by source event time and sample identity;
+2. verify matching source, unit, interface, counter identity, and reset_epoch;
+3. compute a rate only when the delta is non-negative and elapsed time is valid;
+4. invalidate an interval spanning a reset, restart, or unknown discontinuity;
+5. mark uncovered expected scrape time as missing; and
+6. retain late samples for audit while honoring the bucket watermark.
+
+Never average raw byte or packet counters. Never interpret a negative delta as traffic. A restart or reset begins a new reset_epoch; it must not create an artificial spike.
+
+### 6.3 Ten-minute bucket
+
+Rates are assigned by covered event-time duration to half-open buckets [start, end). Each completed DemandBucket preserves, for every metric:
+
+- time-weighted mean;
+- p95 and maximum of valid 30-second rates;
+- covered and expected duration;
+- missing fraction;
+- reset count; and
+- restart status/count.
+
+Traffic fields separately store offered, carried, queued, dropped, and rejected UL/DL quantities. Session fields store mean/max active sessions, new sessions, surviving sessions, departures, and establishment failures. Missing values remain missing; they are not silently converted to zero.
+
+Prometheus is the online collection system. Versioned Parquet is the canonical offline corpus.
+
+## 7. Versioned data contracts
+
+All records carry schema_version, scenario_id or deployment_id, event/measurement time, producer version, and traceable units. Schema changes follow backward-compatible minor versions and breaking major versions.
+
+### 7.1 TelemetrySample v1
+
+~~~yaml
+schema_version: "telemetry-sample/1.0"
+sample_id: string
+event_time: timestamp_utc
+received_time: timestamp_utc
+source: {type: string, id: string}
+metric: string
+dimensions:
+  upf_id: string|null
+  interface: n3|n6|null
+  direction: ul|dl|null
+value: number|null
+unit: bytes_total|packets_total|bytes|packets|sessions|ratio|milliseconds
+is_counter: boolean
+reset_epoch: int64|null
+valid: boolean
+validity_flags: [string]
+restart_id: string|null
+~~~
+
+### 7.2 DemandBucket v1
+
+~~~yaml
+schema_version: "demand-bucket/1.0"
+window: {start: timestamp_utc, end: timestamp_utc}
+group: {zone: string, dnn: string, snssai: string, five_qi: int|null}
+upf_id: string|null
+traffic:
+  offered_ul_bytes: int64|null
+  offered_dl_bytes: int64|null
+  carried_ul_bytes: int64|null
+  carried_dl_bytes: int64|null
+  queued_ul_bytes: int64|null
+  queued_dl_bytes: int64|null
+  dropped_ul_bytes: int64|null
+  dropped_dl_bytes: int64|null
+  rejected_ul_bytes: int64|null
+  rejected_dl_bytes: int64|null
+sessions:
+  active_mean: number|null
+  active_max: int64|null
+  new: int64|null
+  surviving: int64|null
+  departed: int64|null
+  establishment_failures: int64|null
+qos:
+  latency_p95_ms: number|null
+  latency_max_ms: number|null
+rate_statistics:
+  # mean, p95, and max for each reconstructed directional rate
+data_quality:
+  missing_fraction: number
+  reset_count: int64
+  restart_count: int64
+  restarted: boolean
+  late_sample_count: int64
+  validity_flags: [string]
+~~~
+
+### 7.3 Forecast v1
+
+~~~yaml
+schema_version: "forecast/1.0"
+forecast_id: string
+issued_at: timestamp_utc
+source_window_end: timestamp_utc
+target_window: {start: timestamp_utc, end: timestamp_utc}
+horizon_steps: 1|2
+group: {zone: string, dnn: string, snssai: string, five_qi: int|null}
+new_session_count: {p50: number, p90: number, p95: number}
+new_load_mbps:
+  ul: {p50: number, p90: number, p95: number}
+  dl: {p50: number, p90: number, p95: number}
+existing_load_by_upf:
+  - upf_id: string
+    surviving_sessions: {p50: number, p95: number}
+    ul_mbps: {p50: number, p95: number}
+    dl_mbps: {p50: number, p95: number}
+model_version: string
+quality_flags: [string]
+~~~
+
+### 7.4 UPFState v1
+
+~~~yaml
+schema_version: "upf-state/1.0"
+measurement_time: timestamp_utc
+upf_id: string
+capacity_mbps: {ul: number, dl: number}
+safe_utilization: {ul: number, dl: number}
+session_capacity: int64
+session_safe_utilization: number
+health: healthy|degraded|unavailable|unknown
+zone: string
+eligible_groups: [string]
+path_latency_ms_by_zone: {zone_id: number}
+state_ttl_seconds: int
+calibration_version: string
+~~~
+
+### 7.5 Policy v1
+
+~~~yaml
+schema_version: "policy/1.0"
+policy_id: string
+policy_version: int64
+created_at: timestamp_utc
+validity: {from: timestamp_utc, until: timestamp_utc}
+forecast_id: string
+upf_state_time: timestamp_utc
+solver:
+  name: highs
+  status: optimal|feasible_with_slack|infeasible|timeout|error
+  runtime_ms: int64
+constraint_slack:
+  ul_mbps_by_upf: {upf_id: number}
+  dl_mbps_by_upf: {upf_id: number}
+  sessions_by_upf: {upf_id: number}
+groups:
+  - key: {zone: string, dnn: string, snssai: string}
+    weights: {upf_id: number}
+fallback: {used: boolean, reason: string|null, source_policy_id: string|null}
+validator_version: string
+~~~
+
+### 7.6 SelectionAudit v1
+
+~~~yaml
+schema_version: "selection-audit/1.0"
+timestamp: timestamp_utc
+session_id_hash: string
+session_hash_value: string
+group: {zone: string, dnn: string, snssai: string}
+eligible_upfs: [string]
+requested_weights: {upf_id: number}
+selected_upf: string|null
+policy_id: string|null
+reason: optimizer_weighted|fallback_last_safe|fallback_static|no_eligible_upf
+~~~
+
+Parquet datasets are partitioned by schema major version, campaign/deployment, date, scenario, and seed where appropriate. Every experiment shard also records git commit, component versions, configuration hashes, host/job ID, and random seed.
+
+## 8. Forecasting
+
+Use chronological feature generation and splits. A feature at T may depend only on records with event time earlier than T. Hold out scenario templates, seeds, demand regimes, and selected topologies in addition to time ranges so a model cannot memorize event shapes.
+
+Required baselines:
+
+1. seasonal naive;
+2. moving average; and
+3. LightGBM quantile models for p50, p90, and p95.
+
+Useful inputs include lagged offered demand, new-session arrivals, surviving sessions, time-of-day/week, event indicators available before T, mobility/zone transitions, recent growth, and data-quality flags. Carried traffic may be a feature but never replaces the offered-demand target.
+
+Evaluate arrival and UL/DL load forecasts separately using MAE/WAPE where defined, pinball loss, and empirical quantile coverage. Report performance by ordinary, crowd-event, failure, missing-telemetry, and long-lived-session regimes.
+
+## 9. Capacity model and calibration
+
+Each UPF has independent:
+
+- UL throughput capacity;
+- DL throughput capacity;
+- active-session capacity;
+- health state;
+- supported DNN/S-NSSAI combinations; and
+- zone-to-UPF locality/latency limits.
+
+N3 and N6 measurements are retained separately for diagnosis. The optimization capacity definition must name the bottleneck it represents and must not add N3 and N6 byte counts as if they were independent demand.
+
+PacketRusher saturation sweeps vary session count, offered UL/DL rates, packet-size distribution, CPU allocation, and traffic mix. A calibrated UPFState identifies the sustained operating envelope before unacceptable loss, latency, or session failures. Calibration produces separate directional and session safe limits with a version and confidence range.
+
+The macro simulator applies:
+
+\[
+Q^d_u(t+\Delta t)=
+\max(0,Q^d_u(t)+O^d_u(t)-C^d_u(t)\Delta t)
+\]
+
+for direction d ∈ {UL, DL}, followed by configured queue limits, drops, and carried traffic. Session admission has an independent capacity and failure rule. Capacity degradation and failure events change effective capacity and health before service is calculated.
+
+## 10. Linear optimizer
+
+### 10.1 Decision and inputs
+
+\[
+p_{g,u}\in[0,1]
+\]
+
+is the probability that a new session in selection group g is assigned to eligible UPF u.
+
+Inputs for the target window are:
+
+- forecast new-session count Âg;
+- forecast new UL/DL load D̂d,g from those sessions;
+- residual UL/DL load R̂d,u and surviving sessions Ŝu from existing sessions;
+- directional safe capacities Kd,u;
+- safe active-session capacity Nu;
+- eligibility, health, and locality/latency constraints; and
+- previous policy pprev,g,u.
+
+Use a declared planning quantile, initially p95 for showcase safety evaluation. The same quantile choice applies consistently to demand and residual forecasts.
+
+### 10.2 Projected load
+
+\[
+L^d_u=\hat R^d_u+\sum_g p_{g,u}\hat D^d_g
+\]
+
+\[
+N^{active}_u=\hat S_u+\sum_g p_{g,u}\hat A_g
+\]
+
+The implementation may replace the second expression with a calibrated expected number of arrivals still active at window end, but it must document that survival factor.
+
+### 10.3 Constraints
+
+\[
+\sum_{u\in E(g)}p_{g,u}=1 \quad \forall g
+\]
+
+\[
+p_{g,u}=0
+\quad\text{when u is ineligible, unavailable, or violates a hard latency limit}
+\]
+
+Introduce z ∈ [0,1] as maximum safe-envelope utilization and non-negative overload slacks sUL,u, sDL,u, and sN,u:
+
+\[
+L^{UL}_u \le zK^{UL}_u+s^{UL}_u
+\]
+
+\[
+L^{DL}_u \le zK^{DL}_u+s^{DL}_u
+\]
+
+\[
+N^{active}_u \le zN_u+s^N_u
+\]
+
+Absolute policy changes are linearized with auxiliary variables $c_{g,u}$ satisfying $c_{g,u} ≥ p_{g,u}-p^{prev}_{g,u}$ and $c_{g,u} ≥ p^{prev}_{g,u}-p_{g,u}$.
+
+### 10.4 Objective and status
+
+The first implementation uses the HiGHS linear-programming solver:
+
+\[
+\min
+M\sum_u\left(
+\frac{s^{UL}_u}{K^{UL}_u}+
+\frac{s^{DL}_u}{K^{DL}_u}+
+\frac{s^N_u}{N_u}\right)
++\lambda_z z
++\lambda_l\sum_{g,u}\ell_{g,u}p_{g,u}
++\lambda_c\sum_{g,u}c_{g,u}
+\]
+
+M is chosen and tested to dominate maximum-utilization, locality, and churn costs. Locality cost ℓ is finite only for allowed paths; hard eligibility and latency limits remain constraints.
+
+The result status is:
+
+- optimal when all capacity slacks are zero within tolerance;
+- feasible_with_slack when the LP solves but projected overload remains;
+- infeasible for missing eligible/healthy paths or solver-proven infeasibility;
+- timeout or error otherwise.
+
+Capacity slack is surfaced in the Policy and dashboards. A feasible_with_slack policy may be published only under an explicitly configured degraded-mode rule. An infeasible, timed-out, or malformed result is never renormalized into an apparently valid policy.
+
+## 11. Policy publication, fallback, and enforcement
+
+### 11.1 Validator
+
+Before publication, independently verify:
+
+- supported schema and monotonic policy version;
+- exact target validity interval and activation lead;
+- no stale, expired, or overlapping policy;
+- finite weights in [0,1] summing to 1 within tolerance;
+- weights only on eligible, healthy UPFs;
+- current UPFState within its TTL;
+- directional and session projections reproduced from policy inputs;
+- solver status and allowed slack; and
+- configured churn/hysteresis limits.
+
+Publish atomically with compare-and-swap on policy_version. Readers see either the complete old policy or complete new policy, never a partial update.
+
+Fallback order is:
+
+1. the last known safe policy, if still valid for the group and current health/eligibility state;
+2. static capacity-weighted placement across currently healthy eligible UPFs; or
+3. explicit session rejection when no eligible UPF exists.
+
+Every fallback is recorded in Policy and SelectionAudit.
+
+### 11.2 Deterministic weighted rendezvous selection
+
+For a stable session key k and every eligible UPF with weight wu > 0:
+
+1. compute a cryptographic hash of (k, policy_id, upf_id);
+2. map it deterministically to Uu in the open interval (0,1);
+3. compute scoreu = −ln(Uu)/wu; and
+4. select the UPF with the smallest score, using upf_id as the deterministic tie-breaker.
+
+The session key is built from stable, pseudonymized session data such as SUPI hash, PDU-session ID, DNN, and S-NSSAI. Existing sessions remain anchored when a policy changes.
+
+For each group/window report requested weights, realized session counts/shares, realized offered load shares, and sampling error. With at least 100 new sessions in a group/window, realized session share must be within 10 percentage points of the requested share for every destination.
+
+### 11.3 free5GC integration boundary
+
+free5GC documents multiple UPFs, ULCL, multiple slices/DNNs, and Traffic Influence. Its Traffic Influence examples use traffic filters and DNAI/application routes and may influence UPF (re)selection; they do not establish a general per-group weighted session-balancing API. Demo v1 therefore implements a custom new-session selection hook at the SMF integration point. See [free5GC features](https://free5gc.org/guide/features/) and [Traffic Influence](https://free5gc.org/guide/8-traffic-influence/).
+
+Traffic Influence, ULCL, application-path steering, and selected existing-session modification remain post-v1 experiments.
+
+## 12. Simulation stack
+
+### 12.1 High-fidelity plane
+
+- **free5GC:** one control plane and three UPFs.
+- **PacketRusher:** session and user-plane load, crowd-event generation, and saturation sweeps.
+- **UERANSIM:** small functional smoke tests for registration, PDU-session establishment, DNN/slice configuration, and end-to-end reachability.
+- **Prometheus:** 30-second collection from generator, UPF interfaces, session state, and host diagnostics.
+- **Custom SMF hook:** deterministic weighted selection for new sessions.
+
+Bring-up order is one UPF first, then three. Do not begin weighted steering until registration, PDU sessions, N3/N6 traffic, teardown, and independent UPF counters pass.
+
+### 12.2 Macro plane
+
+Implement a deterministic Python/NumPy discrete-time simulator with:
+
+- 30-second steps and half-open time intervals;
+- explicit random seeds and independent random streams;
+- session arrivals, lifetimes, cohorts, and churn;
+- offered UL/DL demand before congestion;
+- directional capacity, queues, carried load, drops, and rejects;
+- active-session capacity;
+- health, capacity, topology, and latency events;
+- scrape gaps, late samples, counter resets, and restarts;
+- controller plug-ins using the same Policy contract; and
+- canonical Parquet plus experiment metadata.
+
+Re-running the same manifest, seed, and component versions must reproduce the same outputs byte-for-byte where library/runtime determinism permits, otherwise within documented numeric tolerances.
+
+### 12.3 Optional RAN calibration
+
+5G-LENA is post-v1 and may calibrate traffic, QoS, and RAN effects. Its feature matrix states that EPC/5GC integration is via the LTE-EPC model, so it is not the multi-UPF 5GC being controlled here. See the [5G-LENA feature matrix](https://5g-lena.cttc.es/features/).
+
+## 13. Cluster capability gate
+
+Before scheduling any high-fidelity replica, Stage 0 records a pass/fail/unknown matrix for:
+
+- SLURM version and job-array behavior;
+- Docker, Podman, or Apptainer/Singularity support;
+- TUN/TAP creation and network namespaces;
+- SCTP availability;
+- GTP5G kernel/module availability;
+- CAP_NET_ADMIN;
+- eBPF load/attach permissions;
+- inter-node UDP/TCP reachability on allocated nodes;
+- shared scratch capacity/quotas; and
+- job-local SSD/NVMe or temporary storage.
+
+The probe must be a reproducible SLURM job and must clean up only resources it created.
+
+Deployment choice:
+
+- **Privileged pass:** run isolated free5GC replicas only on suitable allocated nodes. Each replica has its own namespaces, ports, addresses, storage, and scenario ID.
+- **Privilege failure or uncertainty:** keep free5GC, UPFs, and load generators on a dedicated privileged machine. Use all cluster nodes for macro simulation, forecasting, optimization, and optional ns-3 campaigns.
+
+The cluster never acts as one distributed 5G core for this experiment.
+
+## 14. Experiment design
+
+### 14.1 Controllers
+
+Run all controllers against identical manifests and random streams:
+
+1. static deterministic hash;
+2. reactive threshold placement;
+3. forecast plus capacity-proportional heuristic;
+4. forecast plus constrained HiGHS optimizer; and
+5. oracle-demand optimizer as an upper bound, never as a deployable result.
+
+Paired runs share session arrivals, lifetimes, offered demand, failures, and telemetry-fault schedules. Controller-specific random choices are eliminated by deterministic hashing.
+
+### 14.2 Showcase scenarios
 
 At minimum:
 
-- per-UPF N3 throughput
-  - UL packet counters
-  - DL packet counters
-  - UL byte counters
-  - DL byte counters
-- per-UPF N6 throughput
-- active PDU-session count per UPF
-- traffic dimensions where applicable:
-  - DNN
-  - S-NSSAI / slice
-  - 5QI or traffic class
-  - zone/site/location
-- timestamps and units
-- missing-sample indicators
-- counter-reset indicators
-- UPF restart/failure indicators
+- a Zone-A crowd event with at least 100 new sessions per affected group/window;
+- the same event with a directional UL bottleneck;
+- a UPF capacity degradation during a demand ramp;
+- missing scrapes plus counter reset/restart;
+- low churn with long-lived high-bandwidth sessions; and
+- a topology/locality constraint that removes a tempting remote UPF.
+
+Run at least 30 paired seeds per showcase scenario. Report paired effect sizes and bootstrap 95% confidence intervals.
+
+### 14.3 Metrics
+
+Primary control metrics:
+
+- overload duration above the calibrated safe envelope;
+- overload area, the time integral of utilization beyond the safe envelope;
+- dropped/queued/rejected UL and DL demand;
+- session-establishment failure rate; and
+- p95/p99 latency where the model is calibrated.
+
+Control and operational metrics:
+
+- controllable-load fraction κ;
+- requested versus realized placement shares;
+- policy changes and total-variation churn;
+- locality/latency cost;
+- solver status, capacity slack, and runtime;
+- aggregation, forecast, validation, publication, and total latency; and
+- fallback and stale-policy counts.
 
-### 2.2 Required configuration/state
+Forecast metrics are reported separately and never substituted for closed-loop outcomes.
+
+### 14.4 Leakage controls
+
+Train/validation/test splits are chronological. Test data also holds out selected:
+
+- scenario templates;
+- random seeds;
+- demand regimes and event magnitudes; and
+- topology/capacity configurations.
+
+Preprocessing statistics and model selection use training data only. Oracle demand is isolated in the evaluator and cannot enter deployable controller features.
+
+## 15. Verification and acceptance
+
+### 15.1 Unit and contract tests
+
+- Counter-to-rate reconstruction error is below 1% in fault-free synthetic tests.
+- Resets, restarts, missing/late/duplicate samples, and bucket boundaries never create artificial spikes.
+- Every bucket retains mean, p95, maximum, missing fraction, reset count, and restart status.
+- Offered demand remains unchanged when capacity is reduced; carried, queued, dropped, and rejected quantities change consistently.
+- Schema fixtures round-trip without unit or timestamp ambiguity.
+- The simulator reproduces a fixed golden manifest and seed.
+
+### 15.2 Optimizer and policy tests
+
+- Hand-solvable topologies match expected allocations and load projections.
+- UL, DL, session, health, eligibility, and hard-latency constraints are independently exercised.
+- Deliberately impossible eligibility returns infeasible and publishes no normalized solver policy.
+- Deliberate capacity shortage returns explicit slack and degraded status.
+- Every published policy passes independent normalization, eligibility, health, capacity, freshness, overlap, and expiry validation.
+- Concurrent readers never observe a partially published policy.
+- Small three-UPF/two-zone optimization completes in under one second.
+
+### 15.3 Integration and statistical acceptance
+
+- Full bucket-close-to-policy latency is under 60 seconds.
+- With at least 100 new sessions per group/window, realized shares meet the 10-percentage-point allocation tolerance.
+- Thirty or more paired seeds are used for every showcase scenario.
+- Demo v1 reduces overload duration or area by at least 20% versus static placement, does not regress versus reactive placement, and does not increase session failures.
+- Low-churn scenarios explicitly report low κ and show when new-session steering cannot remove residual overload.
+
+No acceptance statement may combine UL and DL into a single passing average when either directional constraint fails.
+
+## 16. Implementation sequence and gates
+
+1. **Architecture and contracts:** approve this v2, freeze v1 schema fixtures, and choose the primary overload metric.
+2. **Capability probe:** select privileged or split deployment.
+3. **Macro simulator:** deterministic sessions/cohorts, offered and carried traffic, directional/session capacity, and Parquet output.
+4. **Fault/event library:** crowd events, long-lived sessions, UPF/link failures, and telemetry faults.
+5. **Forecasting:** seasonal-naive, moving-average, and LightGBM quantile baselines with leakage tests.
+6. **Optimization/control:** HiGHS LP, validator, atomic publication, fallback, rendezvous hashing, and audit records.
+7. **One-UPF smoke test:** registration, PDU session, N3/N6 traffic, and telemetry.
+8. **Three-UPF calibration:** PacketRusher saturation sweeps for directional and session limits.
+9. **SMF hook:** weighted deterministic selection and requested/realized share logging.
+10. **Closed-loop evaluation:** paired controllers and 30-seed showcase campaigns.
+11. **Cluster scale-out:** independent scenario arrays and reproducible aggregation.
+12. **Post-v1:** 5G-LENA calibration, ULCL/Traffic Influence, and research on existing-session changes.
+
+Each step produces versioned artifacts and must pass its tests before the dependent step begins.
+
+## 17. Recommended repository layout
+
+~~~text
+configs/               topology, capacities, traffic, events
+schemas/               six versioned contracts and fixtures
+simulator/macro/       deterministic 30 s simulator
+telemetry/             exporters, adapters, aggregation
+forecasting/           baselines, features, inference
+optimization/          HiGHS model and solution reports
+steering/              validator, policy store, SMF hook, hashing
+core/free5gc/          isolated high-fidelity deployment
+generators/            PacketRusher and UERANSIM configurations
+experiments/           manifests, SLURM jobs, paired evaluator
+calibration/           saturation sweeps and fitted envelopes
+output/                immutable partitioned Parquet results
+~~~
 
-- UPF identifier
-- UPF site/zone
-- nominal maximum throughput
-- maximum sessions
-- recommended operating threshold
-- available N3/N6/N9 connectivity
-- topology between RAN, UPFs and data networks
-- eligibility matrix such as:
+The topology IDs and group keys in configs are canonical. Adapters may translate external names but no subsystem invents its own identifiers.
 
-\[
-E_{z,c,u} \in \{0,1\}
-\]
+## 18. Demo handoff
 
-where `E[z,c,u] = 1` means traffic group `c` in zone `z` may use UPF `u`.
+The demo presents static, reactive, and predictive runs side-by-side using the same seed. It shows:
 
-### 2.3 Optional but highly valuable measurements
+- offered versus carried UL/DL demand;
+- residual versus new-session load;
+- κ, active sessions, new sessions, and failures;
+- directional capacity and overload area;
+- forecast quantiles and actual target-window demand;
+- requested and realized UPF shares;
+- solver status, slack, active/fallback policy, and latency; and
+- confidence intervals across the paired campaign.
 
-- UPF CPU utilization
-- UPF memory utilization
-- queue occupancy
-- packet-processing utilization
-- packet drops
-- PFCP session counts
-- PDU-session establishment latency
-- RTT / path latency
+The correct v1 conclusion is conditional:
 
-### 2.4 Traffic-generation capabilities
+> Forecast-driven new-session steering reduces overload when enough target-window load comes from newly arriving sessions and eligible UPF headroom exists. It cannot rebalance load already anchored in long-lived sessions.
 
-The simulator must support more than flat random load. It should include:
+## References
 
-- daily patterns
-- weekday/weekend differences
-- stochastic bursts
-- different demand per DNN/slice/5QI/zone
-- scripted crowd events
-- mobility-driven changes between zones
-- UPF failures/restarts
-- topology/link degradation
-- telemetry gaps and delayed observations
-
----
-
-# Part II — Recommended Multi-Fidelity Simulation Stack
-
-## 3. Why One Simulator Is Not Enough
-
-There are two conflicting objectives:
-
-### Objective A — Protocol fidelity
-
-We need real concepts such as:
-
-- N2 / NGAP
-- N3 / GTP-U
-- N4 / PFCP
-- PDU sessions
-- SMF selection
-- UPF state
-- DNN
-- S-NSSAI
-- 5QI/QoS
-- ULCL / multi-UPF paths
-
-A real open-source 5G core is best for this.
-
-### Objective B — statistical scale
-
-We also want:
-
-- many simulated weeks/months
-- millions of traffic conditions
-- thousands of topologies/capacity configurations
-- rare failures
-- many random seeds
-- large optimizer comparisons
-
-Packet-level 5G emulation is unnecessarily expensive for this.
-
-Therefore:
-
-```text
-                HIGH FIDELITY                        HIGH SCALE
-
- UE/RAN simulator -> real 5GC -> real UPF        fast event/flow simulator
-         |                    |                           |
-         |                    |                           |
-         +---- calibration ---+---------------------------+
-                              |
-                              v
-                     unified data schema
-```
-
-The fast simulator should be **calibrated against high-fidelity experiments**, not invented independently.
-
----
-
-## 4. Component Selection
-
-## 4.1 Primary 5G core: free5GC
-
-**Recommendation for Phase 1: free5GC.**
-
-Reasons:
-
-- 5G Standalone core
-- SMF + UPF + PFCP
-- N3/N4/N6/N9
-- multiple UPFs
-- multiple slices and DNNs
-- ULCL
-- PDU Session Modification
-- configurable user-plane topology
-- UPF selection by S-NSSAI / topology
-- Traffic Influence through UDR/NEF
-
-The SMF configuration explicitly represents user-plane nodes and links, which maps naturally to the optimizer's topology and eligibility constraints.
-
-### Documented reference
-
-- free5GC features: https://free5gc.org/guide/features/
-- free5GC SMF/user-plane topology: https://free5gc.org/guide/SMF-Config/
-- free5GC Traffic Influence: https://free5gc.org/guide/8-traffic-influence/
-
-### Important implementation distinction
-
-free5GC provides mechanisms for topology selection and Traffic Influence, but the proposed optimizer emits **continuous allocation weights**, for example:
-
-```json
-{
-  "group": {
-    "zone": "zone-a",
-    "snssai": "1-010203",
-    "dnn": "internet",
-    "5qi": 9
-  },
-  "weights": {
-    "upf-1": 0.10,
-    "upf-2": 0.55,
-    "upf-3": 0.35
-  }
-}
-```
-
-An arbitrary weighted new-session selector is not assumed to exist as a standard free5GC API. **Phase 1 should therefore add a small custom policy hook in/near the SMF** that consumes optimizer weights and chooses among eligible UPFs for new sessions.
-
-Traffic Influence/ULCL is a separate mechanism and becomes useful in later phases for application-aware or active-flow routing.
-
----
-
-## 4.2 Alternative core: OpenAirInterface 5GC
-
-OAI is a strong second platform after the first prototype works.
-
-The current OAI core advertises:
-
-- multiple UPFs
-- ULCL
-- slicing
-- QoS
-- NWDAF
-- NEF/event-exposure work
-- multiple UPF implementations
-  - simple-switch
-  - eBPF/XDP
-  - VPP/DPDK
-
-Reference: https://openairinterface.org/core-network/
-
-Why use OAI later:
-
-- validate that the proposed method is not tied to one open-source core
-- benchmark a higher-performance UPF dataplane
-- investigate NWDAF integration
-- experiment with eBPF/XDP or VPP/DPDK user planes
-
----
-
-## 4.3 Open5GS: useful for instrumentation experiments
-
-Open5GS is another mature open-source core. Its current Prometheus support covers several control-plane functions, and a JSON information API can expose connected UEs, gNBs and PDU-session information including DNN, S-NSSAI and QoS.
-
-References:
-
-- https://open5gs.org/open5gs/docs/tutorial/04-metrics-prometheus/
-- https://open5gs.org/open5gs/docs/tutorial/07-infoAPI-UE-gNB-session-data/
-
-It is useful as:
-
-- an alternative validation core
-- a source of observability ideas
-- a simpler telemetry experimentation target
-
----
-
-## 4.4 UE/gNB load generation
-
-### PacketRusher
-
-PacketRusher is a high-performance UE/gNB simulator and 5GC control-plane/user-plane load tester. It supports multiple simulated UEs and gNBs and is appropriate for core-load experiments.
-
-Reference software record: https://zenodo.org/records/14927077
-
-Use PacketRusher when the goal is:
-
-- generate many registrations/PDU sessions
-- stress SMF/AMF/core behavior
-- generate user-plane load without PHY fidelity
-- measure UPF capacity/session scaling
-
-### UERANSIM
-
-UERANSIM implements a simulated 5G-SA UE and gNB and can connect to open-source cores. Its physical radio is intentionally simplified; the radio interface is simulated rather than being a full RF/PHY model.
-
-References:
-
-- https://github.com/aligungr/UERANSIM
-- https://github.com/aligungr/UERANSIM/wiki/Configuration
-
-Use UERANSIM for:
-
-- functional integration
-- easy end-to-end PDU-session validation
-- DNN/slice configuration tests
-- small controlled demos
-
-Do **not** use it as the only source of radio/mobility realism.
-
----
-
-## 4.5 RAN + traffic realism: ns-3 with 5G-LENA
-
-5G-LENA is the recommended source for statistically meaningful RAN and application behavior.
-
-Current features include:
-
-- OFDMA/TDMA NR operation
-- 5QI-aware scheduling
-- 5QI handling per flow
-- independent multi-flow UE support
-- QoS-aware scheduling
-- NGMN traffic generators
-- FTP
-- HTTP
-- video
-- gaming
-- VoIP
-- 3GPP XR profiles such as VR/AR/cloud gaming
-
-References:
-
-- https://5g-lena.cttc.es/features/
-- https://cttc-lena.gitlab.io/nr/html/cttc-nr-traffic-ngmn-mixed_8cc.html
-
-### Important limitation
-
-5G-LENA's core integration uses an LTE/EPC-derived abstraction. It should therefore **not be treated as a faithful replacement for a real multi-UPF 5G core**.
-
-Recommended use:
-
-1. simulate realistic demand/RAN behavior
-2. extract statistical traffic models
-3. use those distributions to parameterize the fast macro twin or drive traffic into the high-fidelity core
-
----
-
-## 4.6 Mobility: SUMO + ns-3 when needed
-
-For spatial demand migration, SUMO can provide road mobility and ns-3 can provide communication behavior.
-
-NIST publishes an ns-3 co-simulation gateway that synchronizes ns-3 with external simulators such as SUMO/CARLA.
-
-Reference: https://www.nist.gov/services-resources/software/gateway-co-simulation-using-ns-3
-
-This is optional for Phase 1. Start with synthetic zone transitions first.
-
----
-
-# Part III — High-Fidelity Testbed
-
-## 5. Minimum High-Fidelity Topology
-
-Start small:
-
-```text
-                  +---------------------------+
-                  |       free5GC CP          |
-                  | AMF NRF SMF PCF UDR NSSF |
-                  +-------------+-------------+
-                                |
-                               N4
-                  +-------------+-------------+
-                  |             |             |
-                UPF-1         UPF-2         UPF-3
-                  |             |             |
-                 N6            N6            N6
-                  |             |             |
-                 DN-A          DN-B          DN-C
-
-PacketRusher/UERANSIM gNB
-             |
-             | N2 -> AMF
-             | N3 -> selected UPF
-             v
-        simulated UEs
-```
-
-Initial traffic groups:
-
-```text
-Zone-A / eMBB / internet / 5QI-9
-Zone-A / low-latency / edge / 5QI-X
-Zone-B / eMBB / internet / 5QI-9
-Zone-B / IoT / telemetry / 5QI-Y
-```
-
-Exact 5QI choices should be based on the traffic/QoS profiles selected for the experiment rather than hard-coded blindly.
-
----
-
-## 6. Topology and Eligibility Representation
-
-Maintain one canonical topology configuration owned by the experiment controller.
-
-Example:
-
-```yaml
-zones:
-  zone-a:
-    gnbs: [gnb-a1, gnb-a2]
-  zone-b:
-    gnbs: [gnb-b1, gnb-b2]
-
-upfs:
-  upf-1:
-    zone: zone-a
-    capacity_gbps: 20
-    max_sessions: 50000
-    safe_utilization: 0.80
-  upf-2:
-    zone: zone-a
-    capacity_gbps: 30
-    max_sessions: 75000
-    safe_utilization: 0.80
-  upf-3:
-    zone: zone-b
-    capacity_gbps: 25
-    max_sessions: 60000
-    safe_utilization: 0.80
-
-traffic_groups:
-  - id: zone-a-embb
-    zone: zone-a
-    dnn: internet
-    snssai: "1-010203"
-    five_qi: 9
-    eligible_upfs: [upf-1, upf-2, upf-3]
-
-  - id: zone-b-edge
-    zone: zone-b
-    dnn: edge
-    snssai: "1-112233"
-    five_qi: 7
-    eligible_upfs: [upf-2, upf-3]
-```
-
-This file becomes the bridge between:
-
-- simulator
-- optimizer
-- steering controller
-- demo dashboard
-
-Do not let each subsystem invent its own topology naming.
-
----
-
-# Part IV — Generating Realistic Demand
-
-## 7. Traffic Process
-
-A useful initial demand model is:
-
-\[
-D_{z,c}(t) = B_{z,c}\,S_d(t)\,S_w(t)\,M_{z,c}(t) + E_{z,c}(t) + \epsilon_{z,c}(t)
-\]
-
-where:
-
-- `B[z,c]`: baseline traffic level
-- `S_d(t)`: daily seasonality
-- `S_w(t)`: weekly seasonality
-- `M[z,c](t)`: slow regime multiplier
-- `E[z,c](t)`: event component
-- `epsilon`: residual stochastic variation
-
-### 7.1 Daily seasonality
-
-Use a Fourier representation or empirical spline rather than a single sine wave:
-
-\[
-S_d(t) = 1 + \sum_{k=1}^{K}
-[a_k\sin(2\pi k t/T_d) + b_k\cos(2\pi k t/T_d)]
-\]
-
-This can represent morning, lunch, commuting and evening peaks.
-
-### 7.2 Weekly seasonality
-
-Use separate weekday/weekend multipliers or a periodic 7-day basis.
-
-### 7.3 Regime changes
-
-Use a Markov chain to represent:
-
-- quiet
-- normal
-- busy
-- overloaded/event
-
-This prevents every interval from being independent.
-
-### 7.4 Bursty arrivals
-
-Options:
-
-- Markov-modulated Poisson process
-- negative-binomial arrivals
-- Hawkes process for self-exciting events
-
-Start with a Markov-modulated Poisson process; add Hawkes behavior only if needed.
-
----
-
-## 8. Traffic Mix
-
-A traffic group should describe **what kind of traffic is being generated**, not just a bitrate.
-
-Example population:
-
-```yaml
-traffic_mix:
-  video: 0.30
-  web_http: 0.20
-  gaming: 0.10
-  voip: 0.10
-  file_transfer: 0.10
-  background: 0.15
-  xr: 0.05
-```
-
-Use 5G-LENA to estimate distributions of:
-
-- per-session throughput
-- packet sizes
-- burst durations
-- inter-arrival times
-- latency sensitivity
-- flow duration
-
-Then fit compact distributions that can be sampled by the fast simulator.
-
----
-
-## 9. Event Library
-
-Every synthetic run should draw from an explicit event catalogue.
-
-### 9.1 Crowd/flash event
-
-Parameters:
-
-```yaml
-type: crowd_event
-zone: zone-a
-start: 20:00
-ramp_minutes: 20
-duration_minutes: 120
-peak_multiplier: 4.0
-affected_classes:
-  video: 1.0
-  web: 0.6
-  voice: 0.3
-```
-
-### 9.2 UPF degradation
-
-```yaml
-type: upf_capacity_degradation
-upf: upf-1
-start: 12:15
-duration_minutes: 45
-capacity_multiplier: 0.55
-```
-
-### 9.3 Hard UPF failure
-
-```yaml
-type: upf_failure
-upf: upf-2
-start: 16:30
-recovery_minutes: 8
-```
-
-### 9.4 Link degradation
-
-```yaml
-type: path_degradation
-src: zone-a
-dst: upf-3
-latency_add_ms: 15
-capacity_multiplier: 0.60
-```
-
-### 9.5 Observability failures
-
-Include:
-
-- missing Prometheus scrapes
-- stale telemetry
-- counter reset
-- delayed samples
-- incorrect capacity report
-
-This matters because the real optimizer will eventually operate on imperfect measurements.
-
----
-
-# Part V — UPF and Session Model
-
-## 10. State Variables
-
-For each UPF `u` maintain:
-
-\[
-X_u(t) = [B_u(t), S_u(t), Q_u(t), C_u(t), R_u(t), H_u(t)]
-\]
-
-where:
-
-- `B`: throughput
-- `S`: active sessions
-- `Q`: queue/backlog proxy
-- `C`: current effective capacity
-- `R`: resource utilization
-- `H`: health/failure state
-
-For each traffic group `g=(zone,dnn,slice,5QI)` maintain:
-
-\[
-D_g(t), A_g(t), L_g(t)
-\]
-
-where:
-
-- `D`: offered traffic
-- `A`: active sessions
-- `L`: measured latency/SLA statistic
-
----
-
-## 11. Capacity Calibration
-
-Do **not** assign UPF capacity as an arbitrary constant and stop there.
-
-Run a high-fidelity saturation grid.
-
-Independent variables:
-
-- number of sessions
-- offered Gbps
-- packet-size distribution
-- UL/DL mix
-- traffic mix
-- CPU allocation
-- UPF implementation
-- number of PFCP sessions
-
-Measure:
-
-- achieved throughput
-- packet loss
-- CPU
-- memory
-- queue/backlog
-- latency
-
-Then learn or fit:
-
-\[
-C^{eff}_u = f_u(N_{sessions}, packet\_mix, CPU, direction, traffic\_mix)
-\]
-
-A tree-based regressor or piecewise surface is adequate initially. There is no need for a large neural model.
-
----
-
-## 12. Fast Queue/Capacity Model
-
-At time step `Δt`:
-
-\[
-Q_u(t+\Delta t) = \max\{0, Q_u(t) + A_u(t) - S_u(t)\}
-\]
-
-where:
-
-- `A_u(t)` is arriving traffic/work during the interval
-- `S_u(t)` is service capacity during the interval
-
-A basic utilization is:
-
-\[
-\rho_u(t)=\frac{D_u(t)}{C^{eff}_u(t)}
-\]
-
-Use calibrated nonlinear latency rather than assuming latency grows linearly. For example, fit:
-
-\[
-L_u = g(\rho_u, Q_u, N_{sessions})
-\]
-
-from the high-fidelity experiments.
-
-The macro simulator is responsible for reproducing the **control-relevant behavior**, not every packet.
-
----
-
-# Part VI — Telemetry Instrumentation
-
-## 13. Why External Dataplane Instrumentation Is Recommended
-
-Do not depend entirely on core-specific Prometheus counters because availability and semantics can differ between implementations/versions.
-
-Use Linux telemetry at the UPF boundary.
-
-```text
-                   N3                       N6
- gNB -------------->| UPF |---------------->| DN
-              eBPF/TC     eBPF/TC
-                 |           |
-                 +-----+-----+
-                       |
-                 telemetry exporter
-                       |
-                   Prometheus
-```
-
-Useful mechanisms:
-
-- TC/eBPF counters
-- interface counters
-- `node_exporter`
-- cAdvisor for containers
-- UPF-specific counters where stable
-- SMF session information
-
-### Metrics to export
-
-```text
-upf_n3_rx_bytes_total{upf,zone,dnn,snssai,five_qi}
-upf_n3_tx_bytes_total{upf,zone,dnn,snssai,five_qi}
-upf_n6_rx_bytes_total{upf,dnn}
-upf_n6_tx_bytes_total{upf,dnn}
-upf_active_sessions{upf,zone,dnn,snssai,five_qi}
-upf_cpu_utilization{upf}
-upf_memory_bytes{upf}
-upf_queue_depth{upf}
-upf_health{upf}
-```
-
-If exact packet classification at all these label combinations is too expensive, retain a minimal label set and keep a separate session table linking TEID/session to metadata.
-
----
-
-## 14. Canonical Raw Data Schema
-
-Recommended Parquet/Arrow logical schema:
-
-```text
-timestamp                    timestamp[ms]
-scenario_id                  string
-run_seed                     int64
-upf_id                       string
-zone_id                      string
-dnn                          string
-snssai_sst                   int16
-snssai_sd                    string
-five_qi                      int16
-n3_ul_bytes_total            int64
-n3_dl_bytes_total            int64
-n3_ul_packets_total          int64
-n3_dl_packets_total          int64
-n6_ul_bytes_total            int64
-n6_dl_bytes_total            int64
-active_sessions              int32
-cpu_utilization              float32
-memory_utilization           float32
-queue_depth                  float32
-path_latency_ms              float32
-upf_available                bool
-counter_reset                bool
-sample_missing               bool
-current_capacity_mbps        float32
-event_id                     string|null
-```
-
-### Why Parquet
-
-Prefer Parquet for the HPC-generated corpus because it provides:
-
-- columnar compression
-- predicate pushdown
-- efficient partitioning
-- compatibility with Python/Polars/PyArrow/Spark/DuckDB
-
-Prometheus remains the **online demo telemetry system**; Parquet is the **offline experimental corpus**.
-
----
-
-## 15. Ten-Minute Aggregation
-
-For a monotonically increasing byte counter `B(t)`, throughput over a window is:
-
-\[
-R(t_0,t_1) = \frac{8[B(t_1)-B(t_0)]}{t_1-t_0}
-\]
-
-with explicit handling for:
-
-- counter reset
-- UPF restart
-- missing interval
-
-Per 10-minute bucket store:
-
-```text
-window_start
-window_end
-traffic_group
-mean_throughput_mbps
-p95_throughput_mbps
-max_throughput_mbps
-mean_active_sessions
-max_active_sessions
-mean_cpu
-max_cpu
-missing_fraction
-restart_count
-```
-
-The forecaster should consume **completed 10-minute buckets**, not raw 30-second counters.
-
----
-
-# Part VII — HPC Execution Architecture
-
-## 16. Do Not Build One Giant Simulation
-
-The standard cluster should run many independent scenarios.
-
-Given:
-
-- 160 standard nodes
-- 128 CPUs/node
-- ~20,480 CPUs total
-
-use a scenario-array model:
-
-```text
-                          SLURM
-                            |
-                    scenario manifest
-                            |
-       +--------------------+--------------------+
-       |                    |                    |
-     node 1               node 2              node 160
-       |                    |                    |
-  seed/scenario        seed/scenario        seed/scenario
-  seed/scenario        seed/scenario        seed/scenario
-       |                    |                    |
-       +--------------------+--------------------+
-                            |
-                     partitioned Parquet
-```
-
-### Recommended execution modes
-
-#### Mode A — high-fidelity campaign
-
-Small number of expensive jobs:
-
-```text
-free5GC + PacketRusher/UERANSIM + multiple UPFs
-```
-
-Purpose:
-
-- calibration
-- protocol validation
-- capacity measurement
-- failure signatures
-
-#### Mode B — 5G-LENA campaign
-
-Thousands of independent ns-3 jobs.
-
-Purpose:
-
-- traffic/RAN distributions
-- QoS behavior
-- mobility effects
-- traffic-class characterization
-
-#### Mode C — macro simulation campaign
-
-Millions of independent trajectories.
-
-Purpose:
-
-- train forecaster
-- test optimizers
-- measure rare overloads
-- test robustness
-- generate long histories
-
----
-
-## 17. SLURM Campaign Pattern
-
-Example directory structure:
-
-```text
-project/
-  configs/
-    topology.yaml
-    traffic_profiles.yaml
-    event_profiles.yaml
-  manifests/
-    campaign_001.parquet
-  simulator/
-  telemetry/
-  optimizer/
-  steering/
-  output/
-    campaign_001/
-      shard_00000.parquet
-      shard_00001.parquet
-      ...
-```
-
-Conceptual SLURM array:
-
-```bash
-#!/bin/bash
-#SBATCH --job-name=upf-sim
-#SBATCH --array=0-9999
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=2G
-
-SCENARIO_ID=${SLURM_ARRAY_TASK_ID}
-./fast_upf_sim \
-  --manifest manifests/campaign_001.parquet \
-  --scenario ${SCENARIO_ID} \
-  --output output/campaign_001/
-```
-
-For CPU-heavy scenarios, allocate multiple cores per task only if profiling demonstrates speedup. It is usually better to exploit parallelism across independent runs.
-
----
-
-## 18. Role of the 32 TB Shared-Memory Node
-
-The 32 TB system should not automatically be used as the primary packet simulator.
-
-Potential high-value roles:
-
-1. keep a massive synthetic corpus in memory for interactive analysis
-2. build large time-expanded network graphs
-3. run large optimization problems across many time steps
-4. run shared-memory counterfactual evaluation
-5. build huge state-transition datasets
-6. perform all-scenario aggregation without repeated distributed shuffles
-
-Example global tensor:
-
-\[
-D[t,z,c,u]
-\]
-
-can become enormous when `t`, zones, traffic classes, scenarios and UPFs are all expanded.
-
-Because the machine is likely NUMA, benchmark:
-
-- memory placement
-- first-touch allocation
-- thread affinity
-- local/remote NUMA bandwidth
-
-before committing to a shared-memory algorithm.
-
----
-
-# Part VIII — Forecasting Layer
-
-## 19. Forecast Target
-
-At boundary `t`, predict traffic for the next window:
-
-\[
-\hat D_{g,t+1}=F(D_{g,t},D_{g,t-1},...,X_t)
-\]
-
-where `g` is a controllable traffic group such as:
-
-```text
-(zone, DNN, S-NSSAI, 5QI)
-```
-
-Possible features:
-
-- historical throughput
-- active sessions
-- time of day
-- day of week
-- event state
-- recent growth rate
-- UPF utilization
-- zone mobility in/out rate
-
-### Baselines first
-
-Always include:
-
-1. last-value
-2. seasonal naive
-3. moving average
-4. exponential smoothing
-5. linear/AR model
-
-Then compare:
-
-- LightGBM/XGBoost
-- temporal convolution
-- LSTM/GRU
-- transformer/time-series model only if justified
-
-Forecast uncertainty is valuable. Ideally produce:
-
-\[
-\hat D_g,\quad q_{0.90},\quad q_{0.95},\quad q_{0.99}
-\]
-
-not only a point estimate.
-
----
-
-# Part IX — Optimizer
-
-## 20. Decision Variable
-
-Let:
-
-\[
-x_{g,u,t} \in [0,1]
-\]
-
-be the fraction of **new traffic/session demand** from group `g` that should be assigned to eligible UPF `u` during decision window `t`.
-
-Constraint:
-
-\[
-\sum_{u\in E(g)} x_{g,u,t}=1
-\]
-
-Projected load:
-
-\[
-\hat L_{u,t}=
-L^{existing}_{u,t}+
-\sum_g x_{g,u,t}\hat D_{g,t}
-\]
-
-Capacity constraint:
-
-\[
-\hat L_{u,t} \le \alpha_u C_u
-\]
-
-where `alpha` is an operating headroom, e.g. 0.8 initially if justified by calibration.
-
----
-
-## 21. Objective
-
-A useful first formulation:
-
-\[
-\min_x
-\sum_u \phi(\rho_u)
-+ \lambda_1 C_{route}(x)
-+ \lambda_2 C_{locality}(x)
-+ \lambda_3 C_{sla}(x)
-\]
-
-where:
-
-- `phi(rho)` penalizes high utilization nonlinearly
-- `C_route` penalizes policy churn
-- `C_locality` penalizes remote/nonpreferred UPFs
-- `C_sla` penalizes expected SLA violations
-
-Add routing-change regularization:
-
-\[
-C_{route}=\sum_{g,u}|x_{g,u,t}-x_{g,u,t-1}|
-\]
-
-This prevents oscillation every 10 minutes.
-
----
-
-## 22. Robustness to Forecast Error
-
-A point forecast may be wrong. Three useful variants:
-
-### A. Safety multiplier
-
-\[
-D^{plan}=\beta \hat D,\quad \beta>1
-\]
-
-### B. Quantile optimization
-
-Use the 95th-percentile forecast instead of the mean.
-
-### C. Scenario/stochastic optimization
-
-Generate demand scenarios:
-
-\[
-D^{(1)},D^{(2)},...,D^{(K)}
-\]
-
-and optimize expected/tail cost.
-
-The HPC makes `K` much larger than a typical workstation experiment.
-
----
-
-# Part X — What “Load Balancing” Means in a 5G Core
-
-## 23. Do Not Use a Generic Packet Load Balancer Across Stateful UPFs
-
-A PDU session is associated with GTP-U/PFCP forwarding state. Therefore, this is generally incorrect:
-
-```text
-packet 1 -> UPF-1
-packet 2 -> UPF-2
-packet 3 -> UPF-3
-```
-
-unless the architecture explicitly supports shared replicated state and the forwarding design is built for it.
-
-For the first demonstration, the balancing unit should be:
-
-```text
-NEW PDU SESSION
-```
-
-not individual packets.
-
----
-
-## 24. Phase-1 Steering: New-Session UPF Selection
-
-Architecture:
-
-```text
-Optimizer
-   |
-   | desired weights per traffic group
-   v
-Policy service
-   |
-   v
-SMF selection hook
-   |
-   +--> eligibility filter
-   +--> optimizer weight lookup
-   +--> stable weighted selection
-   |
-   v
-Selected UPF
-   |
-  PFCP
-   |
-   v
-PDU session established on selected UPF
-```
-
-### Selection algorithm
-
-Input:
-
-```text
-SUPI/session key
-gNB/zone
-DNN
-S-NSSAI
-5QI/QoS class
-eligible UPFs
-optimizer weights
-```
-
-A simple probabilistic weighted choice works for a prototype, but a stable weighted hash is better.
-
-Conceptually:
-
-\[
-u^* = H_{weighted}(SUPI,DNN,SNSSAI,policy\_version)
-\]
-
-Advantages:
-
-- stickiness
-- predictable allocation
-- fewer unnecessary changes
-- deterministic replay in experiments
-
----
-
-## 25. Optimizer Policy API
-
-Create an independent policy service so the optimizer and 5GC are not tightly coupled.
-
-### `POST /v1/policies`
-
-```json
-{
-  "policy_id": "2026-08-04T12:00:00Z",
-  "valid_from": "2026-08-04T12:00:00Z",
-  "valid_until": "2026-08-04T12:10:00Z",
-  "groups": [
-    {
-      "zone": "zone-a",
-      "dnn": "internet",
-      "snssai": {"sst": 1, "sd": "010203"},
-      "five_qi": 9,
-      "weights": {
-        "upf-1": 0.10,
-        "upf-2": 0.55,
-        "upf-3": 0.35
-      }
-    }
-  ]
-}
-```
-
-### `GET /v1/select`
-
-Conceptual request:
-
-```json
-{
-  "supi_hash": "...",
-  "zone": "zone-a",
-  "dnn": "internet",
-  "snssai": {"sst": 1, "sd": "010203"},
-  "five_qi": 9
-}
-```
-
-Response:
-
-```json
-{
-  "selected_upf": "upf-2",
-  "policy_id": "2026-08-04T12:00:00Z",
-  "reason": "optimizer_weighted_selection"
-}
-```
-
-In production, the integration can be embedded in the SMF rather than using an HTTP call for every session; the external service is convenient for the prototype.
-
----
-
-## 26. Phase-2 Steering: Traffic Influence / ULCL
-
-free5GC documents Traffic Influence mechanisms in which an AF request can influence SMF routing decisions and UPF (re)selection, including steering toward a DNAI.
-
-Reference: https://free5gc.org/guide/8-traffic-influence/
-
-This is useful for:
-
-- application-specific flow steering
-- MEC/local breakout
-- path modification
-- ULCL experiments
-
-Example conceptual chain:
-
-```text
-Optimizer
-   |
-   v
-AF / steering service
-   |
-   v
-NEF
-   |
-   v
-PCF / UDR
-   |
-   v
-SMF
-   |
-  PFCP modification
-   |
-   v
-ULCL / UPF path
-```
-
-### Important scope rule
-
-Treat Traffic Influence as a **documented 5GC mechanism**, but validate exact behavior/version constraints experimentally. Do not assume every desired live migration case is supported.
-
----
-
-## 27. Phase-3: Existing-Session Migration
-
-This is deliberately not required for the first demo.
-
-Migrating an already anchored session may require:
-
-- new tunnel state
-- PFCP rule changes
-- TEID handling
-- IP/session continuity
-- buffering/reordering
-- handover-like sequencing
-- state transfer or intermediate UPF handling
-
-Research this after Phase 1 proves that predictive new-session steering works.
-
----
-
-# Part XI — Full Closed-Loop Demo
-
-## 28. End-to-End Architecture
-
-```mermaid
-flowchart TD
-    TG[Traffic / UE Generators] --> RAN[gNB / Simulated RAN]
-    RAN --> UPFS[UPF Pool]
-    UPFS --> DN[Data Networks]
-
-    UPFS --> T[Telemetry Exporters]
-    SMF[SMF Session State] --> T
-    T --> P[Prometheus]
-    P --> A[10-min Aggregator]
-    A --> F[Forecaster]
-    F --> O[Optimizer]
-    O --> PS[Policy / Steering Service]
-    PS --> SMF
-    SMF --> UPFS
-
-    EV[Scenario / Fault Controller] --> TG
-    EV --> UPFS
-    EV --> P
-```
-
----
-
-## 29. Ten-Minute Runtime Sequence
-
-### Continuously every 15–30 seconds
-
-1. Prometheus scrapes UPF/session/resource telemetry.
-2. Dataplane exporter records N3/N6 counters.
-3. SMF/session exporter records active sessions.
-
-### At `T - small_margin`
-
-4. Aggregator closes the last complete 10-minute bucket.
-5. Data-quality checks detect:
-   - missing data
-   - counter resets
-   - restart
-   - invalid spikes
-
-### Forecast step
-
-6. Forecaster predicts next-window demand per controllable traffic group.
-
-Output:
-
-```text
-D_hat[zone,dnn,slice,5QI]
-```
-
-### Optimization step
-
-7. Optimizer combines:
-
-```text
-forecast
-current active load
-UPF capacities
-UPF health
-eligibility
-locality/path constraints
-previous steering policy
-```
-
-8. Optimizer emits target new-session weights.
-
-### Control step
-
-9. Policy service validates:
-   - weights sum to one
-   - only eligible UPFs appear
-   - no failed UPF is selected
-   - maximum policy delta is respected
-
-10. Policy becomes active for the next window.
-
-11. New PDU sessions are assigned according to the policy.
-
-12. Existing sessions remain where they are in Phase 1.
-
-13. Prometheus observes the result, closing the control loop.
-
----
-
-# Part XII — Guardrails Against Bad Optimizer Predictions
-
-## 30. Never Let the Optimizer Directly Control the Core Without Validation
-
-Insert a policy safety layer.
-
-Checks:
-
-### Feasibility
-
-\[
-\sum_u x_{g,u}=1
-\]
-
-### Eligibility
-
-\[
-x_{g,u}=0 \quad \text{if}\quad E_{g,u}=0
-\]
-
-### Health
-
-No weight on unavailable UPFs.
-
-### Minimum/maximum weight
-
-Avoid drastic changes such as:
-
-```text
-UPF-1: 80% -> 0%
-```
-
-unless an emergency condition is present.
-
-### Hysteresis
-
-Do not change policy unless expected gain exceeds a threshold.
-
-### Cooldown
-
-Prevent repeated reconfiguration within a short period.
-
-### Fallback
-
-If forecast/optimizer fails:
-
-```text
-last_known_safe_policy
-```
-
-or a static capacity-weighted baseline should be used.
-
----
-
-# Part XIII — Demo Scenario
-
-## 31. Recommended Initial Demo
-
-### Topology
-
-```text
-2 zones
-2 gNBs
-3 UPFs
-2 DNNs
-2 slices
-3 traffic classes
-```
-
-### Normal state
-
-```text
-UPF-1: 45%
-UPF-2: 48%
-UPF-3: 43%
-```
-
-### Trigger
-
-At `t0`, inject a Zone-A crowd event with a ramp-up that makes the **future** demand exceed UPF-1's safe capacity under the baseline policy.
-
-Example forecast:
-
-```text
-             now      predicted +10 min
-UPF-1        68%          112%
-UPF-2        51%           61%
-UPF-3        49%           55%
-```
-
-### Baseline policy
-
-```text
-zone-a traffic:
-UPF-1 = 60%
-UPF-2 = 20%
-UPF-3 = 20%
-```
-
-### Optimized policy
-
-```text
-zone-a traffic:
-UPF-1 = 10%
-UPF-2 = 45%
-UPF-3 = 45%
-```
-
-### Demonstrated behavior
-
-**Without predictive steering:**
-
-```text
-UPF-1 -> overload -> latency/drop increase
-```
-
-**With predictive steering:**
-
-new sessions are redirected before the peak arrives, reducing or avoiding overload.
-
----
-
-# Part XIV — Experiment Baselines
-
-## 32. Compare Four Systems
-
-### Baseline A — static hash
-
-Session placement never adapts.
-
-### Baseline B — reactive threshold load balancer
-
-If current utilization crosses a threshold, reduce new placements on that UPF.
-
-### Baseline C — forecast + heuristic
-
-Forecast future load and apply a simple capacity-proportional allocation.
-
-### Proposed system — forecast + constrained optimization
-
-Forecast + topology/eligibility + capacity + routing churn + safety margin.
-
----
-
-## 33. Metrics
-
-Primary:
-
-- fraction of UPF-time above safe threshold
-- number of overload events
-- overload duration
-- packet loss
-- p95/p99 latency
-- rejected/failed sessions
-- SLA violation rate
-
-Control quality:
-
-- routing-policy changes per hour/day
-- fraction of sessions redirected
-- distance/locality penalty
-- utilization balance
-
-Forecast quality:
-
-- MAE
-- RMSE
-- WAPE/sMAPE where appropriate
-- quantile coverage
-
-Operational:
-
-- optimizer runtime
-- policy-application latency
-- telemetry delay
-- CPU/memory overhead
-
----
-
-# Part XV — Simulation-to-Real Transfer
-
-## 34. Calibration Strategy When C-DOT Data Arrives
-
-Synthetic data should not be treated as ground truth forever.
-
-When real C-DOT data becomes available:
-
-### Step 1 — schema alignment
-
-Map real counters into the same canonical fields.
-
-### Step 2 — marginal calibration
-
-Match:
-
-- mean/variance
-- daily profile
-- weekly profile
-- session distribution
-- traffic-class mix
-
-### Step 3 — temporal calibration
-
-Match:
-
-- autocorrelation
-- burst duration
-- peak ramp rate
-- transition probabilities
-
-### Step 4 — UPF response calibration
-
-Fit simulator response to:
-
-```text
-input load -> utilization / latency / drop / session behavior
-```
-
-### Step 5 — topology calibration
-
-Replace synthetic connectivity/eligibility with C-DOT values.
-
-### Step 6 — shadow evaluation
-
-Run the optimizer on real telemetry but do **not** apply controls.
-
-Compare:
-
-```text
-predicted outcome
-recommended policy
-actual outcome under existing system
-```
-
-### Step 7 — advisory demo
-
-Operator reviews recommendations.
-
-### Step 8 — controlled closed loop
-
-Enable automatic steering only after validation and within strict safety bounds.
-
----
-
-# Part XVI — Validation of the Simulator
-
-## 35. What Makes Synthetic Data Credible?
-
-A simulator is not credible because it generated many rows.
-
-Validate at multiple levels.
-
-### Protocol validation
-
-High-fidelity core:
-
-- registration succeeds
-- PDU sessions succeed
-- correct UPF selected
-- expected N3/N4/N6 path observed
-- session teardown/restart behaves correctly
-
-### Telemetry validation
-
-Check:
-
-\[
-\text{generated bytes} \approx \text{N3/N6 observed bytes}
-\]
-
-within known protocol/measurement differences.
-
-### Capacity validation
-
-Measured saturation curves should be repeatable.
-
-### Statistical validation
-
-Synthetic demand should reproduce selected target statistics.
-
-### Control validation
-
-The same optimizer should run unchanged against:
-
-1. macro simulator
-2. high-fidelity free5GC testbed
-3. eventual C-DOT telemetry
-
-Only the adapters should change.
-
----
-
-# Part XVII — Software Architecture and Repository Layout
-
-## 36. Recommended Modules
-
-```text
-cdot-upf-lab/
-|
-+-- core/
-|   +-- free5gc/
-|   +-- topology/
-|
-+-- generators/
-|   +-- packetrusher/
-|   +-- ueransim/
-|   +-- 5g-lena/
-|
-+-- simulator/
-|   +-- macro/
-|   +-- events/
-|   +-- calibration/
-|
-+-- telemetry/
-|   +-- ebpf/
-|   +-- exporters/
-|   +-- prometheus/
-|   +-- aggregation/
-|
-+-- forecasting/
-|   +-- baselines/
-|   +-- models/
-|   +-- inference_service/
-|
-+-- optimization/
-|   +-- models/
-|   +-- solver/
-|   +-- policy_schema/
-|
-+-- steering/
-|   +-- policy_service/
-|   +-- smf_hook/
-|   +-- safety/
-|
-+-- experiments/
-|   +-- manifests/
-|   +-- slurm/
-|   +-- analysis/
-|
-+-- dashboard/
-|
-+-- schemas/
-    +-- telemetry.schema.json
-    +-- topology.schema.json
-    +-- policy.schema.json
-```
-
----
-
-# Part XVIII — Deployment on the C-DOT HPC
-
-## 37. Required HPC Capability Check
-
-Before implementing the high-fidelity core directly on compute nodes, verify with the administrators whether jobs may use:
-
-- network namespaces
-- TUN/TAP
-- SCTP
-- GTP/GTP5G kernel module
-- eBPF
-- `CAP_NET_ADMIN`
-- privileged Docker/Podman/Apptainer capabilities
-- custom Linux routing rules
-- host networking between allocated nodes
-
-Why this matters:
-
-- UERANSIM commonly needs TUN interfaces
-- GTP/PFCP experiments may require kernel/network privileges
-- eBPF instrumentation may require capabilities unavailable in ordinary HPC jobs
-
-### If privileged networking is not permitted
-
-Use a split architecture:
-
-```text
-Dedicated/privileged lab server
-   |
-   +-- free5GC/OAI
-   +-- real UPFs
-   +-- PacketRusher/UERANSIM
-   +-- calibration
-
-C-DOT HPC
-   |
-   +-- 5G-LENA campaigns
-   +-- macro simulation
-   +-- forecasting experiments
-   +-- optimization experiments
-   +-- synthetic dataset generation
-```
-
-This is not a downgrade. It cleanly separates network emulation from large statistical computing.
-
----
-
-# Part XIX — Implementation Roadmap
-
-## 38. Stage 0 — Environment Verification
-
-Deliverables:
-
-- cluster permission matrix
-- SLURM test job
-- container strategy
-- network privilege test
-- filesystem/output strategy
-
-Success criterion:
-
-A reproducible job can launch and produce structured output.
-
----
-
-## 39. Stage 1 — Minimal Functional 5G Core
-
-Deploy:
-
-```text
-free5GC
-1 gNB simulator
-small UE set
-1 UPF
-1 DNN
-1 slice
-```
-
-Validate:
-
-- UE registration
-- PDU session
-- ping/iperf
-- N3 traffic
-- N6 traffic
-
----
-
-## 40. Stage 2 — Multi-UPF Core
-
-Expand to:
-
-```text
-2 gNBs
-3 UPFs
-2 zones
-2 DNNs
-2 slices
-```
-
-Validate:
-
-- topology-specific UPF selection
-- S-NSSAI/DNN constraints
-- independent UPF counters
-- session counts
-
----
-
-## 41. Stage 3 — Prometheus-Compatible Telemetry
-
-Implement:
-
-- N3/N6 exporter
-- session exporter
-- CPU/memory exporter
-- 30-second scrape
-- 10-minute aggregation
-
-Generate the exact schema expected by the forecast pipeline.
-
----
-
-## 42. Stage 4 — Traffic/Event Generator
-
-Add:
-
-- daily seasonality
-- traffic-class mix
-- crowd event
-- UPF failure
-- telemetry gaps
-
-Produce several synthetic weeks.
-
----
-
-## 43. Stage 5 — Forecaster
-
-Implement baseline models first.
-
-Output:
-
-```text
-forecast[window, zone, class]
-```
-
-and optionally uncertainty quantiles.
-
----
-
-## 44. Stage 6 — Optimizer
-
-Implement the constrained allocation problem.
-
-Output:
-
-```text
-policy[window, group, UPF] -> weight
-```
-
-Verify feasibility independently.
-
----
-
-## 45. Stage 7 — Closed-Loop New-Session Steering
-
-Implement:
-
-- policy service
-- SMF selection hook
-- stable weighted selection
-- safety checks
-- fallback policy
-
-Demonstrate a crowd-event avoidance case.
-
----
-
-## 46. Stage 8 — HPC Scaling
-
-Build scenario manifests varying:
-
-```text
-random seed
-traffic intensity
-event time
-event magnitude
-UPF capacity
-number of UPFs
-topology
-forecast error
-failure state
-controller type
-```
-
-Run large SLURM arrays and write partitioned Parquet.
-
----
-
-## 47. Stage 9 — Advanced Steering
-
-Investigate:
-
-- free5GC NEF Traffic Influence
-- ULCL
-- local breakout
-- application-flow steering
-- selected existing-session modifications
-
-Keep this separate from the Phase-1 success criterion.
-
----
-
-# Part XX — Research Experiments Enabled by the HPC
-
-## 48. Scaling Experiment
-
-Question:
-
-> How does optimizer quality/runtime change as the number of zones, UPFs and traffic groups increases?
-
-Sweep:
-
-```text
-UPFs:          10 -> 100 -> 1,000
-zones:         10 -> 100 -> 1,000
-traffic groups:10 -> 100 -> 10,000+
-```
-
-Measure:
-
-- solve time
-- memory
-- solution quality
-- overload probability
-
----
-
-## 49. Forecast Error Sensitivity
-
-Inject controlled forecast error:
-
-\[
-\hat D = D(1+\epsilon)
-\]
-
-with different temporal/cross-zone correlations.
-
-Question:
-
-> At what forecast error does predictive control become worse than reactive control?
-
-This is a valuable negative/robustness result.
-
----
-
-## 50. Rare Overload Study
-
-Generate very large numbers of scenario trajectories and estimate:
-
-\[
-P(\max_u \rho_u > 1)
-\]
-
-and tail metrics such as:
-
-\[
-P(\text{SLA violation})
-\]
-
-under:
-
-- static routing
-- reactive balancing
-- predictive heuristic
-- predictive optimization
-
-The 20k-core cluster is particularly valuable here because independent trajectories are embarrassingly parallel.
-
----
-
-## 51. Control Churn Study
-
-Measure the tradeoff between:
-
-\[
-\text{overload reduction}
-\]
-
-and
-
-\[
-\text{policy changes / session steering churn}
-\]
-
-as the optimizer's regularization parameter changes.
-
----
-
-## 52. Failure-Resilience Study
-
-Inject correlated events:
-
-```text
-traffic surge
-+
-UPF capacity loss
-+
-link degradation
-+
-telemetry delay
-```
-
-Question:
-
-> Can predictive control maintain a safe operating region under compound failures?
-
----
-
-# Part XXI — Demo Dashboard
-
-## 53. Minimum Panels
-
-### Current state
-
-- UPF utilization gauges
-- throughput per UPF
-- active sessions
-- health
-
-### Forecast
-
-- observed demand
-- next-window forecast
-- uncertainty band
-
-### Optimizer
-
-- current allocation
-- recommended allocation
-- capacity headroom
-
-### Control
-
-- currently active policy version
-- number of sessions assigned per UPF since policy activation
-- policy changes
-
-### Outcome
-
-- overload avoided/not avoided
-- p95/p99 latency
-- packet loss
-- safety-threshold violations
-
-For a demo, place **baseline and optimized runs side by side** using the same scenario seed.
-
----
-
-# Part XXII — Interfaces Between Components
-
-## 54. Telemetry Contract
-
-```text
-Prometheus/raw exporters
-       |
-       v
-10-minute aggregation service
-       |
-       v
-Feature Store / Parquet
-```
-
-No forecaster should parse implementation-specific Prometheus metric names directly. Use an adapter into a canonical schema.
-
----
-
-## 55. Forecast Contract
-
-```json
-{
-  "window": "12:00-12:10",
-  "group": {
-    "zone": "zone-a",
-    "dnn": "internet",
-    "snssai": "1-010203",
-    "five_qi": 9
-  },
-  "mean_mbps": 8400,
-  "p95_mbps": 9600
-}
-```
-
----
-
-## 56. Optimizer Contract
-
-```json
-{
-  "window": "12:00-12:10",
-  "group": "zone-a|internet|1-010203|9",
-  "assignments": [
-    {"upf": "upf-1", "weight": 0.10},
-    {"upf": "upf-2", "weight": 0.55},
-    {"upf": "upf-3", "weight": 0.35}
-  ]
-}
-```
-
----
-
-## 57. Steering Audit Record
-
-Every selection should be logged:
-
-```text
-timestamp
-session_id_hash
-traffic_group
-eligible_upfs
-policy_id
-selected_upf
-selection_reason
-```
-
-This is crucial for debugging and for proving that the observed traffic distribution actually came from the optimizer policy.
-
----
-
-# Part XXIII — What Is Standard vs What We Must Build
-
-## 58. Existing Open-Source Functionality
-
-Available:
-
-- 5G SA core
-- PDU-session establishment
-- SMF/UPF/PFCP
-- multi-UPF topology
-- DNN/slice configuration
-- ULCL
-- Traffic Influence mechanisms
-- UE/gNB simulation
-- high-load UE/session generation
-- 5G-LENA traffic and QoS models
-- Prometheus ecosystem
-- Linux/eBPF traffic instrumentation
-- SLURM parallel execution
-
-## 59. Custom Research/Engineering Components
-
-We must build:
-
-1. canonical telemetry adapter
-2. scenario/event generator
-3. fast macro UPF simulator
-4. calibration pipeline
-5. 10-minute feature aggregator
-6. traffic forecaster
-7. optimizer
-8. optimizer policy schema/API
-9. **weighted new-session UPF-selection integration**
-10. safety/hysteresis layer
-11. closed-loop evaluation harness
-12. HPC scenario manager
-13. comparison/dashboard layer
-
-This distinction is important: the research contribution is not “deploy free5GC.” It is the **predictive closed-loop control system, simulation methodology, scale of evaluation, and robust traffic-steering policy** built around it.
-
----
-
-# Part XXIV — Recommended First Milestone
-
-## 60. Definition of Done for Demo v1
-
-The first milestone should be intentionally narrow:
-
-### Network
-
-- 1 free5GC control plane
-- 3 UPFs
-- 2 zones
-- simulated UEs/gNBs
-- at least 2 traffic groups
-
-### Telemetry
-
-- 30-second measurements
-- N3/N6 throughput
-- active sessions
-- UPF CPU/memory if possible
-- 10-minute aggregation
-
-### Prediction
-
-- next-window traffic forecast
-
-### Optimization
-
-- capacity-aware weighted assignment
-
-### Steering
-
-- apply weights to **new PDU sessions only**
-- existing sessions are untouched
-
-### Scenario
-
-- scripted traffic surge
-
-### Baselines
-
-- static assignment
-- reactive threshold
-- predictive optimizer
-
-### Success criterion
-
-Under the same workload seed, the predictive system should reduce the number/duration/severity of UPF overload events without excessive policy churn.
-
----
-
-# Part XXV — Immediate Action Checklist
-
-## 61. Week-0 Technical Questions for C-DOT/HPC Admins
-
-1. What Linux distribution/kernel runs on compute nodes?
-2. Is SLURM used?
-3. Are Docker, Podman or Apptainer/Singularity available?
-4. Can jobs create network namespaces?
-5. Is `CAP_NET_ADMIN` available?
-6. Are TUN/TAP interfaces permitted?
-7. Is SCTP enabled?
-8. Can the `gtp5g` module be installed/loaded?
-9. Is eBPF allowed on compute nodes?
-10. Can allocated nodes communicate directly over arbitrary UDP/TCP ports?
-11. Is there a dedicated high-speed interconnect, and what IP stack is exposed to jobs?
-12. How much scratch storage is available?
-13. Is there a job-local SSD/NVMe tier?
-14. Is Prometheus/Grafana already available internally?
-
----
-
-## 62. Software Bring-Up Order
-
-Recommended order:
-
-```text
-1. free5GC + 1 UPF + UERANSIM
-2. verify PDU traffic
-3. 3 UPFs
-4. verify deterministic UPF selection
-5. add PacketRusher for load
-6. add telemetry exporter
-7. add Prometheus
-8. add synthetic traffic/event service
-9. create 10-minute buckets
-10. forecaster
-11. optimizer
-12. policy service
-13. SMF weighted-selection hook
-14. closed-loop crowd-event demo
-15. 5G-LENA calibration campaign
-16. macro simulator
-17. large SLURM campaigns
-```
-
-Do not attempt all components simultaneously.
-
----
-
-# Part XXVI — Key Risks and Mitigations
-
-## 63. Risk: HPC network restrictions
-
-**Mitigation:** keep high-fidelity network emulation on a privileged test node and use HPC for pure simulation.
-
-## 64. Risk: synthetic traffic is unrealistic
-
-**Mitigation:** use 5G-LENA models, then calibrate with real C-DOT traces.
-
-## 65. Risk: optimizer oscillates
-
-**Mitigation:** routing-change penalty, hysteresis, cooldown, safety layer.
-
-## 66. Risk: forecast errors cause overload
-
-**Mitigation:** quantile forecasts, headroom, stochastic/robust optimization.
-
-## 67. Risk: UPF metric labels are expensive
-
-**Mitigation:** keep packet counters minimally labelled and join against a session/TEID metadata table offline.
-
-## 68. Risk: active-session migration becomes a time sink
-
-**Mitigation:** exclude it from Demo v1; steer new sessions first.
-
-## 69. Risk: high-fidelity simulation cannot scale to millions
-
-**Mitigation:** calibration + fast macro twin; do not packet-simulate every synthetic week.
-
----
-
-# Part XXVII — Final Architecture Recommendation
-
-## 70. System to Build
-
-```text
-                     OFFLINE/HPC PLANE
-
-  5G-LENA --------> traffic calibration
-       |                    |
-       v                    v
-  scenario generator --> fast macro twin
-                              |
-                  20,480-core campaign
-                              |
-                         Parquet corpus
-                              |
-                    forecast/optimization
-                              |
-                              +------------------+
-                                                 |
-                                                 v
-                     ONLINE/HIGH-FIDELITY PLANE
-
- PacketRusher/UERANSIM -> gNB -> free5GC -> SMF -> UPF-1/2/3 -> DN
-                                      ^             |
-                                      |             v
-                               steering hook    eBPF/TC
-                                      ^             |
-                                      |             v
-                                  policy API     Prometheus
-                                      ^             |
-                                      |             v
-                                  optimizer <--- forecaster
-                                                  ^
-                                                  |
-                                          10-min aggregator
-```
-
-This arrangement gives three valuable properties:
-
-1. **Protocol realism:** decisions can be tested against actual PDU sessions, GTP-U, PFCP and UPFs.
-2. **Statistical scale:** the HPC can generate many more histories than a packet-level testbed could.
-3. **Transfer path:** when C-DOT telemetry/control APIs arrive, adapters can be replaced while the forecaster, optimizer, schemas and evaluation logic remain largely unchanged.
-
----
-
-# 71. Final Design Principle
-
-The most important design choice is to keep four layers cleanly separated:
-
-```text
-STATE ESTIMATION
-Prometheus -> canonical telemetry
-
-PREDICTION
-telemetry -> future demand distribution
-
-DECISION
-forecast + constraints -> optimizer weights
-
-ENFORCEMENT
-weights -> validated 5G-aware session steering
-```
-
-Do not embed network-control logic inside the forecaster, and do not allow the optimizer to directly manipulate UPFs without a validation/steering layer.
-
-For Demo v1, the concrete objective is:
-
-> **Predict a UPF overload before the next 10-minute window and proactively alter the distribution of newly arriving PDU sessions across eligible UPFs so that the overload is avoided or reduced.**
-
-Everything in the first implementation should be evaluated against that statement.
-
----
-
-# References
-
-## User-provided requirements
-
-- `cdot_data_req.pdf` — C-DOT data requirements email supplied with this request.
-
-## Open-source 5G core and traffic steering
-
-1. free5GC Features — https://free5gc.org/guide/features/
-2. free5GC SMF Config / User Plane Topology — https://free5gc.org/guide/SMF-Config/
-3. free5GC Traffic Influence — https://free5gc.org/guide/8-traffic-influence/
-4. free5GC Configuration / ULCL — https://free5gc.org/guide/Configuration/
-5. free5GC UPF design — https://free5gc.org/doc/Gtp5g/design/
-6. OpenAirInterface Core Network — https://openairinterface.org/core-network/
-7. Open5GS Prometheus Metrics — https://open5gs.org/open5gs/docs/tutorial/04-metrics-prometheus/
-8. Open5GS PDU/UE/gNB Information API — https://open5gs.org/open5gs/docs/tutorial/07-infoAPI-UE-gNB-session-data/
-
-## UE/RAN and load generation
-
-9. UERANSIM — https://github.com/aligungr/UERANSIM
-10. UERANSIM Configuration — https://github.com/aligungr/UERANSIM/wiki/Configuration
-11. PacketRusher software record — https://zenodo.org/records/14927077
-
-## RAN/network simulation
-
-12. 5G-LENA Features — https://5g-lena.cttc.es/features/
-13. 5G-LENA NGMN Mixed Traffic Example — https://cttc-lena.gitlab.io/nr/html/cttc-nr-traffic-ngmn-mixed_8cc.html
-14. NIST ns-3 Co-Simulation Gateway — https://www.nist.gov/services-resources/software/gateway-co-simulation-using-ns-3
-
----
-
-## Appendix A — Minimal Data Flow Contract
-
-```text
-RAW TELEMETRY (30 s)
-       |
-       +--> validity checks
-       |
-       v
-10-MIN AGGREGATES
-       |
-       v
-FORECAST
-D_hat[g,t+1], quantiles
-       |
-       v
-OPTIMIZER
-x[g,u,t+1]
-       |
-       v
-POLICY VALIDATOR
-       |
-       v
-SMF NEW-SESSION SELECTOR
-       |
-       v
-UPF POOL
-       |
-       v
-RAW TELEMETRY
-```
-
-## Appendix B — Minimum Scenario Manifest
-
-```json
-{
-  "scenario_id": "crowd_zone_a_seed_0042",
-  "seed": 42,
-  "duration_days": 7,
-  "topology": "topology_3upf_2zone_v1",
-  "traffic_profile": "mixed_weekly_v1",
-  "events": [
-    {
-      "type": "crowd_event",
-      "zone": "zone-a",
-      "start_hour": 68.0,
-      "duration_hours": 2.0,
-      "peak_multiplier": 4.0
-    }
-  ],
-  "controller": "predictive_optimizer_v1"
-}
-```
-
-## Appendix C — Recommended Experiment Metadata
-
-Every result shard should record:
-
-```text
-git_commit
-simulator_version
-core_version
-traffic_model_version
-topology_version
-optimizer_version
-forecast_model_version
-scenario_id
-random_seed
-start_time
-end_time
-host/node
-cpu_count
-```
-
-Without this metadata, large HPC campaigns become difficult to reproduce or compare.
+1. [free5GC feature support](https://free5gc.org/guide/features/)
+2. [free5GC Traffic Influence documentation](https://free5gc.org/guide/8-traffic-influence/)
+3. [5G-LENA feature matrix](https://5g-lena.cttc.es/features/)

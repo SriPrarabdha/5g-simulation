@@ -1,0 +1,54 @@
+{
+  "scenario_id": "demo-three-upf-two-zone",
+  "seed": 20260805,
+  "start_time": "2026-08-05T12:00:00Z",
+  "steps": 60,
+  "step_seconds": 30,
+  "decision_interval_steps": 20,
+  "upfs": [
+    {
+      "upf_id": "upf-a", "zone": "zone-a",
+      "capacity_mbps": {"ul": 240, "dl": 500},
+      "safe_utilization": {"ul": 0.8, "dl": 0.8},
+      "session_capacity": 5000, "session_safe_utilization": 0.85,
+      "queue_limit_seconds": 2,
+      "path_latency_ms_by_zone": {"zone-a": 2, "zone-b": 15}
+    },
+    {
+      "upf_id": "upf-b", "zone": "zone-b",
+      "capacity_mbps": {"ul": 300, "dl": 450},
+      "safe_utilization": {"ul": 0.8, "dl": 0.8},
+      "session_capacity": 5000, "session_safe_utilization": 0.85,
+      "queue_limit_seconds": 2,
+      "path_latency_ms_by_zone": {"zone-a": 15, "zone-b": 2}
+    },
+    {
+      "upf_id": "upf-c", "zone": "central",
+      "capacity_mbps": {"ul": 400, "dl": 700},
+      "safe_utilization": {"ul": 0.75, "dl": 0.75},
+      "session_capacity": 7000, "session_safe_utilization": 0.85,
+      "queue_limit_seconds": 2,
+      "path_latency_ms_by_zone": {"zone-a": 10, "zone-b": 10}
+    }
+  ],
+  "groups": [
+    {
+      "key": {"zone": "zone-a", "dnn": "internet", "snssai": "1-010203", "five_qi": 9},
+      "arrivals_per_step": 8.0,
+      "lifetime_steps": {"min": 20, "max": 80},
+      "offered_mbps_per_session": {"ul": 0.8, "dl": 2.5},
+      "eligible_upfs": ["upf-a", "upf-c"]
+    },
+    {
+      "key": {"zone": "zone-b", "dnn": "enterprise", "snssai": "1-112233", "five_qi": 7},
+      "arrivals_per_step": 5.0,
+      "lifetime_steps": {"min": 10, "max": 50},
+      "offered_mbps_per_session": {"ul": 1.2, "dl": 1.8},
+      "eligible_upfs": ["upf-b", "upf-c"]
+    }
+  ],
+  "events": [
+    {"step": 20, "event_type": "capacity_factor", "upf_id": "upf-a", "ul_factor": 0.35},
+    {"step": 40, "event_type": "health", "upf_id": "upf-b", "health": "degraded"}
+  ]
+}
