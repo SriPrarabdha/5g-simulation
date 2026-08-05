@@ -17,7 +17,7 @@ function statusLabel(upf: UpfState) {
 export function TrafficCircuit({ upfs, policy, selected, onSelect }: {
   upfs: UpfState[]; policy: Policy | null; selected: string | null; onSelect: (id: string) => void
 }) {
-  const total = Math.max(1, upfs.reduce((sum, item) => sum + item.traffic.carried, 0))
+  const total = upfs.reduce((sum, item) => sum + item.traffic.carried, 0)
   return (
     <div className="circuit-wrap">
       <div className="circuit-caption">
@@ -89,4 +89,3 @@ export function TrafficCircuit({ upfs, policy, selected, onSelect }: {
     </div>
   )
 }
-

@@ -52,8 +52,8 @@ class Forecast(Contract):
         self.validate()
 
     def validate(self) -> None:
-        if self.horizon_steps not in {1, 2}:
-            raise ValueError("horizon_steps must be 1 or 2")
+        if self.horizon_steps not in range(1, 9):
+            raise ValueError("horizon_steps must be 1 through 8")
         if self.source_window_end > self.target_window.start:
             raise ValueError("forecast features may not overlap the target window")
         if not self.forecast_id or not self.model_version:
@@ -88,4 +88,3 @@ class Forecast(Contract):
             "dl": result.pop("new_load_dl_mbps"),
         }
         return result
-

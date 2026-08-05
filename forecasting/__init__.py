@@ -9,6 +9,12 @@ from .baselines import (
     SeasonalNaiveForecaster,
 )
 from .metrics import QuantileMetrics, evaluate_quantiles
+from .bundle import (
+    SCHEMA_VERSION as BUNDLE_SCHEMA_VERSION,
+    TrainedForecastBundle,
+    train_forecast_bundle,
+    write_forecast_bundle,
+)
 
 __all__ = [
     "DemandObservation",
@@ -19,4 +25,8 @@ __all__ = [
     "ResidualObservation",
     "SeasonalNaiveForecaster",
     "evaluate_quantiles",
+    "BUNDLE_SCHEMA_VERSION",
+    "TrainedForecastBundle",
+    "train_forecast_bundle",
+    "write_forecast_bundle",
 ]

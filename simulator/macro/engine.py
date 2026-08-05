@@ -255,6 +255,50 @@ class Simulator:
             f"lifetimes:{group.key.selection_id}": self._random_stream(f"lifetimes:{group.key.selection_id}")
             for group in config.groups
         })
+        self._step_index = 0
+        self._policy = None
+        self._policy_version = 0
+        self._history_closed_at_step: int | None = None
+        self._events_applied_at_step: int | None = None
+        self._planned_at_step: int | None = None
+        self._dynamic_events: list[Any] = []
+        self.result = SimulationResult(
+            scenario_id=self.config.scenario_id,
+            seed=self.config.seed,
+            step_seconds=self.config.step_seconds,
+            controller=self.controller.name,
+            primary_overload_metric=self.config.primary_overload_metric,
+        )
+
+    @property
+    def current_step(self) -> int:
+        return self._step_index
+
+    @property
+    def current_policy(self):
+        return self._policy
+
+    @property
+    def decision_due(self) -> bool:
+        return (
+            self._step_index < self.config.steps
+            and self._step_index % self.config.decision_interval_steps == 0
+            and self._planned_at_step != self._step_index
+        )
+
+    def inject_event(self, event: Any) -> None:
+        """Add an event at or after the next unprocessed tick without replaying history."""
+        if event.step < self._step_index:
+            raise ValueError("cannot inject an event into already-realized simulation time")
+        self._dynamic_events.append(event)
+        if event.step == self._step_index:
+            self._events_applied_at_step = None
+            self._planned_at_step = None
+
+    def replace_controller(self, controller: Controller) -> None:
+        self.controller = controller
+        self.result.controller = controller.name
+        self._planned_at_step = None
 
     def _random_stream(self, name: str) -> random.Random:
         digest = hashlib.sha256(f"{self.config.seed}:{name}".encode()).digest()
@@ -280,7 +324,7 @@ class Simulator:
         return total
 
     def _apply_events(self, step: int) -> None:
-        for event in self.config.events:
+        for event in (*self.config.events, *self._dynamic_events):
             if event.step != step:
                 continue
             if event.event_type == "arrival_factor":
@@ -371,6 +415,13 @@ class Simulator:
             oracle_new_by_group=self._peek_interval_arrivals(),
         )
 
+    def control_context(self) -> ControlContext:
+        return self._control_context()
+
+    def current_states(self) -> list[UPFState]:
+        at = self.config.start_time + timedelta(seconds=self._step_index * self.config.step_seconds)
+        return self._states(at)
+
     def _peek_interval_arrivals(self) -> dict[str, ResidualObservation]:
         result: dict[str, ResidualObservation] = {}
         for group in self.config.groups:
@@ -388,182 +439,209 @@ class Simulator:
             )
         return result
 
-    def run(self) -> SimulationResult:
-        result = SimulationResult(
-            scenario_id=self.config.scenario_id,
-            seed=self.config.seed,
-            step_seconds=self.config.step_seconds,
-            controller=self.controller.name,
-            primary_overload_metric=self.config.primary_overload_metric,
-        )
-        policy = None
-        version = 0
-        for step in range(self.config.steps):
-            window_start = self.config.start_time + timedelta(seconds=step * self.config.step_seconds)
-            window_end = window_start + timedelta(seconds=self.config.step_seconds)
-            if step > 0 and step % self.config.decision_interval_steps == 0:
-                self._close_history_window(window_start)
+    def _prepare_current_step(self) -> tuple[Any, Any]:
+        if self._step_index >= self.config.steps:
+            raise StopIteration("simulation is complete")
+        step = self._step_index
+        window_start = self.config.start_time + timedelta(seconds=step * self.config.step_seconds)
+        window_end = window_start + timedelta(seconds=self.config.step_seconds)
+        if (
+            step > 0
+            and step % self.config.decision_interval_steps == 0
+            and self._history_closed_at_step != step
+        ):
+            self._close_history_window(window_start)
+            self._history_closed_at_step = step
+        if self._events_applied_at_step != step:
             self._apply_events(step)
-            states = self._states(window_start)
-            state_by_id = {state.upf_id: state for state in states}
-            if policy is None or step % self.config.decision_interval_steps == 0:
-                version += 1
-                try:
-                    policy = self.controller.build_policy(
-                        self.config, self.config.groups, states, window_start, version,
-                        self._control_context(),
-                    )
-                except RuntimeError:
-                    policy = None
+            self._events_applied_at_step = step
+        return window_start, window_end
 
-            active_before = self._active_counts()
-            arrivals: dict[str, int] = {}
-            rejections: Counter[str] = Counter()
-            admitted: Counter[str] = Counter()
-            rejected_by_upf: Counter[str] = Counter()
-            rejected_by_upf_group: Counter[tuple[str, str]] = Counter()
-            unplaced_rejections: Counter[str] = Counter()
-            new_cohorts: Counter[tuple[str, str, int, float, float]] = Counter()
+    def replan(self):
+        """Close the prior bucket and choose the policy for the next tick."""
+        window_start, _ = self._prepare_current_step()
+        states = self._states(window_start)
+        self._policy_version += 1
+        try:
+            self._policy = self.controller.build_policy(
+                self.config,
+                self.config.groups,
+                states,
+                window_start,
+                self._policy_version,
+                self._control_context(),
+            )
+        except RuntimeError:
+            self._policy = None
+        self._planned_at_step = self._step_index
+        return self._policy
 
-            for group in self.config.groups:
-                group_id = group.key.selection_id
-                arrival_count = self._poisson(
-                    group.arrivals_per_step * self._arrival_factors[group_id],
-                    self._streams[f"arrivals:{group_id}"],
-                )
-                arrivals[group_id] = arrival_count
-                self._interval_arrivals[group_id] += arrival_count
-                weights = (
-                    normalized_healthy_weights(policy, group.key, group.eligible_upfs, state_by_id)
-                    if policy is not None else {}
-                )
-                for _ in range(arrival_count):
-                    sequence = self._session_sequence[group_id]
-                    self._session_sequence[group_id] += 1
-                    session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
-                    if not weights:
-                        rejections[group_id] += 1
-                        unplaced_rejections[group_id] += 1
-                        result.selection_audits.append(SelectionAudit(
-                            timestamp=window_start,
-                            session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
-                            session_hash_value=hashlib.sha256(f"{session_key}\x1fno-policy".encode()).hexdigest(),
-                            group=GroupKey(group.key.zone, group.key.dnn, group.key.snssai),
-                            eligible_upfs=[
-                                upf_id for upf_id in group.eligible_upfs
-                                if state_by_id[upf_id].health in {"healthy", "degraded"}
-                            ],
-                            requested_weights={}, selected_upf=None,
-                            policy_id=policy.policy_id if policy is not None else None,
-                            reason="no_eligible_upf",
-                        ))
-                        continue
-                    selected, hash_value = rendezvous_select(session_key, policy.policy_id, weights)
-                    reason = "fallback_static" if policy.fallback.used else "optimizer_weighted"
-                    if policy.fallback.source_policy_id:
-                        reason = "fallback_last_safe"
+    def advance(self) -> StepResult:
+        """Advance exactly one 30-second tick using the policy selected beforehand."""
+        window_start, window_end = self._prepare_current_step()
+        step = self._step_index
+        if self.decision_due:
+            self.replan()
+        policy = self._policy
+        states = self._states(window_start)
+        state_by_id = {state.upf_id: state for state in states}
+        result = self.result
+
+        active_before = self._active_counts()
+        arrivals: dict[str, int] = {}
+        rejections: Counter[str] = Counter()
+        admitted: Counter[str] = Counter()
+        rejected_by_upf: Counter[str] = Counter()
+        rejected_by_upf_group: Counter[tuple[str, str]] = Counter()
+        unplaced_rejections: Counter[str] = Counter()
+        new_cohorts: Counter[tuple[str, str, int, float, float]] = Counter()
+
+        for group in self.config.groups:
+            group_id = group.key.selection_id
+            arrival_count = self._poisson(
+                group.arrivals_per_step * self._arrival_factors[group_id],
+                self._streams[f"arrivals:{group_id}"],
+            )
+            arrivals[group_id] = arrival_count
+            self._interval_arrivals[group_id] += arrival_count
+            weights = (
+                normalized_healthy_weights(policy, group.key, group.eligible_upfs, state_by_id)
+                if policy is not None else {}
+            )
+            for _ in range(arrival_count):
+                sequence = self._session_sequence[group_id]
+                self._session_sequence[group_id] += 1
+                session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
+                if not weights:
+                    rejections[group_id] += 1
+                    unplaced_rejections[group_id] += 1
                     result.selection_audits.append(SelectionAudit(
                         timestamp=window_start,
                         session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
-                        session_hash_value=hash_value,
+                        session_hash_value=hashlib.sha256(f"{session_key}\x1fno-policy".encode()).hexdigest(),
                         group=GroupKey(group.key.zone, group.key.dnn, group.key.snssai),
-                        eligible_upfs=sorted(weights),
-                        requested_weights=dict(weights), selected_upf=selected,
-                        policy_id=policy.policy_id, reason=reason,
+                        eligible_upfs=[
+                            upf_id for upf_id in group.eligible_upfs
+                            if state_by_id[upf_id].health in {"healthy", "degraded"}
+                        ],
+                        requested_weights={}, selected_upf=None,
+                        policy_id=policy.policy_id if policy is not None else None,
+                        reason="no_eligible_upf",
                     ))
-                    runtime = self._upfs[selected]
-                    if active_before[selected] + admitted[selected] >= runtime.profile.session_capacity:
-                        rejections[group_id] += 1
-                        rejected_by_upf[selected] += 1
-                        rejected_by_upf_group[(selected, group_id)] += 1
-                        continue
-                    lifetime = self._streams[f"lifetimes:{group_id}"].randint(
-                        group.lifetime_steps_min, group.lifetime_steps_max
-                    )
-                    admitted[selected] += 1
-                    new_cohorts[(
-                        group_id, selected, lifetime,
-                        group.offered_ul_mbps_per_session, group.offered_dl_mbps_per_session,
-                    )] += 1
-
-            for key, count in new_cohorts.items():
-                group_id, upf_id, lifetime, ul_mbps, dl_mbps = key
-                self._cohorts.append(Cohort(
-                    group_id=group_id,
-                    upf_id=upf_id,
-                    remaining_steps=lifetime,
-                    count=count,
-                    ul_mbps_per_session=ul_mbps,
-                    dl_mbps_per_session=dl_mbps,
-                    arrival_step=step,
+                    continue
+                selected, hash_value = rendezvous_select(session_key, policy.policy_id, weights)
+                reason = "fallback_static" if policy.fallback.used else "optimizer_weighted"
+                if policy.fallback.source_policy_id:
+                    reason = "fallback_last_safe"
+                result.selection_audits.append(SelectionAudit(
+                    timestamp=window_start,
+                    session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
+                    session_hash_value=hash_value,
+                    group=GroupKey(group.key.zone, group.key.dnn, group.key.snssai),
+                    eligible_upfs=sorted(weights),
+                    requested_weights=dict(weights), selected_upf=selected,
+                    policy_id=policy.policy_id, reason=reason,
                 ))
-
-            offered_ul: Counter[str] = Counter()
-            offered_dl: Counter[str] = Counter()
-            new_offered_ul: Counter[str] = Counter()
-            new_offered_dl: Counter[str] = Counter()
-            decision_window_start = step - (step % self.config.decision_interval_steps)
-            for cohort in self._cohorts:
-                offered_ul[cohort.upf_id] += cohort.count * cohort.ul_mbps_per_session
-                offered_dl[cohort.upf_id] += cohort.count * cohort.dl_mbps_per_session
-                if cohort.arrival_step >= decision_window_start:
-                    new_offered_ul[cohort.upf_id] += cohort.count * cohort.ul_mbps_per_session
-                    new_offered_dl[cohort.upf_id] += cohort.count * cohort.dl_mbps_per_session
-
-            departing: Counter[str] = Counter()
-            for cohort in self._cohorts:
-                if cohort.remaining_steps == 1:
-                    departing[cohort.upf_id] += cohort.count
-
-            upf_results: list[UPFStepResult] = []
-            for upf_id, runtime in self._upfs.items():
-                rejected_ul_mbps = 0.0
-                rejected_dl_mbps = 0.0
-                if rejected_by_upf[upf_id]:
-                    for group in self.config.groups:
-                        count = rejected_by_upf_group[(upf_id, group.key.selection_id)]
-                        rejected_ul_mbps += count * group.offered_ul_mbps_per_session
-                        rejected_dl_mbps += count * group.offered_dl_mbps_per_session
-                ul_result, runtime.ul_queue_bytes = self._serve_direction(
-                    offered_ul[upf_id], new_offered_ul[upf_id], rejected_ul_mbps, runtime.ul_queue_bytes,
-                    runtime.ul_capacity_mbps, runtime.profile.safe_utilization_ul,
-                    runtime.profile.queue_limit_seconds,
+                runtime = self._upfs[selected]
+                if active_before[selected] + admitted[selected] >= runtime.profile.session_capacity:
+                    rejections[group_id] += 1
+                    rejected_by_upf[selected] += 1
+                    rejected_by_upf_group[(selected, group_id)] += 1
+                    continue
+                lifetime = self._streams[f"lifetimes:{group_id}"].randint(
+                    group.lifetime_steps_min, group.lifetime_steps_max
                 )
-                dl_result, runtime.dl_queue_bytes = self._serve_direction(
-                    offered_dl[upf_id], new_offered_dl[upf_id], rejected_dl_mbps, runtime.dl_queue_bytes,
-                    runtime.dl_capacity_mbps, runtime.profile.safe_utilization_dl,
-                    runtime.profile.queue_limit_seconds,
-                )
-                upf_results.append(UPFStepResult(
-                    upf_id=upf_id, health=runtime.health,
-                    active_sessions=active_before[upf_id] + admitted[upf_id],
-                    new_sessions=admitted[upf_id], departed_sessions=departing[upf_id],
-                    establishment_failures=rejected_by_upf[upf_id], ul=ul_result, dl=dl_result,
-                ))
+                admitted[selected] += 1
+                new_cohorts[(
+                    group_id, selected, lifetime,
+                    group.offered_ul_mbps_per_session, group.offered_dl_mbps_per_session,
+                )] += 1
 
-            unplaced_ul_mbps = sum(
-                unplaced_rejections[group.key.selection_id] * group.offered_ul_mbps_per_session
-                for group in self.config.groups
-            )
-            unplaced_dl_mbps = sum(
-                unplaced_rejections[group.key.selection_id] * group.offered_dl_mbps_per_session
-                for group in self.config.groups
-            )
-            result.steps.append(StepResult(
-                scenario_id=self.config.scenario_id, seed=self.config.seed, step=step,
-                window_start=window_start, window_end=window_end,
-                policy_id=policy.policy_id if policy is not None else "none",
-                group_arrivals=arrivals, group_rejections=dict(rejections), upfs=upf_results,
-                unplaced_rejected_ul_bytes=unplaced_ul_mbps * 1_000_000 / 8 * self.config.step_seconds,
-                unplaced_rejected_dl_bytes=unplaced_dl_mbps * 1_000_000 / 8 * self.config.step_seconds,
+        for key, count in new_cohorts.items():
+            group_id, upf_id, lifetime, ul_mbps, dl_mbps = key
+            self._cohorts.append(Cohort(
+                group_id=group_id,
+                upf_id=upf_id,
+                remaining_steps=lifetime,
+                count=count,
+                ul_mbps_per_session=ul_mbps,
+                dl_mbps_per_session=dl_mbps,
+                arrival_step=step,
             ))
-            survivors: list[Cohort] = []
-            for cohort in self._cohorts:
-                cohort.remaining_steps -= 1
-                if cohort.remaining_steps > 0:
-                    survivors.append(cohort)
-            self._cohorts = survivors
-        return result
+
+        offered_ul: Counter[str] = Counter()
+        offered_dl: Counter[str] = Counter()
+        new_offered_ul: Counter[str] = Counter()
+        new_offered_dl: Counter[str] = Counter()
+        decision_window_start = step - (step % self.config.decision_interval_steps)
+        for cohort in self._cohorts:
+            offered_ul[cohort.upf_id] += cohort.count * cohort.ul_mbps_per_session
+            offered_dl[cohort.upf_id] += cohort.count * cohort.dl_mbps_per_session
+            if cohort.arrival_step >= decision_window_start:
+                new_offered_ul[cohort.upf_id] += cohort.count * cohort.ul_mbps_per_session
+                new_offered_dl[cohort.upf_id] += cohort.count * cohort.dl_mbps_per_session
+
+        departing: Counter[str] = Counter()
+        for cohort in self._cohorts:
+            if cohort.remaining_steps == 1:
+                departing[cohort.upf_id] += cohort.count
+
+        upf_results: list[UPFStepResult] = []
+        for upf_id, runtime in self._upfs.items():
+            rejected_ul_mbps = 0.0
+            rejected_dl_mbps = 0.0
+            if rejected_by_upf[upf_id]:
+                for group in self.config.groups:
+                    count = rejected_by_upf_group[(upf_id, group.key.selection_id)]
+                    rejected_ul_mbps += count * group.offered_ul_mbps_per_session
+                    rejected_dl_mbps += count * group.offered_dl_mbps_per_session
+            ul_result, runtime.ul_queue_bytes = self._serve_direction(
+                offered_ul[upf_id], new_offered_ul[upf_id], rejected_ul_mbps, runtime.ul_queue_bytes,
+                runtime.ul_capacity_mbps, runtime.profile.safe_utilization_ul,
+                runtime.profile.queue_limit_seconds,
+            )
+            dl_result, runtime.dl_queue_bytes = self._serve_direction(
+                offered_dl[upf_id], new_offered_dl[upf_id], rejected_dl_mbps, runtime.dl_queue_bytes,
+                runtime.dl_capacity_mbps, runtime.profile.safe_utilization_dl,
+                runtime.profile.queue_limit_seconds,
+            )
+            upf_results.append(UPFStepResult(
+                upf_id=upf_id, health=runtime.health,
+                active_sessions=active_before[upf_id] + admitted[upf_id],
+                new_sessions=admitted[upf_id], departed_sessions=departing[upf_id],
+                establishment_failures=rejected_by_upf[upf_id], ul=ul_result, dl=dl_result,
+            ))
+
+        unplaced_ul_mbps = sum(
+            unplaced_rejections[group.key.selection_id] * group.offered_ul_mbps_per_session
+            for group in self.config.groups
+        )
+        unplaced_dl_mbps = sum(
+            unplaced_rejections[group.key.selection_id] * group.offered_dl_mbps_per_session
+            for group in self.config.groups
+        )
+        step_result = StepResult(
+            scenario_id=self.config.scenario_id, seed=self.config.seed, step=step,
+            window_start=window_start, window_end=window_end,
+            policy_id=policy.policy_id if policy is not None else "none",
+            group_arrivals=arrivals, group_rejections=dict(rejections), upfs=upf_results,
+            unplaced_rejected_ul_bytes=unplaced_ul_mbps * 1_000_000 / 8 * self.config.step_seconds,
+            unplaced_rejected_dl_bytes=unplaced_dl_mbps * 1_000_000 / 8 * self.config.step_seconds,
+        )
+        result.steps.append(step_result)
+        survivors: list[Cohort] = []
+        for cohort in self._cohorts:
+            cohort.remaining_steps -= 1
+            if cohort.remaining_steps > 0:
+                survivors.append(cohort)
+        self._cohorts = survivors
+        self._step_index += 1
+        return step_result
+
+    def run(self) -> SimulationResult:
+        while self._step_index < self.config.steps:
+            self.advance()
+        return self.result
 
     def _serve_direction(
         self,

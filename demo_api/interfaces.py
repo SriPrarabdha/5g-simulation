@@ -98,10 +98,15 @@ class PrometheusFlowSource(FlowSource):
                     unit=spec.unit,
                     is_counter=spec.is_counter,
                     upf_id=labels.get("upf_id"),
+                    zone=labels.get("zone"), dnn=labels.get("dnn"),
+                    snssai=labels.get("snssai"),
+                    five_qi=int(labels["five_qi"]) if labels.get("five_qi") else None,
+                    site=labels.get("site"),
                     interface=labels.get("interface"),
                     direction=labels.get("direction"),
                     validity_flags=[f"label:{key}={value}" for key, value in sorted(labels.items())
-                                    if key not in {"upf_id", "interface", "direction", "__name__"}],
+                                    if key not in {"upf_id", "zone", "dnn", "snssai", "five_qi", "site",
+                                                   "interface", "direction", "__name__"}],
                 ))
         return rows
 
@@ -151,4 +156,3 @@ class SmfEmsActuator(ActuatorSink):
 
     def apply(self, recommendation: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError("C-DOT must provide a supported SMF/EMS control interface")
-

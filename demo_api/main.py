@@ -34,6 +34,9 @@ class ControlRequest(BaseModel):
     surge: float | None = None
     telemetry_gap_steps: int | None = Field(default=None, ge=0, le=120)
     fault: dict[str, Any] | None = None
+    min_hold_epochs: int | None = Field(default=None, ge=0, le=8)
+    hysteresis: float | None = Field(default=None, ge=0, le=0.5)
+    churn_budget: float | None = Field(default=None, ge=0, le=1)
 
 
 def create_app(
@@ -60,7 +63,7 @@ def create_app(
     application.state.tokens = tokens
     application.state.audit = audit
 
-    def identity(authorization: Annotated[str | None, Header()] = None) -> Identity:
+    async def identity(authorization: Annotated[str | None, Header()] = None) -> Identity:
         if not authorization or not authorization.lower().startswith("bearer "):
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "bearer token required")
         try:
@@ -68,7 +71,7 @@ def create_app(
         except ValueError as error:
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, str(error)) from error
 
-    def presenter(user: Annotated[Identity, Depends(identity)]) -> Identity:
+    async def presenter(user: Annotated[Identity, Depends(identity)]) -> Identity:
         if user.role != "presenter":
             raise HTTPException(status.HTTP_403_FORBIDDEN, "presenter role required")
         return user
@@ -80,12 +83,12 @@ def create_app(
             raise HTTPException(status.HTTP_404_NOT_FOUND, str(error)) from error
 
     @application.get("/api/v1/health")
-    def health() -> dict[str, Any]:
+    async def health() -> dict[str, Any]:
         return {"status": "ok", "schema_version": "health/1.0", "synthetic": True,
                 "active_runs": len(manager.runs)}
 
     @application.post("/api/v1/auth/login")
-    def login(request: LoginRequest) -> dict[str, Any]:
+    async def login(request: LoginRequest) -> dict[str, Any]:
         expected_user = os.environ.get("CDOT_DEMO_USER", "presenter")
         expected_password = os.environ.get("CDOT_DEMO_PASSWORD", "demo")
         if request.username != expected_user or request.password != expected_password:
@@ -96,17 +99,17 @@ def create_app(
         return {"access_token": token, "token_type": "bearer", "role": "presenter", "expires_in": 3600}
 
     @application.post("/api/v1/auth/renew")
-    def renew(user: Annotated[Identity, Depends(identity)]) -> dict[str, Any]:
+    async def renew(user: Annotated[Identity, Depends(identity)]) -> dict[str, Any]:
         return {"access_token": tokens.issue(user.subject, user.role), "token_type": "bearer",
                 "role": user.role, "expires_in": 3600}
 
     @application.post("/api/v1/viewer/session")
-    def viewer_session() -> dict[str, Any]:
+    async def viewer_session() -> dict[str, Any]:
         return {"access_token": tokens.issue("audience", "viewer", 4 * 3600), "token_type": "bearer",
                 "role": "viewer", "expires_in": 4 * 3600}
 
     @application.get("/api/v1/scenarios")
-    def scenarios() -> dict[str, Any]:
+    async def scenarios() -> dict[str, Any]:
         config = manager.scenario
         return {"items": [{
             "scenario_id": config.scenario_id,
@@ -120,17 +123,24 @@ def create_app(
         }]}
 
     @application.get("/api/v1/artifacts")
-    def artifacts() -> dict[str, Any]:
+    async def artifacts() -> dict[str, Any]:
         registry = json.loads((ROOT / "configs" / "traffic_model_registry.json").read_text(encoding="utf-8"))
-        return {"items": [
+        items = [
             {"artifact_id": "traffic-model/1.0", "kind": "parameter_registry", "immutable": True,
              "synthetic": True, "metadata": registry},
             {"artifact_id": "demo-replay/1.0", "kind": "deterministic_generator", "immutable": True,
              "synthetic": True, "seed": manager.scenario.seed},
-        ]}
+        ]
+        if manager.forecast_bundle is not None:
+            items.append({
+                "artifact_id": manager.forecast_bundle.model_version,
+                "kind": "trained_forecast_bundle", "immutable": True,
+                "synthetic": True, "metadata": manager.forecast_bundle.metadata,
+            })
+        return {"items": items}
 
     @application.post("/api/v1/runs", status_code=status.HTTP_201_CREATED)
-    def create_run(request: CreateRunRequest, user: Annotated[Identity, Depends(presenter)]) -> dict[str, Any]:
+    async def create_run(request: CreateRunRequest, user: Annotated[Identity, Depends(presenter)]) -> dict[str, Any]:
         if request.scenario_id != manager.scenario.scenario_id:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "unknown scenario")
         if request.controller not in CONTROLLERS or request.controller == "oracle":
@@ -140,7 +150,7 @@ def create_app(
         return run.snapshot()
 
     @application.get("/api/v1/runs/{run_id}")
-    def get_run(run_id: str, _: Annotated[Identity, Depends(identity)]) -> dict[str, Any]:
+    async def get_run(run_id: str, _: Annotated[Identity, Depends(identity)]) -> dict[str, Any]:
         return run_or_404(run_id).snapshot()
 
     @application.post("/api/v1/runs/{run_id}/{action}")
@@ -171,49 +181,49 @@ def create_app(
         return run.snapshot()
 
     @application.get("/api/v1/runs/{run_id}/telemetry")
-    def telemetry(run_id: str, _: Annotated[Identity, Depends(identity)], limit: int = Query(120, ge=1, le=2000)):
+    async def telemetry(run_id: str, _: Annotated[Identity, Depends(identity)], limit: int = Query(120, ge=1, le=2000)):
         return {"items": run_or_404(run_id).history[-limit:], "synthetic": True}
 
     @application.get("/api/v1/runs/{run_id}/forecasts")
-    def forecasts(run_id: str, _: Annotated[Identity, Depends(identity)]):
+    async def forecasts(run_id: str, _: Annotated[Identity, Depends(identity)]):
         return {"items": run_or_404(run_id).forecasts, "synthetic": True}
 
     @application.get("/api/v1/runs/{run_id}/topology")
-    def topology(run_id: str, _: Annotated[Identity, Depends(identity)]):
+    async def topology(run_id: str, _: Annotated[Identity, Depends(identity)]):
         return run_or_404(run_id).snapshot()["payload"]["topology"]
 
     @application.get("/api/v1/runs/{run_id}/policy")
-    def policy(run_id: str, _: Annotated[Identity, Depends(identity)]):
+    async def policy(run_id: str, _: Annotated[Identity, Depends(identity)]):
         run = run_or_404(run_id)
         return {"current": run.actuator.current, "history": run.actuator.history}
 
     @application.get("/api/v1/runs/{run_id}/decisions")
-    def decisions(run_id: str, _: Annotated[Identity, Depends(identity)]):
+    async def decisions(run_id: str, _: Annotated[Identity, Depends(identity)]):
         return {"items": run_or_404(run_id).decision_trace}
 
     @application.get("/api/v1/runs/{run_id}/comparison")
-    def comparison(run_id: str, _: Annotated[Identity, Depends(identity)]):
+    async def comparison(run_id: str, _: Annotated[Identity, Depends(identity)]):
         return run_or_404(run_id).comparison()
 
     @application.get("/api/v1/runs/{run_id}/audit")
-    def audit_events(run_id: str, _: Annotated[Identity, Depends(identity)]):
+    async def audit_events(run_id: str, _: Annotated[Identity, Depends(identity)]):
         run_or_404(run_id)
         return {"items": audit.list(run_id)}
 
     @application.get("/api/v1/models")
-    def models() -> dict[str, Any]:
+    async def models() -> dict[str, Any]:
         return {"items": [{
-            "model_id": "calendar-ensemble+ACI/1.0-demo",
-            "label": "Calendar-aware nonlinear ensemble",
+            "model_id": "deterministic-trend-envelope/1.0-demo",
+            "label": "Deterministic replay trend envelope",
             "inputs": ["calendar", "event_schedule", "lagged_demand", "quality_flags"],
             "targets": ["arrivals", "offered_throughput", "sessions", "residual_load"],
             "quantiles": [0.5, 0.9, 0.95], "horizons_minutes": list(range(10, 81, 10)),
-            "calibration": "split conformal + adaptive conformal inference",
-            "validation_selection": "MAE-weighted ensemble", "synthetic_training_data": True,
+            "calibration": "fixed empirical demo envelope",
+            "validation_selection": "not release-calibrated", "synthetic_training_data": True,
         }]}
 
     @application.get("/metrics", response_class=PlainTextResponse)
-    def metrics(run_id: str | None = None) -> str:
+    async def metrics(run_id: str | None = None) -> str:
         if run_id is None:
             if not manager.runs:
                 return "# HELP cdot_demo_active_runs Number of demo runs.\n# TYPE cdot_demo_active_runs gauge\ncdot_demo_active_runs 0\n"
@@ -247,7 +257,7 @@ def create_app(
             application.mount("/assets", StaticFiles(directory=assets), name="assets")
 
         @application.get("/{path:path}", include_in_schema=False)
-        def spa(path: str):
+        async def spa(path: str):
             candidate = static / path
             if path and candidate.is_file() and static in candidate.resolve().parents:
                 return FileResponse(candidate)

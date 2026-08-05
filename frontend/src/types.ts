@@ -37,6 +37,16 @@ export interface Forecast {
   coverage_target: number
   calibration: { method: string; state: string; alpha: number }
   quality_flags: string[]
+  bundle: {
+    schema_version?: string
+    model_version: string
+    algorithm: string
+    synthetic: boolean
+    bundle_sha256?: string
+    source?: { release_status?: string; kind?: string; days?: number; seed?: number }
+    split?: { train: number; calibration: number; test: number; ordered: boolean }
+    summary_metrics?: { mean_test_wape_p50?: number }
+  }
 }
 
 export interface Policy {
@@ -50,7 +60,25 @@ export interface Policy {
   objective: string
   migration: { enabled: boolean; label: string; budget_sessions: number }
   replica_actions: Array<Record<string, unknown>>
-  fallback: { used: boolean; reason: string | null }
+  fallback: { used: boolean; reason: string | null; source_policy_id?: string | null }
+  gate: {
+    action: 'apply' | 'hold' | 'emergency_apply'
+    reason: string
+    applied: boolean
+    hold_remaining_epochs: number
+    current_objective: number | null
+    candidate_objective: number
+    objective_improvement: number | null
+    max_group_total_variation: number
+    emergency_override: boolean
+    config: {
+      min_hold_epochs: number
+      min_objective_improvement: number
+      max_group_total_variation: number
+      emergency_objective_threshold: number
+    }
+  }
+  causal: { applies_from_step: number; history_recomputed: boolean }
 }
 
 export interface TraceEvent {
@@ -64,11 +92,16 @@ export interface TraceEvent {
 export interface Comparison {
   matched_seeds: number
   synthetic: boolean
+  status?: string
   controllers: Array<{ id: string; label: string; overload_minutes: number; loss_gbytes: number; resource_cost: number; deployable: boolean }>
 }
 
 export interface SnapshotPayload {
-  runner: { state: RunState; step: number; steps: number; controller: string; seed: number; speed: number; scenario_id: string }
+  runner: {
+    state: RunState; step: number; steps: number; controller: string; seed: number; speed: number; scenario_id: string
+    loop_mode: string; forecast_source: string
+    gate: { min_hold_epochs: number; min_objective_improvement: number; max_group_total_variation: number; emergency_objective_threshold: number }
+  }
   topology: { upfs: UpfState[]; groups: Array<{ id: string; zone: string; dnn: string; snssai: string; five_qi: number; eligible_upfs: string[] }>; data_networks: string[] }
   history: HistoryRow[]
   forecast: Forecast | null
@@ -88,4 +121,3 @@ export interface Snapshot {
   type: string
   payload: SnapshotPayload
 }
-

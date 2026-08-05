@@ -25,6 +25,11 @@ class TelemetrySample(Contract):
     unit: str
     is_counter: bool
     upf_id: str | None = None
+    zone: str | None = None
+    dnn: str | None = None
+    snssai: str | None = None
+    five_qi: int | None = None
+    site: str | None = None
     interface: str | None = None
     direction: str | None = None
     reset_epoch: int | None = None
@@ -46,6 +51,8 @@ class TelemetrySample(Contract):
             raise ValueError("interface must be n3 or n6")
         if self.direction not in {None, "ul", "dl"}:
             raise ValueError("direction must be ul or dl")
+        if self.five_qi is not None and self.five_qi <= 0:
+            raise ValueError("five_qi must be positive")
         require_non_negative("reset_epoch", self.reset_epoch)
 
     @classmethod
@@ -57,7 +64,10 @@ class TelemetrySample(Contract):
             sample_id=data["sample_id"], event_time=data["event_time"], received_time=data["received_time"],
             source_type=source["type"], source_id=source["id"], metric=data["metric"],
             value=data.get("value"), unit=data["unit"], is_counter=data["is_counter"],
-            upf_id=dimensions.get("upf_id"), interface=dimensions.get("interface"),
+            upf_id=dimensions.get("upf_id"), zone=dimensions.get("zone"),
+            dnn=dimensions.get("dnn"), snssai=dimensions.get("snssai"),
+            five_qi=dimensions.get("five_qi"), site=dimensions.get("site"),
+            interface=dimensions.get("interface"),
             direction=dimensions.get("direction"), reset_epoch=data.get("reset_epoch"),
             valid=data.get("valid", True), validity_flags=list(data.get("validity_flags", [])),
             restart_id=data.get("restart_id"),
@@ -70,6 +80,10 @@ class TelemetrySample(Contract):
             "upf_id": result.pop("upf_id"), "interface": result.pop("interface"),
             "direction": result.pop("direction"),
         }
+        for name in ("zone", "dnn", "snssai", "five_qi", "site"):
+            value = result.pop(name)
+            if value is not None:
+                result["dimensions"][name] = value
         return result
 
 

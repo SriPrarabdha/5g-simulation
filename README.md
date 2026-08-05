@@ -1,10 +1,24 @@
 # C-DOT predictive UPF steering simulation
 
-This repository implements the macro/HPC portion of
-`cdot_upf_simulation_demo_architecture.md`. It is not yet a complete Demo v1:
-the external free5GC/PacketRusher plane, calibrated UPF envelopes, Prometheus
-adapters, and the SMF selection hook still require a suitable privileged 5G
-test environment.
+This repository implements the deterministic macro/HPC simulator and a
+self-contained closed-loop Demo v1. The presentation host advances synthetic
+30-second telemetry through forecasting, optimization, policy validation, and
+simulated actuation, with a FastAPI service and a production-built React
+operator console. External free5GC/PacketRusher validation, calibrated C-DOT
+UPF envelopes, and an SMF selection hook still require a suitable privileged
+5G test environment.
+
+## Documentation
+
+- [`docs/README.md`](docs/README.md) — documentation map and implementation
+  status language.
+- [`docs/system-architecture-decisions.md`](docs/system-architecture-decisions.md)
+  — stage-by-stage architecture decisions, boundaries, and communication paths.
+- [`docs/end-to-end-runbook.md`](docs/end-to-end-runbook.md) — workstation and
+  PBS data generation, current training limitations, artifact transfer, demo
+  startup, split-host operation, rehearsal, and troubleshooting.
+- [`docs/traffic-model-spec.md`](docs/traffic-model-spec.md) — cited synthetic
+  traffic assumptions and unsupported-assumption boundary.
 
 ## Implemented
 
@@ -25,6 +39,17 @@ test environment.
   oracle controllers using deterministic weighted rendezvous selection.
 - Canonical nested Parquet run data, selection-audit Parquet, reproducibility
   metadata/hashes, PBS arrays, and exact paired bootstrap evaluation.
+- Frozen, cited synthetic traffic-model registry with an explicit evidence and
+  unsupported-assumption boundary.
+- Accelerated closed-loop run lifecycle, deterministic seed selection,
+  presenter/viewer roles, SQLite audit, safe-policy fallback, and ordered
+  versioned WebSocket snapshots and deltas.
+- Replaceable synthetic/replay/Prometheus `FlowSource` and
+  simulation/advisory/SMF-placeholder `ActuatorSink` interfaces.
+- Prometheus-compatible synthetic metrics and REST interfaces for topology,
+  telemetry, forecasts, policy, decision traces, model metadata, and matched
+  campaign comparisons.
+- A five-view React/ECharts operations console served offline by FastAPI.
 
 The selected primary metric for the supplied demo is directional UL overload
 area (`overload_area_seconds.ul`). DL results are still reported separately and
@@ -32,7 +57,6 @@ cannot be hidden by a combined passing average.
 
 ## Not yet implemented
 
-- Generator/UPF Prometheus exporters and live DemandBucket assembly.
 - One-UPF and three-UPF free5GC deployment and smoke tests.
 - PacketRusher saturation sweeps and fitted directional/session capacities.
 - The free5GC SMF new-session selection hook and external atomic policy store.
@@ -49,6 +73,32 @@ free5GC and cluster environment; the repository does not claim they passed.
 python3 -m venv env
 env/bin/pip install -e .
 env/bin/python -m unittest discover -s tests -v
+```
+
+Build and run the self-contained demo:
+
+```bash
+cd frontend && npm ci && npm run build && cd ..
+./scripts/start-demo.sh
+```
+
+Open `http://127.0.0.1:8000` and sign in with the local rehearsal credentials
+`presenter` / `demo`. Override them with `CDOT_DEMO_USER`,
+`CDOT_DEMO_PASSWORD`, and `CDOT_DEMO_SECRET` outside a local demo. Run
+`./scripts/preflight.py` separately to verify the pinned registry, frontend
+bundle, service imports, and scenario before presentation.
+
+The traffic assumptions and citations are documented in
+[`docs/traffic-model-spec.md`](docs/traffic-model-spec.md); the exact frozen
+values are in [`configs/traffic_model_registry.json`](configs/traffic_model_registry.json).
+
+Freeze a seed-specific 16-week, 30-second history manifest before submitting
+PBS shards:
+
+```bash
+env/bin/python -m experiments.build_history_manifest \
+  --output output/manifests/history-s20260805.json \
+  --seed 20260805
 ```
 
 Run one controller:
@@ -93,3 +143,19 @@ env/bin/python -m experiments.evaluate_paired \
 
 The evaluator exits successfully only when every architecture acceptance gate
 passes, including at least 30 exactly paired seeds per scenario.
+
+Train the offline 10–80 minute model bundle from completed history shards:
+
+```bash
+env/bin/python -m experiments.train_forecaster \
+  --campaign-root output/macro/schema_major=1/campaign=history-16w-static-v1 \
+  --manifest output/manifests/history-s20260805.json \
+  --controller static-capacity-v1 \
+  --output output/models/forecaster-v1.json
+```
+
+Set `CDOT_FORECAST_BUNDLE` to that file before starting the demo. If it is not
+set, the service loads the compact, explicitly synthetic demo-calibration bundle
+in `configs/demo_forecast_bundle.json`. The live demo is causal: each policy is
+selected after a bucket closes and affects only later simulated sessions;
+injected surge/fault controls never regenerate prior telemetry.

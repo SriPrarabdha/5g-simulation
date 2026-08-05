@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Protocol
+from typing import Any, Protocol
 
 from forecasting import DemandObservation, ForecastingError, MovingAverageForecaster, ResidualObservation
 from optimization import OptimizationConfig, solve_allocation
@@ -20,7 +21,14 @@ from schemas import (
     TimeWindow,
     UPFState,
 )
-from steering import PolicyValidationError, ValidationConfig, validate_policy
+from steering import (
+    PolicyGate,
+    PolicyGateConfig,
+    PolicyGateDecision,
+    PolicyValidationError,
+    ValidationConfig,
+    validate_policy,
+)
 
 from .config import GroupProfile, ScenarioConfig
 
@@ -171,11 +179,23 @@ class ReactiveThresholdController:
 class PredictiveHiGHSController:
     name = "predictive-highs-v1"
 
-    def __init__(self, history_windows: int = 6, *, allow_slack: bool = True) -> None:
-        self.forecaster = MovingAverageForecaster(history_windows)
+    def __init__(
+        self,
+        history_windows: int = 6,
+        *,
+        allow_slack: bool = True,
+        forecaster: Any | None = None,
+        gate_config: PolicyGateConfig | None = None,
+    ) -> None:
+        self.forecaster = forecaster or MovingAverageForecaster(history_windows)
         self.allow_slack = allow_slack
+        self.gate = PolicyGate(gate_config)
         self._previous_policy: Policy | None = None
         self._fallback = StaticCapacityController()
+        self.last_forecasts: list[Forecast] = []
+        self.last_optimization: Any | None = None
+        self.last_candidate: Policy | None = None
+        self.last_gate_decision: PolicyGateDecision | None = None
 
     def build_policy(
         self,
@@ -211,6 +231,7 @@ class PredictiveHiGHSController:
         except ForecastingError:
             return self._fallback_policy(config, groups, upf_states, created_at, version, "insufficient_forecast_history")
 
+        self.last_forecasts = forecasts
         result = solve_allocation(
             forecasts,
             upf_states,
@@ -219,8 +240,10 @@ class PredictiveHiGHSController:
             previous_policy=self._previous_policy,
             config=OptimizationConfig(),
         )
+        self.last_optimization = result
         if result.policy is None or (result.status == "feasible_with_slack" and not self.allow_slack):
             return self._fallback_policy(config, groups, upf_states, created_at, version, result.status)
+        self.last_candidate = result.policy
         try:
             validate_policy(
                 result.policy,
@@ -234,8 +257,72 @@ class PredictiveHiGHSController:
             return self._fallback_policy(
                 config, groups, upf_states, created_at, version, f"validation:{error}"
             )
-        self._previous_policy = result.policy
-        return result.policy
+        candidate_objective = result.max_safe_utilization or 0.0
+        current_objective = (
+            _operating_index(self._previous_policy.groups, forecasts, upf_states)
+            if self._previous_policy is not None else None
+        )
+        decision = self.gate.evaluate(
+            result.policy,
+            epoch=version,
+            candidate_objective=candidate_objective,
+            states=upf_states,
+            current=self._previous_policy,
+            current_objective=current_objective,
+        )
+        self.last_gate_decision = decision
+        if decision.applied or self._previous_policy is None:
+            self._previous_policy = result.policy
+            return result.policy
+        retained = self._roll_previous_policy(
+            config, created_at, version, forecasts, upf_states, decision.reason
+        )
+        self._previous_policy = retained
+        return retained
+
+    def _roll_previous_policy(
+        self,
+        config: ScenarioConfig,
+        created_at: datetime,
+        version: int,
+        forecasts: list[Forecast],
+        upf_states: list[UPFState],
+        reason: str,
+    ) -> Policy:
+        assert self._previous_policy is not None
+        duration = timedelta(seconds=config.step_seconds * config.decision_interval_steps)
+        projected = _project(self._previous_policy.groups, forecasts, upf_states)
+        slack = _slack(projected, upf_states)
+        has_slack = any(value > 1e-7 for values in slack for value in values.values())
+        retained = Policy(
+            policy_id=f"{config.scenario_id}:retained:{version}",
+            policy_version=version,
+            created_at=created_at,
+            validity=TimeWindow(created_at, created_at + duration),
+            forecast_id="+".join(sorted(item.forecast_id for item in forecasts)),
+            upf_state_time=max(state.measurement_time for state in upf_states),
+            solver=SolverReport(self.name, "feasible_with_slack" if has_slack else "optimal", 0),
+            constraint_slack=ConstraintSlack(*slack),
+            groups=[
+                PolicyGroup(item.key, dict(item.weights))
+                for item in self._previous_policy.groups
+            ],
+            fallback=Fallback(
+                used=True,
+                reason=f"policy_gate:{reason}",
+                source_policy_id=self._previous_policy.policy_id,
+            ),
+            validator_version="policy-gate/1.0",
+        )
+        validate_policy(
+            retained,
+            forecasts,
+            upf_states,
+            activation_time=created_at,
+            previous_policy=self._previous_policy,
+            config=ValidationConfig(allow_feasible_with_slack=self.allow_slack),
+        )
+        return retained
 
     def _fallback_policy(
         self,
@@ -246,9 +333,45 @@ class PredictiveHiGHSController:
         version: int,
         reason: str,
     ) -> Policy:
+        self.last_forecasts = []
+        self.last_optimization = None
+        self.last_candidate = None
+        self.last_gate_decision = None
+        previous = self._previous_policy
+        if previous is not None and _policy_routes_safely(previous, upf_states):
+            duration = timedelta(seconds=config.step_seconds * config.decision_interval_steps)
+            retained = Policy(
+                policy_id=f"{config.scenario_id}:retained-fallback:{version}",
+                policy_version=version,
+                created_at=created_at,
+                validity=TimeWindow(created_at, created_at + duration),
+                forecast_id="fallback:no-current-forecast",
+                upf_state_time=max(state.measurement_time for state in upf_states),
+                solver=SolverReport(self.name, "error", 0),
+                constraint_slack=ConstraintSlack(),
+                groups=[PolicyGroup(item.key, dict(item.weights)) for item in previous.groups],
+                fallback=Fallback(True, reason, previous.policy_id),
+                validator_version="last-safe-retention/1.0",
+            )
+            self._previous_policy = retained
+            return retained
         policy = self._fallback.build_policy(config, groups, upf_states, created_at, version)
         policy.policy_id = f"{config.scenario_id}:predictive-fallback:{version}"
-        policy.fallback = Fallback(used=True, reason=reason)
+        policy.fallback = Fallback(
+            used=True,
+            reason=f"emergency_safe_fallback:{reason}" if previous is not None else reason,
+            source_policy_id=previous.policy_id if previous is not None else None,
+        )
+        if previous is not None:
+            self.last_candidate = policy
+            self.last_gate_decision = self.gate.evaluate(
+                policy,
+                epoch=version,
+                candidate_objective=0.0,
+                states=upf_states,
+                current=previous,
+                current_objective=self.gate.config.emergency_objective_threshold + 1e-9,
+            )
         self._previous_policy = policy
         return policy
 
@@ -435,6 +558,36 @@ def _slack(
         {state.upf_id: max(0.0, ul[state.upf_id] - state.safe_capacity_mbps.ul) for state in states},
         {state.upf_id: max(0.0, dl[state.upf_id] - state.safe_capacity_mbps.dl) for state in states},
         {state.upf_id: max(0.0, sessions[state.upf_id] - state.safe_session_capacity) for state in states},
+    )
+
+
+def _operating_index(
+    groups: list[PolicyGroup], forecasts: list[Forecast], states: list[UPFState]
+) -> float:
+    ul, dl, sessions = _project(groups, forecasts, states)
+    def ratio(value: float, capacity: float) -> float:
+        return value / capacity if capacity > 0 else (math.inf if value > 0 else 0.0)
+    return max(
+        max(
+            ratio(ul[state.upf_id], state.safe_capacity_mbps.ul),
+            ratio(dl[state.upf_id], state.safe_capacity_mbps.dl),
+            ratio(sessions[state.upf_id], state.safe_session_capacity),
+        )
+        for state in states
+    )
+
+
+def _policy_routes_safely(policy: Policy, states: list[UPFState]) -> bool:
+    state_by_id = {state.upf_id: state for state in states}
+    return all(
+        weight <= 0
+        or (
+            upf_id in state_by_id
+            and state_by_id[upf_id].health in {"healthy", "degraded"}
+            and group.key.selection_id in state_by_id[upf_id].eligible_groups
+        )
+        for group in policy.groups
+        for upf_id, weight in group.weights.items()
     )
 
 

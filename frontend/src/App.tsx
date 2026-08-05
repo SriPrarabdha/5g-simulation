@@ -107,6 +107,10 @@ function PresenterBar({ payload, busy, action, control }: { payload: SnapshotPay
     <button className="surge-button" disabled={busy} onClick={() => control({ surge: 3.2 })}>INJECT STADIUM SURGE</button>
     <button className="fault-button" disabled={busy} onClick={() => control({ fault: { upf_id: 'upf-a', health: 'unavailable' } })}>FAIL UPF-A</button>
     <button disabled={busy} onClick={() => control({ telemetry_gap_steps: 5 })}>TELEMETRY GAP</button>
+    <span className="bar-divider" />
+    <label>HOLD <button disabled={busy} onClick={() => control({ min_hold_epochs: payload.runner.gate.min_hold_epochs === 3 ? 1 : payload.runner.gate.min_hold_epochs + 1 })}>{payload.runner.gate.min_hold_epochs}E</button></label>
+    <label>HYST <button disabled={busy} onClick={() => control({ hysteresis: payload.runner.gate.min_objective_improvement >= .05 ? .01 : Number((payload.runner.gate.min_objective_improvement + .01).toFixed(2)) })}>Δ{payload.runner.gate.min_objective_improvement.toFixed(2)}</button></label>
+    <label>CHURN <button disabled={busy} onClick={() => control({ churn_budget: payload.runner.gate.max_group_total_variation >= .3 ? .1 : Number((payload.runner.gate.max_group_total_variation + .1).toFixed(2)) })}>{Math.round(payload.runner.gate.max_group_total_variation * 100)}%</button></label>
     <div className="keyboard-hint">SPACE pause · 1—5 views</div>
   </footer>
 }
@@ -122,4 +126,3 @@ function LoginScreen({ onSubmit, busy, error }: { onSubmit: (event: React.FormEv
 }
 
 export default App
-

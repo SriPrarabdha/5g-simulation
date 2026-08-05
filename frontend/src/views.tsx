@@ -32,8 +32,9 @@ export function ControlRoom({ payload }: { payload: SnapshotPayload }) {
   const maxOp = Math.max(0, ...payload.topology.upfs.map(item => item.utilization.operating))
   return <div className="view-stack">
     <section className="signature-panel">
-      <div className="section-heading"><div><span>LIVE NETWORK</span><h1>Predictive traffic circuit</h1></div>
-        <div className="epoch-clock"><span>NEXT POLICY EPOCH</span><strong>{Math.max(0, 20 - (payload.runner.step % 20)) * 30 / 60}<small> min sim</small></strong></div>
+      <div className="section-heading"><div><span>LIVE NETWORK · CAUSAL INCREMENTAL LOOP</span><h1>Predictive traffic circuit</h1></div>
+        <div className="heading-actions">{payload.policy && <span className={`gate-badge ${payload.policy.gate.action}`}>{payload.policy.gate.action === 'emergency_apply' ? 'EMERGENCY APPLY' : payload.policy.gate.action.toUpperCase()}</span>}
+        <div className="epoch-clock"><span>NEXT POLICY EPOCH</span><strong>{Math.max(0, 20 - (payload.runner.step % 20)) * 30 / 60}<small> min sim</small></strong></div></div>
       </div>
       <TrafficCircuit upfs={payload.topology.upfs} policy={payload.policy} selected={selected} onSelect={setSelected} />
     </section>
@@ -85,34 +86,40 @@ function forecastOption(payload: SnapshotPayload): EChartsOption {
 
 export function ForecastStudio({ payload }: { payload: SnapshotPayload }) {
   const forecast = payload.forecast
+  const bundle = forecast?.bundle
+  const wape = bundle?.summary_metrics?.mean_test_wape_p50
+  const checksum = bundle?.bundle_sha256?.slice(0, 12)
   return <div className="forecast-layout">
-    <section className="panel forecast-hero"><div className="section-heading"><div><span>CALENDAR-AWARE ENSEMBLE</span><h1>80-minute demand cone</h1></div><span className="tag violet">SPLIT CONFORMAL + ACI</span></div>
+    <section className="panel forecast-hero"><div className="section-heading"><div><span>OFFLINE TRAINED · DIRECT MULTI-HORIZON</span><h1>80-minute demand cone</h1></div><span className="tag violet">{payload.runner.forecast_source === 'offline_bundle' ? 'FROZEN MODEL BUNDLE' : 'RUNTIME FALLBACK'}</span></div>
       <Chart option={forecastOption(payload)} className="forecast-chart" />
       {!forecast && <div className="chart-overlay-empty">Forecast issues after the first complete 10-minute bucket.</div>}
     </section>
-    <section className="panel model-card"><span className="eyebrow">MODEL BUNDLE</span><h2>{forecast?.model ?? 'calendar-ensemble+ACI/1.0-demo'}</h2>
-      <dl><div><dt>ENSEMBLE WEIGHTS</dt><dd>MAE-selected on validation</dd></div><div><dt>QUANTILES</dt><dd>p50 · p90 · p95</dd></div><div><dt>HORIZONS</dt><dd>10 → 80 minutes</dd></div><div><dt>TRAINING LABEL</dt><dd className="synthetic-text">SYNTHETIC</dd></div></dl></section>
+    <section className="panel model-card"><span className="eyebrow">MODEL BUNDLE</span><h2>{forecast?.model ?? 'awaiting first bucket'}</h2>
+      <dl><div><dt>RELEASE STATUS</dt><dd>{bundle?.source?.release_status?.replaceAll('_', ' ') ?? 'waiting for model issue'}</dd></div><div><dt>ALGORITHM</dt><dd>{bundle?.algorithm ?? '—'}</dd></div><div><dt>ORDERED SPLIT</dt><dd>{bundle?.split ? `${Math.round(bundle.split.train * 100)} / ${Math.round(bundle.split.calibration * 100)} / ${Math.round(bundle.split.test * 100)}` : '—'}</dd></div><div><dt>BUNDLE SHA-256</dt><dd className="mono-value">{checksum ? `${checksum}…` : '—'}</dd></div><div><dt>TRAINING LABEL</dt><dd className="synthetic-text">SYNTHETIC</dd></div></dl></section>
     <section className="panel coverage-card"><span className="eyebrow">CALIBRATION STATE</span><div className="coverage-ring"><strong>{forecast ? Math.round(forecast.coverage_target * 100) : 90}<small>%</small></strong><span>TARGET COVERAGE</span></div>
-      <p>Adaptive conformal state: <b>{forecast?.calibration.state ?? 'waiting'}</b></p></section>
-    <section className="panel residual-card"><span className="eyebrow">REGIME EVIDENCE</span><div className="regime-row"><span>NORMAL</span><i style={{ width: '88%' }} /><b>8.7 WAPE</b></div><div className="regime-row"><span>EVENT</span><i style={{ width: '74%' }} /><b>12.4 WAPE</b></div><div className="regime-row"><span>FAULT</span><i style={{ width: '67%' }} /><b>14.1 WAPE</b></div><small>Illustrative frozen demo-model metrics</small></section>
+      <p>Calibration state: <b>{forecast?.calibration.state ?? 'waiting'}</b></p></section>
+    <section className="panel residual-card"><span className="eyebrow">HELD-OUT SUMMARY</span><div className="evidence-number"><strong>{wape != null ? `${(wape * 100).toFixed(1)}%` : '—'}</strong><span>MEAN TEST WAPE · p50</span></div><div className="regime-row"><span>FEATURE TIME</span><i style={{ width: '100%' }} /><b>STRICT</b></div><div className="regime-row"><span>CALIBRATION</span><i style={{ width: '90%' }} /><b>SPLIT + ACI</b></div><small>Bundle metadata only; no hard-coded accuracy claims.</small></section>
   </div>
 }
 
 export function OptimizerInspector({ payload }: { payload: SnapshotPayload }) {
   const policy = payload.policy
   const groupRows = policy ? Object.entries(policy.weights) : []
+  const gate = policy?.gate
+  const gateLabel = gate?.action === 'emergency_apply' ? 'EMERGENCY APPLY' : gate?.action.toUpperCase() ?? 'WAITING'
   return <div className="optimizer-grid">
-    <section className="panel optimizer-hero"><div className="section-heading"><div><span>RECEDING-HORIZON CONTROL</span><h1>Why this policy wins</h1></div><span className={`tag ${policy?.fallback.used ? 'warning' : ''}`}>{policy?.fallback.used ? 'SAFE FALLBACK' : 'VALIDATED'}</span></div>
+    <section className="panel optimizer-hero"><div className="section-heading"><div><span>RECEDING-HORIZON CONTROL · FIRST ACTION ONLY</span><h1>Why this policy wins</h1></div><span className={`tag gate-tag ${gate?.action ?? ''}`}>{gateLabel}</span></div>
       <div className="objective-line"><span>MINIMIZE</span><strong>max projected UPF operating index</strong><b>{policy?.expected_operating_index.toFixed(3) ?? '—'}</b></div>
+      <div className="objective-compare"><span>CURRENT <b>{gate?.current_objective?.toFixed(3) ?? '—'}</b></span><i>→</i><span>CANDIDATE <b>{gate?.candidate_objective.toFixed(3) ?? '—'}</b></span><small>{gate?.objective_improvement != null ? `${gate.objective_improvement >= 0 ? '+' : ''}${gate.objective_improvement.toFixed(3)} improvement` : 'initial policy'}</small></div>
       <div className="allocation-table"><div className="allocation-head"><span>CONTROL GROUP</span>{payload.topology.upfs.map(upf => <span key={upf.id}>{upf.label}</span>)}</div>
         {groupRows.map(([group, weights]) => <div className="allocation-row" key={group}><span>{group.replaceAll('|', ' / ')}</span>{payload.topology.upfs.map(upf => <span key={upf.id}><i style={{ width: `${(weights[upf.id] ?? 0) * 100}%` }} /><b>{Math.round((weights[upf.id] ?? 0) * 100)}%</b></span>)}</div>)}
         {!groupRows.length && <div className="empty-state">Allocation appears after the first policy epoch.</div>}
       </div>
     </section>
     <section className="panel constraints"><span className="eyebrow">BINDING CONSTRAINTS</span>{(policy?.binding_constraints ?? ['locality', 'policy_churn']).map(item => <div className="constraint" key={item}><i />{item}</div>)}
-      <hr/><span className="eyebrow">GUARD RAILS</span><div className="guard"><span>CHURN BUDGET</span><b>≤ 18%</b></div><div className="guard"><span>MIN HOLD</span><b>2 epochs</b></div><div className="guard"><span>STATE TTL</span><b>10 min</b></div></section>
+      <hr/><span className="eyebrow">LIVE GUARD RAILS</span><div className="guard"><span>CHURN BUDGET</span><b>≤ {Math.round((gate?.config.max_group_total_variation ?? payload.runner.gate.max_group_total_variation) * 100)}%</b></div><div className="guard"><span>MIN HOLD</span><b>{gate?.config.min_hold_epochs ?? payload.runner.gate.min_hold_epochs} epochs</b></div><div className="guard"><span>HYSTERESIS</span><b>Δ ≥ {(gate?.config.min_objective_improvement ?? payload.runner.gate.min_objective_improvement).toFixed(2)}</b></div><div className="guard"><span>EMERGENCY</span><b>&gt; {(gate?.config.emergency_objective_threshold ?? payload.runner.gate.emergency_objective_threshold).toFixed(2)}×</b></div></section>
     <section className="panel candidate"><span className="eyebrow">CANDIDATE SCORE</span>{payload.topology.upfs.map(upf => <div className="candidate-row" key={upf.id}><span>{upf.label}<small>{upf.health}</small></span><div><i style={{ width: `${Math.min(100, upf.utilization.operating * 100)}%` }} /></div><b>{upf.utilization.operating.toFixed(2)}</b></div>)}</section>
-    <section className="panel simulation-only"><span>SIMULATION-ONLY</span><strong>Bounded migration</strong><p>Disabled in this replay. Production control is limited to weighted rendezvous placement of new sessions.</p></section>
+    <section className={`panel policy-gate-card ${gate?.action ?? ''}`}><span>POLICY GATE</span><strong>{gateLabel}</strong><p>{gate ? gate.reason.replaceAll('_', ' ') : 'Waiting for the first closed bucket.'}</p><div><span>GROUP TV <b>{gate ? `${(gate.max_group_total_variation * 100).toFixed(1)}%` : '—'}</b></span><span>HOLD LEFT <b>{gate?.hold_remaining_epochs ?? 0}</b></span></div><small>{policy?.causal.history_recomputed === false ? `Applies from tick ${policy.causal.applies_from_step}; past telemetry unchanged.` : 'Causal status pending.'}</small></section>
   </div>
 }
 
@@ -126,10 +133,9 @@ function comparisonOption(payload: SnapshotPayload): EChartsOption {
 
 export function CampaignEvidence({ payload }: { payload: SnapshotPayload }) {
   return <div className="campaign-grid">
-    <section className="panel campaign-hero"><div className="section-heading"><div><span>MATCHED RANDOM NUMBERS</span><h1>Controller evidence</h1></div><span className="tag">N = {payload.comparison.matched_seeds} SEEDS</span></div><Chart option={comparisonOption(payload)} className="campaign-chart" /></section>
-    <section className="panel evidence-callout"><span className="eyebrow">HEADLINE GATE</span><strong>−39<small>%</small></strong><p>overload time vs static in the frozen illustrative campaign</p><i>Target ≥ 30%</i></section>
+    <section className="panel campaign-hero"><div className="section-heading"><div><span>ILLUSTRATIVE REPLAY PROJECTION</span><h1>Controller evidence</h1></div><span className="tag">RELEASE RUN PENDING</span></div><Chart option={comparisonOption(payload)} className="campaign-chart" /></section>
+    <section className="panel evidence-callout"><span className="eyebrow">HEADLINE GATE</span><strong>—</strong><p>Run the frozen 30-seed paired campaign before accepting a release claim.</p><i>Target ≥ 30%</i></section>
     <section className="panel span-2 table-panel"><div className="table-header"><span>PAIRED OUTCOMES</span><small>95% bootstrap intervals in release artifact</small></div><table><thead><tr><th>CONTROLLER</th><th>OVERLOAD MIN</th><th>LOSS GB</th><th>RESOURCE COST</th><th>STATUS</th></tr></thead><tbody>{payload.comparison.controllers.map(row => <tr key={row.id}><td>{row.label}</td><td>{row.overload_minutes.toFixed(2)}</td><td>{row.loss_gbytes.toFixed(3)}</td><td>{row.resource_cost.toFixed(2)}×</td><td><span className={`quality-chip ${!row.deployable ? 'muted' : ''}`}>{row.deployable ? 'DEPLOYABLE' : 'UPPER BOUND'}</span></td></tr>)}</tbody></table></section>
     <section className="panel evidence-note"><span className="eyebrow">EVIDENCE BOUNDARY</span><p>All results are synthetic and scenario-specific. Oracle is an evaluator upper bound and is never exposed as an actionable controller.</p></section>
   </div>
 }
-

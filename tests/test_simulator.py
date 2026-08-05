@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from simulator.macro import ScenarioConfig, Simulator, load_scenario
+from simulator.macro.config import ScenarioEvent
 
 
 class SimulatorTests(unittest.TestCase):
@@ -64,6 +65,20 @@ class SimulatorTests(unittest.TestCase):
         before = sum(result.steps[index].group_arrivals[group_id] for index in range(2))
         after = sum(result.steps[index].group_arrivals[group_id] for index in range(2, 8))
         self.assertGreater(after / 6, before / 2)
+
+    def test_incremental_fault_changes_only_future_ticks(self) -> None:
+        simulator = Simulator(ScenarioConfig.from_dict(self._scenario(100.0)))
+        first = simulator.advance()
+        second = simulator.advance()
+        realized = [first.to_dict(), second.to_dict()]
+        simulator.inject_event(ScenarioEvent(
+            step=simulator.current_step, event_type="health",
+            upf_id="upf-a", health="unavailable",
+        ))
+        third = simulator.advance()
+        self.assertEqual([first.to_dict(), second.to_dict()], realized)
+        self.assertEqual(third.upfs[0].health, "unavailable")
+        self.assertEqual(simulator.current_step, 3)
 
     @staticmethod
     def _scenario(capacity: float) -> dict:

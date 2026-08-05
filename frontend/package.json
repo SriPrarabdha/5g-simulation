@@ -6,19 +6,20 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "echarts": "^5.6.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "vite": "latest"
+    "@vitejs/plugin-react": "6.0.5",
+    "echarts": "6.1.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "vite": "8.2.0"
   },
   "devDependencies": {
-    "@types/react": "^19.1.9",
-    "@types/react-dom": "^19.1.7",
-    "typescript": "~5.8.3"
+    "@playwright/test": "1.62.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "typescript": "5.8.3"
   }
 }
-

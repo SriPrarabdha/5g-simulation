@@ -2,6 +2,15 @@
 
 from .common import GroupKey, TimeWindow
 from .forecast import ExistingLoad, Forecast, Quantiles
+from .demo import (
+    DecisionTrace,
+    DecisionTraceEvent,
+    ForecastBundle,
+    ForecastTarget,
+    MigrationPlan,
+    OptimizationRecommendation,
+    ReplicaAction,
+)
 from .policy import (
     ConstraintSlack,
     Fallback,
@@ -26,15 +35,22 @@ __all__ = [
     "ConstraintSlack",
     "DataQuality",
     "DemandBucket",
+    "DecisionTrace",
+    "DecisionTraceEvent",
     "ExistingLoad",
     "Fallback",
     "Forecast",
+    "ForecastBundle",
+    "ForecastTarget",
     "GroupKey",
     "Policy",
     "PolicyGroup",
+    "MigrationPlan",
+    "OptimizationRecommendation",
     "QosSummary",
     "Quantiles",
     "RateStatistics",
+    "ReplicaAction",
     "SelectionAudit",
     "SessionSummary",
     "SolverReport",
@@ -43,4 +59,3 @@ __all__ = [
     "TrafficSummary",
     "UPFState",
 ]
-
