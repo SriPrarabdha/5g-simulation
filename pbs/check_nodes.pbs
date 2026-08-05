@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -N upf_check_nodes
+#PBS -l select=2:ncpus=4:mem=8gb
+#PBS -l walltime=00:10:00
+#PBS -q workq
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+echo "================ PBS ALLOCATION ================"
+qstat -f "$PBS_JOBID" 2>/dev/null | grep -E 'Resource_List|exec_host|exec_vnode' || true
+test -n "${PBS_NODEFILE:-}"
+mapfile -t NODES < <(sort -u "$PBS_NODEFILE")
+printf 'node=%s\n' "${NODES[@]}"
+if [ "${#NODES[@]}" -ne 2 ]; then
+    echo "ERROR: expected two distinct nodes, got ${#NODES[@]}" >&2
+    exit 1
+fi
+
+echo "================ SHARED PYTHON ON EACH NODE ================"
+SSH_OPTIONS=(-o StrictHostKeyChecking=no -o BatchMode=yes -o LogLevel=ERROR)
+for node in "${NODES[@]}"; do
+    ssh "${SSH_OPTIONS[@]}" "$node" \
+        "PYTHONPATH='$PYTHONPATH' '$PYTHON_BIN' -c 'import schemas, simulator.macro; print(\"OK\")'"
+done
+
+echo "================ NODE CPU/MEMORY ================"
+for node in "${NODES[@]}"; do
+    ssh "${SSH_OPTIONS[@]}" "$node" 'hostname; nproc; free -h | head -2'
+done
+echo "TWO-NODE CHECK PASSED"
+

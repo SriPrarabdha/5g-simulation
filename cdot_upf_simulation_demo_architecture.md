@@ -584,7 +584,7 @@ Re-running the same manifest, seed, and component versions must reproduce the sa
 
 Before scheduling any high-fidelity replica, Stage 0 records a pass/fail/unknown matrix for:
 
-- SLURM version and job-array behavior;
+- PBS Pro version and job-array behavior;
 - Docker, Podman, or Apptainer/Singularity support;
 - TUN/TAP creation and network namespaces;
 - SCTP availability;
@@ -595,7 +595,7 @@ Before scheduling any high-fidelity replica, Stage 0 records a pass/fail/unknown
 - shared scratch capacity/quotas; and
 - job-local SSD/NVMe or temporary storage.
 
-The probe must be a reproducible SLURM job and must clean up only resources it created.
+The probe must be a reproducible PBS Pro job and must clean up only resources it created.
 
 Deployment choice:
 
@@ -724,7 +724,7 @@ optimization/          HiGHS model and solution reports
 steering/              validator, policy store, SMF hook, hashing
 core/free5gc/          isolated high-fidelity deployment
 generators/            PacketRusher and UERANSIM configurations
-experiments/           manifests, SLURM jobs, paired evaluator
+experiments/           manifests, PBS Pro jobs, paired evaluator
 calibration/           saturation sweeps and fitted envelopes
 output/                immutable partitioned Parquet results
 ~~~

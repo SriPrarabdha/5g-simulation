@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N upf_cap_probe
+#PBS -l select=2:ncpus=4:mem=8gb
+#PBS -l walltime=00:15:00
+#PBS -q workq
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+PROBE_DIR="${PROBE_DIR:-output/capability-probes}"
+mkdir -p "$PROBE_DIR"
+JOB_TAG="$(printf '%s' "$PBS_JOBID" | tr '[]/' '___')"
+
+"$PYTHON_BIN" -m experiments.cluster_probe --output "$PROBE_DIR/$JOB_TAG.json"
+
+echo "================ REMOTE NODE VISIBILITY ================"
+mapfile -t NODES < <(sort -u "$PBS_NODEFILE")
+SSH_OPTIONS=(-o StrictHostKeyChecking=no -o BatchMode=yes -o LogLevel=ERROR)
+for node in "${NODES[@]}"; do
+    echo "node=$node"
+    ssh "${SSH_OPTIONS[@]}" "$node" \
+        "test -x '$PYTHON_BIN' && test -r /proc/self/status && echo shared-python-and-proc=pass" \
+        || echo "remote-visibility=unknown"
+done
+
+echo "NOTE: unknown privilege checks select the split deployment; they are not treated as privileged passes."
+echo "CAPABILITY PROBE COMPLETE: $PROBE_DIR/$JOB_TAG.json"
+

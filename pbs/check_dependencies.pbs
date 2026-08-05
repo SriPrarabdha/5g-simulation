@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -N upf_check_deps
+#PBS -l select=1:ncpus=4:mem=8gb
+#PBS -l walltime=00:10:00
+#PBS -q workq
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+echo "================ PBS ALLOCATION ================"
+qstat -f "$PBS_JOBID" 2>/dev/null | grep -E 'Resource_List|exec_host|exec_vnode' || true
+echo "PBS_NODEFILE=${PBS_NODEFILE:-unset}"
+[ -n "${PBS_NODEFILE:-}" ] && sort -u "$PBS_NODEFILE" || true
+
+echo "================ REQUIRED RUNTIME ================"
+"$PYTHON_BIN" -c "import schemas, simulator.macro, steering, experiments; print('OK project imports')"
+"$PYTHON_BIN" -m compileall -q schemas simulator steering experiments
+"$PYTHON_BIN" -c "import json, hashlib, statistics, unittest; print('OK standard-library dependencies')"
+
+echo "================ OPTIONAL V1 DEPENDENCIES ================"
+"$PYTHON_BIN" -c "import importlib.util as u; print({m: bool(u.find_spec(m)) for m in ('numpy','pyarrow','highspy','lightgbm')})"
+
+echo "================ STORAGE ================"
+df -h "$PBS_O_WORKDIR" || true
+echo "job-local scratch=${PBS_JOBFS:-${TMPDIR:-/tmp}}"
+test -w "$PBS_O_WORKDIR"
+test -w "${PBS_JOBFS:-${TMPDIR:-/tmp}}"
+echo "DEPENDENCY CHECK PASSED"
+

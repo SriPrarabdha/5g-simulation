@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -N upf_macro_array
+#PBS -J 0-29
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=00:30:00
+#PBS -q workq
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+MANIFEST="${MANIFEST:-configs/demo_scenario.json}"
+CAMPAIGN_ID="${CAMPAIGN_ID:-demo-v1}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-output/macro}"
+SEED_START="${SEED_START:-1000}"
+ARRAY_INDEX="${PBS_ARRAY_INDEX:?PBS_ARRAY_INDEX is required; submit this as a PBS array}"
+SEED=$((SEED_START + ARRAY_INDEX))
+
+echo "campaign=$CAMPAIGN_ID manifest=$MANIFEST array_index=$ARRAY_INDEX seed=$SEED"
+"$PYTHON_BIN" -m experiments.run_campaign_shard \
+    --manifest "$MANIFEST" \
+    --campaign-id "$CAMPAIGN_ID" \
+    --seed "$SEED" \
+    --output-root "$OUTPUT_ROOT" \
+    --skip-existing
+

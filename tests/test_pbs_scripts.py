@@ -1,0 +1,38 @@
+from __future__ import annotations
+
+import unittest
+from pathlib import Path
+
+
+PBS_DIR = Path("pbs")
+
+
+class PBSScriptTests(unittest.TestCase):
+    def test_every_job_uses_workq_and_workdir(self) -> None:
+        for path in PBS_DIR.glob("*.pbs"):
+            with self.subTest(path=path):
+                content = path.read_text(encoding="utf-8")
+                self.assertIn("#PBS -q workq", content)
+                self.assertIn('cd "$PBS_O_WORKDIR"', content)
+                self.assertIn("source pbs/env.sh", content)
+
+    def test_macro_campaign_is_an_independent_job_array(self) -> None:
+        content = (PBS_DIR / "run_macro_array.pbs").read_text(encoding="utf-8")
+        self.assertIn("#PBS -J 0-29", content)
+        self.assertIn("PBS_ARRAY_INDEX", content)
+        self.assertNotIn("mpiexec", content)
+        self.assertIn("--skip-existing", content)
+
+    def test_submitter_uses_success_dependency(self) -> None:
+        content = (PBS_DIR / "submit_campaign.sh").read_text(encoding="utf-8")
+        self.assertIn("depend=afterok", content)
+        self.assertIn('qsub -J "0-$ARRAY_LAST"', content)
+
+    def test_environment_prefers_project_virtualenv(self) -> None:
+        content = (PBS_DIR / "env.sh").read_text(encoding="utf-8")
+        self.assertIn("env/bin/python", content)
+        self.assertIn("CONDA_ENV_NAME", content)
+
+
+if __name__ == "__main__":
+    unittest.main()
