@@ -11,16 +11,17 @@ def rendezvous_select(session_key: str, policy_id: str, weights: Mapping[str, fl
     Returns both the selected UPF and the winning hash value for audit records.
     Zero-weight destinations are ignored. Ties are resolved by UPF ID.
     """
-    candidates: list[tuple[float, str, str]] = []
+    winner: tuple[float, str, bytes] | None = None
     for upf_id, weight in weights.items():
         if weight <= 0:
             continue
-        digest = hashlib.sha256(f"{session_key}\x1f{policy_id}\x1f{upf_id}".encode()).hexdigest()
-        integer = int(digest, 16)
+        digest = hashlib.sha256(f"{session_key}\x1f{policy_id}\x1f{upf_id}".encode()).digest()
+        integer = int.from_bytes(digest, "big")
         uniform = (integer + 0.5) / (2**256)
-        candidates.append((-math.log(uniform) / weight, upf_id, digest))
-    if not candidates:
+        candidate = (-math.log(uniform) / weight, upf_id, digest)
+        if winner is None or candidate[:2] < winner[:2]:
+            winner = candidate
+    if winner is None:
         raise ValueError("at least one positive weight is required")
-    _, selected, digest = min(candidates, key=lambda item: (item[0], item[1]))
-    return selected, digest
-
+    _, selected, digest = winner
+    return selected, digest.hex()

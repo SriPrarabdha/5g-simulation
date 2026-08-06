@@ -19,6 +19,11 @@ def sample(
     received_delay: int = 1,
     epoch: int = 0,
     restart: str = "boot-a",
+    zone: str | None = None,
+    dnn: str | None = None,
+    snssai: str | None = None,
+    five_qi: int | None = None,
+    site: str | None = None,
 ) -> TelemetrySample:
     event_time = START + timedelta(seconds=seconds)
     return TelemetrySample(
@@ -32,6 +37,11 @@ def sample(
         unit="bytes_total",
         is_counter=True,
         upf_id="upf-a",
+        zone=zone,
+        dnn=dnn,
+        snssai=snssai,
+        five_qi=five_qi,
+        site=site,
         interface="n3",
         direction="ul",
         reset_epoch=epoch,
@@ -40,6 +50,22 @@ def sample(
 
 
 class TelemetryPipelineTests(unittest.TestCase):
+    def test_traffic_dimensions_are_part_of_counter_identity(self) -> None:
+        samples = [
+            sample(0, 0, sample_id="a-0", zone="north", dnn="internet", snssai="1-1", five_qi=9),
+            sample(30, 3000, sample_id="a-30", zone="north", dnn="internet", snssai="1-1", five_qi=9),
+            sample(0, 0, sample_id="b-0", zone="south", dnn="ims", snssai="1-2", five_qi=1),
+            sample(30, 6000, sample_id="b-30", zone="south", dnn="ims", snssai="1-2", five_qi=1),
+        ]
+        buckets = aggregate_counter_buckets(
+            samples,
+            [TimeWindow(START, START + timedelta(seconds=30))],
+        )
+        self.assertEqual(len(buckets), 2)
+        keyed = {(item.series.zone, item.series.dnn, item.series.snssai, item.series.five_qi): item for item in buckets}
+        self.assertEqual(keyed[("north", "internet", "1-1", 9)].total, 3000)
+        self.assertEqual(keyed[("south", "ims", "1-2", 1)].total, 6000)
+
     def test_fault_free_counter_rate_and_bucket_error_are_exact(self) -> None:
         samples = [sample(i, i * 100.0) for i in range(0, 121, 30)]
         intervals = reconstruct_counter_intervals(samples)

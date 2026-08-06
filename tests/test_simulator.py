@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 from simulator.macro import ScenarioConfig, Simulator, load_scenario
@@ -45,9 +46,18 @@ class SimulatorTests(unittest.TestCase):
             result.write_parquet(path)
             import pyarrow.parquet as pq
             table = pq.read_table(path)
-            self.assertEqual(table.schema.metadata[b"schema_version"], b"simulation-step/1.0")
+            self.assertEqual(table.schema.metadata[b"schema_version"], b"simulation-step/1.1")
             self.assertEqual(table.num_rows, len(result.steps))
             self.assertEqual(len(table.column("upfs")[0].as_py()), 1)
+            joint = table.column("group_upf_buckets").to_pylist()
+            self.assertEqual([index for index, rows in enumerate(joint) if rows], [3, 7])
+            self.assertEqual(joint[0], [])
+            self.assertEqual(joint[3][0]["five_qi"], 9)
+            first_bucket_admitted = sum(item["admitted_sessions"] for item in joint[3])
+            self.assertEqual(
+                first_bucket_admitted,
+                sum(step.upfs[0].new_sessions for step in result.steps[:4]),
+            )
             audit_path = Path(directory) / "selection-audits.parquet"
             result.write_selection_audits_parquet(audit_path)
             audits = pq.read_table(audit_path)
@@ -80,6 +90,28 @@ class SimulatorTests(unittest.TestCase):
         self.assertEqual(third.upfs[0].health, "unavailable")
         self.assertEqual(simulator.current_step, 3)
 
+    def test_selection_audit_stride_retains_a_deterministic_sample(self) -> None:
+        config = replace(ScenarioConfig.from_dict(self._scenario(100.0)), selection_audit_stride=3)
+        first = Simulator(config).run()
+        second = Simulator(config).run()
+        total_arrivals = sum(sum(step.group_arrivals.values()) for step in first.steps)
+        self.assertEqual(len(first.selection_audits), (total_arrivals + 2) // 3)
+        self.assertEqual(
+            [item.to_dict() for item in first.selection_audits],
+            [item.to_dict() for item in second.selection_audits],
+        )
+        self.assertEqual(first.summary["selection_audit_stride"], 3)
+
+    def test_run_reports_bounded_progress_and_completion(self) -> None:
+        updates: list[tuple[int, int]] = []
+        config = ScenarioConfig.from_dict(self._scenario(100.0))
+        result = Simulator(config).run(
+            progress_interval_steps=3,
+            progress_callback=lambda completed, total: updates.append((completed, total)),
+        )
+        self.assertEqual(updates, [(3, 8), (6, 8), (8, 8)])
+        self.assertEqual(len(result.steps), 8)
+
     @staticmethod
     def _scenario(capacity: float) -> dict:
         return {
@@ -93,7 +125,7 @@ class SimulatorTests(unittest.TestCase):
                 "queue_limit_seconds": 0, "path_latency_ms_by_zone": {"zone-a": 1}
             }],
             "groups": [{
-                "key": {"zone": "zone-a", "dnn": "internet", "snssai": "1-1"},
+                "key": {"zone": "zone-a", "dnn": "internet", "snssai": "1-1", "five_qi": 9},
                 "arrivals_per_step": 5, "lifetime_steps": {"min": 4, "max": 4},
                 "offered_mbps_per_session": {"ul": 1, "dl": 1},
                 "eligible_upfs": ["upf-a"]

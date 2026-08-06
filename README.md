@@ -19,6 +19,11 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
   startup, split-host operation, rehearsal, and troubleshooting.
 - [`docs/traffic-model-spec.md`](docs/traffic-model-spec.md) — cited synthetic
   traffic assumptions and unsupported-assumption boundary.
+- [`docs/extreme-training-runbook.md`](docs/extreme-training-runbook.md) — the
+  calibrated 16-million-UE, 8–12-hour forecast-training workload.
+- [`docs/extreme-data-spec-and-cdot-gap-analysis.md`](docs/extreme-data-spec-and-cdot-gap-analysis.md)
+  — exact generated schemas/model, public scale comparison, requirement gaps,
+  and C-DOT meeting checklist.
 
 ## Implemented
 
@@ -37,7 +42,8 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
   compare-and-swap publication.
 - Static, reactive, forecast-capacity, predictive-HiGHS, and non-deployable
   oracle controllers using deterministic weighted rendezvous selection.
-- Canonical nested Parquet run data, selection-audit Parquet, reproducibility
+- Canonical nested Parquet run data including compact 10-minute joint
+  UPF/group demand snapshots, selection-audit Parquet, reproducibility
   metadata/hashes, PBS arrays, and exact paired bootstrap evaluation.
 - Frozen, cited synthetic traffic-model registry with an explicit evidence and
   unsupported-assumption boundary.

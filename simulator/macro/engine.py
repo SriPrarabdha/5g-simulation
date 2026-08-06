@@ -8,15 +8,15 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from schemas import Capacity, GroupKey, SelectionAudit, TimeWindow, UPFState
 from forecasting import DemandObservation, ResidualObservation
 from steering import rendezvous_select
 
 from .config import GroupProfile, ScenarioConfig, UPFProfile
-from .controllers import ControlContext, Controller, StaticCapacityController, normalized_healthy_weights
-from .model import Cohort, DirectionResult, StepResult, UPFStepResult
+from .controllers import ControlContext, Controller, StaticCapacityController
+from .model import DirectionResult, GroupUPFBucketResult, StepResult, UPFStepResult
 
 
 @dataclass(slots=True)
@@ -44,11 +44,16 @@ class SimulationResult:
     step_seconds: int
     controller: str
     primary_overload_metric: str
+    selection_audit_stride: int = 1
     steps: list[StepResult] = field(default_factory=list)
     selection_audits: list[SelectionAudit] = field(default_factory=list)
+    _summary_cache: dict[str, Any] | None = field(default=None, init=False, repr=False)
+    _summary_cache_steps: int = field(default=-1, init=False, repr=False)
 
     @property
     def summary(self) -> dict[str, Any]:
+        if self._summary_cache is not None and self._summary_cache_steps == len(self.steps):
+            return self._summary_cache
         offered = {"ul": 0.0, "dl": 0.0}
         carried = {"ul": 0.0, "dl": 0.0}
         dropped = {"ul": 0.0, "dl": 0.0}
@@ -85,7 +90,7 @@ class SimulationResult:
             new_session_offered["ul"] += step.unplaced_rejected_ul_bytes
             new_session_offered["dl"] += step.unplaced_rejected_dl_bytes
             failures += sum(step.group_rejections.values()) - sum(upf.establishment_failures for upf in step.upfs)
-        return {
+        summary = {
             "scenario_id": self.scenario_id,
             "seed": self.seed,
             "controller": self.controller,
@@ -103,7 +108,12 @@ class SimulationResult:
             "overload_duration_seconds": overload_duration,
             "overload_area_seconds": overload_area,
             "establishment_failures": failures,
+            "selection_audit_stride": self.selection_audit_stride,
+            "selection_audits_retained": len(self.selection_audits),
         }
+        self._summary_cache = summary
+        self._summary_cache_steps = len(self.steps)
+        return summary
 
     def write_jsonl(self, path: str | Path) -> None:
         destination = Path(path)
@@ -117,7 +127,7 @@ class SimulationResult:
             stream.write(json.dumps(metadata, sort_keys=True, separators=(",", ":")) + "\n")
             for step in self.steps:
                 stream.write(json.dumps(
-                    {"record_type": "simulation_step", "schema_version": "simulation-step/0.1", **step.to_dict()},
+                    {"record_type": "simulation_step", "schema_version": "simulation-step/0.2", **step.to_dict()},
                     sort_keys=True, separators=(",", ":"),
                 ) + "\n")
             for audit in self.selection_audits:
@@ -157,6 +167,20 @@ class SimulationResult:
             ("dl", direction),
         ])
         group_count = pa.struct([("group_id", pa.string()), ("count", pa.int64())])
+        group_upf_bucket = pa.struct([
+            ("group_id", pa.string()),
+            ("zone", pa.string()),
+            ("dnn", pa.string()),
+            ("snssai", pa.string()),
+            ("five_qi", pa.int16()),
+            ("upf_id", pa.string()),
+            ("bucket_seconds", pa.int32()),
+            ("active_sessions", pa.int64()),
+            ("admitted_sessions", pa.int64()),
+            ("establishment_failures", pa.int64()),
+            ("offered_ul_mbps", pa.float64()),
+            ("offered_dl_mbps", pa.float64()),
+        ])
         schema = pa.schema([
             ("scenario_id", pa.string()),
             ("seed", pa.int64()),
@@ -166,36 +190,41 @@ class SimulationResult:
             ("policy_id", pa.string()),
             ("group_arrivals", pa.list_(group_count)),
             ("group_rejections", pa.list_(group_count)),
+            ("group_upf_buckets", pa.list_(group_upf_bucket)),
             ("unplaced_rejected_ul_bytes", pa.float64()),
             ("unplaced_rejected_dl_bytes", pa.float64()),
             ("upfs", pa.list_(upf)),
         ], metadata={
-            b"schema_version": b"simulation-step/1.0",
+            b"schema_version": b"simulation-step/1.1",
             b"controller": self.controller.encode(),
             b"summary": json.dumps(self.summary, sort_keys=True, separators=(",", ":")).encode(),
         })
-        rows: list[dict[str, Any]] = []
-        for step in self.steps:
-            row = step.to_dict()
-            row["window_start"] = step.window_start
-            row["window_end"] = step.window_end
-            row["group_arrivals"] = [
-                {"group_id": key, "count": value}
-                for key, value in sorted(step.group_arrivals.items())
-            ]
-            row["group_rejections"] = [
-                {"group_id": key, "count": value}
-                for key, value in sorted(step.group_rejections.items())
-            ]
-            rows.append(row)
-        table = pa.Table.from_pylist(rows, schema=schema)
-        pq.write_table(
-            table,
+        with pq.ParquetWriter(
             destination,
+            schema,
             compression="zstd",
             version="2.6",
             write_statistics=True,
-        )
+        ) as writer:
+            rows: list[dict[str, Any]] = []
+            for step in self.steps:
+                row = step.to_dict()
+                row["window_start"] = step.window_start
+                row["window_end"] = step.window_end
+                row["group_arrivals"] = [
+                    {"group_id": key, "count": value}
+                    for key, value in sorted(step.group_arrivals.items())
+                ]
+                row["group_rejections"] = [
+                    {"group_id": key, "count": value}
+                    for key, value in sorted(step.group_rejections.items())
+                ]
+                rows.append(row)
+                if len(rows) == 4096:
+                    writer.write_table(pa.Table.from_pylist(rows, schema=schema))
+                    rows.clear()
+            if rows:
+                writer.write_table(pa.Table.from_pylist(rows, schema=schema))
 
     def write_selection_audits_parquet(self, path: str | Path) -> None:
         try:
@@ -219,21 +248,28 @@ class SimulationResult:
             ("policy_id", pa.string()),
             ("reason", pa.string()),
         ], metadata={b"schema_version": b"selection-audit/1.0"})
-        rows = [{
-            "schema_version": audit.schema_version,
-            "timestamp": audit.timestamp,
-            "session_id_hash": audit.session_id_hash,
-            "session_hash_value": audit.session_hash_value,
-            "zone": audit.group.zone,
-            "dnn": audit.group.dnn,
-            "snssai": audit.group.snssai,
-            "eligible_upfs": audit.eligible_upfs,
-            "requested_weights": audit.requested_weights,
-            "selected_upf": audit.selected_upf,
-            "policy_id": audit.policy_id,
-            "reason": audit.reason,
-        } for audit in self.selection_audits]
-        pq.write_table(pa.Table.from_pylist(rows, schema=schema), destination, compression="zstd")
+        with pq.ParquetWriter(destination, schema, compression="zstd") as writer:
+            rows: list[dict[str, Any]] = []
+            for audit in self.selection_audits:
+                rows.append({
+                    "schema_version": audit.schema_version,
+                    "timestamp": audit.timestamp,
+                    "session_id_hash": audit.session_id_hash,
+                    "session_hash_value": audit.session_hash_value,
+                    "zone": audit.group.zone,
+                    "dnn": audit.group.dnn,
+                    "snssai": audit.group.snssai,
+                    "eligible_upfs": audit.eligible_upfs,
+                    "requested_weights": audit.requested_weights,
+                    "selected_upf": audit.selected_upf,
+                    "policy_id": audit.policy_id,
+                    "reason": audit.reason,
+                })
+                if len(rows) == 50_000:
+                    writer.write_table(pa.Table.from_pylist(rows, schema=schema))
+                    rows.clear()
+            if rows:
+                writer.write_table(pa.Table.from_pylist(rows, schema=schema))
 
 
 class Simulator:
@@ -241,12 +277,40 @@ class Simulator:
         self.config = config
         self.controller = controller or StaticCapacityController()
         self._upfs = {profile.upf_id: _UPFRuntime(profile) for profile in config.upfs}
-        self._cohorts: list[Cohort] = []
+        self._active_sessions: Counter[str] = Counter()
+        self._active_ul_mbps: Counter[str] = Counter()
+        self._active_dl_mbps: Counter[str] = Counter()
+        self._active_sessions_by_group_upf: Counter[tuple[str, str]] = Counter()
+        self._interval_admitted_by_group_upf: Counter[tuple[str, str]] = Counter()
+        self._interval_rejected_by_group_upf: Counter[tuple[str, str]] = Counter()
+        self._new_window_ul_mbps: Counter[str] = Counter()
+        self._new_window_dl_mbps: Counter[str] = Counter()
+        self._departures_by_step: dict[int, Counter[tuple[str, str, float, float]]] = defaultdict(Counter)
+        self._new_window_departures_by_step: dict[int, Counter[tuple[str, str, float, float]]] = defaultdict(Counter)
         self._session_sequence: Counter[str] = Counter()
         self._history_by_group: dict[str, list[DemandObservation]] = defaultdict(list)
         self._interval_arrivals: Counter[str] = Counter()
         self._arrival_factors = {group.key.selection_id: 1.0 for group in config.groups}
         self._path_latency_overrides: dict[tuple[str, str], float] = {}
+        self._eligible_group_ids_by_upf: dict[str, list[str]] = {
+            upf_id: [
+                group.key.selection_id
+                for group in config.groups
+                if upf_id in group.eligible_upfs
+            ]
+            for upf_id in self._upfs
+        }
+        self._audit_groups = {
+            group.key.selection_id: GroupKey(group.key.zone, group.key.dnn, group.key.snssai)
+            for group in config.groups
+        }
+        self._group_profiles = {
+            group.key.selection_id: group
+            for group in config.groups
+        }
+        self._events_by_step: dict[int, list[Any]] = defaultdict(list)
+        for event in config.events:
+            self._events_by_step[event.step].append(event)
         self._streams = {
             f"arrivals:{group.key.selection_id}": self._random_stream(f"arrivals:{group.key.selection_id}")
             for group in config.groups
@@ -261,13 +325,13 @@ class Simulator:
         self._history_closed_at_step: int | None = None
         self._events_applied_at_step: int | None = None
         self._planned_at_step: int | None = None
-        self._dynamic_events: list[Any] = []
         self.result = SimulationResult(
             scenario_id=self.config.scenario_id,
             seed=self.config.seed,
             step_seconds=self.config.step_seconds,
             controller=self.controller.name,
             primary_overload_metric=self.config.primary_overload_metric,
+            selection_audit_stride=self.config.selection_audit_stride,
         )
 
     @property
@@ -290,7 +354,7 @@ class Simulator:
         """Add an event at or after the next unprocessed tick without replaying history."""
         if event.step < self._step_index:
             raise ValueError("cannot inject an event into already-realized simulation time")
-        self._dynamic_events.append(event)
+        self._events_by_step[event.step].append(event)
         if event.step == self._step_index:
             self._events_applied_at_step = None
             self._planned_at_step = None
@@ -298,6 +362,7 @@ class Simulator:
     def replace_controller(self, controller: Controller) -> None:
         self.controller = controller
         self.result.controller = controller.name
+        self.result._summary_cache = None
         self._planned_at_step = None
 
     def _random_stream(self, name: str) -> random.Random:
@@ -324,9 +389,7 @@ class Simulator:
         return total
 
     def _apply_events(self, step: int) -> None:
-        for event in (*self.config.events, *self._dynamic_events):
-            if event.step != step:
-                continue
+        for event in self._events_by_step.get(step, ()):
             if event.event_type == "arrival_factor":
                 self._arrival_factors[event.group_id or ""] = event.arrival_factor or 0.0
                 continue
@@ -342,10 +405,6 @@ class Simulator:
                 self._path_latency_overrides[(event.upf_id or "", event.zone or "")] = event.latency_ms or 0.0
 
     def _states(self, measurement_time) -> list[UPFState]:
-        eligible_by_upf: dict[str, list[str]] = {upf_id: [] for upf_id in self._upfs}
-        for group in self.config.groups:
-            for upf_id in group.eligible_upfs:
-                eligible_by_upf[upf_id].append(group.key.selection_id)
         return [
             UPFState(
                 measurement_time=measurement_time,
@@ -359,7 +418,7 @@ class Simulator:
                 session_safe_utilization=runtime.profile.session_safe_utilization,
                 health=runtime.health,
                 zone=runtime.profile.zone,
-                eligible_groups=eligible_by_upf[upf_id],
+                eligible_groups=self._eligible_group_ids_by_upf[upf_id],
                 path_latency_ms_by_zone={
                     zone: self._path_latency_overrides.get((upf_id, zone), latency)
                     for zone, latency in runtime.profile.path_latency_ms_by_zone.items()
@@ -371,21 +430,15 @@ class Simulator:
         ]
 
     def _active_counts(self) -> Counter[str]:
-        counts: Counter[str] = Counter()
-        for cohort in self._cohorts:
-            counts[cohort.upf_id] += cohort.count
-        return counts
+        return Counter(self._active_sessions)
 
     def _residual_by_upf(self) -> dict[str, ResidualObservation]:
-        sessions: Counter[str] = Counter()
-        ul: Counter[str] = Counter()
-        dl: Counter[str] = Counter()
-        for cohort in self._cohorts:
-            sessions[cohort.upf_id] += cohort.count
-            ul[cohort.upf_id] += cohort.count * cohort.ul_mbps_per_session
-            dl[cohort.upf_id] += cohort.count * cohort.dl_mbps_per_session
         return {
-            upf_id: ResidualObservation(sessions[upf_id], ul[upf_id], dl[upf_id])
+            upf_id: ResidualObservation(
+                self._active_sessions[upf_id],
+                max(0.0, self._active_ul_mbps[upf_id]),
+                max(0.0, self._active_dl_mbps[upf_id]),
+            )
             for upf_id in self._upfs
         }
 
@@ -405,15 +458,32 @@ class Simulator:
             ))
         self._interval_arrivals.clear()
 
-    def _control_context(self) -> ControlContext:
+    def _control_context(
+        self,
+        *,
+        include_history: bool = True,
+        include_oracle: bool = True,
+    ) -> ControlContext:
         return ControlContext(
             history_by_group={
                 group_id: tuple(items)
                 for group_id, items in self._history_by_group.items()
-            },
+            } if include_history else {},
             residual_by_upf=self._residual_by_upf(),
-            oracle_new_by_group=self._peek_interval_arrivals(),
+            oracle_new_by_group=self._peek_interval_arrivals() if include_oracle else {},
         )
+
+    def _context_for_controller(self) -> ControlContext | None:
+        name = self.controller.name
+        if name == "static-capacity-v1":
+            return None
+        if name == "reactive-threshold-v1":
+            return self._control_context(include_history=False, include_oracle=False)
+        if name == "oracle-highs-v1":
+            return self._control_context(include_history=False, include_oracle=True)
+        if name in {"forecast-capacity-v1", "predictive-highs-v1"}:
+            return self._control_context(include_history=True, include_oracle=False)
+        return self._control_context()
 
     def control_context(self) -> ControlContext:
         return self._control_context()
@@ -451,6 +521,9 @@ class Simulator:
             and self._history_closed_at_step != step
         ):
             self._close_history_window(window_start)
+            self._new_window_ul_mbps.clear()
+            self._new_window_dl_mbps.clear()
+            self._new_window_departures_by_step.clear()
             self._history_closed_at_step = step
         if self._events_applied_at_step != step:
             self._apply_events(step)
@@ -469,7 +542,7 @@ class Simulator:
                 states,
                 window_start,
                 self._policy_version,
-                self._control_context(),
+                self._context_for_controller(),
             )
         except RuntimeError:
             self._policy = None
@@ -485,6 +558,10 @@ class Simulator:
         policy = self._policy
         states = self._states(window_start)
         state_by_id = {state.upf_id: state for state in states}
+        policy_weights_by_group = (
+            {item.key.selection_id: item.weights for item in policy.groups}
+            if policy is not None else {}
+        )
         result = self.result
 
         active_before = self._active_counts()
@@ -504,49 +581,63 @@ class Simulator:
             )
             arrivals[group_id] = arrival_count
             self._interval_arrivals[group_id] += arrival_count
+            requested = policy_weights_by_group.get(group_id, {})
+            allowed = {
+                upf_id: weight
+                for upf_id, weight in requested.items()
+                if upf_id in group.eligible_upfs
+                and state_by_id[upf_id].health in {"healthy", "degraded"}
+            }
+            total_weight = sum(allowed.values())
             weights = (
-                normalized_healthy_weights(policy, group.key, group.eligible_upfs, state_by_id)
-                if policy is not None else {}
+                {upf_id: weight / total_weight for upf_id, weight in allowed.items()}
+                if total_weight > 0 else {}
             )
+            retained_eligible = sorted(weights)
             for _ in range(arrival_count):
                 sequence = self._session_sequence[group_id]
                 self._session_sequence[group_id] += 1
-                session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
+                retain_audit = sequence % self.config.selection_audit_stride == 0
                 if not weights:
                     rejections[group_id] += 1
                     unplaced_rejections[group_id] += 1
-                    result.selection_audits.append(SelectionAudit(
-                        timestamp=window_start,
-                        session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
-                        session_hash_value=hashlib.sha256(f"{session_key}\x1fno-policy".encode()).hexdigest(),
-                        group=GroupKey(group.key.zone, group.key.dnn, group.key.snssai),
-                        eligible_upfs=[
-                            upf_id for upf_id in group.eligible_upfs
-                            if state_by_id[upf_id].health in {"healthy", "degraded"}
-                        ],
-                        requested_weights={}, selected_upf=None,
-                        policy_id=policy.policy_id if policy is not None else None,
-                        reason="no_eligible_upf",
-                    ))
+                    if retain_audit:
+                        session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
+                        result.selection_audits.append(SelectionAudit(
+                            timestamp=window_start,
+                            session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
+                            session_hash_value=hashlib.sha256(f"{session_key}\x1fno-policy".encode()).hexdigest(),
+                            group=self._audit_groups[group_id],
+                            eligible_upfs=[
+                                upf_id for upf_id in group.eligible_upfs
+                                if state_by_id[upf_id].health in {"healthy", "degraded"}
+                            ],
+                            requested_weights={}, selected_upf=None,
+                            policy_id=policy.policy_id if policy is not None else None,
+                            reason="no_eligible_upf",
+                        ))
                     continue
+                session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
                 selected, hash_value = rendezvous_select(session_key, policy.policy_id, weights)
                 reason = "fallback_static" if policy.fallback.used else "optimizer_weighted"
                 if policy.fallback.source_policy_id:
                     reason = "fallback_last_safe"
-                result.selection_audits.append(SelectionAudit(
-                    timestamp=window_start,
-                    session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
-                    session_hash_value=hash_value,
-                    group=GroupKey(group.key.zone, group.key.dnn, group.key.snssai),
-                    eligible_upfs=sorted(weights),
-                    requested_weights=dict(weights), selected_upf=selected,
-                    policy_id=policy.policy_id, reason=reason,
-                ))
+                if retain_audit:
+                    result.selection_audits.append(SelectionAudit(
+                        timestamp=window_start,
+                        session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
+                        session_hash_value=hash_value,
+                        group=self._audit_groups[group_id],
+                        eligible_upfs=retained_eligible,
+                        requested_weights=weights, selected_upf=selected,
+                        policy_id=policy.policy_id, reason=reason,
+                    ))
                 runtime = self._upfs[selected]
                 if active_before[selected] + admitted[selected] >= runtime.profile.session_capacity:
                     rejections[group_id] += 1
                     rejected_by_upf[selected] += 1
                     rejected_by_upf_group[(selected, group_id)] += 1
+                    self._interval_rejected_by_group_upf[(group_id, selected)] += 1
                     continue
                 lifetime = self._streams[f"lifetimes:{group_id}"].randint(
                     group.lifetime_steps_min, group.lifetime_steps_max
@@ -559,32 +650,28 @@ class Simulator:
 
         for key, count in new_cohorts.items():
             group_id, upf_id, lifetime, ul_mbps, dl_mbps = key
-            self._cohorts.append(Cohort(
-                group_id=group_id,
-                upf_id=upf_id,
-                remaining_steps=lifetime,
-                count=count,
-                ul_mbps_per_session=ul_mbps,
-                dl_mbps_per_session=dl_mbps,
-                arrival_step=step,
-            ))
+            ul_load = count * ul_mbps
+            dl_load = count * dl_mbps
+            self._active_sessions[upf_id] += count
+            self._active_ul_mbps[upf_id] += ul_load
+            self._active_dl_mbps[upf_id] += dl_load
+            self._active_sessions_by_group_upf[(group_id, upf_id)] += count
+            self._interval_admitted_by_group_upf[(group_id, upf_id)] += count
+            self._new_window_ul_mbps[upf_id] += ul_load
+            self._new_window_dl_mbps[upf_id] += dl_load
+            departure_step = step + lifetime - 1
+            departure_key = (group_id, upf_id, ul_mbps, dl_mbps)
+            self._departures_by_step[departure_step][departure_key] += count
+            self._new_window_departures_by_step[departure_step][departure_key] += count
 
-        offered_ul: Counter[str] = Counter()
-        offered_dl: Counter[str] = Counter()
-        new_offered_ul: Counter[str] = Counter()
-        new_offered_dl: Counter[str] = Counter()
-        decision_window_start = step - (step % self.config.decision_interval_steps)
-        for cohort in self._cohorts:
-            offered_ul[cohort.upf_id] += cohort.count * cohort.ul_mbps_per_session
-            offered_dl[cohort.upf_id] += cohort.count * cohort.dl_mbps_per_session
-            if cohort.arrival_step >= decision_window_start:
-                new_offered_ul[cohort.upf_id] += cohort.count * cohort.ul_mbps_per_session
-                new_offered_dl[cohort.upf_id] += cohort.count * cohort.dl_mbps_per_session
-
+        offered_ul = self._active_ul_mbps
+        offered_dl = self._active_dl_mbps
+        new_offered_ul = self._new_window_ul_mbps
+        new_offered_dl = self._new_window_dl_mbps
+        departures = self._departures_by_step.get(step, Counter())
         departing: Counter[str] = Counter()
-        for cohort in self._cohorts:
-            if cohort.remaining_steps == 1:
-                departing[cohort.upf_id] += cohort.count
+        for (_, upf_id, _, _), count in departures.items():
+            departing[upf_id] += count
 
         upf_results: list[UPFStepResult] = []
         for upf_id, runtime in self._upfs.items():
@@ -620,27 +707,92 @@ class Simulator:
             unplaced_rejections[group.key.selection_id] * group.offered_dl_mbps_per_session
             for group in self.config.groups
         )
+        group_upf_buckets: list[GroupUPFBucketResult] = []
+        closes_bucket = (
+            (step + 1) % self.config.decision_interval_steps == 0
+            or step + 1 == self.config.steps
+        )
+        if closes_bucket:
+            bucket_steps = step % self.config.decision_interval_steps + 1
+            keys = (
+                set(self._active_sessions_by_group_upf)
+                | set(self._interval_admitted_by_group_upf)
+                | set(self._interval_rejected_by_group_upf)
+            )
+            for group_id, upf_id in sorted(keys):
+                group = self._group_profiles[group_id]
+                active = self._active_sessions_by_group_upf[(group_id, upf_id)]
+                group_upf_buckets.append(GroupUPFBucketResult(
+                    group_id=group_id,
+                    zone=group.key.zone,
+                    dnn=group.key.dnn,
+                    snssai=group.key.snssai,
+                    five_qi=group.key.five_qi,
+                    upf_id=upf_id,
+                    bucket_seconds=bucket_steps * self.config.step_seconds,
+                    active_sessions=active,
+                    admitted_sessions=self._interval_admitted_by_group_upf[(group_id, upf_id)],
+                    establishment_failures=self._interval_rejected_by_group_upf[(group_id, upf_id)],
+                    offered_ul_mbps=active * group.offered_ul_mbps_per_session,
+                    offered_dl_mbps=active * group.offered_dl_mbps_per_session,
+                ))
+            self._interval_admitted_by_group_upf.clear()
+            self._interval_rejected_by_group_upf.clear()
+
         step_result = StepResult(
             scenario_id=self.config.scenario_id, seed=self.config.seed, step=step,
             window_start=window_start, window_end=window_end,
             policy_id=policy.policy_id if policy is not None else "none",
             group_arrivals=arrivals, group_rejections=dict(rejections), upfs=upf_results,
+            group_upf_buckets=group_upf_buckets,
             unplaced_rejected_ul_bytes=unplaced_ul_mbps * 1_000_000 / 8 * self.config.step_seconds,
             unplaced_rejected_dl_bytes=unplaced_dl_mbps * 1_000_000 / 8 * self.config.step_seconds,
         )
         result.steps.append(step_result)
-        survivors: list[Cohort] = []
-        for cohort in self._cohorts:
-            cohort.remaining_steps -= 1
-            if cohort.remaining_steps > 0:
-                survivors.append(cohort)
-        self._cohorts = survivors
+        for (group_id, upf_id, ul_mbps, dl_mbps), count in self._departures_by_step.pop(step, {}).items():
+            self._active_sessions[upf_id] -= count
+            self._active_ul_mbps[upf_id] -= count * ul_mbps
+            self._active_dl_mbps[upf_id] -= count * dl_mbps
+            self._active_sessions_by_group_upf[(group_id, upf_id)] -= count
+            if self._active_sessions[upf_id] == 0:
+                del self._active_sessions[upf_id]
+            if abs(self._active_ul_mbps[upf_id]) < 1e-7:
+                del self._active_ul_mbps[upf_id]
+            if abs(self._active_dl_mbps[upf_id]) < 1e-7:
+                del self._active_dl_mbps[upf_id]
+            if self._active_sessions_by_group_upf[(group_id, upf_id)] == 0:
+                del self._active_sessions_by_group_upf[(group_id, upf_id)]
+        for (_, upf_id, ul_mbps, dl_mbps), count in self._new_window_departures_by_step.pop(step, {}).items():
+            self._new_window_ul_mbps[upf_id] -= count * ul_mbps
+            self._new_window_dl_mbps[upf_id] -= count * dl_mbps
+            if abs(self._new_window_ul_mbps[upf_id]) < 1e-7:
+                del self._new_window_ul_mbps[upf_id]
+            if abs(self._new_window_dl_mbps[upf_id]) < 1e-7:
+                del self._new_window_dl_mbps[upf_id]
         self._step_index += 1
         return step_result
 
-    def run(self) -> SimulationResult:
+    def run(
+        self,
+        *,
+        progress_interval_steps: int | None = None,
+        progress_callback: Callable[[int, int], None] | None = None,
+    ) -> SimulationResult:
+        if (progress_interval_steps is None) != (progress_callback is None):
+            raise ValueError("progress interval and callback must be provided together")
+        if progress_interval_steps is not None and progress_interval_steps <= 0:
+            raise ValueError("progress_interval_steps must be positive")
         while self._step_index < self.config.steps:
             self.advance()
+            if (
+                progress_callback is not None
+                and progress_interval_steps is not None
+                and (
+                    self._step_index % progress_interval_steps == 0
+                    or self._step_index == self.config.steps
+                )
+            ):
+                progress_callback(self._step_index, self.config.steps)
         return self.result
 
     def _serve_direction(

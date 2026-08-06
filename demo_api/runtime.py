@@ -231,6 +231,7 @@ class DemoRun:
             "compute": {
                 "cpu": round(min(1.0, 0.16 + operating * 0.72), 3),
                 "memory": round(min(1.0, 0.23 + item.active_sessions / profile.session_capacity * 0.58), 3),
+                "source": "derived_synthetic_proxy",
             },
             "queue_mbytes": round((item.ul.queued_bytes + item.dl.queued_bytes) / 1_000_000, 3),
             "traffic": {

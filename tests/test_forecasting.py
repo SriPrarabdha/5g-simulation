@@ -37,6 +37,13 @@ def history(count: int) -> list[DemandObservation]:
 
 
 class ForecastingTests(unittest.TestCase):
+    def test_interpolated_equal_quantiles_are_monotonic(self) -> None:
+        from forecasting.baselines import _quantiles
+
+        result = _quantiles([54.449999999999996, 55.35, 55.35, 55.35])
+        self.assertLessEqual(result.p50, result.p90)
+        self.assertLessEqual(result.p90, result.p95)
+
     def test_moving_average_builds_monotonic_quantiles_and_residuals(self) -> None:
         observations = history(6)
         issued = observations[-1].window.end

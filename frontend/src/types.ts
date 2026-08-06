@@ -9,7 +9,7 @@ export interface UpfState {
   new_sessions: number
   capacity: { ul: number; dl: number }
   utilization: { ul: number; dl: number; operating: number }
-  compute: { cpu: number; memory: number }
+  compute: { cpu: number; memory: number; source: 'derived_synthetic_proxy' }
   queue_mbytes: number
   traffic: { ul: number; dl: number; offered: number; carried: number; dropped: number; rejected: number }
   replicas: { active: number; warming: number; ready_in_epochs: number }

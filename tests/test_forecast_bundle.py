@@ -11,6 +11,24 @@ from schemas import GroupKey, TimeWindow
 
 
 class ForecastBundleTests(unittest.TestCase):
+    def test_national_scale_features_are_numerically_stable(self) -> None:
+        group = GroupKey("zone", "high-volume", "1-2", 9)
+        start = datetime(2026, 1, 5, tzinfo=timezone.utc)
+        observations = []
+        for index in range(96):
+            value = 200_000.0 + (index % 4) * 2_500.0
+            window = TimeWindow(
+                start + timedelta(minutes=10 * index),
+                start + timedelta(minutes=10 * (index + 1)),
+            )
+            observations.append(DemandObservation(window, group, value, value * 3, value * 6))
+        payload = train_forecast_bundle(
+            {group.selection_id: [observations]},
+            model_version="national-scale-unit",
+        )
+        coefficient = payload["groups"][group.selection_id]["targets"]["new_session_count"]["1"]["model"]["coefficients"]
+        self.assertTrue(all(math.isfinite(item) for item in coefficient))
+
     def test_frozen_bundle_is_checksum_verified_and_supports_eight_horizons(self) -> None:
         group = GroupKey("zone", "internet", "1-1", 9)
         start = datetime(2026, 1, 1, tzinfo=timezone.utc)

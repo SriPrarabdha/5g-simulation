@@ -4,6 +4,14 @@ Status: frozen for `traffic-model/1.0`
 Purpose: training, evaluation, and demonstration only  
 Measurement claim: **none**. Every generated record is labelled synthetic.
 
+> **Executable-coverage warning:** this document includes target-state traffic
+> mechanisms. The current extreme generator implements time-varying Poisson
+> arrivals, uniform integer holding times, fixed per-class UL/DL rates, and
+> seeded calendar/stress factors. It does **not** currently implement the AR(1),
+> Markov-burst, heavy-tailed rate/holding-time, mobility, or telemetry-quality
+> generation described below. The as-built specification is
+> [extreme-data-spec-and-cdot-gap-analysis.md](extreme-data-spec-and-cdot-gap-analysis.md).
+
 ## Evidence boundary
 
 The generator uses published work to constrain plausible shapes, service mixes,
@@ -97,4 +105,3 @@ retrying the same shard either verifies the identical artifact or fails loudly.
 - Bounded migration and replica scale-out are simulation-only actions.
 - Oracle policies are evaluator upper bounds and are never deployable.
 - No autonomous C-DOT SMF/EMS claim is made without a supported operator interface.
-

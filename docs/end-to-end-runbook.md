@@ -59,20 +59,23 @@ The Python macro engine is primarily single-shard and CPU-bound. Assigning 128
 cores to one shard does not make the current engine 128 times faster. Parallel
 capacity should be used across independent seeds, scenarios, and controllers.
 
-Local measurements on 2026-08-05 used a Ryzen 9 9950X3D workstation and the
-current three-UPF scenario, with output retained in memory but not serialized:
+Local measurements on 2026-08-05 used a Ryzen 9 9950X3D workstation after the
+aggregate-cohort, indexed-event, bounded-Parquet, and hashing optimizations:
 
-| Controller | Simulated duration | Wall time | Peak RSS |
-|---|---:|---:|---:|
-| Static | 1 day / 2,880 ticks | 3.19 s | 86.8 MiB |
-| Static | 1 week / 20,160 ticks | 22.62 s | 498.8 MiB |
-| Predictive | 1 day / 2,880 ticks | 3.40 s | 142.6 MiB |
+| Profile | Artifact scope | Simulated duration | Wall time | Peak RSS |
+|---|---|---:|---:|---:|
+| Standard three-UPF | In-memory static simulation | 1 week | 5.26 s | 352.3 MiB |
+| Standard three-UPF | Complete campaign shard | 1 week | 20.20 s | 507.9 MiB |
+| Extreme 16-million-UE with joint group/UPF buckets | Complete campaign shard | 1 day | 5:06.31 | 588.0 MiB |
 
-A linear projection for one current 16-week shard is about six minutes of
-simulation and roughly 8 GiB of retained Python objects. JSONL and Parquet
-serialization can add time, disk space, and a temporary memory peak, so use a
-conservative initial allocation of one fast CPU, 16–32 GiB RAM, and 30 minutes.
-Run the capacity pilot in section 7 before fixing PBS requests.
+A linear projection for one standard 16-week shard is about 1:24 in memory or
+5:23 with artifacts. The calibrated extreme profile projects to 9:31:46 with
+artifacts and is documented in
+[extreme-training-runbook.md](extreme-training-runbook.md). JSONL and Parquet
+serialization add time and disk, while retained step results make full-run
+memory scale with duration. The joint-bucket calibration projects to 9:31:46
+and about 64.3 GiB peak RSS, so reserve 12 hours and 96 GiB RAM on this
+workstation. Run the capacity pilot in section 7 before fixing PBS requests.
 
 Use the workstation for:
 

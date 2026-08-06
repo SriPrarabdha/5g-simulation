@@ -7,7 +7,7 @@ import statistics
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 import numpy as np
 
@@ -111,10 +111,20 @@ def _fit_direct_model(
     y = np.asarray(targets, dtype=float)
     identity = np.eye(x.shape[1], dtype=float)
     identity[0, 0] = 0.0
-    coefficients = np.linalg.solve(
-        x[:train_end].T @ x[:train_end] + ridge * identity,
-        x[:train_end].T @ y[:train_end],
+    x_train = x[:train_end]
+    # National-scale session counts make the raw normal equations poorly
+    # conditioned.  RMS scaling preserves the intercept, keeps ridge strength
+    # comparable across features, and converts back to the existing bundle
+    # coefficient contract for inference.
+    feature_scale = np.sqrt(np.mean(np.square(x_train), axis=0))
+    feature_scale[0] = 1.0
+    feature_scale[~np.isfinite(feature_scale) | (feature_scale < 1e-12)] = 1.0
+    scaled_train = x_train / feature_scale
+    scaled_coefficients = np.linalg.solve(
+        scaled_train.T @ scaled_train + ridge * identity,
+        scaled_train.T @ y[:train_end],
     )
+    coefficients = scaled_coefficients / feature_scale
     calibration_raw = x[train_end:calibration_end] @ coefficients
     calibration_y = y[train_end:calibration_end]
     median_bias = float(np.median(calibration_y - calibration_raw))
@@ -151,13 +161,15 @@ def train_forecast_bundle(
     model_version: str,
     source: dict[str, Any] | None = None,
     ridge: float = 1e-6,
+    progress_callback: Callable[[int, int, str], None] | None = None,
 ) -> dict[str, Any]:
     """Train a deterministic direct multi-horizon model and freeze JSON-safe state."""
     if not series_by_group:
         raise ForecastingError("no grouped training series were supplied")
     groups: dict[str, Any] = {}
     metric_rows: list[float] = []
-    for group_id, sequences in sorted(series_by_group.items()):
+    ordered_groups = sorted(series_by_group.items())
+    for group_index, (group_id, sequences) in enumerate(ordered_groups, start=1):
         nonempty = [list(items) for items in sequences if items]
         if not nonempty:
             raise ForecastingError(f"group {group_id} has no training observations")
@@ -171,6 +183,8 @@ def train_forecast_bundle(
                 metric_rows.append(metrics["wape_p50"])
             targets[field] = by_horizon
         groups[group_id] = {"key": _group_dict(key), "targets": targets}
+        if progress_callback is not None:
+            progress_callback(group_index, len(ordered_groups), group_id)
     payload: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "model_version": model_version,

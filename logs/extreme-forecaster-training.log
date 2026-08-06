@@ -1,0 +1,10 @@
+nohup: ignoring input
+[2026-08-06T05:32:55Z] phase=load status=started campaign_root=output/macro/schema_major=1/campaign=extreme-training-16w-s20260805 controller=static-capacity-v1
+[2026-08-06T05:35:46Z] phase=load status=complete groups=96 observations=1548288 elapsed=00:02:51 peak_rss_gib=1.78
+[2026-08-06T05:35:46Z] phase=train status=started targets=3 horizons=8
+[2026-08-06T05:39:25Z] phase=train status=running progress=1.04% group=1/96 group_id=airport|edge-inference|5-500001 elapsed=00:03:39 eta=05:47:32 peak_rss_gib=1.79
+[2026-08-06T05:42:56Z] phase=train status=running progress=2.08% group=2/96 group_id=airport|enterprise-backup|1-100007 elapsed=00:07:11 eta=05:37:22 peak_rss_gib=1.80
+[2026-08-06T05:46:35Z] phase=train status=running progress=3.12% group=3/96 group_id=airport|enterprise-rtc|1-100006 elapsed=00:10:49 eta=05:35:31 peak_rss_gib=1.80
+[2026-08-06T05:50:08Z] phase=train status=running progress=4.17% group=4/96 group_id=airport|enterprise|1-100005 elapsed=00:14:22 eta=05:30:22 peak_rss_gib=1.80
+[2026-08-06T05:53:39Z] phase=train status=running progress=5.21% group=5/96 group_id=airport|factory-control|2-200001 elapsed=00:17:53 eta=05:25:30 peak_rss_gib=1.80
+[2026-08-06T05:57:10Z] phase=train status=running progress=6.25% group=6/96 group_id=airport|gaming|1-100003 elapsed=00:21:24 eta=05:21:01 peak_rss_gib=1.80

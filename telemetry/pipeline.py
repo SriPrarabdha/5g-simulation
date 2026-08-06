@@ -18,6 +18,11 @@ class SeriesKey:
     metric: str
     unit: str
     upf_id: str | None
+    zone: str | None
+    dnn: str | None
+    snssai: str | None
+    five_qi: int | None
+    site: str | None
     interface: str | None
     direction: str | None
 
@@ -29,6 +34,11 @@ class SeriesKey:
             metric=sample.metric,
             unit=sample.unit,
             upf_id=sample.upf_id,
+            zone=sample.zone,
+            dnn=sample.dnn,
+            snssai=sample.snssai,
+            five_qi=sample.five_qi,
+            site=sample.site,
             interface=sample.interface,
             direction=sample.direction,
         )

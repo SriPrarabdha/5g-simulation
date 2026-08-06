@@ -43,6 +43,24 @@ class UPFStepResult:
 
 
 @dataclass(slots=True)
+class GroupUPFBucketResult:
+    """Compact joint group/UPF state emitted once per decision bucket."""
+
+    group_id: str
+    zone: str
+    dnn: str
+    snssai: str
+    five_qi: int | None
+    upf_id: str
+    bucket_seconds: int
+    active_sessions: int
+    admitted_sessions: int
+    establishment_failures: int
+    offered_ul_mbps: float
+    offered_dl_mbps: float
+
+
+@dataclass(slots=True)
 class StepResult:
     scenario_id: str
     seed: int
@@ -54,6 +72,7 @@ class StepResult:
     group_rejections: dict[str, int]
     unplaced_rejected_ul_bytes: float
     unplaced_rejected_dl_bytes: float
+    group_upf_buckets: list[GroupUPFBucketResult]
     upfs: list[UPFStepResult]
 
     def to_dict(self) -> dict[str, Any]:

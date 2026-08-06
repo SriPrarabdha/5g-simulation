@@ -1,0 +1,84 @@
+{
+  "schema_version": "extreme-training-profile/1.0",
+  "scenario_id": "extreme-national-training-16w",
+  "weeks": 16,
+  "nominal_ue_population": 16000000,
+  "arrival_scale": 16.0,
+  "capacity_scale": 16.0,
+  "selection_audit_stride": 5000,
+  "event_resolution_minutes": 60,
+  "zones": [
+    "north-urban", "south-urban", "east-urban", "west-urban",
+    "industrial", "airport", "stadium", "rural"
+  ],
+  "services": [
+    {
+      "id": "consumer-video", "dnn": "internet-video", "snssai": "1-100001", "five_qi": 9,
+      "arrivals_per_step": 18.0, "lifetime_steps": [120, 1440],
+      "offered_mbps_per_session": [0.15, 4.0], "daily_profile": "evening", "weekend_factor": 1.25
+    },
+    {
+      "id": "social-live", "dnn": "social-live", "snssai": "1-100002", "five_qi": 8,
+      "arrivals_per_step": 10.0, "lifetime_steps": [20, 240],
+      "offered_mbps_per_session": [2.0, 1.0], "daily_profile": "evening", "weekend_factor": 1.35
+    },
+    {
+      "id": "gaming", "dnn": "gaming", "snssai": "1-100003", "five_qi": 3,
+      "arrivals_per_step": 12.0, "lifetime_steps": [80, 720],
+      "offered_mbps_per_session": [0.20, 0.40], "daily_profile": "late", "weekend_factor": 1.30
+    },
+    {
+      "id": "voice", "dnn": "ims-voice", "snssai": "1-100004", "five_qi": 1,
+      "arrivals_per_step": 8.0, "lifetime_steps": [20, 480],
+      "offered_mbps_per_session": [0.08, 0.08], "daily_profile": "commute", "weekend_factor": 0.90
+    },
+    {
+      "id": "enterprise", "dnn": "enterprise", "snssai": "1-100005", "five_qi": 7,
+      "arrivals_per_step": 10.0, "lifetime_steps": [60, 960],
+      "offered_mbps_per_session": [1.0, 2.0], "daily_profile": "business", "weekend_factor": 0.45
+    },
+    {
+      "id": "video-conference", "dnn": "enterprise-rtc", "snssai": "1-100006", "five_qi": 2,
+      "arrivals_per_step": 8.0, "lifetime_steps": [60, 720],
+      "offered_mbps_per_session": [1.5, 1.5], "daily_profile": "business", "weekend_factor": 0.50
+    },
+    {
+      "id": "industrial-urllc", "dnn": "factory-control", "snssai": "2-200001", "five_qi": 82,
+      "arrivals_per_step": 6.0, "lifetime_steps": [480, 2880],
+      "offered_mbps_per_session": [0.10, 0.08], "daily_profile": "industrial", "weekend_factor": 0.75
+    },
+    {
+      "id": "massive-iot", "dnn": "mmtc", "snssai": "3-300001", "five_qi": 9,
+      "arrivals_per_step": 20.0, "lifetime_steps": [720, 5760],
+      "offered_mbps_per_session": [0.020, 0.004], "daily_profile": "flat", "weekend_factor": 1.0
+    },
+    {
+      "id": "connected-vehicle", "dnn": "v2x", "snssai": "4-400001", "five_qi": 84,
+      "arrivals_per_step": 10.0, "lifetime_steps": [10, 120],
+      "offered_mbps_per_session": [0.50, 1.0], "daily_profile": "commute", "weekend_factor": 0.80
+    },
+    {
+      "id": "edge-ai", "dnn": "edge-inference", "snssai": "5-500001", "five_qi": 7,
+      "arrivals_per_step": 5.0, "lifetime_steps": [20, 240],
+      "offered_mbps_per_session": [3.0, 6.0], "daily_profile": "business", "weekend_factor": 0.70
+    },
+    {
+      "id": "cloud-backup", "dnn": "enterprise-backup", "snssai": "1-100007", "five_qi": 9,
+      "arrivals_per_step": 2.0, "lifetime_steps": [120, 1440],
+      "offered_mbps_per_session": [8.0, 2.0], "daily_profile": "overnight", "weekend_factor": 1.15
+    },
+    {
+      "id": "public-safety", "dnn": "mission-critical", "snssai": "6-600001", "five_qi": 65,
+      "arrivals_per_step": 3.0, "lifetime_steps": [40, 400],
+      "offered_mbps_per_session": [2.0, 2.0], "daily_profile": "flat", "weekend_factor": 1.0
+    }
+  ],
+  "stress": {
+    "surges_per_week": 12,
+    "surge_multiplier_range": [2.5, 8.0],
+    "surge_duration_hours_range": [2, 10],
+    "capacity_faults_per_week": 8,
+    "outages_per_week": 3,
+    "latency_incidents_per_week": 5
+  }
+}

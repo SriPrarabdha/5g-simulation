@@ -5,8 +5,10 @@ import hashlib
 import json
 import os
 import platform
+import resource
 import socket
 import subprocess
+import time
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
@@ -55,6 +57,15 @@ def shard_directory(output_root: Path, campaign_id: str, scenario_id: str, contr
     )
 
 
+def _duration(seconds: float | None) -> str:
+    if seconds is None:
+        return "unknown"
+    seconds = max(0, round(seconds))
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+
 def run_shard(
     manifest: Path,
     output_root: Path,
@@ -62,6 +73,7 @@ def run_shard(
     seed: int,
     skip_existing: bool = False,
     controller: str = "static",
+    progress_every_simulated_hours: float | None = None,
 ) -> Path:
     project_root = Path(__file__).resolve().parent.parent
     base_config = load_scenario(manifest)
@@ -73,6 +85,12 @@ def run_shard(
     parquet_path = destination / "run.parquet"
     audits_path = destination / "selection-audits.parquet"
     manifest_digest = file_sha256(manifest)
+    progress_enabled = progress_every_simulated_hours is not None
+
+    def log(message: str) -> None:
+        if progress_enabled:
+            timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+            print(f"[{timestamp}] {message}", flush=True)
 
     if run_path.exists() or parquet_path.exists() or audits_path.exists() or metadata_path.exists():
         if not skip_existing or not run_path.is_file() or not parquet_path.is_file() or not audits_path.is_file() or not metadata_path.is_file():
@@ -86,20 +104,63 @@ def run_shard(
             or existing.get("controller") != simulator.controller.name
         ):
             raise FileExistsError(f"existing shard does not match this manifest or is incomplete: {destination}")
+        log(f"phase=complete status=already_published destination={destination}")
         return destination
 
-    result = simulator.run()
+    progress_steps: int | None = None
+    if progress_enabled:
+        if progress_every_simulated_hours is None or progress_every_simulated_hours <= 0:
+            raise ValueError("progress_every_simulated_hours must be positive")
+        progress_steps = max(
+            1,
+            round(progress_every_simulated_hours * 3600 / config.step_seconds),
+        )
+    started = time.monotonic()
+    simulated_days = config.steps * config.step_seconds / 86_400
+    log(
+        f"phase=simulate status=started scenario={config.scenario_id} controller={simulator.controller.name} "
+        f"seed={seed} steps={config.steps} simulated_days={simulated_days:g} destination={destination}"
+    )
+
+    def progress(completed: int, total: int) -> None:
+        elapsed = time.monotonic() - started
+        rate = completed / elapsed if elapsed > 0 else 0.0
+        eta = (total - completed) / rate if rate > 0 else None
+        sim_day = completed * config.step_seconds / 86_400
+        peak_rss_gib = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 / 1024
+        log(
+            f"phase=simulate status=running progress={completed / total * 100:.2f}% "
+            f"step={completed}/{total} simulated_day={sim_day:.2f}/{simulated_days:g} "
+            f"elapsed={_duration(elapsed)} eta={_duration(eta)} peak_rss_gib={peak_rss_gib:.2f}"
+        )
+
+    try:
+        result = simulator.run(
+            progress_interval_steps=progress_steps,
+            progress_callback=progress if progress_steps is not None else None,
+        )
+    except BaseException as error:
+        log(f"phase=simulate status=failed error={type(error).__name__}:{error}")
+        raise
+    log(f"phase=simulate status=complete elapsed={_duration(time.monotonic() - started)}")
     destination.mkdir(parents=True, exist_ok=True)
     temporary_run = destination / f".run.jsonl.{os.getpid()}.tmp"
+    log("phase=write_jsonl status=started")
     result.write_jsonl(temporary_run)
     os.replace(temporary_run, run_path)
+    log(f"phase=write_jsonl status=complete bytes={run_path.stat().st_size}")
     temporary_parquet = destination / f".run.parquet.{os.getpid()}.tmp"
+    log("phase=write_parquet status=started")
     result.write_parquet(temporary_parquet)
     os.replace(temporary_parquet, parquet_path)
+    log(f"phase=write_parquet status=complete bytes={parquet_path.stat().st_size}")
     temporary_audits = destination / f".selection-audits.parquet.{os.getpid()}.tmp"
+    log("phase=write_selection_audits status=started")
     result.write_selection_audits_parquet(temporary_audits)
     os.replace(temporary_audits, audits_path)
+    log(f"phase=write_selection_audits status=complete bytes={audits_path.stat().st_size}")
 
+    log("phase=metadata status=started action=hash_artifacts")
     metadata = {
         "schema_version": "experiment-shard/1.0",
         "campaign_id": campaign_id,
@@ -123,6 +184,10 @@ def run_shard(
         "summary": result.summary,
     }
     atomic_json(metadata_path, metadata)
+    log(
+        f"phase=complete status=published elapsed={_duration(time.monotonic() - started)} "
+        f"metadata={metadata_path}"
+    )
     return destination
 
 
@@ -133,6 +198,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--campaign-id", required=True)
     parser.add_argument("--seed", required=True, type=int)
     parser.add_argument("--skip-existing", action="store_true")
+    parser.add_argument(
+        "--progress-every-simulated-hours",
+        type=float,
+        default=12.0,
+        help="emit a flushed progress line at this simulated-time interval (default: 12 hours)",
+    )
     parser.add_argument(
         "--controller",
         choices=("static", "reactive", "forecast-capacity", "predictive", "oracle"),
@@ -145,8 +216,8 @@ def main() -> int:
     args = build_parser().parse_args()
     destination = run_shard(
         args.manifest, args.output_root, args.campaign_id, args.seed,
-        skip_existing=args.skip_existing,
-        controller=args.controller,
+        skip_existing=args.skip_existing, controller=args.controller,
+        progress_every_simulated_hours=args.progress_every_simulated_hours,
     )
     print(destination)
     return 0

@@ -13,6 +13,11 @@ external integration exists.
   and deferred integration decisions.
 - [Synthetic traffic-model specification](traffic-model-spec.md) — evidence,
   distributions, leakage rules, and unsupported assumptions.
+- [Extreme training runbook](extreme-training-runbook.md) — calibrated
+  national-scale manifest generation, runtime sizing, execution, and training.
+- [Extreme data specification and C-DOT gap analysis](extreme-data-spec-and-cdot-gap-analysis.md)
+  — schemas, classes, probabilistic model, scale comparison, mail-requirement
+  traceability, and meeting questions.
 - [Architecture whitepaper](whitepaper.pdf) — presentation-oriented background.
 
 The root [README](../README.md) remains the short project entry point. PBS-specific

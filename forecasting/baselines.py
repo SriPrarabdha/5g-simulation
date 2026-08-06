@@ -68,10 +68,18 @@ def _quantile(values: list[float], probability: float) -> float:
 
 
 def _quantiles(values: list[float]) -> Quantiles:
+    # Linear interpolation can place mathematically equal quantiles a few ULPs
+    # out of order (for example 55.35 versus 55.349999999999994).  Sorting is
+    # the deterministic monotonicity correction also used by the fitted model.
+    p50, p90, p95 = sorted((
+        _quantile(values, 0.50),
+        _quantile(values, 0.90),
+        _quantile(values, 0.95),
+    ))
     return Quantiles(
-        p50=_quantile(values, 0.50),
-        p90=_quantile(values, 0.90),
-        p95=_quantile(values, 0.95),
+        p50=p50,
+        p90=p90,
+        p95=p95,
     )
 
 
