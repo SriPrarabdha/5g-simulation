@@ -19,6 +19,10 @@ def main() -> int:
         default=("static", "reactive", "predictive"),
     )
     parser.add_argument("--skip-existing", action="store_true")
+    parser.add_argument(
+        "--forecast-bundle", type=Path,
+        help="trained bundle used by predictive and forecast-capacity controllers",
+    )
     args = parser.parse_args()
     if args.seed_count < 1:
         parser.error("--seed-count must be positive")
@@ -31,6 +35,10 @@ def main() -> int:
                 seed,
                 skip_existing=args.skip_existing,
                 controller=controller,
+                forecast_bundle=(
+                    args.forecast_bundle
+                    if controller in {"predictive", "forecast-capacity"} else None
+                ),
             )
             print(destination)
     return 0

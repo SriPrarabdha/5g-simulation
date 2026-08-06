@@ -18,6 +18,9 @@ external integration exists.
 - [Extreme data specification and C-DOT gap analysis](extreme-data-spec-and-cdot-gap-analysis.md)
   — schemas, classes, probabilistic model, scale comparison, mail-requirement
   traceability, and meeting questions.
+- [Extreme forecaster v1 results](extreme-forecaster-v1-results.md) — frozen
+  checksums, held-out and baseline results, acceptance status, improvement
+  triggers, and the optimizer handoff.
 - [Architecture whitepaper](whitepaper.pdf) — presentation-oriented background.
 
 The root [README](../README.md) remains the short project entry point. PBS-specific

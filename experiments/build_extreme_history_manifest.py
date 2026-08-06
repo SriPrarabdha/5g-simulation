@@ -288,6 +288,95 @@ def build(
     return payload
 
 
+def build_optimizer_pilot(
+    profile: dict[str, Any], seed: int, start: datetime
+) -> dict[str, Any]:
+    """Build one future day with deterministic, concentrated control stress."""
+    payload = build(profile, seed, start, days=1)
+    hour = STEPS_PER_HOUR
+    surge_windows = [
+        {
+            "name": "stadium_crowd_plus_brownout",
+            "start_hour": 4,
+            "end_hour": 8,
+            "multipliers": {
+                "stadium|social-live|1-100002": 8.0,
+                "stadium|internet-video|1-100001": 6.0,
+                "stadium|gaming|1-100003": 6.0,
+                "stadium|mission-critical|6-600001": 5.0,
+            },
+        },
+        {
+            "name": "airport_crowd_plus_outage",
+            "start_hour": 10,
+            "end_hour": 14,
+            "multipliers": {
+                "airport|edge-inference|5-500001": 7.0,
+                "airport|enterprise-rtc|1-100006": 6.0,
+                "airport|social-live|1-100002": 6.0,
+                "airport|mission-critical|6-600001": 5.0,
+            },
+        },
+        {
+            "name": "industrial_uplink_plus_brownout",
+            "start_hour": 17,
+            "end_hour": 21,
+            "multipliers": {
+                "industrial|enterprise-backup|1-100007": 8.0,
+                "industrial|edge-inference|5-500001": 7.0,
+                "industrial|enterprise-rtc|1-100006": 6.0,
+                "industrial|mission-critical|6-600001": 5.0,
+            },
+        },
+    ]
+    arrival_events = [
+        dict(event) for event in payload["events"] if event["event_type"] == "arrival_factor"
+    ]
+    for event in arrival_events:
+        for window in surge_windows:
+            multiplier = window["multipliers"].get(event["group_id"])
+            if (
+                multiplier is not None
+                and window["start_hour"] * hour <= event["step"] < window["end_hour"] * hour
+            ):
+                event["arrival_factor"] = round(event["arrival_factor"] * multiplier, 4)
+
+    scripted_faults = [
+        {"step": 5 * hour, "event_type": "capacity_factor", "upf_id": "upf-edge-stadium-a", "ul_factor": 0.20, "dl_factor": 0.30},
+        {"step": 5 * hour, "event_type": "capacity_factor", "upf_id": "upf-regional-3", "ul_factor": 0.40, "dl_factor": 0.50},
+        {"step": 8 * hour, "event_type": "capacity_factor", "upf_id": "upf-edge-stadium-a", "ul_factor": 1.0, "dl_factor": 1.0},
+        {"step": 8 * hour, "event_type": "capacity_factor", "upf_id": "upf-regional-3", "ul_factor": 1.0, "dl_factor": 1.0},
+        {"step": 11 * hour, "event_type": "health", "upf_id": "upf-edge-airport-a", "health": "degraded"},
+        {"step": 11 * hour, "event_type": "capacity_factor", "upf_id": "upf-edge-airport-a", "ul_factor": 0.01, "dl_factor": 0.01},
+        {"step": 13 * hour, "event_type": "capacity_factor", "upf_id": "upf-edge-airport-a", "ul_factor": 1.0, "dl_factor": 1.0},
+        {"step": 13 * hour, "event_type": "health", "upf_id": "upf-edge-airport-a", "health": "healthy"},
+        {"step": 15 * hour, "event_type": "path_latency", "upf_id": "upf-regional-2", "zone": "industrial", "latency_ms": 120.0},
+        {"step": 17 * hour, "event_type": "path_latency", "upf_id": "upf-regional-2", "zone": "industrial", "latency_ms": 5.0},
+        {"step": 18 * hour, "event_type": "capacity_factor", "upf_id": "upf-edge-industrial-a", "ul_factor": 0.20, "dl_factor": 0.35},
+        {"step": 18 * hour, "event_type": "capacity_factor", "upf_id": "upf-regional-2", "ul_factor": 0.35, "dl_factor": 0.50},
+        {"step": 21 * hour, "event_type": "capacity_factor", "upf_id": "upf-edge-industrial-a", "ul_factor": 1.0, "dl_factor": 1.0},
+        {"step": 21 * hour, "event_type": "capacity_factor", "upf_id": "upf-regional-2", "ul_factor": 1.0, "dl_factor": 1.0},
+    ]
+    payload["events"] = sorted(
+        [*arrival_events, *scripted_faults],
+        key=lambda item: (
+            item["step"], item["event_type"], item.get("group_id", ""), item.get("upf_id", "")
+        ),
+    )
+    payload["scenario_id"] = f"extreme-optimizer-pilot-1d-s{seed}"
+    payload["corpus"]["purpose"] = "fresh-seed event-dense trained-optimizer pilot"
+    payload["corpus"]["pilot_surge_windows"] = [
+        {key: value for key, value in window.items() if key != "multipliers"}
+        | {"groups": sorted(window["multipliers"]), "multipliers": window["multipliers"]}
+        for window in surge_windows
+    ]
+    payload["corpus"]["pilot_fault_events"] = len(scripted_faults)
+    payload["corpus"].pop("manifest_sha256", None)
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    payload["corpus"]["manifest_sha256"] = hashlib.sha256(canonical).hexdigest()
+    return payload
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build a deterministic high-scale 5G training manifest")
     parser.add_argument("--profile", type=Path, default=Path("configs/extreme_training_profile.json"))
@@ -295,14 +384,19 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=20260805)
     parser.add_argument("--start", default="2026-01-05T00:00:00+00:00")
     parser.add_argument("--days", type=int, help="short calibration manifest; omit for the full profile")
+    parser.add_argument(
+        "--optimizer-pilot", action="store_true",
+        help="build the fixed one-day, event-dense optimizer comparison manifest",
+    )
     args = parser.parse_args()
     profile = json.loads(args.profile.read_text(encoding="utf-8"))
-    manifest = build(
-        profile,
-        args.seed,
-        datetime.fromisoformat(args.start.replace("Z", "+00:00")),
-        days=args.days,
-    )
+    start = datetime.fromisoformat(args.start.replace("Z", "+00:00"))
+    if args.optimizer_pilot:
+        if args.days is not None:
+            parser.error("--optimizer-pilot has a fixed one-day duration; omit --days")
+        manifest = build_optimizer_pilot(profile, args.seed, start)
+    else:
+        manifest = build(profile, args.seed, start, days=args.days)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     temporary = args.output.with_suffix(args.output.suffix + ".tmp")
     temporary.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")

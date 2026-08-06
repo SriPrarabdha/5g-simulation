@@ -585,6 +585,8 @@ class RunManager:
         default = self.scenario_path.parent / "demo_forecast_bundle.json"
         selected = Path(configured) if configured else default
         self.forecast_bundle = TrainedForecastBundle.load(selected) if selected.exists() else None
+        if self.forecast_bundle is not None:
+            self.forecast_bundle.validate_groups(group.key for group in self.scenario.groups)
         self.forecast_bundle_path = selected if selected.exists() else None
         self.runs: dict[str, DemoRun] = {}
 

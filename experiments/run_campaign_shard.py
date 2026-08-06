@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from forecasting import TrainedForecastBundle
 from simulator.macro import Simulator, controller_by_name, load_scenario
 
 
@@ -74,17 +75,34 @@ def run_shard(
     skip_existing: bool = False,
     controller: str = "static",
     progress_every_simulated_hours: float | None = None,
+    forecast_bundle: Path | None = None,
 ) -> Path:
     project_root = Path(__file__).resolve().parent.parent
     base_config = load_scenario(manifest)
     config = replace(base_config, seed=seed)
-    simulator = Simulator(config, controller_by_name(controller))
+    trained_forecaster = (
+        TrainedForecastBundle.load(forecast_bundle) if forecast_bundle is not None else None
+    )
+    if trained_forecaster is not None:
+        trained_forecaster.validate_groups(group.key for group in config.groups)
+    simulator = Simulator(
+        config, controller_by_name(controller, forecaster=trained_forecaster)
+    )
     destination = shard_directory(output_root, campaign_id, config.scenario_id, simulator.controller.name, seed)
     run_path = destination / "run.jsonl"
     metadata_path = destination / "metadata.json"
     parquet_path = destination / "run.parquet"
     audits_path = destination / "selection-audits.parquet"
     manifest_digest = file_sha256(manifest)
+    forecast_identity = (
+        {
+            "path": str(forecast_bundle.resolve()),
+            "file_sha256": file_sha256(forecast_bundle),
+            "bundle_sha256": trained_forecaster.metadata["bundle_sha256"],
+            "model_version": trained_forecaster.model_version,
+        }
+        if forecast_bundle is not None and trained_forecaster is not None else None
+    )
     progress_enabled = progress_every_simulated_hours is not None
 
     def log(message: str) -> None:
@@ -102,6 +120,7 @@ def run_shard(
             or existing.get("parquet_file_sha256") != file_sha256(parquet_path)
             or existing.get("selection_audits_sha256") != file_sha256(audits_path)
             or existing.get("controller") != simulator.controller.name
+            or existing.get("forecast_bundle") != forecast_identity
         ):
             raise FileExistsError(f"existing shard does not match this manifest or is incomplete: {destination}")
         log(f"phase=complete status=already_published destination={destination}")
@@ -167,6 +186,7 @@ def run_shard(
         "scenario_id": config.scenario_id,
         "seed": seed,
         "controller": result.controller,
+        "forecast_bundle": forecast_identity,
         "manifest": str(manifest.resolve()),
         "manifest_sha256": manifest_digest,
         "git_commit": git_commit(project_root),
@@ -209,6 +229,11 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("static", "reactive", "forecast-capacity", "predictive", "oracle"),
         default="static",
     )
+    parser.add_argument(
+        "--forecast-bundle",
+        type=Path,
+        help="checksum-verified trained bundle for predictive or forecast-capacity controllers",
+    )
     return parser
 
 
@@ -218,6 +243,7 @@ def main() -> int:
         args.manifest, args.output_root, args.campaign_id, args.seed,
         skip_existing=args.skip_existing, controller=args.controller,
         progress_every_simulated_hours=args.progress_every_simulated_hours,
+        forecast_bundle=args.forecast_bundle,
     )
     print(destination)
     return 0

@@ -108,3 +108,14 @@ selection group and target with an ordered 70/15/15 train/calibration/test
 split. This is not yet the exact 11/2/3-week boundary declared in the manifest.
 More synthetic volume reduces sampling noise and broadens stress coverage, but
 does not replace calibration and final testing against operator telemetry.
+
+Report the bundle's held-out metrics by horizon and target after training:
+
+```bash
+env/bin/python -m experiments.report_forecast_bundle \
+  output/models/extreme-forecaster-v1.json
+```
+
+Use `--json` for a machine-readable report. WAPE and interval coverage are
+forecasting metrics; `1-WAPE` is included as a convenient score but should not
+be described as classification accuracy.

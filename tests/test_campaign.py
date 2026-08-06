@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -49,6 +50,29 @@ class CampaignTests(unittest.TestCase):
                 manifest, Path(directory), "reactive-campaign", 7, controller="reactive"
             )
             self.assertIn("controller=reactive-threshold-v1", str(destination))
+
+    def test_predictive_shard_records_the_exact_forecast_bundle(self) -> None:
+        manifest = Path("configs/demo_scenario.json")
+        bundle = Path("configs/demo_forecast_bundle.json")
+        with tempfile.TemporaryDirectory() as directory:
+            destination = run_shard(
+                manifest,
+                Path(directory),
+                "trained-predictive-campaign",
+                7,
+                controller="predictive",
+                forecast_bundle=bundle,
+            )
+            metadata = json.loads(
+                (destination / "metadata.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(
+                metadata["forecast_bundle"]["bundle_sha256"],
+                json.loads(bundle.read_text(encoding="utf-8"))["bundle_sha256"],
+            )
+            self.assertEqual(
+                metadata["summary"]["controller"], "predictive-highs-v1"
+            )
 
     def test_capability_probe_has_architecture_gate_fields(self) -> None:
         checks = probe()["checks"]

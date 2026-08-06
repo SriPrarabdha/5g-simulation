@@ -24,6 +24,9 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
 - [`docs/extreme-data-spec-and-cdot-gap-analysis.md`](docs/extreme-data-spec-and-cdot-gap-analysis.md)
   — exact generated schemas/model, public scale comparison, requirement gaps,
   and C-DOT meeting checklist.
+- [`docs/extreme-forecaster-v1-results.md`](docs/extreme-forecaster-v1-results.md)
+  — frozen v1 forecast results, baseline evidence, limitations, improvement
+  plan, and predictive-optimizer handoff.
 
 ## Implemented
 

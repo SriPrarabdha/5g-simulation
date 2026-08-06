@@ -178,7 +178,8 @@ def main() -> int:
     write_forecast_bundle(args.output, payload)
     _log(
         f"phase=complete status=published elapsed={_duration(time.monotonic() - started)} "
-        f"output={args.output} sha256={payload['bundle_sha256']}"
+        f"output={args.output} sha256={payload['bundle_sha256']} "
+        f"mean_test_wape_pct={payload['summary_metrics']['mean_test_wape_p50'] * 100:.3f}"
     )
     print(json.dumps({
         "output": str(args.output), "model_version": payload["model_version"],

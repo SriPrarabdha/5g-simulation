@@ -591,12 +591,14 @@ def _policy_routes_safely(policy: Policy, states: list[UPFState]) -> bool:
     )
 
 
-def controller_by_name(name: str) -> Controller:
+def controller_by_name(name: str, *, forecaster: Any | None = None) -> Controller:
+    if forecaster is not None and name not in {"forecast-capacity", "predictive"}:
+        raise ValueError("a forecast bundle can only be attached to a forecast controller")
     controllers: dict[str, Controller] = {
         "static": StaticCapacityController(),
         "reactive": ReactiveThresholdController(),
-        "forecast-capacity": ForecastCapacityController(),
-        "predictive": PredictiveHiGHSController(),
+        "forecast-capacity": ForecastCapacityController(forecaster=forecaster),
+        "predictive": PredictiveHiGHSController(forecaster=forecaster),
         "oracle": OracleHiGHSController(),
     }
     try:

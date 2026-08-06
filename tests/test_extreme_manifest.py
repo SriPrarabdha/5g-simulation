@@ -5,7 +5,7 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from experiments.build_extreme_history_manifest import STEPS_PER_DAY, build
+from experiments.build_extreme_history_manifest import STEPS_PER_DAY, build, build_optimizer_pilot
 from simulator.macro import ScenarioConfig
 
 
@@ -33,6 +33,25 @@ class ExtremeManifestTests(unittest.TestCase):
         self.assertEqual(payload["steps"], 16 * 7 * STEPS_PER_DAY)
         self.assertEqual(payload["corpus"]["split"]["train_weeks"], [1, 11])
         self.assertIn("near_total_upf_outages", payload["corpus"]["stress_families"])
+
+    def test_optimizer_pilot_is_one_day_fresh_seed_and_event_dense(self) -> None:
+        profile = json.loads((ROOT / "configs" / "extreme_training_profile.json").read_text())
+        payload = build_optimizer_pilot(
+            profile, 20260806, datetime(2026, 5, 4, tzinfo=timezone.utc)
+        )
+        self.assertEqual(payload["steps"], STEPS_PER_DAY)
+        self.assertEqual(payload["scenario_id"], "extreme-optimizer-pilot-1d-s20260806")
+        self.assertEqual(len(payload["corpus"]["pilot_surge_windows"]), 3)
+        self.assertEqual(payload["corpus"]["pilot_fault_events"], 14)
+        self.assertGreater(
+            max(
+                event["arrival_factor"]
+                for event in payload["events"]
+                if event["event_type"] == "arrival_factor"
+            ),
+            5.0,
+        )
+        ScenarioConfig.from_dict(payload)
 
 
 if __name__ == "__main__":

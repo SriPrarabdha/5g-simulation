@@ -48,6 +48,7 @@ def _features(
     origin: int,
     target_start: datetime,
 ) -> list[float]:
+    """Build the single inference row; bulk training uses the vectorized path."""
     values = [float(getattr(item, field)) for item in observations]
     recent = values[max(0, origin - 5): origin + 1]
     trend = values[origin] - values[max(0, origin - 1)]
@@ -69,6 +70,60 @@ def _features(
     ]
 
 
+def _sequence_training_rows(
+    observations: list[DemandObservation],
+    field: str,
+    horizon: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Build one sequence in O(n), preserving the original feature contract.
+
+    The previous scalar implementation rebuilt the complete value series for
+    every origin row, turning each direct model into O(n²) Python work.  All
+    columns below are now calculated as NumPy vectors once per sequence.
+    """
+    values = np.fromiter(
+        (float(getattr(item, field)) for item in observations),
+        dtype=np.float64,
+        count=len(observations),
+    )
+    origins = np.arange(5, len(observations) - horizon, dtype=np.int64)
+    if origins.size == 0:
+        return np.empty((0, len(FEATURE_NAMES)), dtype=np.float64), np.empty(0, dtype=np.float64)
+
+    targets = origins + horizon
+    prefix = np.concatenate((np.zeros(1, dtype=np.float64), np.cumsum(values, dtype=np.float64)))
+    rolling = (prefix[origins + 1] - prefix[origins - 5]) / 6.0
+    seasonal = rolling.copy()
+    has_daily_history = origins >= 143
+    seasonal[has_daily_history] = values[origins[has_daily_history] - 143]
+
+    target_starts = [observations[int(index)].window.start for index in targets]
+    seconds = np.fromiter(
+        (item.hour * 3600 + item.minute * 60 + item.second for item in target_starts),
+        dtype=np.float64,
+        count=len(target_starts),
+    )
+    weekdays = np.fromiter(
+        (item.weekday() for item in target_starts),
+        dtype=np.float64,
+        count=len(target_starts),
+    )
+    daily_angle = 2.0 * math.pi * seconds / 86_400.0
+    weekly_angle = 2.0 * math.pi * weekdays / 7.0
+    rows = np.column_stack((
+        np.ones(origins.size, dtype=np.float64),
+        values[origins],
+        rolling,
+        values[origins] - values[origins - 1],
+        seasonal,
+        np.sin(daily_angle),
+        np.cos(daily_angle),
+        np.sin(weekly_angle),
+        np.cos(weekly_angle),
+    ))
+    return rows, values[targets]
+
+
 def _quantile(values: list[float], probability: float) -> float:
     if not values:
         return 0.0
@@ -88,27 +143,23 @@ def _fit_direct_model(
     *,
     ridge: float,
 ) -> tuple[dict[str, Any], dict[str, float]]:
-    rows: list[list[float]] = []
-    targets: list[float] = []
+    row_blocks: list[np.ndarray] = []
+    target_blocks: list[np.ndarray] = []
     for observations in sequences:
-        for origin in range(5, len(observations) - horizon):
-            target_index = origin + horizon
-            rows.append(_features(
-                observations,
-                field,
-                origin,
-                observations[target_index].window.start,
-            ))
-            targets.append(float(getattr(observations[target_index], field)))
-    if len(rows) < 24:
+        rows, targets = _sequence_training_rows(observations, field, horizon)
+        if len(rows):
+            row_blocks.append(rows)
+            target_blocks.append(targets)
+    row_count = sum(len(items) for items in row_blocks)
+    if row_count < 24:
         raise ForecastingError(
             f"offline bundle needs at least 24 training rows for {field} horizon {horizon}"
         )
-    train_end = max(12, int(len(rows) * 0.70))
-    calibration_end = max(train_end + 6, int(len(rows) * 0.85))
-    calibration_end = min(calibration_end, len(rows) - 1)
-    x = np.asarray(rows, dtype=float)
-    y = np.asarray(targets, dtype=float)
+    train_end = max(12, int(row_count * 0.70))
+    calibration_end = max(train_end + 6, int(row_count * 0.85))
+    calibration_end = min(calibration_end, row_count - 1)
+    x = np.concatenate(row_blocks, axis=0)
+    y = np.concatenate(target_blocks)
     identity = np.eye(x.shape[1], dtype=float)
     identity[0, 0] = 0.0
     x_train = x[:train_end]
@@ -138,10 +189,10 @@ def _fit_direct_model(
     p90_width = _quantile(absolute_residuals, 0.90)
     p95_width = _quantile(absolute_residuals, 0.95)
     metrics = {
-        "rows": float(len(rows)),
+        "rows": float(row_count),
         "train_rows": float(train_end),
         "calibration_rows": float(calibration_end - train_end),
-        "test_rows": float(len(rows) - calibration_end),
+        "test_rows": float(row_count - calibration_end),
         "mae_p50": float(np.mean(absolute)) if len(absolute) else 0.0,
         "wape_p50": float(np.sum(absolute) / denominator) if denominator else 0.0,
         "coverage_p90": float(np.mean(test_y <= test_point + p90_width)) if len(test_y) else 0.0,
@@ -254,6 +305,30 @@ class TrainedForecastBundle:
                 "summary_metrics", "bundle_sha256",
             )
         }
+
+    def validate_groups(self, groups: Iterable[GroupKey]) -> None:
+        """Fail before a run if its control groups are absent or incompatible."""
+        missing: list[str] = []
+        mismatched: list[str] = []
+        for group in groups:
+            entry = self.payload["groups"].get(group.selection_id)
+            if entry is None:
+                missing.append(group.selection_id)
+                continue
+            trained_key = GroupKey.from_dict(entry["key"])
+            if trained_key != group:
+                mismatched.append(group.selection_id)
+        if missing or mismatched:
+            details = []
+            if missing:
+                details.append(f"missing={missing[:5]}" + ("..." if len(missing) > 5 else ""))
+            if mismatched:
+                details.append(
+                    f"key_mismatch={mismatched[:5]}" + ("..." if len(mismatched) > 5 else "")
+                )
+            raise ForecastingError(
+                "forecast bundle is incompatible with scenario groups: " + "; ".join(details)
+            )
 
     def predict(
         self,

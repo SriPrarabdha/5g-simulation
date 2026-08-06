@@ -399,6 +399,29 @@ Verify that the artifact loads and its checksum matches its content:
 env/bin/python -c 'from forecasting import TrainedForecastBundle as B; b=B.load("output/models/forecaster-v1.json"); print(b.metadata)'
 ```
 
+Create a separate provisional freeze record with campaign lineage and held-out
+metrics (the output must not already exist):
+
+```bash
+env/bin/python -m experiments.freeze_forecast_bundle \
+  --bundle output/models/forecaster-v1.json \
+  --manifest output/manifests/history-s20260805.json \
+  --campaign-metadata '<campaign-shard>/metadata.json' \
+  --output output/models/forecaster-v1.freeze.json
+```
+
+Evaluate the exact frozen test rows against daily seasonal-naive and six-bucket
+moving-average baselines:
+
+```bash
+env/bin/python -m experiments.evaluate_forecaster_baselines \
+  --bundle output/models/forecaster-v1.json \
+  --campaign-root output/macro/schema_major=1/campaign=history-16w-static-v1 \
+  --manifest output/manifests/history-s20260805.json \
+  --controller static-capacity-v1 \
+  --output output/models/forecaster-v1-baseline-evaluation.json
+```
+
 The compact bundle shipped for rehearsals can be rebuilt deterministically with
 `env/bin/python -m experiments.bootstrap_demo_forecaster`. It is labeled
 `demo_calibrated_not_campaign_release` and must not be presented as the
@@ -417,6 +440,11 @@ Training release gate:
 Stop here for an artifact-backed release until the declared campaign passes the
 coverage, baseline, and held-out-event gates. The shipped compact bundle proves
 the interface and closed loop, not those release claims.
+
+For predictive campaign evaluation, attach the model explicitly with
+`--forecast-bundle`. Its file and internal bundle hashes are then recorded in
+the shard metadata. Omitting this argument intentionally uses the runtime
+moving-average fallback and is not an evaluation of the trained model.
 
 ## 11. Stage 6 — freeze the demo artifact bundle
 
