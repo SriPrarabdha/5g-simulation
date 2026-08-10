@@ -57,6 +57,12 @@ class PBSScriptTests(unittest.TestCase):
         self.assertNotIn("qsub", content)
         self.assertNotIn("PBS_JOBID", content)
 
+    def test_demo_waits_for_registered_and_public_tunnel(self) -> None:
+        content = Path("scripts/start-demo.sh").read_text(encoding="utf-8")
+        self.assertIn('--pidfile "$TUNNEL_PIDFILE"', content)
+        self.assertIn('[[ -n "$PUBLIC_URL" && -s "$TUNNEL_PIDFILE" ]]', content)
+        self.assertIn('f"{sys.argv[1]}/api/v1/health"', content)
+
 
 if __name__ == "__main__":
     unittest.main()

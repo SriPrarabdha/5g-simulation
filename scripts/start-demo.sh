@@ -101,6 +101,7 @@ fi
 
 RUNTIME_DIR="$(mktemp -d -t cdot-demo.XXXXXX)"
 TUNNEL_LOG="$RUNTIME_DIR/cloudflared.log"
+TUNNEL_PIDFILE="$RUNTIME_DIR/cloudflared.pid"
 SERVER_PID=""
 TUNNEL_PID=""
 
@@ -114,7 +115,7 @@ cleanup() {
     kill "$SERVER_PID" 2>/dev/null || true
     wait "$SERVER_PID" 2>/dev/null || true
   fi
-  rm -f "$TUNNEL_LOG"
+  rm -f "$TUNNEL_LOG" "$TUNNEL_PIDFILE"
   rmdir "$RUNTIME_DIR" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
@@ -156,18 +157,21 @@ if [[ "$READY" != "1" ]]; then
   exit 1
 fi
 
-cloudflared tunnel --config /dev/null --url "http://$TUNNEL_ORIGIN_HOST:$DEMO_PORT" --no-autoupdate >"$TUNNEL_LOG" 2>&1 &
+cloudflared tunnel --config /dev/null --pidfile "$TUNNEL_PIDFILE" \
+  --url "http://$TUNNEL_ORIGIN_HOST:$DEMO_PORT" --no-autoupdate >"$TUNNEL_LOG" 2>&1 &
 TUNNEL_PID=$!
 
 PUBLIC_URL=""
-for _ in {1..120}; do
+for _ in {1..240}; do
   if ! kill -0 "$TUNNEL_PID" 2>/dev/null; then
     cat "$TUNNEL_LOG" >&2
     wait "$TUNNEL_PID"
     exit 1
   fi
   PUBLIC_URL="$(sed -nE 's|.*(https://[-a-z0-9]+\.trycloudflare\.com).*|\1|p' "$TUNNEL_LOG" | head -n 1)"
-  if [[ -n "$PUBLIC_URL" ]]; then
+  # cloudflared writes --pidfile only after its first successful edge
+  # connection. A Quick Tunnel URL may be printed before that connection.
+  if [[ -n "$PUBLIC_URL" && -s "$TUNNEL_PIDFILE" ]]; then
     break
   fi
   sleep 0.25
@@ -175,6 +179,49 @@ done
 
 if [[ -z "$PUBLIC_URL" ]]; then
   echo "cloudflared started but did not publish a tunnel URL" >&2
+  cat "$TUNNEL_LOG" >&2
+  exit 1
+fi
+
+if [[ ! -s "$TUNNEL_PIDFILE" ]]; then
+  echo "Cloudflare allocated $PUBLIC_URL, but cloudflared could not establish an edge connection." >&2
+  echo "Check outbound DNS and TCP/UDP port 7844 from this host." >&2
+  cat "$TUNNEL_LOG" >&2
+  exit 1
+fi
+
+PUBLIC_READY=0
+for _ in {1..40}; do
+  if ! kill -0 "$TUNNEL_PID" 2>/dev/null; then
+    cat "$TUNNEL_LOG" >&2
+    wait "$TUNNEL_PID"
+    exit 1
+  fi
+  if "$PYTHON_BIN" - "$PUBLIC_URL" <<'PY'
+import json
+import sys
+import urllib.error
+import urllib.request
+
+try:
+    with urllib.request.urlopen(
+        f"{sys.argv[1]}/api/v1/health", timeout=2
+    ) as response:
+        payload = json.load(response)
+except (OSError, ValueError, urllib.error.URLError):
+    raise SystemExit(1)
+if payload.get("status") != "ok":
+    raise SystemExit(1)
+PY
+  then
+    PUBLIC_READY=1
+    break
+  fi
+  sleep 0.5
+done
+
+if [[ "$PUBLIC_READY" != "1" ]]; then
+  echo "The connector registered, but the public health check failed for $PUBLIC_URL" >&2
   cat "$TUNNEL_LOG" >&2
   exit 1
 fi
