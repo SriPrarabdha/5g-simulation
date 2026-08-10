@@ -115,6 +115,19 @@ npm --prefix frontend ci
 ./scripts/start-demo.sh
 ```
 
+On a Conda-managed cluster where the login node has internet access, use the
+single login-node launcher after confirming that the cluster permits a
+long-running demo process and outbound tunnel:
+
+```bash
+./scripts/start-login-demo.sh
+```
+
+It creates and reuses `.conda/cdot-demo`, installs missing Python, Node/npm,
+frontend, and `cloudflared` dependencies without root access, then starts the
+demo and tunnel. Run it inside `tmux` if the demo must survive an SSH
+disconnect. Press `Ctrl+C` in that session to stop both processes.
+
 The launcher rebuilds the React dashboard, runs preflight, and starts the
 FastAPI API/WebSocket service that serves the production dashboard from the
 same origin. It selects the first free port at or above `CDOT_DEMO_PORT`

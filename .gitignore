@@ -1,4 +1,5 @@
 env/
+.conda/
 __pycache__/
 *.py[cod]
 output/

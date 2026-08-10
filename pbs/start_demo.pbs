@@ -1,0 +1,138 @@
+#!/bin/bash
+#PBS -N upf_demo
+#PBS -l select=1:ncpus=4:mem=16gb
+#PBS -l walltime=08:00:00
+#PBS -q workq
+#PBS -j oe
+
+set -euo pipefail
+umask 077
+
+if [[ -z "${PBS_JOBID:-}" && "${CDOT_DEMO_ALLOW_NO_PBS:-0}" != "1" ]]; then
+    echo "ERROR: submit this script with: qsub pbs/start_demo.pbs" >&2
+    exit 1
+fi
+
+cd "$PBS_O_WORKDIR"
+PROJECT_ROOT="$PBS_O_WORKDIR"
+
+mkdir -p logs/pbs
+JOB_TAG="${PBS_JOBID:-manual}"
+JOB_TAG="${JOB_TAG//[^A-Za-z0-9_.-]/_}"
+DEMO_LOG="$PROJECT_ROOT/logs/pbs/demo-${JOB_TAG}.log"
+exec > >(tee -a "$DEMO_LOG") 2>&1
+
+echo "[demo] job=${PBS_JOBID:-none} host=$(hostname)"
+echo "[demo] log=$DEMO_LOG"
+echo "[demo] started=$(date --iso-8601=seconds)"
+
+# PBS jobs use a non-interactive shell, so locate and initialize Conda explicitly.
+CONDA_SH=""
+if command -v conda >/dev/null 2>&1; then
+    CONDA_BASE_PATH="$(conda info --base 2>/dev/null || true)"
+    if [[ -n "$CONDA_BASE_PATH" && -f "$CONDA_BASE_PATH/etc/profile.d/conda.sh" ]]; then
+        CONDA_SH="$CONDA_BASE_PATH/etc/profile.d/conda.sh"
+    fi
+fi
+if [[ -z "$CONDA_SH" ]]; then
+    for candidate in "$HOME/miniforge3" "$HOME/miniconda3" "$HOME/anaconda3" "$HOME/conda"; do
+        if [[ -f "$candidate/etc/profile.d/conda.sh" ]]; then
+            CONDA_SH="$candidate/etc/profile.d/conda.sh"
+            break
+        fi
+    done
+fi
+if [[ -z "$CONDA_SH" ]]; then
+    echo "ERROR: Conda was not found. Load the cluster Conda module before qsub," >&2
+    echo "       or install Miniforge/Miniconda in one of the standard locations." >&2
+    exit 1
+fi
+# shellcheck disable=SC1090
+source "$CONDA_SH"
+
+# Keep this environment on shared storage so later jobs reuse installed packages.
+CONDA_ENV_PREFIX="${CDOT_DEMO_CONDA_PREFIX:-$PROJECT_ROOT/.conda/cdot-demo}"
+if [[ ! -x "$CONDA_ENV_PREFIX/bin/python" ]]; then
+    echo "[deps] creating Conda environment at $CONDA_ENV_PREFIX"
+    conda create --yes --prefix "$CONDA_ENV_PREFIX" --channel conda-forge \
+        python=3.11 pip "nodejs>=22.12"
+fi
+conda activate "$CONDA_ENV_PREFIX"
+
+if ! python -c 'import sys; raise SystemExit(sys.version_info < (3, 10))'; then
+    echo "[deps] upgrading Python to a supported version"
+    conda install --yes --prefix "$CONDA_ENV_PREFIX" --channel conda-forge python=3.11 pip
+fi
+
+if ! command -v npm >/dev/null 2>&1 || \
+   ! node -e 'const [M,m]=process.versions.node.split(".").map(Number); process.exit(M>22 || (M===22&&m>=12) || (M===20&&m>=19) ? 0 : 1)'; then
+    echo "[deps] installing a Vite-compatible Node.js and npm"
+    conda install --yes --prefix "$CONDA_ENV_PREFIX" --channel conda-forge "nodejs>=22.12"
+fi
+
+PYTHON_IMPORTS='import fastapi, uvicorn, numpy, scipy, pyarrow, lightgbm, duckdb, httpx'
+PYPROJECT_HASH="$(python -c 'import hashlib; print(hashlib.sha256(open("pyproject.toml", "rb").read()).hexdigest())')"
+PYTHON_DEPS_STAMP="$CONDA_ENV_PREFIX/.cdot-python-deps-$PYPROJECT_HASH"
+if [[ ! -f "$PYTHON_DEPS_STAMP" ]] || ! python -c "$PYTHON_IMPORTS" >/dev/null 2>&1; then
+    echo "[deps] installing Python project dependencies"
+    python -m pip install --upgrade pip
+    python -m pip install --editable "$PROJECT_ROOT"
+    touch "$PYTHON_DEPS_STAMP"
+else
+    echo "[deps] Python dependencies are available"
+fi
+
+PACKAGE_LOCK_HASH="$(python -c 'import hashlib; print(hashlib.sha256(open("frontend/package-lock.json", "rb").read()).hexdigest())')"
+FRONTEND_DEPS_STAMP="$PROJECT_ROOT/frontend/node_modules/.cdot-package-lock-$PACKAGE_LOCK_HASH"
+if [[ ! -f "$FRONTEND_DEPS_STAMP" ]] || ! npm --prefix frontend ls --depth=0 --silent >/dev/null 2>&1; then
+    echo "[deps] installing pinned frontend dependencies with npm ci"
+    npm --prefix frontend ci
+    touch "$FRONTEND_DEPS_STAMP"
+else
+    echo "[deps] frontend dependencies are available"
+fi
+
+# cloudflared is a standalone Go binary. Install it in this Conda prefix so it
+# is isolated with the rest of the demo runtime and persists across PBS jobs.
+if ! command -v cloudflared >/dev/null 2>&1; then
+    case "$(uname -m)" in
+        x86_64) CLOUDFLARED_ARCH="amd64" ;;
+        aarch64|arm64) CLOUDFLARED_ARCH="arm64" ;;
+        *)
+            echo "ERROR: unsupported cloudflared architecture: $(uname -m)" >&2
+            exit 1
+            ;;
+    esac
+    CLOUDFLARED_URL="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${CLOUDFLARED_ARCH}"
+    CLOUDFLARED_TMP="$(mktemp "$CONDA_ENV_PREFIX/bin/cloudflared.XXXXXX")"
+    trap 'rm -f "$CLOUDFLARED_TMP"' EXIT
+    echo "[deps] downloading cloudflared from the official Cloudflare release"
+    python - "$CLOUDFLARED_URL" "$CLOUDFLARED_TMP" <<'PY'
+import shutil
+import sys
+import urllib.request
+
+request = urllib.request.Request(sys.argv[1], headers={"User-Agent": "cdot-demo-installer"})
+with urllib.request.urlopen(request, timeout=120) as response, open(sys.argv[2], "wb") as output:
+    shutil.copyfileobj(response, output)
+PY
+    chmod 0755 "$CLOUDFLARED_TMP"
+    mv "$CLOUDFLARED_TMP" "$CONDA_ENV_PREFIX/bin/cloudflared"
+    trap - EXIT
+else
+    echo "[deps] cloudflared is available: $(command -v cloudflared)"
+fi
+
+export PROJECT_PYTHON="$CONDA_ENV_PREFIX/bin/python"
+export CDOT_DEMO_PYTHON="$PROJECT_PYTHON"
+export CDOT_DEMO_TUNNEL="${CDOT_DEMO_TUNNEL:-1}"
+export CDOT_DEMO_HOST="${CDOT_DEMO_HOST:-127.0.0.1}"
+source pbs/env.sh
+
+echo "[deps] python=$($PROJECT_PYTHON --version 2>&1)"
+echo "[deps] node=$(node --version) npm=$(npm --version)"
+echo "[deps] cloudflared=$(cloudflared --version)"
+echo "[demo] starting; the public URL and generated credentials will appear below"
+echo "[demo] stop with: qdel ${PBS_JOBID:-<job-id>}"
+
+exec "$PROJECT_ROOT/scripts/start-demo.sh"

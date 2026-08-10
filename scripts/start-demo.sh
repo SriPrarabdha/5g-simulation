@@ -4,6 +4,21 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
+if [[ -n "${CDOT_DEMO_PYTHON:-}" ]]; then
+  PYTHON_BIN="$CDOT_DEMO_PYTHON"
+elif [[ -x "$PROJECT_DIR/env/bin/python" ]]; then
+  PYTHON_BIN="$PROJECT_DIR/env/bin/python"
+elif [[ -n "${CONDA_PREFIX:-}" && -x "$CONDA_PREFIX/bin/python" ]]; then
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+else
+  PYTHON_BIN="$(command -v python3 || command -v python || true)"
+fi
+
+if [[ -z "$PYTHON_BIN" || ! -x "$PYTHON_BIN" ]]; then
+  echo "No usable Python found; set CDOT_DEMO_PYTHON to the Python executable." >&2
+  exit 1
+fi
+
 TUNNEL_ENABLED="${CDOT_DEMO_TUNNEL:-1}"
 DEMO_HOST="${CDOT_DEMO_HOST:-127.0.0.1}"
 PREFERRED_PORT="${CDOT_DEMO_PORT:-8000}"
@@ -16,7 +31,7 @@ if ! [[ "$PREFERRED_PORT" =~ ^[0-9]+$ ]] || (( PREFERRED_PORT < 1 || PREFERRED_P
 fi
 
 port_is_free() {
-  ./env/bin/python - "$1" <<'PY'
+  "$PYTHON_BIN" - "$1" <<'PY'
 import socket
 import sys
 
@@ -53,10 +68,10 @@ if [[ "$TUNNEL_ENABLED" == "1" ]]; then
     exit 1
   fi
   if [[ -z "${CDOT_DEMO_PASSWORD:-}" ]]; then
-    CDOT_DEMO_PASSWORD="$(./env/bin/python -c 'import secrets; print(secrets.token_urlsafe(12))')"
+    CDOT_DEMO_PASSWORD="$("$PYTHON_BIN" -c 'import secrets; print(secrets.token_urlsafe(12))')"
   fi
   if [[ -z "${CDOT_DEMO_SECRET:-}" ]]; then
-    CDOT_DEMO_SECRET="$(./env/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+    CDOT_DEMO_SECRET="$("$PYTHON_BIN" -c 'import secrets; print(secrets.token_urlsafe(32))')"
   fi
 else
   CDOT_DEMO_PASSWORD="${CDOT_DEMO_PASSWORD:-demo}"
@@ -75,13 +90,13 @@ if [[ "${CDOT_DEMO_SKIP_FRONTEND_BUILD:-0}" != "1" ]]; then
   npm --prefix frontend run build
 fi
 
-./env/bin/python scripts/preflight.py
+"$PYTHON_BIN" scripts/preflight.py
 
 if [[ "$TUNNEL_ENABLED" != "1" ]]; then
   echo "Local URL: http://$DEMO_HOST:$DEMO_PORT"
   echo "Presenter username: $CDOT_DEMO_USER"
   echo "Presenter password: $CDOT_DEMO_PASSWORD"
-  exec ./env/bin/uvicorn demo_api.main:app --host "$DEMO_HOST" --port "$DEMO_PORT"
+  exec "$PYTHON_BIN" -m uvicorn demo_api.main:app --host "$DEMO_HOST" --port "$DEMO_PORT"
 fi
 
 RUNTIME_DIR="$(mktemp -d -t cdot-demo.XXXXXX)"
@@ -104,7 +119,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-./env/bin/uvicorn demo_api.main:app --host "$DEMO_HOST" --port "$DEMO_PORT" &
+"$PYTHON_BIN" -m uvicorn demo_api.main:app --host "$DEMO_HOST" --port "$DEMO_PORT" &
 SERVER_PID=$!
 
 READY=0
@@ -113,7 +128,7 @@ for _ in {1..80}; do
     wait "$SERVER_PID"
     exit 1
   fi
-  if ./env/bin/python - "$TUNNEL_ORIGIN_HOST" "$DEMO_PORT" <<'PY'
+  if "$PYTHON_BIN" - "$TUNNEL_ORIGIN_HOST" "$DEMO_PORT" <<'PY'
 import json
 import sys
 import urllib.error
@@ -141,7 +156,7 @@ if [[ "$READY" != "1" ]]; then
   exit 1
 fi
 
-cloudflared tunnel --url "http://$TUNNEL_ORIGIN_HOST:$DEMO_PORT" --no-autoupdate >"$TUNNEL_LOG" 2>&1 &
+cloudflared tunnel --config /dev/null --url "http://$TUNNEL_ORIGIN_HOST:$DEMO_PORT" --no-autoupdate >"$TUNNEL_LOG" 2>&1 &
 TUNNEL_PID=$!
 
 PUBLIC_URL=""

@@ -40,6 +40,23 @@ class PBSScriptTests(unittest.TestCase):
                 self.assertIn("schema_major=1", content)
                 self.assertNotIn("schema_major=0", content)
 
+    def test_demo_job_bootstraps_conda_dependencies_and_tunnel(self) -> None:
+        content = (PBS_DIR / "start_demo.pbs").read_text(encoding="utf-8")
+        self.assertIn("conda create", content)
+        self.assertIn("nodejs>=22.12", content)
+        self.assertIn("npm --prefix frontend ci", content)
+        self.assertIn("cloudflared", content)
+        self.assertIn("scripts/start-demo.sh", content)
+
+    def test_login_demo_bootstraps_without_pbs(self) -> None:
+        content = Path("scripts/start-login-demo.sh").read_text(encoding="utf-8")
+        self.assertIn("conda create", content)
+        self.assertIn("npm --prefix frontend ci", content)
+        self.assertIn("cloudflared", content)
+        self.assertIn("scripts/start-demo.sh", content)
+        self.assertNotIn("qsub", content)
+        self.assertNotIn("PBS_JOBID", content)
+
 
 if __name__ == "__main__":
     unittest.main()
