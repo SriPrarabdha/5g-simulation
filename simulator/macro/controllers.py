@@ -6,7 +6,14 @@ from datetime import datetime, timedelta
 from typing import Any, Protocol
 
 from forecasting import DemandObservation, ForecastingError, MovingAverageForecaster, ResidualObservation
-from optimization import OptimizationConfig, solve_allocation
+from optimization import (
+    ActiveCohort,
+    CohortMPCConfig,
+    CohortMPCResult,
+    OptimizationConfig,
+    solve_allocation,
+    solve_cohort_mpc,
+)
 
 from schemas import (
     ConstraintSlack,
@@ -38,6 +45,26 @@ class ControlContext:
     history_by_group: dict[str, tuple[DemandObservation, ...]] = field(default_factory=dict)
     residual_by_upf: dict[str, ResidualObservation] = field(default_factory=dict)
     oracle_new_by_group: dict[str, ResidualObservation] = field(default_factory=dict)
+    scheduled_multiplier_by_group: dict[str, float] = field(default_factory=dict)
+    scheduled_multiplier_by_group_horizon: dict[str, tuple[float, ...]] = field(default_factory=dict)
+    active_cohorts: tuple[ActiveCohort, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ForecastAdjustmentConfig:
+    scheduled_event_hints_enabled: bool = False
+    anomaly_fallback_enabled: bool = False
+    anomaly_history_windows: int = 6
+    anomaly_ratio_threshold: float = 1.5
+    anomaly_multiplier_cap: float = 4.0
+
+    def __post_init__(self) -> None:
+        if self.anomaly_history_windows < 2:
+            raise ValueError("anomaly_history_windows must be at least two")
+        if self.anomaly_ratio_threshold <= 1:
+            raise ValueError("anomaly_ratio_threshold must be greater than one")
+        if self.anomaly_multiplier_cap < 1:
+            raise ValueError("anomaly_multiplier_cap must be at least one")
 
 
 class Controller(Protocol):
@@ -186,10 +213,20 @@ class PredictiveHiGHSController:
         allow_slack: bool = True,
         forecaster: Any | None = None,
         gate_config: PolicyGateConfig | None = None,
+        optimization_config: OptimizationConfig | None = None,
+        optimizer_weight: float = 1.0,
+        forecast_adjustment_config: ForecastAdjustmentConfig | None = None,
     ) -> None:
+        if not 0 <= optimizer_weight <= 1:
+            raise ValueError("optimizer_weight must be in [0, 1]")
         self.forecaster = forecaster or MovingAverageForecaster(history_windows)
         self.allow_slack = allow_slack
         self.gate = PolicyGate(gate_config)
+        self.optimization_config = optimization_config or OptimizationConfig()
+        self.optimizer_weight = optimizer_weight
+        self.forecast_adjustment_config = (
+            forecast_adjustment_config or ForecastAdjustmentConfig()
+        )
         self._previous_policy: Policy | None = None
         self._fallback = StaticCapacityController()
         self.last_forecasts: list[Forecast] = []
@@ -218,6 +255,22 @@ class PredictiveHiGHSController:
                     issued_at=created_at,
                     target_window=target,
                 )
+                multiplier, flags = self._forecast_adjustment(
+                    history, context.scheduled_multiplier_by_group.get(
+                        group.key.selection_id, 1.0
+                    )
+                )
+                if multiplier != 1.0:
+                    predicted.new_session_count = _scale_quantiles(
+                        predicted.new_session_count, multiplier
+                    )
+                    predicted.new_load_ul_mbps = _scale_quantiles(
+                        predicted.new_load_ul_mbps, multiplier
+                    )
+                    predicted.new_load_dl_mbps = _scale_quantiles(
+                        predicted.new_load_dl_mbps, multiplier
+                    )
+                predicted.quality_flags.extend(flags)
                 predicted.existing_load_by_upf = [
                     ExistingLoad(
                         upf_id=upf_id,
@@ -238,11 +291,59 @@ class PredictiveHiGHSController:
             created_at=created_at,
             policy_version=version,
             previous_policy=self._previous_policy,
-            config=OptimizationConfig(),
+            config=self.optimization_config,
+            demand_multiplier_by_group=_lifetime_demand_multipliers(
+                groups,
+                decision_interval_steps=config.decision_interval_steps,
+                horizon_windows=self.optimization_config.lifetime_horizon_windows,
+                strength=self.optimization_config.lifetime_weight_strength,
+            ),
         )
         self.last_optimization = result
         if result.policy is None or (result.status == "feasible_with_slack" and not self.allow_slack):
             return self._fallback_policy(config, groups, upf_states, created_at, version, result.status)
+        if self.optimizer_weight < 1.0:
+            static_policy = self._fallback.build_policy(
+                config, groups, upf_states, created_at, version, context
+            )
+            static_by_group = {
+                item.key.selection_id: item.weights for item in static_policy.groups
+            }
+            blended_groups: list[PolicyGroup] = []
+            for optimized in result.policy.groups:
+                baseline = static_by_group[optimized.key.selection_id]
+                destinations = sorted(set(baseline) | set(optimized.weights))
+                weights = {
+                    upf_id: (
+                        (1.0 - self.optimizer_weight) * baseline.get(upf_id, 0.0)
+                        + self.optimizer_weight * optimized.weights.get(upf_id, 0.0)
+                    )
+                    for upf_id in destinations
+                }
+                total = sum(weights.values())
+                blended_groups.append(PolicyGroup(
+                    optimized.key,
+                    {upf_id: weight / total for upf_id, weight in weights.items()},
+                ))
+            result.policy.groups = blended_groups
+            projected = _project(blended_groups, forecasts, upf_states)
+            slack = _slack(projected, upf_states)
+            result.policy.constraint_slack = ConstraintSlack(*slack)
+            has_slack = any(
+                value > self.optimization_config.slack_tolerance
+                for category in slack
+                for value in category.values()
+            )
+            result.policy.solver = SolverReport(
+                result.policy.solver.name,
+                "feasible_with_slack" if has_slack else "optimal",
+                result.policy.solver.runtime_ms,
+            )
+            result.policy.policy_id = (
+                f"predictive-blend-{self.optimizer_weight:g}:{version}:"
+                f"{result.policy.forecast_id[:16]}"
+            )
+            result.policy.validate()
         self.last_candidate = result.policy
         try:
             validate_policy(
@@ -257,7 +358,7 @@ class PredictiveHiGHSController:
             return self._fallback_policy(
                 config, groups, upf_states, created_at, version, f"validation:{error}"
             )
-        candidate_objective = result.max_safe_utilization or 0.0
+        candidate_objective = _operating_index(result.policy.groups, forecasts, upf_states)
         current_objective = (
             _operating_index(self._previous_policy.groups, forecasts, upf_states)
             if self._previous_policy is not None else None
@@ -279,6 +380,35 @@ class PredictiveHiGHSController:
         )
         self._previous_policy = retained
         return retained
+
+    def _forecast_adjustment(
+        self,
+        history: tuple[DemandObservation, ...],
+        scheduled_multiplier: float,
+    ) -> tuple[float, list[str]]:
+        settings = self.forecast_adjustment_config
+        if settings.scheduled_event_hints_enabled and scheduled_multiplier != 1.0:
+            return scheduled_multiplier, [
+                f"causal_scheduled_event_multiplier:{scheduled_multiplier:g}"
+            ]
+        if not settings.anomaly_fallback_enabled or len(history) < 3:
+            return 1.0, []
+        prior = history[-(settings.anomaly_history_windows + 1):-1]
+        baseline_values = sorted(item.new_session_count for item in prior)
+        if not baseline_values:
+            return 1.0, []
+        middle = len(baseline_values) // 2
+        baseline = (
+            baseline_values[middle]
+            if len(baseline_values) % 2
+            else (baseline_values[middle - 1] + baseline_values[middle]) / 2
+        )
+        latest = history[-1].new_session_count
+        ratio = latest / max(1.0, baseline)
+        if ratio < settings.anomaly_ratio_threshold:
+            return 1.0, []
+        multiplier = min(settings.anomaly_multiplier_cap, ratio)
+        return multiplier, [f"observed_anomaly_multiplier:{multiplier:g}"]
 
     def _roll_previous_policy(
         self,
@@ -403,6 +533,23 @@ class ForecastCapacityController(PredictiveHiGHSController):
                     issued_at=created_at,
                     target_window=target,
                 )
+                multiplier, flags = self._forecast_adjustment(
+                    context.history_by_group.get(group.key.selection_id, ()),
+                    context.scheduled_multiplier_by_group.get(
+                        group.key.selection_id, 1.0
+                    ),
+                )
+                if multiplier != 1.0:
+                    predicted.new_session_count = _scale_quantiles(
+                        predicted.new_session_count, multiplier
+                    )
+                    predicted.new_load_ul_mbps = _scale_quantiles(
+                        predicted.new_load_ul_mbps, multiplier
+                    )
+                    predicted.new_load_dl_mbps = _scale_quantiles(
+                        predicted.new_load_dl_mbps, multiplier
+                    )
+                predicted.quality_flags.extend(flags)
                 predicted.existing_load_by_upf = _residual_contract(context)
                 forecasts.append(predicted)
                 scores: dict[str, float] = {}
@@ -512,6 +659,236 @@ class OracleHiGHSController(PredictiveHiGHSController):
         return result.policy
 
 
+class CohortMPCController:
+    """Causal multi-period controller guarded by a same-state static replay."""
+
+    name = "cohort-mpc-v1"
+
+    def __init__(
+        self,
+        *,
+        forecaster: Any | None = None,
+        mpc_config: CohortMPCConfig | None = None,
+        forecast_adjustment: ForecastAdjustmentConfig | None = None,
+    ) -> None:
+        self.forecaster = forecaster or MovingAverageForecaster(6)
+        self.mpc_config = mpc_config or CohortMPCConfig()
+        self.forecast_adjustment = forecast_adjustment or ForecastAdjustmentConfig()
+        self._fallback = StaticCapacityController()
+        self.last_result: CohortMPCResult | None = None
+        self.last_forecasts: list[Forecast] = []
+        self.decision_count = 0
+        self.certified_decision_count = 0
+
+    def build_policy(
+        self,
+        config: ScenarioConfig,
+        groups: tuple[GroupProfile, ...],
+        upf_states: list[UPFState],
+        created_at: datetime,
+        version: int,
+        context: ControlContext | None = None,
+    ) -> Policy:
+        self.decision_count += 1
+        context = context or ControlContext()
+        duration = timedelta(seconds=config.step_seconds * config.decision_interval_steps)
+        demand_by_group: dict[str, list[ResidualObservation]] = {}
+        forecasts: list[Forecast] = []
+        try:
+            for group in groups:
+                group_id = group.key.selection_id
+                history = context.history_by_group.get(group_id, ())
+                horizon: list[ResidualObservation] = []
+                last: Forecast | None = None
+                for horizon_step in range(1, self.mpc_config.horizon_windows + 1):
+                    target = TimeWindow(
+                        created_at + duration * (horizon_step - 1),
+                        created_at + duration * horizon_step,
+                    )
+                    try:
+                        predicted = self.forecaster.predict(
+                            history,
+                            issued_at=created_at,
+                            target_window=target,
+                            horizon_steps=horizon_step,
+                        )
+                        last = predicted
+                    except ForecastingError:
+                        if last is None:
+                            raise
+                        predicted = last
+                    horizon_multipliers = context.scheduled_multiplier_by_group_horizon.get(
+                        group_id, ()
+                    )
+                    scheduled_multiplier = (
+                        horizon_multipliers[horizon_step - 1]
+                        if horizon_step <= len(horizon_multipliers)
+                        else 1.0
+                    )
+                    anomaly_multiplier = self._observed_anomaly_multiplier(history)
+                    multiplier = scheduled_multiplier * anomaly_multiplier
+                    flags: list[str] = []
+                    if scheduled_multiplier != 1.0:
+                        flags.append("scheduled_event_knowledge")
+                    if anomaly_multiplier != 1.0:
+                        flags.append("surprise_anomaly_adaptation")
+                    horizon.append(ResidualObservation(
+                        predicted.new_session_count.p95 * multiplier,
+                        predicted.new_load_ul_mbps.p95 * multiplier,
+                        predicted.new_load_dl_mbps.p95 * multiplier,
+                    ))
+                    if horizon_step == 1:
+                        if multiplier != 1.0:
+                            predicted.new_session_count = _scale_quantiles(
+                                predicted.new_session_count, multiplier
+                            )
+                            predicted.new_load_ul_mbps = _scale_quantiles(
+                                predicted.new_load_ul_mbps, multiplier
+                            )
+                            predicted.new_load_dl_mbps = _scale_quantiles(
+                                predicted.new_load_dl_mbps, multiplier
+                            )
+                        predicted.quality_flags.extend(flags)
+                        forecasts.append(predicted)
+                demand_by_group[group_id] = horizon
+        except ForecastingError:
+            self.last_result = None
+            self.last_forecasts = []
+            return self._static_fallback(
+                config, groups, upf_states, created_at, version,
+                "insufficient_multi_horizon_forecast_history",
+            )
+
+        self.last_forecasts = forecasts
+        current_step = round(
+            (created_at - config.start_time).total_seconds() / config.step_seconds
+        )
+        result = solve_cohort_mpc(
+            config,
+            groups,
+            upf_states,
+            context.active_cohorts,
+            demand_by_group,
+            current_step=current_step,
+            settings=self.mpc_config,
+        )
+        self.last_result = result
+        profile_by_id = {profile.upf_id: profile for profile in config.upfs}
+        unplanned_capacity_state = (
+            result.known_future_events == 0
+            and any(
+                state.health not in {"healthy", "degraded"}
+                or state.capacity_mbps.ul
+                < profile_by_id[state.upf_id].capacity_ul_mbps - 1e-9
+                or state.capacity_mbps.dl
+                < profile_by_id[state.upf_id].capacity_dl_mbps - 1e-9
+                for state in upf_states
+            )
+        )
+        if (
+            result.status != "optimal"
+            or result.certificate is None
+            or not result.certificate.accepted
+            or (
+                self.mpc_config.require_known_future_capacity_event
+                and result.known_future_events == 0
+            )
+            or (
+                self.mpc_config.fallback_on_unplanned_capacity_state
+                and unplanned_capacity_state
+            )
+        ):
+            reason = (
+                "no_known_future_capacity_event"
+                if (
+                    self.mpc_config.require_known_future_capacity_event
+                    and result.known_future_events == 0
+                )
+                else "observed_unplanned_capacity_state"
+                if (
+                    self.mpc_config.fallback_on_unplanned_capacity_state
+                    and unplanned_capacity_state
+                )
+                else result.certificate.reason
+                if result.certificate is not None
+                else result.status
+            )
+            return self._static_fallback(
+                config, groups, upf_states, created_at, version,
+                f"same_state_static_certificate:{reason}",
+            )
+
+        policy_groups = [
+            PolicyGroup(
+                GroupKey(group.key.zone, group.key.dnn, group.key.snssai),
+                result.first_allocation[group.key.selection_id],
+            )
+            for group in groups
+        ]
+        policy = Policy(
+            policy_id=f"{config.scenario_id}:cohort-mpc:{version}",
+            policy_version=version,
+            created_at=created_at,
+            validity=TimeWindow(created_at, created_at + duration),
+            forecast_id="+".join(sorted(item.forecast_id for item in forecasts)),
+            upf_state_time=max(state.measurement_time for state in upf_states),
+            solver=SolverReport(self.name, "optimal", result.runtime_ms),
+            constraint_slack=ConstraintSlack(),
+            groups=policy_groups,
+            fallback=Fallback(),
+            validator_version="same-state-static-certificate/1.0",
+        )
+        policy.validate()
+        self.certified_decision_count += 1
+        return policy
+
+    def _observed_anomaly_multiplier(
+        self, history: tuple[DemandObservation, ...]
+    ) -> float:
+        settings = self.forecast_adjustment
+        if not settings.anomaly_fallback_enabled or len(history) < 2:
+            return 1.0
+        prior = history[-(settings.anomaly_history_windows + 1):-1]
+        if not prior:
+            return 1.0
+        values = sorted(item.new_session_count for item in prior)
+        middle = len(values) // 2
+        baseline = (
+            values[middle]
+            if len(values) % 2
+            else (values[middle - 1] + values[middle]) / 2
+        )
+        ratio = history[-1].new_session_count / max(1.0, baseline)
+        if ratio < settings.anomaly_ratio_threshold:
+            return 1.0
+        return min(settings.anomaly_multiplier_cap, ratio)
+
+    def _static_fallback(
+        self,
+        config: ScenarioConfig,
+        groups: tuple[GroupProfile, ...],
+        upf_states: list[UPFState],
+        created_at: datetime,
+        version: int,
+        reason: str,
+    ) -> Policy:
+        policy = self._fallback.build_policy(
+            config, groups, upf_states, created_at, version
+        )
+        # Preserve the exact static policy identity as well as its weights.
+        # The policy ID salts weighted rendezvous, so changing it here would
+        # reshuffle sessions and make an MPC fallback differ from paired static.
+        policy.solver = SolverReport(
+            self.name,
+            self.last_result.status if self.last_result is not None else "error",
+            self.last_result.runtime_ms if self.last_result is not None else 0,
+        )
+        policy.fallback = Fallback(True, reason)
+        policy.validator_version = "same-state-static-certificate/1.0"
+        policy.validate()
+        return policy
+
+
 def _residual_contract(context: ControlContext) -> list[ExistingLoad]:
     return [
         ExistingLoad(
@@ -522,6 +899,44 @@ def _residual_contract(context: ControlContext) -> list[ExistingLoad]:
         )
         for upf_id, value in sorted(context.residual_by_upf.items())
     ]
+
+
+def _scale_quantiles(values: Quantiles, multiplier: float) -> Quantiles:
+    return Quantiles(
+        values.p50 * multiplier,
+        values.p95 * multiplier,
+        None if values.p90 is None else values.p90 * multiplier,
+    )
+
+
+def _lifetime_demand_multipliers(
+    groups: tuple[GroupProfile, ...],
+    *,
+    decision_interval_steps: int,
+    horizon_windows: int,
+    strength: float,
+) -> dict[str, float]:
+    """Relative integrated occupancy of a newly admitted cohort over the horizon."""
+    if horizon_windows == 1 or strength == 0:
+        return {}
+    occupancies: dict[str, float] = {}
+    for group in groups:
+        lifetime_values = range(group.lifetime_steps_min, group.lifetime_steps_max + 1)
+        count = group.lifetime_steps_max - group.lifetime_steps_min + 1
+        occupancy = 0.0
+        for horizon in range(horizon_windows):
+            threshold = horizon * decision_interval_steps
+            surviving = max(
+                0,
+                group.lifetime_steps_max - max(group.lifetime_steps_min, threshold + 1) + 1,
+            )
+            occupancy += surviving / count
+        occupancies[group.key.selection_id] = occupancy
+    normalizer = sum(occupancies.values()) / len(occupancies)
+    return {
+        group_id: (1.0 - strength) + strength * occupancy / normalizer
+        for group_id, occupancy in occupancies.items()
+    }
 
 
 def _project(
@@ -591,15 +1006,48 @@ def _policy_routes_safely(policy: Policy, states: list[UPFState]) -> bool:
     )
 
 
-def controller_by_name(name: str, *, forecaster: Any | None = None) -> Controller:
-    if forecaster is not None and name not in {"forecast-capacity", "predictive"}:
+def controller_by_name(
+    name: str,
+    *,
+    forecaster: Any | None = None,
+    gate_config: PolicyGateConfig | None = None,
+    optimization_config: OptimizationConfig | None = None,
+    optimizer_weight: float = 1.0,
+    forecast_adjustment_config: ForecastAdjustmentConfig | None = None,
+    mpc_config: CohortMPCConfig | None = None,
+) -> Controller:
+    if forecaster is not None and name not in {"forecast-capacity", "predictive", "mpc"}:
         raise ValueError("a forecast bundle can only be attached to a forecast controller")
+    if (
+        gate_config is not None
+        or optimization_config is not None
+        or forecast_adjustment_config is not None
+    ) and name not in {"forecast-capacity", "predictive"}:
+        raise ValueError("forecast settings can only be attached to a forecast controller")
+    if mpc_config is not None and name != "mpc":
+        raise ValueError("MPC settings can only be attached to the MPC controller")
     controllers: dict[str, Controller] = {
         "static": StaticCapacityController(),
         "reactive": ReactiveThresholdController(),
-        "forecast-capacity": ForecastCapacityController(forecaster=forecaster),
-        "predictive": PredictiveHiGHSController(forecaster=forecaster),
+        "forecast-capacity": ForecastCapacityController(
+            forecaster=forecaster,
+            gate_config=gate_config,
+            optimization_config=optimization_config,
+            optimizer_weight=optimizer_weight,
+            forecast_adjustment_config=forecast_adjustment_config,
+        ),
+        "predictive": PredictiveHiGHSController(
+            forecaster=forecaster,
+            gate_config=gate_config,
+            optimization_config=optimization_config,
+            optimizer_weight=optimizer_weight,
+            forecast_adjustment_config=forecast_adjustment_config,
+        ),
         "oracle": OracleHiGHSController(),
+        "mpc": CohortMPCController(
+            forecaster=forecaster,
+            mpc_config=mpc_config,
+        ),
     }
     try:
         return controllers[name]

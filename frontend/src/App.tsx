@@ -1,73 +1,212 @@
 import { useEffect, useRef, useState } from 'react'
-import { createRun, getRun, login, runAction, setControls } from './api'
-import { DecisionRail } from './components/DecisionRail'
-import type { Forecast, Policy, Snapshot, SnapshotPayload, TraceEvent } from './types'
-import { CampaignEvidence, ControlRoom, ForecastStudio, OptimizerInspector, TelemetryLab } from './views'
+import { createRun, getRun, login, rewindStory, runAction, setControls } from './api'
+import type { Forecast, Policy, Snapshot, TraceEvent } from './types'
+import { Evidence, LiveStory, StoryOverview, TechnicalDetail } from './views'
 
-const views = ['Control Room', 'Telemetry Lab', 'Forecast Studio', 'Optimizer Inspector', 'Campaign Evidence'] as const
-type View = typeof views[number]
+type Destination = 'Live Dashboard' | 'Evidence' | 'Technical Detail'
+type ConnectionState = 'connecting' | 'live' | 'reconnecting'
+type Notice = { tone: 'success' | 'warning'; message: string } | null
 
 function App() {
   const [token, setToken] = useState<string | null>(sessionStorage.getItem('cdot-token'))
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
-  const [active, setActive] = useState<View>('Control Room')
+  const [destination, setDestination] = useState<Destination>('Live Dashboard')
+  const [overview, setOverview] = useState(true)
+  const [expert, setExpert] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [connection, setConnection] = useState<ConnectionState>('connecting')
+  const [notice, setNotice] = useState<Notice>(null)
   const socket = useRef<WebSocket | null>(null)
 
   useEffect(() => {
+    const runId = sessionStorage.getItem('cdot-run-id')
+    if (!token || !runId || snapshot) return
+    getRun(token, runId).then(run => {
+      setSnapshot(run)
+      setOverview(run.payload.runner.step === 0)
+    }).catch(() => {
+      sessionStorage.removeItem('cdot-token')
+      sessionStorage.removeItem('cdot-run-id')
+      setToken(null)
+    })
+  }, [token, snapshot])
+
+  useEffect(() => {
     if (!token || !snapshot?.run_id) return
-    const scheme = location.protocol === 'https:' ? 'wss' : 'ws'
-    const ws = new WebSocket(`${scheme}://${location.host}/api/v1/ws/runs/${snapshot.run_id}?token=${encodeURIComponent(token)}`)
-    socket.current = ws
-    ws.onmessage = message => {
-      const event = JSON.parse(message.data)
-      if (event.type === 'snapshot') { setSnapshot(event); return }
-      setSnapshot(previous => previous ? applyDelta(previous, event) : previous)
-      if (event.type === 'decision.trace' || event.type === 'policy.changed') {
-        window.setTimeout(() => getRun(token, snapshot.run_id).then(setSnapshot).catch(() => {}), 20)
+    let cancelled = false
+    let retry: number | undefined
+    const runId = snapshot.run_id
+    const refresh = () => getRun(token, runId).then(setSnapshot).catch(() => {})
+    const connect = () => {
+      setConnection(socket.current ? 'reconnecting' : 'connecting')
+      const scheme = location.protocol === 'https:' ? 'wss' : 'ws'
+      const ws = new WebSocket(`${scheme}://${location.host}/api/v1/ws/runs/${runId}?token=${encodeURIComponent(token)}`)
+      socket.current = ws
+      ws.onopen = () => setConnection('live')
+      ws.onmessage = message => {
+        const event = JSON.parse(message.data)
+        if (event.type === 'snapshot') { setSnapshot(event); return }
+        setSnapshot(previous => previous ? applyDelta(previous, event) : previous)
+        if (['guided.checkpoint', 'story.checkpoint', 'story.rewound', 'policy.changed'].includes(event.type)) window.setTimeout(refresh, 25)
       }
+      ws.onclose = () => {
+        if (cancelled) return
+        setConnection('reconnecting')
+        retry = window.setTimeout(connect, 1000)
+      }
+      ws.onerror = () => ws.close()
     }
-    return () => ws.close()
+    connect()
+    return () => {
+      cancelled = true
+      if (retry) window.clearTimeout(retry)
+      socket.current?.close()
+      socket.current = null
+    }
   }, [token, snapshot?.run_id])
 
+  useEffect(() => {
+    if (!notice) return
+    const timer = window.setTimeout(() => setNotice(null), 3200)
+    return () => window.clearTimeout(timer)
+  }, [notice])
+
+  useEffect(() => {
+    if (!snapshot || overview) return
+    const handler = (event: KeyboardEvent) => {
+      const tag = (event.target as HTMLElement | null)?.tagName
+      if (tag && ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(tag)) return
+      if (event.key === '1') setDestination('Live Dashboard')
+      if (event.key === '2') setDestination('Evidence')
+      if (event.key === '3') setDestination('Technical Detail')
+      if (event.key.toLowerCase() === 'e') setExpert(value => !value)
+      if (event.key === 'ArrowLeft' && destination === 'Live Dashboard') {
+        event.preventDefault()
+        void rewindBack()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [snapshot, overview, destination, busy])
+
   async function signIn(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setLoginError('')
+    event.preventDefault()
+    setBusy(true)
+    setLoginError('')
     const form = new FormData(event.currentTarget)
     try {
       const auth = await login(String(form.get('username')), String(form.get('password')))
-      sessionStorage.setItem('cdot-token', auth.access_token); setToken(auth.access_token)
-      const run = await createRun(auth.access_token); setSnapshot(run)
-    } catch (error) { setLoginError(error instanceof Error ? error.message : 'Unable to sign in') }
-    finally { setBusy(false) }
+      const run = await createRun(auth.access_token, 'mpc')
+      sessionStorage.setItem('cdot-token', auth.access_token)
+      sessionStorage.setItem('cdot-run-id', run.run_id)
+      setToken(auth.access_token)
+      setSnapshot(run)
+      setOverview(true)
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : 'Unable to sign in')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function startStory() {
+    if (!token || !snapshot || busy) return
+    setBusy(true)
+    setOverview(false)
+    setDestination('Live Dashboard')
+    try {
+      setSnapshot(await runAction(token, snapshot.run_id, 'start'))
+    } catch (error) {
+      setNotice({ tone: 'warning', message: error instanceof Error ? error.message : 'Unable to start the story.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function togglePlayback() {
+    if (!snapshot) return
+    await action(snapshot.payload.runner.state === 'running' ? 'pause' : 'resume')
+  }
+
+  async function restartStory() {
+    if (!token || !snapshot || busy) return
+    setBusy(true)
+    try {
+      await runAction(token, snapshot.run_id, 'reset')
+      setSnapshot(await runAction(token, snapshot.run_id, 'start'))
+      setNotice({ tone: 'success', message: 'Story restarted from the same seeded baseline.' })
+    } catch (error) {
+      setNotice({ tone: 'warning', message: error instanceof Error ? error.message : 'Unable to restart the story.' })
+    } finally { setBusy(false) }
+  }
+
+  async function rewindTo(checkpointId: string) {
+    if (!token || !snapshot || busy) return
+    const checkpoint = snapshot.payload.story.checkpoints.find(item => item.id === checkpointId)
+    if (!checkpoint?.reached) return
+    setBusy(true)
+    try {
+      setSnapshot(await rewindStory(token, snapshot.run_id, checkpointId, true))
+      setNotice({ tone: 'success', message: `Replaying from Chapter ${checkpoint.number}` })
+    } catch (error) {
+      setNotice({ tone: 'warning', message: error instanceof Error ? error.message : 'Unable to rewind the story.' })
+    } finally { setBusy(false) }
+  }
+
+  async function rewindBack() {
+    if (!snapshot || busy) return
+    const currentNumber = snapshot.payload.guided_story.current_chapter.number
+    const previous = snapshot.payload.story.checkpoints.filter(item => item.reached && item.number < currentNumber).at(-1)
+    if (previous) await rewindTo(previous.id)
   }
 
   async function action(name: string) {
-    if (!token || !snapshot) return
+    if (!token || !snapshot || busy) return
     setBusy(true)
-    try { setSnapshot(await runAction(token, snapshot.run_id, name)) } finally { setBusy(false) }
+    try {
+      const next = await runAction(token, snapshot.run_id, name)
+      setSnapshot(next)
+      if (name === 'reset') { setOverview(true); setDestination('Live Dashboard') }
+      setNotice({ tone: 'success', message: name === 'reset' ? 'Run returned to the deterministic baseline.' : `Runner ${name} command accepted.` })
+    } catch (error) {
+      setNotice({ tone: 'warning', message: error instanceof Error ? error.message : 'Runner command failed.' })
+    } finally { setBusy(false) }
   }
 
   async function control(body: Record<string, unknown>) {
-    if (!token || !snapshot) return
+    if (!token || !snapshot || busy) return
     setBusy(true)
-    try { setSnapshot(await setControls(token, snapshot.run_id, body)) } finally { setBusy(false) }
+    try {
+      setSnapshot(await setControls(token, snapshot.run_id, body))
+      setNotice({ tone: 'success', message: 'Expert control applied; realized history was not recomputed.' })
+    } catch (error) {
+      setNotice({ tone: 'warning', message: error instanceof Error ? error.message : 'Control change failed.' })
+    } finally { setBusy(false) }
   }
 
-  if (!token || !snapshot) return <LoginScreen onSubmit={signIn} busy={busy} error={loginError} />
+  function signOut() {
+    socket.current?.close()
+    sessionStorage.removeItem('cdot-token')
+    sessionStorage.removeItem('cdot-run-id')
+    setToken(null)
+    setSnapshot(null)
+  }
+
+  if (!token || !snapshot) return <LoginScreen onSubmit={signIn} busy={busy} error={loginError} loading={Boolean(token)} />
   const payload = snapshot.payload
-  return <div className="app-shell">
-    <Header snapshot={snapshot} />
-    <nav className="view-nav" aria-label="Primary views">{views.map((view, index) => <button key={view} className={active === view ? 'active' : ''} onClick={() => setActive(view)}><span>{String(index + 1).padStart(2, '0')}</span>{view}</button>)}</nav>
-    <main className="main-stage">
-      {active === 'Control Room' && <ControlRoom payload={payload} />}
-      {active === 'Telemetry Lab' && <TelemetryLab payload={payload} />}
-      {active === 'Forecast Studio' && <ForecastStudio payload={payload} />}
-      {active === 'Optimizer Inspector' && <OptimizerInspector payload={payload} />}
-      {active === 'Campaign Evidence' && <CampaignEvidence payload={payload} />}
-    </main>
-    <DecisionRail events={payload.decision_trace} />
-    <PresenterBar payload={payload} busy={busy} action={action} control={control} />
+  if (overview) return <div className="guided-app"><AppHeader snapshot={snapshot} connection={connection} expert={expert} onExpert={() => setExpert(value => !value)} onHome={() => setOverview(true)} onSignOut={signOut} />
+    <StoryOverview payload={payload} busy={busy} onStart={startStory} />
+    {notice && <Toast notice={notice} />}
+  </div>
+
+  return <div className="guided-app">
+    <AppHeader snapshot={snapshot} connection={connection} expert={expert} onExpert={() => setExpert(value => !value)} onHome={() => setOverview(true)} onSignOut={signOut} />
+    <nav className="primary-nav" aria-label="Primary navigation">{(['Live Dashboard', 'Evidence', 'Technical Detail'] as Destination[]).map((item, index) => <button key={item} className={destination === item ? 'active' : ''} aria-current={destination === item ? 'page' : undefined} onClick={() => setDestination(item)}><span>0{index + 1}</span>{item}</button>)}</nav>
+    {destination === 'Live Dashboard' && <LiveStory payload={payload} busy={busy} onToggle={togglePlayback} onRestart={restartStory} onRewind={rewindTo} onBack={rewindBack} />}
+    {destination === 'Evidence' && <Evidence payload={payload} />}
+    {destination === 'Technical Detail' && <TechnicalDetail payload={payload} expertControls={expert ? <ExpertControls payload={payload} busy={busy} action={action} control={control} /> : undefined} />}
+    {notice && <Toast notice={notice} />}
   </div>
 }
 
@@ -77,52 +216,62 @@ function applyDelta(previous: Snapshot, event: { sequence: number; simulated_tim
     payload.history = [...payload.history, event.payload].slice(-240)
     payload.topology = { ...payload.topology, upfs: event.payload.upfs }
     payload.runner = { ...payload.runner, step: event.payload.step + 1 }
+    payload.story = { ...payload.story, elapsed_simulated_seconds: (event.payload.step + 1) * payload.runner.step_seconds }
   } else if (event.type === 'decision.trace') {
     payload.decision_trace = [...payload.decision_trace, event.payload as TraceEvent].slice(-120)
     if (event.payload.kind === 'forecast.ready') payload.forecast = event.payload.details as Forecast
     if (event.payload.kind === 'optimization.solved') payload.policy = event.payload.details as Policy
-  } else if (event.type === 'runner.state') payload.runner = { ...payload.runner, state: event.payload.state }
+  } else if (event.type === 'runner.state' || event.type === 'guided.checkpoint') {
+    payload.runner = { ...payload.runner, state: event.payload.state }
+  }
   return { ...previous, sequence: event.sequence, simulated_time: event.simulated_time, wall_time: event.wall_time, payload }
 }
 
-function Header({ snapshot }: { snapshot: Snapshot }) {
-  const { runner } = snapshot.payload
-  return <header className="topbar">
-    <div className="brand-mark"><svg viewBox="0 0 40 40"><path d="M7 29V11h9l8 9 9-9v18h-7V20l-2 3h-3l-5-5v11z" /></svg><div><b>C-DOT</b><span>TRAFFIC ENGINEERING LAB</span></div></div>
-    <div className="run-identity"><span>SCENARIO</span><strong>STADIUM SURGE / 3-UPF</strong><i /> <span>SEED</span><b>{runner.seed}</b></div>
-    <div className="synthetic-badge"><i /> SYNTHETIC DATA</div>
-    <div className="sim-clock"><span>SIMULATED TIME</span><time>{new Date(snapshot.simulated_time).toISOString().replace('T', ' ').slice(0, 19)}Z</time></div>
-    <div className={`runner-state ${runner.state}`}><i />{runner.state.toUpperCase()}</div>
+function AppHeader({ snapshot, connection, expert, onExpert, onHome, onSignOut }: { snapshot: Snapshot; connection: ConnectionState; expert: boolean; onExpert: () => void; onHome: () => void; onSignOut: () => void }) {
+  const runner = snapshot.payload.runner
+  return <header className="app-header">
+    <button className="brand" onClick={onHome} aria-label="Open dashboard overview"><BrandMark /><span><b>C-DOT</b><small>PREDICTIVE USER PLANE</small></span></button>
+    <div className="header-run"><span>PREDICTIVE UPF SIMULATION · SEED {runner.seed}</span><b>{new Date(snapshot.simulated_time).toISOString().slice(11, 19)} SIM</b></div>
+    <div className="synthetic-label"><i />SYNTHETIC DATA</div>
+    <div className={`link-state ${connection}`}><i />{connection === 'live' ? 'Connected' : 'Reconnecting'}</div>
+    <button className={`expert-toggle ${expert ? 'active' : ''}`} aria-pressed={expert} onClick={onExpert}>Expert mode <kbd>E</kbd></button>
+    <button className="exit-button" onClick={onSignOut}>Exit</button>
   </header>
 }
 
-function PresenterBar({ payload, busy, action, control }: { payload: SnapshotPayload; busy: boolean; action: (name: string) => void; control: (body: Record<string, unknown>) => void }) {
-  const running = payload.runner.state === 'running'
-  return <footer className="presenter-bar">
-    <div className="presenter-label"><span>PRESENTER</span><b>CONTROL AUTHORITY</b></div>
-    <button className="primary-control" disabled={busy} onClick={() => action(running ? 'pause' : payload.runner.state === 'paused' ? 'resume' : 'start')}><i className={running ? 'pause-icon' : 'play-icon'} />{running ? 'PAUSE' : payload.runner.state === 'paused' ? 'RESUME' : 'START LOOP'}</button>
-    <button disabled={busy} onClick={() => action('reset')}>RESET</button>
-    <span className="bar-divider" />
-    <label>SPEED <button onClick={() => control({ speed: payload.runner.speed === 75 ? 150 : 75 })}>{payload.runner.speed}×</button></label>
-    <button className="surge-button" disabled={busy} onClick={() => control({ surge: 3.2 })}>INJECT STADIUM SURGE</button>
-    <button className="fault-button" disabled={busy} onClick={() => control({ fault: { upf_id: 'upf-a', health: 'unavailable' } })}>FAIL UPF-A</button>
-    <button disabled={busy} onClick={() => control({ telemetry_gap_steps: 5 })}>TELEMETRY GAP</button>
-    <span className="bar-divider" />
-    <label>HOLD <button disabled={busy} onClick={() => control({ min_hold_epochs: payload.runner.gate.min_hold_epochs === 3 ? 1 : payload.runner.gate.min_hold_epochs + 1 })}>{payload.runner.gate.min_hold_epochs}E</button></label>
-    <label>HYST <button disabled={busy} onClick={() => control({ hysteresis: payload.runner.gate.min_objective_improvement >= .05 ? .01 : Number((payload.runner.gate.min_objective_improvement + .01).toFixed(2)) })}>Δ{payload.runner.gate.min_objective_improvement.toFixed(2)}</button></label>
-    <label>CHURN <button disabled={busy} onClick={() => control({ churn_budget: payload.runner.gate.max_group_total_variation >= .3 ? .1 : Number((payload.runner.gate.max_group_total_variation + .1).toFixed(2)) })}>{Math.round(payload.runner.gate.max_group_total_variation * 100)}%</button></label>
-    <div className="keyboard-hint">SPACE pause · 1—5 views</div>
-  </footer>
+function ExpertControls({ payload, busy, action, control }: { payload: Snapshot['payload']; busy: boolean; action: (name: string) => void; control: (body: Record<string, unknown>) => void }) {
+  return <section className="expert-controls" aria-label="Expert controls">
+    <div><span>EXPERT MODE</span><p>Manual controls bypass guided checkpoints while preserving causal history.</p></div>
+    <label>Controller<select value={payload.runner.controller} disabled={busy} onChange={event => control({ controller: event.target.value })}><option value="mpc">Frozen cohort MPC</option><option value="static">Static</option><option value="reactive">Reactive</option><option value="predictive">Predictive HiGHS</option></select></label>
+    <label>Speed<select value={payload.runner.speed} disabled={busy} onChange={event => control({ speed: Number(event.target.value) })}><option value="30">30×</option><option value="75">75×</option><option value="150">150×</option><option value="300">300×</option></select></label>
+    <button disabled={busy} onClick={() => action(payload.runner.state === 'running' ? 'pause' : payload.runner.state === 'paused' ? 'resume' : 'start')}>{payload.runner.state === 'running' ? 'Pause' : 'Run'}</button>
+    <button disabled={busy} onClick={() => control({ surge: 3.2 })}>Inject surge</button>
+    <button disabled={busy} onClick={() => control({ fault: { upf_id: 'upf-a', health: 'unavailable' } })}>Fail UPF-A</button>
+    <button disabled={busy} onClick={() => control({ telemetry_gap_steps: 5 })}>Telemetry gap</button>
+    <button disabled={busy} onClick={() => action('reset')}>Reset</button>
+  </section>
 }
 
-function LoginScreen({ onSubmit, busy, error }: { onSubmit: (event: React.FormEvent<HTMLFormElement>) => void; busy: boolean; error: string }) {
-  return <main className="login-screen"><div className="login-circuit" aria-hidden="true"><i/><i/><i/><i/></div><form className="login-panel" onSubmit={onSubmit}>
-    <div className="brand-mark large"><svg viewBox="0 0 40 40"><path d="M7 29V11h9l8 9 9-9v18h-7V20l-2 3h-3l-5-5v11z" /></svg><div><b>C-DOT</b><span>CLOSED-LOOP TRAFFIC ENGINEERING</span></div></div>
-    <p className="login-kicker">PRESENTER AUTHENTICATION</p><h1>Take control of the predictive user plane.</h1><p className="login-copy">A deterministic, accelerated 5G demonstration. All telemetry, forecasts, and campaign evidence are explicitly synthetic.</p>
-    <label>OPERATOR ID<input name="username" defaultValue="presenter" autoComplete="username" /></label><label>PASSCODE<input name="password" type="password" defaultValue="demo" autoComplete="current-password" /></label>
-    {error && <div className="login-error">{error}</div>}<button className="login-submit" disabled={busy}>{busy ? 'INITIALIZING…' : 'ENTER CONTROL ROOM'}<span>→</span></button>
-    <div className="login-meta"><span><i className="healthy-dot"/>API READY</span><span>SCHEMA 1.0</span><span>LOCAL / OFFLINE</span></div>
-  </form></main>
+function LoginScreen({ onSubmit, busy, error, loading }: { onSubmit: (event: React.FormEvent<HTMLFormElement>) => void; busy: boolean; error: string; loading: boolean }) {
+  return <main className="login-page">
+    <section className="login-narrative"><BrandMark /><span className="eyebrow">C-DOT PREDICTIVE USER PLANE</span><h1>Predictive 5G traffic placement and capacity assurance.</h1><p>An operational dashboard for observing demand, validating forecasts, and reviewing new-session routing decisions.</p><div className="login-proof"><span>01</span>Observe <i /> <span>02</span>Predict <i /> <span>03</span>Certify <i /> <span>04</span>Place</div><small>Synthetic · offline · no live SMF actuation</small></section>
+    <form className="login-form" onSubmit={onSubmit}>
+      <span className="eyebrow">AUTHORIZED ACCESS</span><h2>{loading ? 'Restoring dashboard…' : 'Open operations dashboard'}</h2><p>The frozen cohort-MPC evaluation profile is selected by default. Alternate controllers are available in Expert Mode.</p>
+      <label>Operator ID<input name="username" defaultValue="presenter" autoComplete="username" /></label>
+      <label>Passcode<input name="password" type="password" defaultValue="demo" autoComplete="current-password" /></label>
+      {error && <div className="form-error" role="alert">{error}</div>}
+      <button className="primary-button" disabled={busy || loading}>{busy || loading ? 'Preparing…' : 'Sign in'} <span>→</span></button>
+      <small>Local rehearsal credentials are prefilled.</small>
+    </form>
+  </main>
+}
+
+function BrandMark() {
+  return <svg className="brand-symbol" viewBox="0 0 40 40" aria-hidden="true"><path d="M7 29V11h9l8 9 9-9v18h-7V20l-2 3h-3l-5-5v11z" /></svg>
+}
+
+function Toast({ notice }: { notice: Exclude<Notice, null> }) {
+  return <div className={`toast ${notice.tone}`} role="status"><i />{notice.message}</div>
 }
 
 export default App

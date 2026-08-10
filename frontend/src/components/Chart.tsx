@@ -1,6 +1,11 @@
 import { useEffect, useRef } from 'react'
-import * as echarts from 'echarts'
 import type { EChartsOption } from 'echarts'
+import { BarChart, LineChart } from 'echarts/charts'
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
+import * as echarts from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+
+echarts.use([BarChart, LineChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer])
 
 export function Chart({ option, className = '' }: { option: EChartsOption; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -17,4 +22,3 @@ export function Chart({ option, className = '' }: { option: EChartsOption; class
 
 export const chartText = '#8a96a6'
 export const chartGrid = 'rgba(207,224,242,.07)'
-

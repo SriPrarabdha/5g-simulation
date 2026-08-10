@@ -1,0 +1,14 @@
+{
+  "schema_version": "scenario-event-knowledge-overlay/1.0",
+  "description": "Evaluator-only declarations for the planned stadium and industrial brownouts. The airport outage remains unannounced.",
+  "events": [
+    {"event_type": "capacity_factor", "upf_id": "upf-edge-stadium-a", "step": 600, "known_at_step": 240},
+    {"event_type": "capacity_factor", "upf_id": "upf-regional-3", "step": 600, "known_at_step": 240},
+    {"event_type": "capacity_factor", "upf_id": "upf-edge-stadium-a", "step": 960, "known_at_step": 240},
+    {"event_type": "capacity_factor", "upf_id": "upf-regional-3", "step": 960, "known_at_step": 240},
+    {"event_type": "capacity_factor", "upf_id": "upf-edge-industrial-a", "step": 2160, "known_at_step": 1800},
+    {"event_type": "capacity_factor", "upf_id": "upf-regional-2", "step": 2160, "known_at_step": 1800},
+    {"event_type": "capacity_factor", "upf_id": "upf-edge-industrial-a", "step": 2520, "known_at_step": 1800},
+    {"event_type": "capacity_factor", "upf_id": "upf-regional-2", "step": 2520, "known_at_step": 1800}
+  ]
+}

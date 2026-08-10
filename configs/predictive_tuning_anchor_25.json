@@ -1,0 +1,20 @@
+{
+  "schema_version": "predictive-controller-profile/1.0",
+  "profile_id": "static-anchor-25pct-v1",
+  "optimizer_weight": 0.25,
+  "gate": {
+    "min_hold_epochs": 0,
+    "min_objective_improvement": 0.0,
+    "max_group_total_variation": 1.0,
+    "emergency_objective_threshold": 1.0
+  },
+  "optimization": {
+    "planning_quantile": "p95",
+    "overload_penalty": 1000000.0,
+    "utilization_cost": 1.0,
+    "locality_cost": 0.001,
+    "churn_cost": 0.01,
+    "demand_safety_factor": 1.0,
+    "timeout_seconds": 1.0
+  }
+}

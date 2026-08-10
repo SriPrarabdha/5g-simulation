@@ -18,6 +18,14 @@ class SimulatorTests(unittest.TestCase):
         self.assertEqual([step.to_dict() for step in first.steps], [step.to_dict() for step in second.steps])
         self.assertEqual(len(first.steps), config.steps)
         self.assertGreater(first.summary["offered_bytes"]["ul"], 0)
+        self.assertEqual(first.summary["control_scope"], "new_session_placement_only")
+        self.assertFalse(first.summary["session_migration_supported"])
+        self.assertTrue(any(step.group_upf_admissions for step in first.steps))
+        for step in first.steps:
+            self.assertEqual(
+                sum(sum(by_upf.values()) for by_upf in step.group_upf_admissions.values()),
+                sum(upf.new_sessions for upf in step.upfs),
+            )
 
     def test_capacity_reduction_does_not_change_offered_demand(self) -> None:
         high = Simulator(ScenarioConfig.from_dict(self._scenario(100.0))).run().summary
@@ -25,6 +33,17 @@ class SimulatorTests(unittest.TestCase):
         self.assertEqual(high["offered_bytes"], low["offered_bytes"])
         self.assertLess(low["carried_bytes"]["ul"], high["carried_bytes"]["ul"])
         self.assertGreater(low["dropped_bytes"]["ul"], high["dropped_bytes"]["ul"])
+
+    def test_total_overload_is_decomposed_without_hiding_it(self) -> None:
+        summary = Simulator(ScenarioConfig.from_dict(self._scenario(1.0))).run().summary
+        for direction in ("ul", "dl"):
+            total = summary["overload_area_seconds"][direction]
+            residual = summary["residual_overload_area_seconds"][direction]
+            incremental = summary["incremental_new_session_overload_area_seconds"][direction]
+            self.assertGreater(total, 0)
+            self.assertGreaterEqual(residual, 0)
+            self.assertGreaterEqual(incremental, 0)
+            self.assertAlmostEqual(total, residual + incremental)
 
     def test_jsonl_output_is_byte_stable(self) -> None:
         result = Simulator(ScenarioConfig.from_dict(self._scenario(10.0))).run()
@@ -75,6 +94,32 @@ class SimulatorTests(unittest.TestCase):
         before = sum(result.steps[index].group_arrivals[group_id] for index in range(2))
         after = sum(result.steps[index].group_arrivals[group_id] for index in range(2, 8))
         self.assertGreater(after / 6, before / 2)
+
+    def test_scheduled_arrival_hint_is_exposed_only_when_event_becomes_active(self) -> None:
+        payload = self._scenario(100.0)
+        payload["events"] = [{
+            "step": 4, "event_type": "arrival_factor",
+            "group_id": "zone-a|internet|1-1", "arrival_factor": 5,
+            "known_at_step": 0, "forecast_hint_multiplier": 5,
+        }]
+        simulator = Simulator(ScenarioConfig.from_dict(payload))
+        self.assertEqual(simulator.control_context().scheduled_multiplier_by_group[
+            "zone-a|internet|1-1"
+        ], 1.0)
+        for _ in range(4):
+            simulator.advance()
+        simulator.replan()
+        self.assertEqual(simulator.control_context().scheduled_multiplier_by_group[
+            "zone-a|internet|1-1"
+        ], 5.0)
+
+    def test_forecast_hint_validation_prevents_future_leakage(self) -> None:
+        with self.assertRaisesRegex(ValueError, "known_at_step"):
+            ScenarioEvent(
+                step=4, event_type="arrival_factor",
+                group_id="zone-a|internet|1-1", arrival_factor=5,
+                known_at_step=5, forecast_hint_multiplier=5,
+            )
 
     def test_incremental_fault_changes_only_future_ticks(self) -> None:
         simulator = Simulator(ScenarioConfig.from_dict(self._scenario(100.0)))

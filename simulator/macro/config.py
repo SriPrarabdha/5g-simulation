@@ -67,10 +67,21 @@ class ScenarioEvent:
     arrival_factor: float | None = None
     zone: str | None = None
     latency_ms: float | None = None
+    known_at_step: int | None = None
+    forecast_hint_multiplier: float | None = None
 
     def __post_init__(self) -> None:
         if self.step < 0:
             raise ValueError("event step must be non-negative")
+        if self.known_at_step is not None and not 0 <= self.known_at_step <= self.step:
+            raise ValueError("known_at_step must be between zero and the event step")
+        if self.forecast_hint_multiplier is not None:
+            if self.event_type != "arrival_factor":
+                raise ValueError("forecast hints are only valid for arrival-factor events")
+            if self.known_at_step is None:
+                raise ValueError("forecast hints require known_at_step")
+            if self.forecast_hint_multiplier <= 0:
+                raise ValueError("forecast_hint_multiplier must be positive")
         if self.event_type not in {"capacity_factor", "health", "arrival_factor", "path_latency"}:
             raise ValueError(f"unsupported event type: {self.event_type}")
         if self.event_type == "capacity_factor":

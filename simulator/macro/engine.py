@@ -61,6 +61,8 @@ class SimulationResult:
         new_session_offered = {"ul": 0.0, "dl": 0.0}
         overload_duration = {"ul": 0.0, "dl": 0.0}
         overload_area = {"ul": 0.0, "dl": 0.0}
+        residual_overload_area = {"ul": 0.0, "dl": 0.0}
+        incremental_new_session_overload_area = {"ul": 0.0, "dl": 0.0}
         failures = 0
         for step in self.steps:
             for upf in step.upfs:
@@ -75,13 +77,36 @@ class SimulationResult:
                         (item.offered_bytes - item.rejected_bytes) * 8
                         / self.step_seconds / 1_000_000
                     )
+                    # Rejections apply to newly arriving sessions. Removing
+                    # admitted new-session bytes leaves the load that was
+                    # already attached to this UPF at the start of the tick.
+                    admitted_new_bytes = max(
+                        0.0, item.new_session_offered_bytes - item.rejected_bytes
+                    )
+                    residual_mbps = max(
+                        0.0,
+                        admitted_mbps
+                        - admitted_new_bytes * 8 / self.step_seconds / 1_000_000,
+                    )
                     if item.safe_capacity_mbps > 0:
                         excess = max(0.0, admitted_mbps / item.safe_capacity_mbps - 1.0)
+                        residual_excess = max(
+                            0.0, residual_mbps / item.safe_capacity_mbps - 1.0
+                        )
+                        incremental_excess = excess - residual_excess
                     else:
                         excess = math.inf if admitted_mbps > 0 else 0.0
+                        residual_excess = math.inf if residual_mbps > 0 else 0.0
+                        incremental_excess = (
+                            0.0 if residual_mbps > 0 else excess
+                        )
                     if excess > 0:
                         overload_duration[direction] += self.step_seconds
                         overload_area[direction] += excess * self.step_seconds
+                        residual_overload_area[direction] += residual_excess * self.step_seconds
+                        incremental_new_session_overload_area[direction] += (
+                            incremental_excess
+                        ) * self.step_seconds
                 failures += upf.establishment_failures
             rejected["ul"] += step.unplaced_rejected_ul_bytes
             rejected["dl"] += step.unplaced_rejected_dl_bytes
@@ -94,6 +119,8 @@ class SimulationResult:
             "scenario_id": self.scenario_id,
             "seed": self.seed,
             "controller": self.controller,
+            "control_scope": "new_session_placement_only",
+            "session_migration_supported": False,
             "primary_overload_metric": self.primary_overload_metric,
             "steps": len(self.steps),
             "offered_bytes": offered,
@@ -107,6 +134,8 @@ class SimulationResult:
             },
             "overload_duration_seconds": overload_duration,
             "overload_area_seconds": overload_area,
+            "residual_overload_area_seconds": residual_overload_area,
+            "incremental_new_session_overload_area_seconds": incremental_new_session_overload_area,
             "establishment_failures": failures,
             "selection_audit_stride": self.selection_audit_stride,
             "selection_audits_retained": len(self.selection_audits),
@@ -291,6 +320,9 @@ class Simulator:
         self._history_by_group: dict[str, list[DemandObservation]] = defaultdict(list)
         self._interval_arrivals: Counter[str] = Counter()
         self._arrival_factors = {group.key.selection_id: 1.0 for group in config.groups}
+        self._scheduled_forecast_multipliers = {
+            group.key.selection_id: 1.0 for group in config.groups
+        }
         self._path_latency_overrides: dict[tuple[str, str], float] = {}
         self._eligible_group_ids_by_upf: dict[str, list[str]] = {
             upf_id: [
@@ -392,6 +424,10 @@ class Simulator:
         for event in self._events_by_step.get(step, ()):
             if event.event_type == "arrival_factor":
                 self._arrival_factors[event.group_id or ""] = event.arrival_factor or 0.0
+                if event.forecast_hint_multiplier is not None:
+                    self._scheduled_forecast_multipliers[event.group_id or ""] = (
+                        event.forecast_hint_multiplier
+                    )
                 continue
             runtime = self._upfs[event.upf_id or ""]
             if event.event_type == "health":
@@ -471,7 +507,71 @@ class Simulator:
             } if include_history else {},
             residual_by_upf=self._residual_by_upf(),
             oracle_new_by_group=self._peek_interval_arrivals() if include_oracle else {},
+            scheduled_multiplier_by_group=dict(self._scheduled_forecast_multipliers),
+            scheduled_multiplier_by_group_horizon=self._known_demand_horizon(),
+            active_cohorts=self._active_cohort_state(),
         )
+
+    def _known_demand_horizon(self) -> dict[str, tuple[float, ...]]:
+        """Return only schedule multipliers available at the current decision time."""
+
+        horizon = int(getattr(getattr(self.controller, "mpc_config", None), "horizon_windows", 12))
+        bucket_steps = self.config.decision_interval_steps
+        result: dict[str, tuple[float, ...]] = {}
+        for group in self.config.groups:
+            group_id = group.key.selection_id
+            known_events = sorted(
+                (
+                    event for event in self.config.events
+                    if event.event_type == "arrival_factor"
+                    and event.group_id == group_id
+                    and event.step >= self._step_index
+                    and event.known_at_step is not None
+                    and event.known_at_step <= self._step_index
+                ),
+                key=lambda item: item.step,
+            )
+            values: list[float] = []
+            factor = self._arrival_factors[group_id]
+            for window in range(horizon):
+                start = self._step_index + window * bucket_steps
+                end = start + bucket_steps
+                samples: list[float] = []
+                event_index = 0
+                while event_index < len(known_events) and known_events[event_index].step < start:
+                    factor = known_events[event_index].forecast_hint_multiplier or known_events[event_index].arrival_factor or 1.0
+                    event_index += 1
+                window_factor = factor
+                for step in range(start, end):
+                    while event_index < len(known_events) and known_events[event_index].step == step:
+                        window_factor = known_events[event_index].forecast_hint_multiplier or known_events[event_index].arrival_factor or 1.0
+                        event_index += 1
+                    samples.append(window_factor)
+                factor = window_factor
+                values.append(sum(samples) / len(samples) if samples else factor)
+            result[group_id] = tuple(values)
+        return result
+
+    def _active_cohort_state(self):
+        """Return exact anchored cohorts without exposing future random arrivals."""
+        from optimization import ActiveCohort
+
+        cohorts = []
+        for departure_step, departures in sorted(self._departures_by_step.items()):
+            remaining_steps = departure_step - self._step_index + 1
+            if remaining_steps < 1:
+                continue
+            for (group_id, upf_id, ul_mbps, dl_mbps), count in sorted(departures.items()):
+                if count:
+                    cohorts.append(ActiveCohort(
+                        group_id=group_id,
+                        upf_id=upf_id,
+                        sessions=float(count),
+                        remaining_steps=remaining_steps,
+                        ul_mbps_per_session=ul_mbps,
+                        dl_mbps_per_session=dl_mbps,
+                    ))
+        return tuple(cohorts)
 
     def _context_for_controller(self) -> ControlContext | None:
         name = self.controller.name
@@ -481,7 +581,7 @@ class Simulator:
             return self._control_context(include_history=False, include_oracle=False)
         if name == "oracle-highs-v1":
             return self._control_context(include_history=False, include_oracle=True)
-        if name in {"forecast-capacity-v1", "predictive-highs-v1"}:
+        if name in {"forecast-capacity-v1", "predictive-highs-v1", "cohort-mpc-v1"}:
             return self._control_context(include_history=True, include_oracle=False)
         return self._control_context()
 
@@ -618,7 +718,17 @@ class Simulator:
                         ))
                     continue
                 session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
-                selected, hash_value = rendezvous_select(session_key, policy.policy_id, weights)
+                # Keep the rendezvous hash namespace stable across controller
+                # policies. Weight changes should change placement through the
+                # weighted score, not by independently re-salting every key;
+                # this also gives paired controller experiments common random
+                # numbers for the selection mechanism.
+                selection_namespace = (
+                    f"{self.config.scenario_id}:weighted-rendezvous-v1"
+                )
+                selected, hash_value = rendezvous_select(
+                    session_key, selection_namespace, weights
+                )
                 reason = "fallback_static" if policy.fallback.used else "optimizer_weighted"
                 if policy.fallback.source_policy_id:
                     reason = "fallback_last_safe"
@@ -663,6 +773,11 @@ class Simulator:
             departure_key = (group_id, upf_id, ul_mbps, dl_mbps)
             self._departures_by_step[departure_step][departure_key] += count
             self._new_window_departures_by_step[departure_step][departure_key] += count
+
+        group_upf_admissions: dict[str, dict[str, int]] = {}
+        for (group_id, upf_id, _, _, _), count in sorted(new_cohorts.items()):
+            by_upf = group_upf_admissions.setdefault(group_id, {})
+            by_upf[upf_id] = by_upf.get(upf_id, 0) + count
 
         offered_ul = self._active_ul_mbps
         offered_dl = self._active_dl_mbps
@@ -744,6 +859,7 @@ class Simulator:
             window_start=window_start, window_end=window_end,
             policy_id=policy.policy_id if policy is not None else "none",
             group_arrivals=arrivals, group_rejections=dict(rejections), upfs=upf_results,
+            group_upf_admissions=group_upf_admissions,
             group_upf_buckets=group_upf_buckets,
             unplaced_rejected_ul_bytes=unplaced_ul_mbps * 1_000_000 / 8 * self.config.step_seconds,
             unplaced_rejected_dl_bytes=unplaced_dl_mbps * 1_000_000 / 8 * self.config.step_seconds,

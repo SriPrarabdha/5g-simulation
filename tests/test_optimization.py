@@ -66,6 +66,33 @@ def forecast(*, ul: float = 100, dl: float = 100, arrivals: float = 100, residua
 
 @unittest.skipUnless(__import__("importlib").util.find_spec("scipy"), "SciPy/HiGHS not installed")
 class OptimizationTests(unittest.TestCase):
+    def test_demand_safety_factor_must_be_positive(self) -> None:
+        with self.assertRaisesRegex(ValueError, "demand_safety_factor"):
+            OptimizationConfig(demand_safety_factor=0)
+
+    def test_diversification_bound_limits_each_group_destination(self) -> None:
+        result = solve_allocation(
+            [forecast()], [state("upf-a"), state("upf-b"), state("upf-c")],
+            created_at=NOW, policy_version=1,
+            config=OptimizationConfig(
+                locality_cost=0, churn_cost=0, max_group_upf_weight=0.5
+            ),
+        )
+        self.assertEqual(result.status, "optimal")
+        self.assertLessEqual(
+            max(result.policy.weights_for(GROUP).values()), 0.5 + 1e-8  # type: ignore[union-attr]
+        )
+
+    def test_impossible_diversification_bound_is_structurally_infeasible(self) -> None:
+        result = solve_allocation(
+            [forecast()], [state("upf-a"), state("upf-b"), state("upf-c")],
+            created_at=NOW, policy_version=1,
+            config=OptimizationConfig(max_group_upf_weight=0.3),
+        )
+        self.assertEqual(result.status, "infeasible")
+        self.assertIsNone(result.policy)
+        self.assertIn("diversification", result.message)
+
     def test_hand_solvable_balanced_topology(self) -> None:
         result = solve_allocation(
             [forecast()], [state("upf-a"), state("upf-b")],

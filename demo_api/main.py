@@ -24,7 +24,7 @@ class LoginRequest(BaseModel):
 
 class CreateRunRequest(BaseModel):
     scenario_id: str = "demo-three-upf-two-zone"
-    controller: str = "predictive"
+    controller: str = "mpc"
     seed: int | None = None
 
 
@@ -37,6 +37,12 @@ class ControlRequest(BaseModel):
     min_hold_epochs: int | None = Field(default=None, ge=0, le=8)
     hysteresis: float | None = Field(default=None, ge=0, le=0.5)
     churn_budget: float | None = Field(default=None, ge=0, le=1)
+    pause_at_step: int | None = Field(default=None, ge=1, le=100000)
+
+
+class StoryRewindRequest(BaseModel):
+    checkpoint_id: str
+    autoplay: bool = True
 
 
 def create_app(
@@ -56,7 +62,7 @@ def create_app(
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    manager = RunManager(scenario_path or ROOT / "configs" / "demo_scenario.json")
+    manager = RunManager(scenario_path or ROOT / "configs" / "demo_mpc_scenario.json")
     tokens = TokenService()
     audit = AuditStore(audit_path)
     application.state.manager = manager
@@ -137,6 +143,22 @@ def create_app(
                 "kind": "trained_forecast_bundle", "immutable": True,
                 "synthetic": True, "metadata": manager.forecast_bundle.metadata,
             })
+        items.extend([
+            {
+                "artifact_id": manager.mpc_profile["profile_id"],
+                "kind": "cohort_mpc_profile",
+                "immutable": True,
+                "synthetic": True,
+                "metadata": manager.mpc_profile,
+            },
+            {
+                "artifact_id": manager.campaign_evidence["campaign_id"],
+                "kind": "paired_campaign_evidence",
+                "immutable": True,
+                "synthetic": True,
+                "metadata": manager.campaign_evidence,
+            },
+        ])
         return {"items": items}
 
     @application.post("/api/v1/runs", status_code=status.HTTP_201_CREATED)
@@ -178,6 +200,24 @@ def create_app(
             audit.append(run_id, user.subject, "controls.rejected", {"changes": changes, "reason": str(error)})
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
         audit.append(run_id, user.subject, "controls.applied", changes)
+        return run.snapshot()
+
+    @application.post("/api/v1/runs/{run_id}/story/rewind")
+    async def rewind_story(
+        run_id: str,
+        request: StoryRewindRequest,
+        user: Annotated[Identity, Depends(presenter)],
+    ) -> dict[str, Any]:
+        run = run_or_404(run_id)
+        try:
+            await run.rewind(request.checkpoint_id, autoplay=request.autoplay)
+        except ValueError as error:
+            audit.append(run_id, user.subject, "story.rewind_rejected", {
+                "checkpoint_id": request.checkpoint_id,
+                "reason": str(error),
+            })
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
+        audit.append(run_id, user.subject, "story.rewound", request.model_dump())
         return run.snapshot()
 
     @application.get("/api/v1/runs/{run_id}/telemetry")

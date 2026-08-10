@@ -1,0 +1,8 @@
+{
+  "schema_version": "predictive-controller-profile/1.0",
+  "profile_id": "mechanism-combined-v2",
+  "optimizer_weight": 0.25,
+  "forecast_adjustment": {"scheduled_event_hints_enabled": true, "anomaly_fallback_enabled": true, "anomaly_history_windows": 6, "anomaly_ratio_threshold": 1.75, "anomaly_multiplier_cap": 3.0},
+  "gate": {"min_hold_epochs": 0, "min_objective_improvement": 0.0, "max_group_total_variation": 1.0, "emergency_objective_threshold": 1.0},
+  "optimization": {"planning_quantile": "p95", "overload_penalty": 1000000.0, "utilization_cost": 1.0, "locality_cost": 0.001, "churn_cost": 0.01, "demand_safety_factor": 1.0, "max_group_upf_weight": 0.25, "lifetime_horizon_windows": 12, "lifetime_weight_strength": 1.0, "timeout_seconds": 1.0}
+}

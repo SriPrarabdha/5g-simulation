@@ -6,6 +6,8 @@ external integration exists.
 
 ## Start here
 
+- [Pilot presenter guide](presenter-guide.md) — five-minute chapter timing,
+  exact defensible claims, deterministic checkpoints, and recovery steps.
 - [End-to-end runbook](end-to-end-runbook.md) — commands, host responsibilities,
   validation gates, artifact movement, demo startup, and troubleshooting.
 - [System architecture decisions](system-architecture-decisions.md) — why each
@@ -21,6 +23,26 @@ external integration exists.
 - [Extreme forecaster v1 results](extreme-forecaster-v1-results.md) — frozen
   checksums, held-out and baseline results, acceptance status, improvement
   triggers, and the optimizer handoff.
+- [Extreme optimizer pilot results](extreme-optimizer-pilot-results.md) —
+  fresh-seed one-day paired outcome, event analysis, and the decision to defer
+  the full campaign.
+- [C-DOT session migration decision](cdot-session-migration-decision.md) —
+  public evidence boundary, current new-session-only scope, and exact questions
+  requiring build-specific confirmation.
+- [Extreme validation oracle-bound results](extreme-oracle-bound-results.md) —
+  full-horizon continuous action-space bounds, knowledge-regime comparison,
+  and the decision to proceed with cohort-state MPC.
+- [Cohort-state MPC development results](cohort-mpc-development-results.md) —
+  Stage A freeze, causal MPC implementation, randomized development replay,
+  and the initial development-screen decision.
+- [Cohort MPC pre-campaign pilot results](cohort-mpc-pilot-results.md) —
+  historical failed-profile evidence and the replacement rationale.
+- [Cohort MPC full-campaign results](cohort-mpc-full-campaign-results.md) —
+  30 paired one-day runs, the passed 10% demo gate, aggregate guardrails, and
+  the remaining fault-tail risk.
+- [Extreme optimizer tuning results](extreme-optimizer-tuning-results.md) —
+  regime-aware forecast metrics, overload decomposition, validation matrix,
+  and the recorded no-selection decision.
 - [Architecture whitepaper](whitepaper.pdf) — presentation-oriented background.
 
 The root [README](../README.md) remains the short project entry point. PBS-specific
@@ -38,8 +60,9 @@ The documentation uses three labels:
 ## Current release boundary
 
 The standalone demo is runnable on one host. It advances a local deterministic
-simulation one tick at a time, loads a checksum-verified offline forecast
-bundle, and exposes the causal control loop through FastAPI. The PBS cluster can
-generate immutable campaign shards and the trainer can turn their Parquet data
-into a 10–80 minute bundle. A full release campaign and real C-DOT SMF/EMS
-actuation remain outside the current evidence boundary.
+simulation one tick at a time, defaults to the frozen MA6 cohort-MPC profile,
+and exposes the causal control loop through FastAPI. A 30-seed synthetic demo
+campaign is complete; its 10.52% mean-pair result coexists with only 2.84%
+severity-weighted improvement and material fault-seed tails. A production
+release campaign and real C-DOT SMF/EMS actuation remain outside the current
+evidence boundary.

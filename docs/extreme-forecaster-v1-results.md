@@ -136,7 +136,8 @@ brownout, and outage windows still need separate reporting.
 | Non-event versus event-stratified accuracy | Pending | Must isolate normal, surge, brownout, outage, and latency windows |
 | Manifest-declared 11/2/3 week split | Pending | v1 used 70/15/15 rather than explicit weeks 1–11 / 12–13 / 14–16 |
 | Predictive optimizer integration smoke | Pass | 96 forecasts loaded from this bundle; HiGHS status `optimal` on the 24-UPF topology |
-| Paired controller benefit | Pending | Must compare static, reactive, and trained predictive controllers on matched seeds |
+| One-day paired controller pilot | Below primary gate | 2.40% lower UL overload area than static; duration improved 19.53% UL and 76.38% DL |
+| Full paired controller benefit | Deferred | Improve and repeat short fresh-seed pilots before a long campaign |
 | C-DOT telemetry validation | External dependency | Requires representative labeled C-DOT history and capacity/topology truth |
 
 The model is suitable for the next optimizer-evaluation phase and for a clearly
@@ -197,7 +198,10 @@ env/bin/python -m experiments.report_forecast_bundle \
 The freeze and baseline CLIs refuse accidental overwrite. Use a new v2 output
 name for any rerun.
 
-Predictive campaign shards can now receive an explicit trained bundle:
+Predictive campaign shards can now receive an explicit trained bundle. The
+following long command is retained for reproducibility, but the one-day pilot
+in [extreme optimizer pilot results](extreme-optimizer-pilot-results.md) says
+**not to run it yet**:
 
 ```bash
 env/bin/python -m experiments.run_campaign_shard \

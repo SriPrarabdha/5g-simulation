@@ -70,6 +70,7 @@ class StepResult:
     policy_id: str
     group_arrivals: dict[str, int]
     group_rejections: dict[str, int]
+    group_upf_admissions: dict[str, dict[str, int]]
     unplaced_rejected_ul_bytes: float
     unplaced_rejected_dl_bytes: float
     group_upf_buckets: list[GroupUPFBucketResult]

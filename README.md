@@ -27,6 +27,19 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
 - [`docs/extreme-forecaster-v1-results.md`](docs/extreme-forecaster-v1-results.md)
   — frozen v1 forecast results, baseline evidence, limitations, improvement
   plan, and predictive-optimizer handoff.
+- [`docs/extreme-optimizer-pilot-results.md`](docs/extreme-optimizer-pilot-results.md)
+  — one-day event-dense controller comparison and full-campaign decision.
+- [`docs/cdot-session-migration-decision.md`](docs/cdot-session-migration-decision.md)
+  — established-session control boundary and C-DOT confirmation checklist.
+- [`docs/cohort-mpc-development-results.md`](docs/cohort-mpc-development-results.md)
+  — frozen oracle handoff and the first same-state-certified cohort MPC result.
+- [`docs/cohort-mpc-pilot-results.md`](docs/cohort-mpc-pilot-results.md)
+  — historical failed-profile evidence and the replacement rationale.
+- [`docs/cohort-mpc-full-campaign-results.md`](docs/cohort-mpc-full-campaign-results.md)
+  — 30-seed static/MPC campaign, 10% demo gate, tail-risk boundary, and demo
+  handoff.
+- [`docs/extreme-optimizer-tuning-results.md`](docs/extreme-optimizer-tuning-results.md)
+  — event-regime forecast evidence and optimizer-profile validation outcome.
 
 ## Implemented
 
@@ -40,11 +53,19 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
 - Seasonal-naive, moving-average, and LightGBM p50/p90/p95 forecasting, plus
   MAE, WAPE, pinball loss, and empirical coverage metrics.
 - The HiGHS LP with UL, DL, session, eligibility, health, latency, overload
-  slack, locality, and policy-churn terms.
+  slack, locality, policy-churn, lifetime weighting, and per-group
+  diversification terms.
+- Auditable causal scheduled-demand hints and a closed-history anomaly
+  fallback for unannounced surges.
 - Independent policy validation, degraded-mode gating, and atomic in-process
   compare-and-swap publication.
 - Static, reactive, forecast-capacity, predictive-HiGHS, and non-deployable
   oracle controllers using deterministic weighted rendezvous selection.
+- A causal two-hour cohort-state MPC controller with known-capacity paths,
+  terminal exposure, diversification, and same-state static certification.
+- A completed 30-seed, four-scenario paired campaign: 10.52% mean-pair UL
+  overload-area improvement, 2.84% severity-weighted improvement, and all
+  aggregate guardrails passing.
 - Canonical nested Parquet run data including compact 10-minute joint
   UPF/group demand snapshots, selection-audit Parquet, reproducibility
   metadata/hashes, PBS arrays, and exact paired bootstrap evaluation.
@@ -53,12 +74,15 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
 - Accelerated closed-loop run lifecycle, deterministic seed selection,
   presenter/viewer roles, SQLite audit, safe-policy fallback, and ordered
   versioned WebSocket snapshots and deltas.
+- A seeded 100-tick Live Dashboard with three scheduled episodes, one causal
+  surprise, four decision-cycle outcomes, and exact rewindable checkpoints.
 - Replaceable synthetic/replay/Prometheus `FlowSource` and
   simulation/advisory/SMF-placeholder `ActuatorSink` interfaces.
 - Prometheus-compatible synthetic metrics and REST interfaces for topology,
   telemetry, forecasts, policy, decision traces, model metadata, and matched
   campaign comparisons.
-- A five-view React/ECharts operations console served offline by FastAPI.
+- A three-destination React operations console served offline by FastAPI, with
+  a routing-led Live Dashboard, frozen Evidence, and Technical Detail.
 
 The selected primary metric for the supplied demo is directional UL overload
 area (`overload_area_seconds.ul`). DL results are still reported separately and
@@ -69,8 +93,8 @@ cannot be hidden by a combined passing average.
 - One-UPF and three-UPF free5GC deployment and smoke tests.
 - PacketRusher saturation sweeps and fitted directional/session capacities.
 - The free5GC SMF new-session selection hook and external atomic policy store.
-- A completed 30-seed campaign for every showcase scenario and its accepted
-  immutable result bundle.
+- An untouched production-release campaign with positive severity-weighted
+  confidence bounds and no material fault-seed tail regressions.
 - Optional post-v1 5G-LENA, ULCL, and Traffic Influence experiments.
 
 Those items depend on the Stage-0 capability result and access to the target
@@ -87,13 +111,23 @@ env/bin/python -m unittest discover -s tests -v
 Build and run the self-contained demo:
 
 ```bash
-cd frontend && npm ci && npm run build && cd ..
+npm --prefix frontend ci
 ./scripts/start-demo.sh
 ```
 
-Open `http://127.0.0.1:8000` and sign in with the local rehearsal credentials
-`presenter` / `demo`. Override them with `CDOT_DEMO_USER`,
-`CDOT_DEMO_PASSWORD`, and `CDOT_DEMO_SECRET` outside a local demo. Run
+The launcher rebuilds the React dashboard, runs preflight, and starts the
+FastAPI API/WebSocket service that serves the production dashboard from the
+same origin. It selects the first free port at or above `CDOT_DEMO_PORT`
+(default `8000`), starts a Cloudflare Quick Tunnel, and prints the local URL,
+public `trycloudflare.com` URL, and presenter credentials. If no presenter
+password is supplied, tunnel mode generates a new password for that run. Press
+`Ctrl+C` to stop both processes. Set `CDOT_DEMO_TUNNEL=0` for local-only mode,
+or `CDOT_DEMO_SKIP_FRONTEND_BUILD=1` only when intentionally reusing an already
+verified bundle.
+
+Open the printed URL and sign in with the printed credentials. Local-only mode
+defaults to `presenter` / `demo`. Override them with `CDOT_DEMO_USER`,
+`CDOT_DEMO_PASSWORD`, and `CDOT_DEMO_SECRET`. Run
 `./scripts/preflight.py` separately to verify the pinned registry, frontend
 bundle, service imports, and scenario before presentation.
 

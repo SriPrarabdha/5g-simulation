@@ -1,185 +1,105 @@
-# C-DOT Traffic Engineering Interface System
+# C-DOT guided pilot interface system
 
 ## Direction and intent
 
-The interface is a dense, stage-readable network operations console for a 5G
-operator or technical presenter. The operator must understand traffic movement,
-capacity risk, forecast uncertainty, and the causal decision chain without
-leaving the current run. It should feel like a purpose-built user-plane control
-room: exact, cold, restrained, and trustworthy.
+The interface is a six-minute continuous network briefing for mixed leadership
+and engineering audiences. It should feel calm, credible, and
+projector-readable: plain-language conclusions lead, with technical evidence
+one interaction away.
 
-Domain vocabulary: UPF pools, UE cohorts, N3/N6 lanes, DNN, S-NSSAI, 5QI,
-operating envelope, headroom, forecast cone, policy epoch, replica lifecycle,
-decision trace, telemetry quality, and matched-seed evidence.
+Domain vocabulary: traffic pressure, UPF headroom, known capacity event,
+causal forecast, cohort horizon, same-state certificate, weighted rendezvous,
+new-session placement, matched pair, fault tail, and deployment boundary.
 
-Color world: dark equipment racks, cyan fiber light, violet forecast ghosts,
-green healthy indicators, amber capacity alarms, coral drops/failures, and pale
-blue-white technical labels.
+Signature: demand on the left, three UPFs in the center, and destinations on
+the right. Muted previous paths stay visible while a C-DOT blue active path
+arrives. Route width encodes the current episode's future-session allocation,
+never total load; the adjacent violet lens resolves forecast against reality.
 
-Signature: the predictive traffic circuit. UE origins sit left, three UPF pools
-occupy the center, and data networks sit right. Lane width encodes throughput;
-solid lanes are carried traffic and dotted violet ghosts are forecast demand.
-UPF nodes combine throughput, sessions, operating index, safety state, and
-replica state in the topology itself.
+Reject: card mosaic → one dominant route stage; manual Continue prompts → one
+compact playback bar; six technical destinations → Live Dashboard, Evidence,
+Technical Detail; decorative charts → direct annotated comparisons.
 
-Reject these defaults:
-
-- Generic equal card grid → one dominant topology circuit with subordinate evidence.
-- Decorative dashboard color → semantic color tied only to traffic or state.
-- Conventional wide sidebar → compact numbered view rail that serves the stage.
-- Rounded consumer-SaaS styling → technical, small-radius equipment surfaces.
-- Decorative gradients/particles → solid graphite surfaces and quantified lanes.
-
-## Depth and surface strategy
-
-Use borders and small surface-color shifts, not shadows, as the primary depth
-strategy. Borders must be quiet and visible only when sought.
+## Tokens and depth
 
 ```css
---graphite-0: #080b0f;      /* canvas */
---graphite-1: #0b1016;      /* chrome / rail */
---graphite-2: #0f151d;      /* elevated controls */
---graphite-3: #141c25;      /* UPF nodes */
---graphite-inset: #070a0e;  /* topology and input wells */
---line-soft: rgba(215, 231, 247, .055);
---line: rgba(215, 231, 247, .095);
---line-focus: rgba(49, 215, 244, .45);
+--control-canvas: #f4f7fa;
+--control-surface: #ffffff;
+--control-inset: #edf2f5;
+--control-ink: #12212b;
+--cdot-flow: #006f8e;
+--forecast: #6558b8;
+--approach-risk: #b7791f;
+--actual-loss: #c2413b;
+--validated: #1f7a5a;
 ```
 
-Do not introduce decorative gradients. Use `--graphite-inset` for receiving
-surfaces, `--graphite-1` for persistent chrome, and `--graphite-3` only where an
-object needs to read as equipment above the canvas.
+Use quiet borders and tonal shifts for structure. Use only a restrained shadow
+on floating feedback and the small route annotation. Color communicates action,
+forecast, risk, actual loss, or validation; it is not decoration.
 
-## Semantic palette
+## Typography, spacing, and hierarchy
 
-```css
---fiber: #31d7f4;    /* live carried traffic, focus, primary actuation */
---spectrum: #9b85ff; /* forecasts, future state, predictive values */
---phosphor: #63e6a5; /* healthy, validated, within envelope */
---risk: #f3b654;     /* synthetic disclosure, warning, headroom risk */
---drop: #ff716d;     /* drops, rejection, failure, unavailable */
---ink: #e9f0f8;
---ink-2: #a8b4c2;
---ink-3: #778493;
---ink-4: #505b68;
-```
+- IBM Plex Sans is self-hosted for interface copy; IBM Plex Mono is self-hosted
+  for time, measurements, labels, and dynamic values.
+- Use an 8px base spacing grid. Standard panel padding is 24px desktop and 16px
+  mobile. Standard stage/context gap is 24px.
+- Display headings use 40–78px depending on context, tight tracking, and weight
+  600. View headings are 28–36px. Body copy is 13–17px with 1.5 line-height.
+- Dynamic values use tabular mono numerals.
+- Projector-critical explanations use 13–16px text; 8–11px mono is reserved
+  for short metadata labels, never conclusions or causal explanations.
+- Every screen has one focal point: story premise on overview, routing map in
+  Live Dashboard, 10.52% result in Evidence, or the selected technical artifact.
 
-Color is data. Never use the semantic accents to decorate neutral structure.
-All synthetic-data disclosures use amber. Oracle or non-deployable evidence is
-muted rather than given a deployable control color.
+## Reusable patterns
 
-## Typography and hierarchy
+- Primary button: minimum 48px height, 18px horizontal padding, 6px radius,
+  C-DOT blue fill, white 600-weight label, 120ms press feedback.
+- Primary navigation: three centered 56px-height native buttons with a 2px blue
+  selected underline. On mobile they divide the viewport equally.
+- Story stage: white bordered surface, 12px radius, 24px padding; 324px context
+  column at ≥1280px and single column below it.
+- Chapter rail: five native checkpoint buttons; reached chapters rewind the
+  simulator, current is blue filled, and completed is green outlined. On mobile
+  retain the five numbered circles and hide labels.
+- Decision lens: violet p90 band and p50 marker, green/coral realized marker,
+  static/optimized risk bars, applied/held state, and a future-sessions-only
+  boundary.
+- Event ribbon: four persistent cycle cards; resolved cards retain forecast
+  coverage and divert/hold outcome.
+- Completed surge analysis: selectable completed episodes with one large
+  conclusion, a restrained three-metric summary, and three spacious stages:
+  Event + Forecast → Optimizer + Placement → Observed Result. Normalize static
+  exposure to 100% in audience views; keep raw solver scores in Technical
+  Detail. Units sit on the same baseline at roughly half the value size. Every
+  metric includes a plain-language interpretation and the 1.00 safe operating
+  threshold is stated explicitly.
+- Route annotation: white surface with a 3px semantic left edge and one
+  plain-language explanation of what changed and why.
+- Context disclosure: amber quiet surface stating that existing sessions remain
+  attached and only future sessions are redirected.
+- Technical tables: contained horizontal scrolling only; never allow page-level
+  horizontal overflow.
+- Class telemetry inspector: four persistent surge selectors lead to one
+  selected class profile, a four-metric summary, and admitted traffic bars for
+  UPF-A/B/C. Keep the six-class catalog as secondary context. Class-level data
+  covers new-session arrivals, admissions, rejections, and offered demand;
+  carried and dropped bandwidth must remain labeled as network-wide context.
 
-- Display/title family: `Bahnschrift`, `DIN Alternate`, `Arial Narrow`, sans-serif.
-- Data/metadata family: `Cascadia Code`, `IBM Plex Mono`, `SFMono-Regular`, monospace.
-- Dynamic numbers always use tabular numerals.
-- Screen title: 22px / 600 / tight tracking.
-- Large metric: 22–24px / 600 / monospace.
-- Section eyebrow: 8px / monospace / `.12em` tracking / semantic accent.
-- Operator labels: 8–10px / monospace / tertiary or muted ink.
-- Body/supporting explanation: 11–12px / 1.45–1.55 line height.
+## Responsive and motion rules
 
-Hierarchy is driven by weight, ink level, and whitespace before size. Every view
-has one focal element: topology, source chart, forecast cone, allocation table,
-or matched-controller chart.
-
-## Spacing, density, and geometry
-
-- Base spacing unit: 4px.
-- Standard panel gap: 12px; stage padding: 16px.
-- Standard panel padding: 16px.
-- Dense technical rows: 8–12px vertical padding.
-- Control height: 32px; login control height: 42–44px.
-- Top bar: 58px; presenter bar: 56px.
-- Desktop view rail: 176px; decision rail: 292px.
-- Small control radius: 0–4px; equipment/card radius: 8–10px.
-- Do not use pill-shaped controls except true compact status indicators.
-
-Desktop composition at 1920×1080:
-
-```text
-58px top bar
-176px view rail | fluid stage | 292px decision rail
-56px presenter control bar
-```
-
-At widths below 1100px, navigation becomes a horizontal rail, the decision rail
-hides, and evidence layouts collapse to one column. Preserve an 820px minimum
-technical canvas rather than compressing topology labels until unreadable.
-
-## Reusable component patterns
-
-### Persistent chrome
-
-- Top bar: scenario/seed, synthetic badge, simulated time, and runner state.
-- View rail: five numbered views, 54px desktop rows, cyan 2px active edge.
-- Decision rail: ordered events with 9px status markers and a vertical causal line.
-- Presenter bar: authority label, cyan primary start/pause, neutral reset/speed,
-  amber surge, coral failure, neutral telemetry-gap control.
-
-### Panel
-
-`16px` padding, `--graphite-1`-family background, `1px --line` border. Section
-headers pair an 8px eyebrow with a 22px title. Tags are compact rectangular
-status labels with 5px × 7px padding and an 8px mono label.
-
-### Metric
-
-`18px 14px` padding. Label: 8px muted mono. Value: 22px/600 mono. Unit: 9px
-tertiary mono. Supporting detail: 9px tertiary mono. Accent only the value, using
-the metric's semantic state.
-
-### Traffic circuit
-
-- Circuit well starts 64px below its panel header.
-- Origin nodes: 170×76 SVG units, 8px radius.
-- UPF nodes: 264×104 SVG units, 10px radius.
-- UPF state line: 14 SVG units high; green, amber, or coral by state.
-- Lane width scales with throughput and remains at least 2px.
-- Forecast lanes are violet, translucent, and dashed.
-- Selection adds a cyan border; keyboard Enter must select a UPF.
-
-### Tables and quality states
-
-Tables use 10px monospace, 8px headers, tabular values, and quiet row dividers.
-Quality chips use green for complete, amber for degraded, and muted ink for
-upper-bound/non-deployable evidence. Empty states must explain the action needed
-to populate the view.
-
-### Charts
-
-Charts use no entry animation during repeated telemetry updates. Grid lines are
-`rgba(207,224,242,.07)`. Observed/carried is cyan; forecasts are violet; loss is
-coral. Tooltips use `--graphite-3` with a quiet border. Keep chart labels at
-10px mono and explicitly label units.
-
-## Interaction and motion
-
-- Button press: `scale(.97)` for 120ms.
-- Hover/focus transitions: 140–180ms, named color/border/transform properties.
-- Never use `transition: all` or animate layout dimensions.
-- Continuous decorative motion is prohibited.
-- `prefers-reduced-motion` removes movement and lane glow while retaining state color.
-- All buttons remain native buttons; UPF SVG nodes support focus and Enter.
-- Focus ring: 1px fiber cyan with a 2px offset.
+- ≥1280px: route stage plus 324px explanation column.
+- 768–1279px: single-column stage and explanation.
+- <768px: vertical demand → three-UPF row → destination flow. Primary story
+  controls and navigation never scroll horizontally.
+- All interactive targets are at least 44px high. Focus uses a visible blue ring.
+- Animate only chapter/feedback entry and the one certified-route arrival.
+  Reduced motion disables route movement. Never use continuous motion.
 
 ## Data-trust rules
 
-- Keep `SYNTHETIC DATA` visible in persistent chrome.
-- Never present projected campaign numbers as accepted evidence.
-- Demo fallback forecasts must state that they are not release-calibrated.
-- Oracle remains labeled as an upper bound and never receives actionable styling.
-- Simulation-only migration must remain visibly labeled and cannot look deployable.
-- Missing, stale, reset, and restart states must be explicit rather than smoothed away.
-
-## Verification baseline
-
-Before shipping UI changes:
-
-- Run `npm run build` and `npm run test:e2e` from `frontend/`.
-- Check 1920×1080 and 900×900/tablet behavior.
-- Confirm the circuit remains the focal point at stage resolution.
-- Confirm no false nonzero value appears in an empty state.
-- Confirm every semantic accent corresponds to a real traffic or status meaning.
-- Confirm reduced-motion behavior and keyboard navigation still work.
-
+Keep synthetic and simulation-only boundaries visible. “Divert” always means
+future-session weighted rendezvous placement. Never imply established-session
+migration, live SMF actuation, overload prevention, a production release, or
+that the provisional extreme trained forecaster drives the frozen MA6 profile.

@@ -62,6 +62,7 @@ class CampaignTests(unittest.TestCase):
                 7,
                 controller="predictive",
                 forecast_bundle=bundle,
+                predictive_profile=Path("configs/predictive_tuning_load_first.json"),
             )
             metadata = json.loads(
                 (destination / "metadata.json").read_text(encoding="utf-8")
@@ -72,6 +73,29 @@ class CampaignTests(unittest.TestCase):
             )
             self.assertEqual(
                 metadata["summary"]["controller"], "predictive-highs-v1"
+            )
+            self.assertEqual(
+                metadata["predictive_profile"]["profile_id"], "load-first-balanced-v1"
+            )
+
+    def test_mpc_shard_records_profile_and_controller_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            destination = run_shard(
+                Path("configs/demo_scenario.json"),
+                Path(directory),
+                "cohort-mpc-campaign",
+                31001,
+                controller="mpc",
+                forecast_bundle=Path("configs/demo_forecast_bundle.json"),
+                mpc_profile=Path("configs/cohort_mpc_development_v1.json"),
+            )
+            metadata = json.loads(
+                (destination / "metadata.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(metadata["controller"], "cohort-mpc-v1")
+            self.assertEqual(
+                metadata["mpc_profile"]["profile_id"],
+                "cohort-state-mpc-development-v1",
             )
 
     def test_capability_probe_has_architecture_gate_fields(self) -> None:

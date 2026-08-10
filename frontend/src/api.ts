@@ -20,7 +20,7 @@ export async function login(username: string, password: string) {
   })
 }
 
-export async function createRun(token: string, controller = 'predictive'): Promise<Snapshot> {
+export async function createRun(token: string, controller = 'mpc'): Promise<Snapshot> {
   return request('/api/v1/runs', {
     method: 'POST', body: JSON.stringify({ scenario_id: 'demo-three-upf-two-zone', controller }),
   }, token)
@@ -36,4 +36,10 @@ export async function getRun(token: string, runId: string): Promise<Snapshot> {
 
 export async function setControls(token: string, runId: string, body: Record<string, unknown>): Promise<Snapshot> {
   return request(`/api/v1/runs/${runId}/controls`, { method: 'PATCH', body: JSON.stringify(body) }, token)
+}
+
+export async function rewindStory(token: string, runId: string, checkpointId: string, autoplay = true): Promise<Snapshot> {
+  return request(`/api/v1/runs/${runId}/story/rewind`, {
+    method: 'POST', body: JSON.stringify({ checkpoint_id: checkpointId, autoplay }),
+  }, token)
 }

@@ -297,6 +297,7 @@ def build_optimizer_pilot(
     surge_windows = [
         {
             "name": "stadium_crowd_plus_brownout",
+            "knowledge": "scheduled_2h_notice",
             "start_hour": 4,
             "end_hour": 8,
             "multipliers": {
@@ -308,6 +309,7 @@ def build_optimizer_pilot(
         },
         {
             "name": "airport_crowd_plus_outage",
+            "knowledge": "unannounced",
             "start_hour": 10,
             "end_hour": 14,
             "multipliers": {
@@ -319,6 +321,7 @@ def build_optimizer_pilot(
         },
         {
             "name": "industrial_uplink_plus_brownout",
+            "knowledge": "scheduled_2h_notice",
             "start_hour": 17,
             "end_hour": 21,
             "multipliers": {
@@ -335,11 +338,23 @@ def build_optimizer_pilot(
     for event in arrival_events:
         for window in surge_windows:
             multiplier = window["multipliers"].get(event["group_id"])
+            start_step = window["start_hour"] * hour
+            end_step = window["end_hour"] * hour
             if (
                 multiplier is not None
-                and window["start_hour"] * hour <= event["step"] < window["end_hour"] * hour
+                and start_step <= event["step"] < end_step
             ):
                 event["arrival_factor"] = round(event["arrival_factor"] * multiplier, 4)
+                if window["knowledge"] != "unannounced":
+                    event["known_at_step"] = max(0, start_step - 2 * hour)
+                    event["forecast_hint_multiplier"] = multiplier
+            elif (
+                multiplier is not None
+                and event["step"] == end_step
+                and window["knowledge"] != "unannounced"
+            ):
+                event["known_at_step"] = max(0, start_step - 2 * hour)
+                event["forecast_hint_multiplier"] = 1.0
 
     scripted_faults = [
         {"step": 5 * hour, "event_type": "capacity_factor", "upf_id": "upf-edge-stadium-a", "ul_factor": 0.20, "dl_factor": 0.30},

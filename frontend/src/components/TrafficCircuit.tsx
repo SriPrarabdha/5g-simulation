@@ -1,91 +1,111 @@
-import type { Policy, UpfState } from '../types'
+import type { DecisionCycle, RoutingPresentation, UpfState } from '../types'
 
-const zoneY = [116, 250, 384]
-const upfY = [100, 250, 400]
-const classColors = ['#31d7f4', '#9b85ff', '#f3b654']
-
-function laneWidth(value: number) { return Math.max(2, Math.min(18, 2 + value / 35)) }
-
-function statusLabel(upf: UpfState) {
-  if (upf.health === 'unavailable') return 'OFFLINE'
-  if (upf.utilization.operating >= 1) return 'OVERLOAD'
-  if (upf.utilization.operating >= .82) return 'HEADROOM LOW'
-  if (upf.replicas.warming) return `R${upf.replicas.active + 1} WARMING`
-  return 'WITHIN ENVELOPE'
+function status(upf: UpfState) {
+  if (upf.health === 'unavailable') return { label: 'Unavailable', tone: 'loss' }
+  if (upf.utilization.operating >= 1) return { label: 'Overloaded', tone: 'loss' }
+  if (upf.utilization.operating >= .82) return { label: 'Headroom low', tone: 'risk' }
+  return { label: 'Healthy headroom', tone: 'healthy' }
 }
 
-export function TrafficCircuit({ upfs, policy, selected, onSelect }: {
-  upfs: UpfState[]; policy: Policy | null; selected: string | null; onSelect: (id: string) => void
+function routePath(y: number) {
+  return `M120 244 C220 244 232 ${y} 340 ${y} M620 ${y} C728 ${y} 740 244 840 244`
+}
+
+function percent(value = 0) { return `${Math.round(value * 100)}%` }
+
+export function TrafficCircuit({ upfs, routing, cycle, currentAdmissions, currentAdmissionMbps }: {
+  upfs: UpfState[]
+  routing: RoutingPresentation | null
+  cycle: DecisionCycle | null
+  currentAdmissions?: Record<string, number>
+  currentAdmissionMbps?: Record<string, number>
 }) {
-  const total = upfs.reduce((sum, item) => sum + item.traffic.carried, 0)
-  return (
-    <div className="circuit-wrap">
-      <div className="circuit-caption">
-        <span>UE COHORT ORIGIN</span><span>POLICY-CONTROLLED USER PLANE</span><span>DATA NETWORK</span>
-      </div>
-      <svg className="circuit" viewBox="0 0 1120 500" aria-label="Predictive traffic circuit">
-        <defs>
-          <filter id="lane-glow"><feGaussianBlur stdDeviation="2" result="blur" /><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <pattern id="warm" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 8L8 0" stroke="#f3b654" strokeOpacity=".22"/></pattern>
-        </defs>
-        {['RESIDENTIAL', 'BUSINESS', 'STADIUM'].map((zone, index) => (
-          <g key={zone} transform={`translate(26 ${zoneY[index]})`}>
-            <rect className="zone-node" width="170" height="76" rx="8" />
-            <circle cx="22" cy="24" r="5" className={`zone-pip z${index}`} />
-            <text x="38" y="28" className="node-title">{zone}</text>
-            <text x="18" y="52" className="node-meta">{index === 0 ? '12.4K UEs' : index === 1 ? '8.7K UEs' : '18.9K EVENT UEs'}</text>
-          </g>
-        ))}
-        {upfs.map((upf, index) => {
-          const y = upfY[index] ?? (100 + index * 145)
-          const risk = upf.utilization.operating >= .82
-          const offline = upf.health === 'unavailable'
-          return (
-            <g key={upf.id} transform={`translate(470 ${y})`} role="button" tabIndex={0}
-              onClick={() => onSelect(upf.id)} onKeyDown={event => event.key === 'Enter' && onSelect(upf.id)}
-              className={`upf-node ${selected === upf.id ? 'selected' : ''} ${risk ? 'risk' : ''} ${offline ? 'offline' : ''}`}>
-              <rect width="264" height="104" rx="10" className="upf-shell" />
-              <path d="M0 8Q0 0 8 0H256Q264 0 264 8V14H0Z" className="upf-status-line" />
-              <text x="18" y="36" className="upf-title">{upf.label}</text>
-              <text x="246" y="35" textAnchor="end" className="upf-status">{statusLabel(upf)}</text>
-              <text x="18" y="62" className="upf-value">{Math.round(upf.traffic.carried)}</text>
-              <text x="78" y="61" className="upf-unit">Mbps</text>
-              <text x="160" y="61" className="upf-secondary">{upf.sessions.toLocaleString()} sessions</text>
-              <rect x="18" y="76" width="228" height="7" rx="3.5" className="meter-track" />
-              <rect x="18" y="76" width={228 * Math.min(1, upf.utilization.operating)} height="7" rx="3.5" className="meter-fill" />
-              <text x="18" y="96" className="node-meta">UL {Math.round(upf.utilization.ul * 100)}%</text>
-              <text x="90" y="96" className="node-meta">DL {Math.round(upf.utilization.dl * 100)}%</text>
-              <text x="246" y="96" textAnchor="end" className="node-meta">R{upf.replicas.active}{upf.replicas.warming ? ' +1' : ''}</text>
-            </g>
-          )
-        })}
-        {upfs.map((upf, index) => {
-          const targetY = (upfY[index] ?? 100) + 52
-          const sourceIndex = index % 3
-          const sourceY = zoneY[sourceIndex] + 38
-          const width = laneWidth(upf.traffic.carried)
-          return <g key={`lane-${upf.id}`}>
-            <path d={`M196 ${sourceY} C300 ${sourceY}, 350 ${targetY}, 470 ${targetY}`} className="lane-ghost" strokeWidth={width + 7} />
-            <path d={`M196 ${sourceY} C300 ${sourceY}, 350 ${targetY}, 470 ${targetY}`} className="lane-live" stroke={classColors[sourceIndex]} strokeWidth={width} />
-            <path d={`M734 ${targetY} C835 ${targetY}, 858 ${250}, 944 ${250}`} className="lane-live" stroke={classColors[sourceIndex]} strokeWidth={Math.max(2, width - 2)} />
-          </g>
-        })}
-        <g transform="translate(944 194)">
-          <rect className="network-node" width="150" height="112" rx="8" />
-          <text x="75" y="33" textAnchor="middle" className="node-title">N6 FABRIC</text>
-          <text x="75" y="58" textAnchor="middle" className="node-meta">INTERNET</text>
-          <text x="75" y="76" textAnchor="middle" className="node-meta">ENTERPRISE</text>
-          <text x="75" y="94" textAnchor="middle" className="node-meta">FACTORY / IOT</text>
-        </g>
-        <text x="280" y="482" className="lane-key">SOLID  CARRIED</text>
-        <text x="422" y="482" className="lane-key ghost-key">GHOST  p95 FORECAST</text>
-        <text x="658" y="482" className="lane-key">WIDTH  THROUGHPUT</text>
-      </svg>
-      <div className="circuit-total"><span>LIVE CARRIED</span><strong>{Math.round(total).toLocaleString()}</strong><small>Mbps</small></div>
-      {selected && <div className="circuit-inspector">
-        <span>INSPECTING</span><strong>{selected.toUpperCase()}</strong>
-        <small>{policy ? `${Object.keys(policy.weights).length} controllable groups · policy epoch ${policy.policy_epoch}` : 'Awaiting first policy epoch'}</small>
-      </div>}
+  const previous = cycle?.decision.previous_weights ?? {}
+  const planned = cycle?.planned_admitted_share_by_upf ?? previous
+  const realized = cycle?.outcome?.realized_admitted_share_by_upf ?? null
+  const realizedSessions = cycle?.outcome?.realized_admitted_sessions_by_upf ?? null
+  const realizedMbps = cycle?.outcome?.realized_new_session_mbps_by_upf ?? null
+  const incomingWindow = realizedSessions ? '10 MIN' : 'THIS TICK'
+  const activeLabel = cycle?.episode.audience_label ?? 'Normal mixed demand'
+  const tickTotal = Object.values(currentAdmissions ?? {}).reduce((sum, value) => sum + value, 0)
+  const bContext = cycle?.decision.upf_context['upf-b']
+  const bDelta = cycle?.decision.weight_deltas['upf-b'] ?? 0
+  const routeExplanation = !cycle
+    ? 'All traffic classes begin inside the safe operating envelope. The first scheduled episode is visible before it arrives.'
+    : !bContext?.eligible
+      ? `UPF-B may have spare headroom, but it is not eligible for ${cycle.episode.affected_class}. This class can use ${cycle.decision.eligible_upfs.map(item => item.toUpperCase()).join(' and ')} only.`
+      : cycle.decision.applied && bDelta > .0001
+        ? `UPF-B receives ${(bDelta * 100).toFixed(1)} percentage points more of future ${cycle.episode.group_label} sessions. Existing load on UPF-A and UPF-C cannot be migrated, so overload may remain.`
+        : cycle.decision.applied
+          ? `The optimizer applied new weights across eligible UPFs for future ${cycle.episode.group_label} sessions. Established sessions remain attached.`
+          : `The optimizer proposed a candidate but held the last safe policy: ${cycle.decision.reason.replaceAll('_', ' ')}.`
+
+  return <div className={`routing-stage ${cycle ? `episode-${cycle.order}` : 'baseline'}`} data-testid="routing-stage">
+    <div className="routing-key" aria-label="Route legend">
+      <span><i className="route-old" />Previous policy</span>
+      <span><i className="route-new" />Active policy</span>
+      <small>Lane width = {activeLabel} new-session share</small>
     </div>
-  )
+    <svg className="routing-map" viewBox="0 0 960 500" role="img" aria-labelledby="routing-title routing-desc">
+      <title id="routing-title">New-session routing for {activeLabel}</title>
+      <desc id="routing-desc">Muted lanes show previous weights. Blue lanes show active new-session placement, resolved with canonical admitted-session shares.</desc>
+      <g className="demand-node">
+        <rect x="24" y="190" width="96" height="108" rx="12" />
+        <text x="72" y="221" textAnchor="middle">ACTIVE CLASS</text>
+        <text x="72" y="249" textAnchor="middle" className="node-number">UE</text>
+        <text x="72" y="275" textAnchor="middle" className="node-small">NEW SESSIONS</text>
+      </g>
+      {upfs.map((upf, index) => {
+        const y = 28 + index * 148
+        const live = status(upf)
+        const oldWeight = previous[upf.id] ?? 0
+        const newWeight = planned[upf.id] ?? 0
+        const actualWeight = realized?.[upf.id]
+        const incomingSessions = realizedSessions?.[upf.id] ?? currentAdmissions?.[upf.id] ?? 0
+        const incomingMbps = realizedMbps?.[upf.id] ?? currentAdmissionMbps?.[upf.id] ?? 0
+        const tickShare = tickTotal ? (currentAdmissions?.[upf.id] ?? 0) / tickTotal : null
+        const incomingShare = actualWeight ?? tickShare
+        const eligible = cycle?.decision.upf_context[upf.id]?.eligible ?? true
+        return <g key={upf.id}>
+          <path d={routePath(y + 66)} className="route previous-route" strokeWidth={2 + oldWeight * 20} />
+          {cycle && <path d={routePath(y + 66)} className="route candidate-route" strokeWidth={2 + newWeight * 20} />}
+          <g className={`upf-card ${live.tone} ${eligible ? '' : 'ineligible'}`}>
+            <rect x="340" y={y} width="280" height="132" rx="12" />
+            <text x="364" y={y + 28} className="upf-name">{upf.label}</text>
+            <text x="596" y={y + 28} textAnchor="end" className="upf-state">{live.label}</text>
+            <text x="364" y={y + 53} className="route-label">POLICY SHARE</text>
+            <text x="596" y={y + 53} textAnchor="end" className="route-label">OBSERVED ARRIVALS</text>
+            <text x="364" y={y + 76} className="route-share">{percent(oldWeight)} → {percent(newWeight)}</text>
+            <text x="596" y={y + 76} textAnchor="end" className={`actual-share ${incomingShare == null ? 'pending' : ''}`}>{!eligible ? 'NOT ELIGIBLE' : incomingShare == null ? 'NONE YET' : `${percent(incomingShare)} · ${incomingSessions}`}</text>
+            <rect x="364" y={y + 92} width="232" height="7" rx="3.5" className="headroom-track" />
+            <rect x="364" y={y + 92} width={232 * Math.min(1, upf.utilization.operating)} height="7" rx="3.5" className="headroom-fill" />
+            <text x="364" y={y + 119} className="capacity-label">{Math.max(0, Math.round((1 - upf.utilization.operating) * 100))}% HEADROOM</text>
+            <text x="596" y={y + 119} textAnchor="end" className="capacity-label">{incomingMbps.toFixed(1)} Mbps · {incomingWindow}</text>
+          </g>
+        </g>
+      })}
+      <g className="network-node">
+        <rect x="840" y="190" width="96" height="108" rx="12" />
+        <text x="888" y="223" textAnchor="middle">N6</text>
+        <text x="888" y="250" textAnchor="middle" className="node-number">DN</text>
+        <text x="888" y="275" textAnchor="middle" className="node-small">DESTINATIONS</text>
+      </g>
+    </svg>
+    <div className="mobile-routing" aria-hidden="true">
+      <div className="mobile-endpoint">{activeLabel}<small>new demand</small></div>
+      <i className="mobile-flow" />
+      <div className="mobile-upfs">{upfs.map(upf => {
+        const eligible = cycle?.decision.upf_context[upf.id]?.eligible ?? true
+        const count = realizedSessions?.[upf.id] ?? currentAdmissions?.[upf.id] ?? 0
+        const mbps = realizedMbps?.[upf.id] ?? currentAdmissionMbps?.[upf.id] ?? 0
+        return <div key={upf.id} className={`${status(upf).tone} ${eligible ? '' : 'ineligible'}`}><b>{upf.label}</b><strong>{percent(previous[upf.id])} → {percent(planned[upf.id])}</strong><span>{eligible ? `${count} / ${incomingWindow.toLowerCase()} · ${mbps.toFixed(1)} Mbps` : 'not eligible for class'}</span></div>
+      })}</div>
+      <i className="mobile-flow" />
+      <div className="mobile-endpoint">N6 destinations</div>
+    </div>
+    <div className={`route-annotation ${routing ? 'ready' : ''}`}>
+      <span>{cycle ? cycle.episode.affected_class : 'NORMAL NETWORK'}</span>
+      <p>{routeExplanation}</p>
+    </div>
+  </div>
 }

@@ -523,22 +523,25 @@ cd ..
 ```
 
 For anything except a loopback-only rehearsal, set unique credentials and a
-random signing secret:
+random signing secret. The launcher also generates both automatically when its
+default Cloudflare Quick Tunnel mode is used:
 
 ```bash
 export CDOT_DEMO_USER='<presenter-user>'
 export CDOT_DEMO_PASSWORD='<strong-presenter-password>'
 export CDOT_DEMO_SECRET='<random-secret-from-approved-secret-store>'
 export CDOT_FORECAST_BUNDLE='<absolute-path>/forecaster-v1.json'
-export CDOT_DEMO_HOST='0.0.0.0'
-export CDOT_DEMO_PORT='8000'
 ./scripts/start-demo.sh
 ```
 
-For a single-host rehearsal, omit the host/port variables and open:
+The launcher chooses the first free port at or above `CDOT_DEMO_PORT` (default
+`8000`), waits for the API, starts `cloudflared`, and prints the local URL,
+public URL, and presenter credentials. `Ctrl+C` stops both processes.
 
-```text
-http://127.0.0.1:8000
+For a single-host rehearsal without a public tunnel, run:
+
+```bash
+CDOT_DEMO_TUNNEL=0 ./scripts/start-demo.sh
 ```
 
 Check service health and synthetic Prometheus exposition:
@@ -548,10 +551,10 @@ curl -fsS http://127.0.0.1:8000/api/v1/health
 curl -fsS http://127.0.0.1:8000/metrics | head
 ```
 
-If browsers are on other machines, put the service behind the site's TLS
-reverse proxy, permit only the required ingress port, and browse to the proxy's
-HTTPS URL. The frontend uses same-origin REST and WebSocket requests; no
-separate frontend-to-cluster rule is needed.
+For a persistent deployment, use the site's authenticated Cloudflare Tunnel or
+TLS reverse proxy instead of a temporary Quick Tunnel. The frontend uses
+same-origin REST and WebSocket requests; no separate frontend-to-cluster rule
+is needed.
 
 Current runtime behavior:
 
@@ -640,8 +643,8 @@ Perform at least one rehearsal using the exact release checkout and host:
 6. Start, pause, resume, change speed, and reset.
 7. Inject the stadium surge, capacity degradation, UPF failure, and telemetry
    gap one at a time.
-8. Confirm the decision rail shows bucket, forecast, risk, optimization,
-   validation, actuation, and realized outcome in order.
+8. Confirm the event-and-decision ribbon shows event, forecast, optimization,
+   future-session actuation, and realized outcome in order.
 9. Confirm no policy routes new sessions to an unavailable or ineligible UPF.
 10. Confirm an audience viewer cannot call presenter controls.
 11. Disconnect and reconnect a viewer; it must receive a full current snapshot.
@@ -650,6 +653,38 @@ Perform at least one rehearsal using the exact release checkout and host:
 Presentation gate: the demo must work with no cluster dependency. Preserve the
 accepted seed, browser route, credentials delivery method, and fallback steps in
 the release record.
+
+### Continuous Live Story rehearsal
+
+The default presenter run is a 100-tick, 30-second synthetic story. At the
+default 8× rate it lasts about 6 minutes 15 seconds of wall time and represents
+50 simulated minutes. The seed selects one of several bounded, prevalidated
+four-episode playlists; it does not generate arbitrary surge parameters. Every
+playlist has three scheduled episodes, one unannounced surprise, and explicit
+arrival/capacity reset events.
+
+Rehearse the following before a presentation:
+
+1. Start Story and confirm it advances without presenter Continue prompts.
+2. Confirm decisions close at simulated steps 20, 40, 60, and 80. Step 100
+   resolves the final outcome without publishing a future policy.
+3. Confirm the ribbon ends with three diversions and one safe hold. The
+   surprise must say `no advance signal`, miss p90, and be followed by an
+   anomaly-adaptation flag.
+4. Rewind a reached chapter or use Left Arrow / Back one chapter. The runtime
+   must emit `story.rewound`, retain the run ID, and continue WebSocket sequence
+   numbers monotonically.
+5. Confirm replay reaches byte-equivalent telemetry, policies, and decision
+   outcomes. Wall timestamps and WebSocket sequence numbers may differ.
+
+`CDOT_STORY_SPEED` may accelerate automated rehearsal (the browser suite uses
+600×). Do not set it for the normal audience run. The API contract is
+`demo-stream/1.1`; rewind is presenter-only at
+`POST /api/v1/runs/{run_id}/story/rewind`.
+
+Forecast outcomes use only closed demand buckets. Planned and realized UPF
+shares are different fields: the realized value is derived from canonical
+`group_upf_buckets.admitted_sessions`, never sampled selection-audit rows.
 
 ## 16. Troubleshooting
 

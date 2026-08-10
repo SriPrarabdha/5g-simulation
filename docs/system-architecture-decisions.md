@@ -455,6 +455,54 @@ clock. Dashboard policy records include `applies_from_step` and
 
 Status: implemented and covered by causal fault-injection and runtime tests.
 
+### ADR-022 — Seed bounded Live Story playlists
+
+Decision: the presenter story selects a complete prevalidated playlist from the
+run seed. A playlist contains four distinct traffic groups, three scheduled
+episodes, one surprise, bounded magnitudes, and explicit reset events.
+
+Why: unrestricted runtime randomization can produce misleading or uneventful
+demonstrations. Seeded playlist selection keeps runs reproducible while still
+varying the audience story across published seeds.
+
+Consequence: this six-minute story profile is synthetic presentation logic. It
+does not relabel, replace, or expand the frozen 30-pair campaign evidence.
+
+Status: implemented in `demo_api.story`.
+
+### ADR-023 — Rewind complete runtime state, not presentation state
+
+Decision: checkpoints at steps 0, 20, 40, 60, and 100 deep-copy simulator,
+controller, cohorts, queues, random streams, policy, forecast history,
+telemetry, decision cycles, route presentation, actuator, replicas, and alerts.
+Advance, controls, and rewind share one runtime lock.
+
+Why: moving only the UI chapter would break causality. A real rewind must
+restore the exact random and cohort state from which replay continues.
+
+Consequence: later state and later checkpoints are discarded. The run ID and
+WebSocket sequence are not rewound; `story.rewound` marks the discontinuity and
+autoplay resumes unless explicitly disabled.
+
+Status: implemented and covered by exact-replay and concurrency tests.
+
+### ADR-024 — Account forecast outcomes from canonical closed buckets
+
+Decision: each decision cycle targets one 10-minute window and retains its
+p50/p90/p95 new-session UL+DL demand forecast, same-state scores, policy action,
+and realized result. Realized admitted-session share is computed from
+`group_upf_buckets`, not retained selection-audit samples.
+
+Why: forecast accuracy and placement accuracy must refer to the same closed
+window and authoritative population. Sampled audits are evidence of individual
+selection behavior, not a denominator for routing shares.
+
+Consequence: scheduled hints become forecast inputs only after
+`known_at_step`. Surprise traffic is absent before observation, produces an
+explicit miss and safe hold, and becomes anomaly history at the next epoch.
+
+Status: implemented in stream contract `demo-stream/1.1`.
+
 ## 6. Release gates
 
 No cluster/model bundle is releasable until all of the following are recorded:

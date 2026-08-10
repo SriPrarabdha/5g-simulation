@@ -15,7 +15,10 @@ from pathlib import Path
 from typing import Any
 
 from forecasting import TrainedForecastBundle
+from optimization import CohortMPCConfig, OptimizationConfig
 from simulator.macro import Simulator, controller_by_name, load_scenario
+from simulator.macro.controllers import ForecastAdjustmentConfig
+from steering import PolicyGateConfig
 
 
 def file_sha256(path: Path) -> str:
@@ -76,6 +79,8 @@ def run_shard(
     controller: str = "static",
     progress_every_simulated_hours: float | None = None,
     forecast_bundle: Path | None = None,
+    predictive_profile: Path | None = None,
+    mpc_profile: Path | None = None,
 ) -> Path:
     project_root = Path(__file__).resolve().parent.parent
     base_config = load_scenario(manifest)
@@ -85,8 +90,53 @@ def run_shard(
     )
     if trained_forecaster is not None:
         trained_forecaster.validate_groups(group.key for group in config.groups)
+    if predictive_profile is not None and controller not in {"predictive", "forecast-capacity"}:
+        raise ValueError("a predictive profile can only be used with a forecast controller")
+    if mpc_profile is not None and controller != "mpc":
+        raise ValueError("an MPC profile can only be used with the MPC controller")
+    profile_payload = (
+        json.loads(predictive_profile.read_text(encoding="utf-8"))
+        if predictive_profile is not None else None
+    )
+    if profile_payload is not None and profile_payload.get("schema_version") != "predictive-controller-profile/1.0":
+        raise ValueError("unsupported predictive controller profile schema")
+    mpc_profile_payload = (
+        json.loads(mpc_profile.read_text(encoding="utf-8"))
+        if mpc_profile is not None else None
+    )
+    if mpc_profile_payload is not None and mpc_profile_payload.get("schema_version") != "cohort-mpc-profile/1.0":
+        raise ValueError("unsupported cohort MPC profile schema")
+    gate_config = (
+        PolicyGateConfig(**profile_payload.get("gate", {}))
+        if profile_payload is not None else None
+    )
+    optimization_config = (
+        OptimizationConfig(**profile_payload.get("optimization", {}))
+        if profile_payload is not None else None
+    )
+    optimizer_weight = (
+        float(profile_payload.get("optimizer_weight", 1.0))
+        if profile_payload is not None else 1.0
+    )
+    forecast_adjustment_config = (
+        ForecastAdjustmentConfig(**profile_payload.get("forecast_adjustment", {}))
+        if profile_payload is not None else None
+    )
+    mpc_config = (
+        CohortMPCConfig(**mpc_profile_payload.get("mpc", {}))
+        if mpc_profile_payload is not None else None
+    )
     simulator = Simulator(
-        config, controller_by_name(controller, forecaster=trained_forecaster)
+        config,
+        controller_by_name(
+            controller,
+            forecaster=trained_forecaster,
+            gate_config=gate_config,
+            optimization_config=optimization_config,
+            optimizer_weight=optimizer_weight,
+            forecast_adjustment_config=forecast_adjustment_config,
+            mpc_config=mpc_config,
+        ),
     )
     destination = shard_directory(output_root, campaign_id, config.scenario_id, simulator.controller.name, seed)
     run_path = destination / "run.jsonl"
@@ -102,6 +152,27 @@ def run_shard(
             "model_version": trained_forecaster.model_version,
         }
         if forecast_bundle is not None and trained_forecaster is not None else None
+    )
+    profile_identity = (
+        {
+            "path": str(predictive_profile.resolve()),
+            "file_sha256": file_sha256(predictive_profile),
+            "profile_id": profile_payload.get("profile_id"),
+            "gate": profile_payload.get("gate", {}),
+            "optimization": profile_payload.get("optimization", {}),
+            "optimizer_weight": optimizer_weight,
+            "forecast_adjustment": profile_payload.get("forecast_adjustment", {}),
+        }
+        if predictive_profile is not None and profile_payload is not None else None
+    )
+    mpc_profile_identity = (
+        {
+            "path": str(mpc_profile.resolve()),
+            "file_sha256": file_sha256(mpc_profile),
+            "profile_id": mpc_profile_payload.get("profile_id"),
+            "mpc": mpc_profile_payload.get("mpc", {}),
+        }
+        if mpc_profile is not None and mpc_profile_payload is not None else None
     )
     progress_enabled = progress_every_simulated_hours is not None
 
@@ -121,6 +192,8 @@ def run_shard(
             or existing.get("selection_audits_sha256") != file_sha256(audits_path)
             or existing.get("controller") != simulator.controller.name
             or existing.get("forecast_bundle") != forecast_identity
+            or existing.get("predictive_profile") != profile_identity
+            or existing.get("mpc_profile") != mpc_profile_identity
         ):
             raise FileExistsError(f"existing shard does not match this manifest or is incomplete: {destination}")
         log(f"phase=complete status=already_published destination={destination}")
@@ -187,6 +260,8 @@ def run_shard(
         "seed": seed,
         "controller": result.controller,
         "forecast_bundle": forecast_identity,
+        "predictive_profile": profile_identity,
+        "mpc_profile": mpc_profile_identity,
         "manifest": str(manifest.resolve()),
         "manifest_sha256": manifest_digest,
         "git_commit": git_commit(project_root),
@@ -226,13 +301,23 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--controller",
-        choices=("static", "reactive", "forecast-capacity", "predictive", "oracle"),
+        choices=("static", "reactive", "forecast-capacity", "predictive", "mpc", "oracle"),
         default="static",
     )
     parser.add_argument(
         "--forecast-bundle",
         type=Path,
         help="checksum-verified trained bundle for predictive or forecast-capacity controllers",
+    )
+    parser.add_argument(
+        "--mpc-profile",
+        type=Path,
+        help="versioned horizon, objective, and certificate profile for MPC",
+    )
+    parser.add_argument(
+        "--predictive-profile",
+        type=Path,
+        help="versioned optimizer and policy-gate profile for a forecast controller",
     )
     return parser
 
@@ -244,6 +329,8 @@ def main() -> int:
         skip_existing=args.skip_existing, controller=args.controller,
         progress_every_simulated_hours=args.progress_every_simulated_hours,
         forecast_bundle=args.forecast_bundle,
+        predictive_profile=args.predictive_profile,
+        mpc_profile=args.mpc_profile,
     )
     print(destination)
     return 0

@@ -28,6 +28,10 @@ class OptimizationConfig:
     churn_cost: float = 0.01
     slack_tolerance: float = 1e-7
     timeout_seconds: float = 1.0
+    demand_safety_factor: float = 1.0
+    max_group_upf_weight: float = 1.0
+    lifetime_horizon_windows: int = 1
+    lifetime_weight_strength: float = 1.0
 
     def __post_init__(self) -> None:
         if self.planning_quantile not in {"p50", "p90", "p95"}:
@@ -38,6 +42,14 @@ class OptimizationConfig:
             raise ValueError("objective costs must be non-negative")
         if self.timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
+        if self.demand_safety_factor <= 0:
+            raise ValueError("demand_safety_factor must be positive")
+        if not 0 < self.max_group_upf_weight <= 1:
+            raise ValueError("max_group_upf_weight must be in (0, 1]")
+        if self.lifetime_horizon_windows < 1:
+            raise ValueError("lifetime_horizon_windows must be positive")
+        if not 0 <= self.lifetime_weight_strength <= 1:
+            raise ValueError("lifetime_weight_strength must be in [0, 1]")
 
 
 @dataclass(frozen=True, slots=True)
@@ -83,6 +95,7 @@ def solve_allocation(
     policy_version: int,
     previous_policy: Policy | None = None,
     config: OptimizationConfig | None = None,
+    demand_multiplier_by_group: dict[str, float] | None = None,
 ) -> OptimizationResult:
     """Solve the v1 LP and return no policy for structural/solver failures."""
 
@@ -104,6 +117,12 @@ def solve_allocation(
     upf_ids = sorted(state_by_id)
     group_ids = [forecast.group.selection_id for forecast in forecasts]
     forecast_by_group = {forecast.group.selection_id: forecast for forecast in forecasts}
+    demand_multipliers = demand_multiplier_by_group or {}
+    unknown_multipliers = set(demand_multipliers) - set(group_ids)
+    if unknown_multipliers:
+        raise ValueError(f"demand multipliers reference unknown groups: {sorted(unknown_multipliers)}")
+    if any(value <= 0 for value in demand_multipliers.values()):
+        raise ValueError("demand multipliers must be positive")
 
     allowed: dict[str, list[str]] = {}
     for forecast in forecasts:
@@ -125,6 +144,16 @@ def solve_allocation(
             return OptimizationResult(
                 status="infeasible", policy=None,
                 message=f"no healthy eligible UPF for group {group_id}",
+                projected_ul_mbps_by_upf={}, projected_dl_mbps_by_upf={},
+                projected_sessions_by_upf={}, max_safe_utilization=None,
+            )
+        if len(allowed[group_id]) * settings.max_group_upf_weight < 1 - settings.slack_tolerance:
+            return OptimizationResult(
+                status="infeasible", policy=None,
+                message=(
+                    f"diversification bound {settings.max_group_upf_weight:g} cannot "
+                    f"allocate group {group_id} across {len(allowed[group_id])} UPFs"
+                ),
                 projected_ul_mbps_by_upf={}, projected_dl_mbps_by_upf={},
                 projected_sessions_by_upf={}, max_safe_utilization=None,
             )
@@ -194,7 +223,11 @@ def solve_allocation(
                 if upf_id in allowed[group_id]:
                     forecast = forecast_by_group[group_id]
                     demand = forecast.new_load_ul_mbps if direction == "ul" else forecast.new_load_dl_mbps
-                    row[p_index[(group_id, upf_id)]] = _q(demand, settings.planning_quantile)
+                    row[p_index[(group_id, upf_id)]] = (
+                        _q(demand, settings.planning_quantile)
+                        * settings.demand_safety_factor
+                        * demand_multipliers.get(group_id, 1.0)
+                    )
             safe_capacity = getattr(state.safe_capacity_mbps, direction)
             row[z_index] = -safe_capacity
             row[slack_indexes[upf_id]] = -1.0
@@ -204,9 +237,13 @@ def solve_allocation(
         row = [0.0] * variable_count
         for group_id in group_ids:
             if upf_id in allowed[group_id]:
-                row[p_index[(group_id, upf_id)]] = _q(
-                    forecast_by_group[group_id].new_session_count,
-                    settings.planning_quantile,
+                row[p_index[(group_id, upf_id)]] = (
+                    _q(
+                        forecast_by_group[group_id].new_session_count,
+                        settings.planning_quantile,
+                    )
+                    * settings.demand_safety_factor
+                    * demand_multipliers.get(group_id, 1.0)
                 )
         row[z_index] = -state.safe_session_capacity
         row[slack_n_index[upf_id]] = -1.0
@@ -234,7 +271,7 @@ def solve_allocation(
 
     bounds = [(0.0, None)] * variable_count
     for index in p_index.values():
-        bounds[index] = (0.0, 1.0)
+        bounds[index] = (0.0, settings.max_group_upf_weight)
     bounds[z_index] = (0.0, 1.0)
 
     started = time.perf_counter()
@@ -283,9 +320,21 @@ def solve_allocation(
     for group_id, group_weights in weights.items():
         forecast = forecast_by_group[group_id]
         for upf_id, weight in group_weights.items():
-            projected_ul[upf_id] += weight * _q(forecast.new_load_ul_mbps, settings.planning_quantile)
-            projected_dl[upf_id] += weight * _q(forecast.new_load_dl_mbps, settings.planning_quantile)
-            projected_sessions[upf_id] += weight * _q(forecast.new_session_count, settings.planning_quantile)
+            projected_ul[upf_id] += (
+                weight * _q(forecast.new_load_ul_mbps, settings.planning_quantile)
+                * settings.demand_safety_factor
+                * demand_multipliers.get(group_id, 1.0)
+            )
+            projected_dl[upf_id] += (
+                weight * _q(forecast.new_load_dl_mbps, settings.planning_quantile)
+                * settings.demand_safety_factor
+                * demand_multipliers.get(group_id, 1.0)
+            )
+            projected_sessions[upf_id] += (
+                weight * _q(forecast.new_session_count, settings.planning_quantile)
+                * settings.demand_safety_factor
+                * demand_multipliers.get(group_id, 1.0)
+            )
 
     slack_ul = {
         upf_id: max(0.0, projected_ul[upf_id] - state_by_id[upf_id].safe_capacity_mbps.ul)

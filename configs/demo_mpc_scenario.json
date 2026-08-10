@@ -1,0 +1,88 @@
+{
+  "scenario_id": "demo-three-upf-two-zone",
+  "seed": 20260805,
+  "start_time": "2026-08-05T12:00:00Z",
+  "steps": 60,
+  "step_seconds": 30,
+  "decision_interval_steps": 20,
+  "primary_overload_metric": "overload_area_seconds.ul",
+  "upfs": [
+    {
+      "upf_id": "upf-a", "zone": "zone-a",
+      "capacity_mbps": {"ul": 240, "dl": 500},
+      "safe_utilization": {"ul": 0.8, "dl": 0.8},
+      "session_capacity": 5000, "session_safe_utilization": 0.85,
+      "queue_limit_seconds": 2,
+      "path_latency_ms_by_zone": {"residential": 2, "business": 15, "stadium": 7, "metro": 9, "factory": 18}
+    },
+    {
+      "upf_id": "upf-b", "zone": "zone-b",
+      "capacity_mbps": {"ul": 300, "dl": 450},
+      "safe_utilization": {"ul": 0.8, "dl": 0.8},
+      "session_capacity": 5000, "session_safe_utilization": 0.85,
+      "queue_limit_seconds": 2,
+      "path_latency_ms_by_zone": {"residential": 15, "business": 2, "stadium": 8, "metro": 6, "factory": 4}
+    },
+    {
+      "upf_id": "upf-c", "zone": "central",
+      "capacity_mbps": {"ul": 400, "dl": 700},
+      "safe_utilization": {"ul": 0.75, "dl": 0.75},
+      "session_capacity": 7000, "session_safe_utilization": 0.85,
+      "queue_limit_seconds": 2,
+      "path_latency_ms_by_zone": {"residential": 10, "business": 10, "stadium": 4, "metro": 5, "factory": 9}
+    }
+  ],
+  "groups": [
+    {
+      "key": {"zone": "residential", "dnn": "internet", "snssai": "1-010203", "five_qi": 9},
+      "arrivals_per_step": 5.5,
+      "lifetime_steps": {"min": 30, "max": 120},
+      "offered_mbps_per_session": {"ul": 0.22, "dl": 3.2},
+      "eligible_upfs": ["upf-a", "upf-c"]
+    },
+    {
+      "key": {"zone": "stadium", "dnn": "social-live", "snssai": "1-010204", "five_qi": 8},
+      "arrivals_per_step": 3.2,
+      "lifetime_steps": {"min": 4, "max": 35},
+      "offered_mbps_per_session": {"ul": 2.8, "dl": 0.9},
+      "eligible_upfs": ["upf-a", "upf-b", "upf-c"]
+    },
+    {
+      "key": {"zone": "metro", "dnn": "gaming-voice", "snssai": "1-010205", "five_qi": 3},
+      "arrivals_per_step": 4.2,
+      "lifetime_steps": {"min": 20, "max": 100},
+      "offered_mbps_per_session": {"ul": 0.16, "dl": 0.25},
+      "eligible_upfs": ["upf-a", "upf-b", "upf-c"]
+    },
+    {
+      "key": {"zone": "business", "dnn": "enterprise", "snssai": "1-112233", "five_qi": 7},
+      "arrivals_per_step": 4.5,
+      "lifetime_steps": {"min": 10, "max": 50},
+      "offered_mbps_per_session": {"ul": 1.2, "dl": 1.8},
+      "eligible_upfs": ["upf-b", "upf-c"]
+    },
+    {
+      "key": {"zone": "factory", "dnn": "industrial", "snssai": "2-445566", "five_qi": 82},
+      "arrivals_per_step": 2.0,
+      "lifetime_steps": {"min": 80, "max": 160},
+      "offered_mbps_per_session": {"ul": 0.08, "dl": 0.05},
+      "eligible_upfs": ["upf-b", "upf-c"]
+    },
+    {
+      "key": {"zone": "metro", "dnn": "iot", "snssai": "3-778899", "five_qi": 9},
+      "arrivals_per_step": 7.0,
+      "lifetime_steps": {"min": 100, "max": 240},
+      "offered_mbps_per_session": {"ul": 0.012, "dl": 0.002},
+      "eligible_upfs": ["upf-a", "upf-b", "upf-c"]
+    }
+  ],
+  "events": [
+    {"step": 10, "event_type": "arrival_factor", "group_id": "stadium|social-live|1-010204", "arrival_factor": 3.0},
+    {"step": 15, "event_type": "arrival_factor", "group_id": "metro|gaming-voice|1-010205", "arrival_factor": 1.7},
+    {"step": 18, "event_type": "arrival_factor", "group_id": "business|enterprise|1-112233", "arrival_factor": 0.55},
+    {"step": 30, "event_type": "arrival_factor", "group_id": "stadium|social-live|1-010204", "arrival_factor": 5.5},
+    {"step": 45, "event_type": "arrival_factor", "group_id": "business|enterprise|1-112233", "arrival_factor": 1.15},
+    {"step": 21, "event_type": "capacity_factor", "upf_id": "upf-a", "ul_factor": 0.35, "known_at_step": 0},
+    {"step": 41, "event_type": "health", "upf_id": "upf-b", "health": "degraded", "known_at_step": 20}
+  ]
+}

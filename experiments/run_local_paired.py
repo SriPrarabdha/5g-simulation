@@ -15,14 +15,16 @@ def main() -> int:
     parser.add_argument("--seed-count", type=int, default=30)
     parser.add_argument(
         "--controllers", nargs="+",
-        choices=("static", "reactive", "forecast-capacity", "predictive", "oracle"),
+        choices=("static", "reactive", "forecast-capacity", "predictive", "mpc", "oracle"),
         default=("static", "reactive", "predictive"),
     )
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument(
         "--forecast-bundle", type=Path,
-        help="trained bundle used by predictive and forecast-capacity controllers",
+        help="trained bundle used by predictive, forecast-capacity, and MPC controllers",
     )
+    parser.add_argument("--predictive-profile", type=Path)
+    parser.add_argument("--mpc-profile", type=Path)
     args = parser.parse_args()
     if args.seed_count < 1:
         parser.error("--seed-count must be positive")
@@ -37,8 +39,13 @@ def main() -> int:
                 controller=controller,
                 forecast_bundle=(
                     args.forecast_bundle
+                    if controller in {"predictive", "forecast-capacity", "mpc"} else None
+                ),
+                predictive_profile=(
+                    args.predictive_profile
                     if controller in {"predictive", "forecast-capacity"} else None
                 ),
+                mpc_profile=args.mpc_profile if controller == "mpc" else None,
             )
             print(destination)
     return 0

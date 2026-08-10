@@ -22,7 +22,7 @@ def main() -> int:
     except (OSError, json.JSONDecodeError) as error:
         checks.append(("traffic registry", False, str(error)))
 
-    scenario_path = ROOT / "configs" / "demo_scenario.json"
+    scenario_path = ROOT / "configs" / "demo_mpc_scenario.json"
     try:
         from simulator.macro.config import load_scenario
         scenario = load_scenario(scenario_path)
