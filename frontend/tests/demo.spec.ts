@@ -14,6 +14,18 @@ async function completeStory(page: import('@playwright/test').Page) {
   await expect(page.getByRole('heading', { name: /forecast versus reality/i })).toBeVisible({ timeout: 15_000 })
 }
 
+test('workshop fallback recording', async ({ page }) => {
+  test.skip(!process.env.CDOT_CAPTURE_WORKSHOP_VIDEO, 'Only captured by scripts/capture-workshop-fallback.sh')
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await signIn(page)
+  await page.waitForTimeout(1200)
+  await completeStory(page)
+  await page.waitForTimeout(2200)
+  await page.getByRole('button', { name: /^02Evidence$/i }).click()
+  await expect(page.getByText(/10.52%/).first()).toBeVisible()
+  await page.waitForTimeout(2200)
+})
+
 test('autoplay renders every forecast, optimizer decision, diversion, and outcome', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await signIn(page)

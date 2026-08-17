@@ -8,6 +8,7 @@ from statistics import mean
 from typing import Any
 
 from .run_campaign_shard import atomic_json
+from .artifacts import validate_published_shard
 
 
 class EvaluationError(ValueError):
@@ -35,7 +36,7 @@ def _bootstrap_mean_ci(values: list[float], *, samples: int = 10_000) -> list[fl
 def _load(root: Path) -> dict[tuple[str, str, int], dict[str, Any]]:
     records: dict[tuple[str, str, int], dict[str, Any]] = {}
     for path in sorted(root.rglob("metadata.json")):
-        item = json.loads(path.read_text(encoding="utf-8"))
+        item = validate_published_shard(path.parent)
         key = (item["scenario_id"], item["controller"], int(item["seed"]))
         if key in records:
             raise EvaluationError(f"duplicate shard {key}")

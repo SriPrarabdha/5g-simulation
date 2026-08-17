@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pyarrow.parquet as pq
+from experiments.artifacts import validate_published_shard
 
 from optimization import (
     OracleBoundResult,
@@ -128,16 +129,20 @@ def evaluate_pair(
     knowledge_overlay: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     config = load_scenario(manifest)
-    metadata = json.loads(static_metadata_path.read_text(encoding="utf-8"))
+    metadata = validate_published_shard(static_metadata_path.parent)
     if metadata.get("controller") != "static-capacity-v1":
         raise ValueError(f"not a static shard: {static_metadata_path}")
     if metadata.get("scenario_id") != config.scenario_id or int(metadata.get("seed")) != config.seed:
         raise ValueError("static shard is not paired with the manifest scenario and seed")
     if metadata.get("manifest_sha256") != _sha256(manifest):
         raise ValueError("static shard manifest checksum does not match")
-    parquet_path = static_metadata_path.parent / metadata["canonical_file"]
-    if metadata.get("parquet_file_sha256") != _sha256(parquet_path):
-        raise ValueError("static shard Parquet checksum does not match")
+    detailed = next(
+        (item for item in metadata["artifacts"] if item["kind"] == "detailed_steps"),
+        None,
+    )
+    if detailed is None:
+        raise ValueError("oracle evaluation requires a Silver or Gold static shard")
+    parquet_path = static_metadata_path.parent / detailed["path"]
     arrivals = bucket_arrivals_from_steps(config, _arrival_trace(parquet_path))
     modeled_static = evaluate_allocation(
         config, arrivals, static_capacity_allocation(config)

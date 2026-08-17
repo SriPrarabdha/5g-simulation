@@ -19,7 +19,7 @@ class PairedEvaluationTests(unittest.TestCase):
                         controller=controller,
                     )
             result = evaluate(
-                root / "schema_major=1" / "campaign=paired", bootstrap_samples=100
+                root / "schema_major=2" / "campaign=paired", bootstrap_samples=100
             )
             self.assertEqual(result["paired_seed_count"], 2)
             self.assertFalse(result["acceptance_gates"]["at_least_30_paired_seeds_per_scenario"])
@@ -30,7 +30,7 @@ class PairedEvaluationTests(unittest.TestCase):
             root = Path(directory)
             run_shard(Path("configs/demo_scenario.json"), root, "bad", 1, controller="static")
             with self.assertRaisesRegex(EvaluationError, "missing"):
-                evaluate(root / "schema_major=1" / "campaign=bad", bootstrap_samples=10)
+                evaluate(root / "schema_major=2" / "campaign=bad", bootstrap_samples=10)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ from steering import PolicyGateConfig
 from .config import load_scenario
 from .controllers import ForecastAdjustmentConfig, controller_by_name
 from .engine import Simulator
+from .sinks import CompositeSink, JsonlSink
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -50,7 +51,7 @@ def main() -> int:
     )
     if mpc_profile is not None and mpc_profile.get("schema_version") != "cohort-mpc-profile/1.0":
         raise ValueError("unsupported cohort MPC profile schema")
-    result = Simulator(
+    simulator = Simulator(
         scenario,
         controller_by_name(
             args.controller,
@@ -69,9 +70,10 @@ def main() -> int:
                 if mpc_profile else None
             ),
         ),
-    ).run()
-    result.write_jsonl(args.output)
-    print(json.dumps(result.summary, indent=2, sort_keys=True))
+    )
+    summary = simulator.make_summary_sink()
+    outcome = simulator.run(CompositeSink([summary, JsonlSink(args.output)]))
+    print(json.dumps(outcome.summary, indent=2, sort_keys=True))
     return 0
 
 

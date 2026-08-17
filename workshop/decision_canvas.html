@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>C-DOT UPF workshop decision canvas</title>
+  <style>
+    @page { size: A4 portrait; margin: 9mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #17343f; background: #eef3f5; font: 12px/1.35 Arial, sans-serif; }
+    main { width: 192mm; min-height: 276mm; margin: 0 auto; padding: 10mm; background: white; }
+    header { display: grid; grid-template-columns: 1fr auto; gap: 10mm; border-bottom: 2px solid #087f8c; padding-bottom: 6mm; }
+    .eyebrow { color: #087f8c; font: 700 9px/1.2 monospace; letter-spacing: .12em; }
+    h1 { margin: 2mm 0 0; font-size: 25px; letter-spacing: -.02em; }
+    .team { display: grid; gap: 3mm; width: 58mm; }
+    .field { border-bottom: 1px solid #83969d; min-height: 7mm; }
+    .loop { margin: 5mm 0; padding: 3mm 4mm; background: #102f3a; color: white; font: 700 10px/1.2 monospace; letter-spacing: .04em; text-align: center; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+    section { min-height: 78mm; border-top: 5px solid #087f8c; background: #f4f8f9; padding: 5mm; }
+    section:nth-child(2) { border-color: #753bbd; }
+    section:nth-child(3) { border-color: #cf8b16; }
+    section:nth-child(4) { border-color: #16805c; }
+    .number { font: 700 9px monospace; color: #62777f; }
+    h2 { margin: 2mm 0 1mm; font-size: 16px; }
+    .prompt { color: #52676f; min-height: 12mm; }
+    .lines { height: 41mm; background: repeating-linear-gradient(to bottom, transparent 0, transparent 8mm, #c9d5d9 8.2mm, transparent 8.5mm); }
+    footer { margin-top: 5mm; border: 1px solid #9cafb5; padding: 4mm; }
+    footer strong { color: #087f8c; }
+    .integration { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm 6mm; margin-top: 3mm; }
+    .boundary { margin-top: 4mm; color: #8a5b0b; font-weight: 700; }
+    @media print { body { background: white; } main { margin: 0; padding: 7mm; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div><div class="eyebrow">C-DOT · INTERACTIVE UPF CONTROL-ROOM LAB</div><h1>Closed-loop decision canvas</h1></div>
+    <div class="team"><div>Table / team<div class="field"></div></div><div>Reporter<div class="field"></div></div></div>
+  </header>
+  <div class="loop">OBSERVE → PREDICT → CERTIFY → STEER FUTURE SESSIONS → MEASURE</div>
+  <div class="grid">
+    <section><div class="number">01 · TRAFFIC</div><h2>What is happening?</h2><div class="prompt">Group, event, offered demand, carried traffic, overload and loss. Which UPF is becoming constrained?</div><div class="lines"></div></section>
+    <section><div class="number">02 · FORECAST</div><h2>What will happen next?</h2><div class="prompt">Six-window causal forecast, p50/p90 choice, uncertainty, assumptions and likely miss modes.</div><div class="lines"></div></section>
+    <section><div class="number">03 · SAFETY</div><h2>What action is safe?</h2><div class="prompt">Controller, eligible/healthy destinations, normalized weights, capacity, new-session-only scope and fallback.</div><div class="lines"></div></section>
+    <section><div class="number">04 · EVIDENCE</div><h2>What supports the conclusion?</h2><div class="prompt">Later telemetry, placement, overload area, loss, forecast error, policy result and evidence boundary.</div><div class="lines"></div></section>
+  </div>
+  <footer>
+    <strong>C-DOT pilot contracts to resolve</strong>
+    <div class="integration"><span>□ Prometheus telemetry</span><span>□ Capacity calibration</span><span>□ Group eligibility</span><span>□ SMF selection hook</span><span>□ Auth + atomic publish</span><span>□ Audit + rollback</span></div>
+    <div class="boundary">We would deploy this in advisory mode only after ________________________________________________.</div>
+  </footer>
+</main>
+</body>
+</html>

@@ -6,6 +6,11 @@ external integration exists.
 
 ## Start here
 
+- [Interactive workshop facilitator guide](workshop-facilitator-guide.md) —
+  90-minute control-room lab, team flow, presenter handoff, fallbacks,
+  rehearsal, and acceptance checks.
+- [Workshop coordination templates](workshop-coordination.md) — professor
+  confirmation, room/cluster questions, attendance, and travel handoff.
 - [Pilot presenter guide](presenter-guide.md) — five-minute chapter timing,
   exact defensible claims, deterministic checkpoints, and recovery steps.
 - [End-to-end runbook](end-to-end-runbook.md) — commands, host responsibilities,

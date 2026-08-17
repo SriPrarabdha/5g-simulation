@@ -6,15 +6,26 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 
-from simulator.macro import ScenarioConfig, Simulator, load_scenario
+from simulator.macro import BoundedMemorySink, ScenarioConfig, Simulator, load_scenario
 from simulator.macro.config import ScenarioEvent
 
 
 class SimulatorTests(unittest.TestCase):
+    @staticmethod
+    def _bounded_run(config: ScenarioConfig) -> BoundedMemorySink:
+        simulator = Simulator(config)
+        sink = BoundedMemorySink(
+            simulator.make_summary_sink(), max_steps=config.steps, max_audits=1_000_000
+        )
+        simulator.attach_bounded_advance_sink(sink)
+        while simulator.current_step < config.steps:
+            simulator.advance()
+        return sink
+
     def test_demo_manifest_runs_deterministically(self) -> None:
         config = load_scenario("configs/demo_scenario.json")
-        first = Simulator(config).run()
-        second = Simulator(config).run()
+        first = self._bounded_run(config)
+        second = self._bounded_run(config)
         self.assertEqual([step.to_dict() for step in first.steps], [step.to_dict() for step in second.steps])
         self.assertEqual(len(first.steps), config.steps)
         self.assertGreater(first.summary["offered_bytes"]["ul"], 0)
@@ -28,14 +39,14 @@ class SimulatorTests(unittest.TestCase):
             )
 
     def test_capacity_reduction_does_not_change_offered_demand(self) -> None:
-        high = Simulator(ScenarioConfig.from_dict(self._scenario(100.0))).run().summary
-        low = Simulator(ScenarioConfig.from_dict(self._scenario(1.0))).run().summary
+        high = self._bounded_run(ScenarioConfig.from_dict(self._scenario(100.0))).summary
+        low = self._bounded_run(ScenarioConfig.from_dict(self._scenario(1.0))).summary
         self.assertEqual(high["offered_bytes"], low["offered_bytes"])
         self.assertLess(low["carried_bytes"]["ul"], high["carried_bytes"]["ul"])
         self.assertGreater(low["dropped_bytes"]["ul"], high["dropped_bytes"]["ul"])
 
     def test_total_overload_is_decomposed_without_hiding_it(self) -> None:
-        summary = Simulator(ScenarioConfig.from_dict(self._scenario(1.0))).run().summary
+        summary = self._bounded_run(ScenarioConfig.from_dict(self._scenario(1.0))).summary
         for direction in ("ul", "dl"):
             total = summary["overload_area_seconds"][direction]
             residual = summary["residual_overload_area_seconds"][direction]
@@ -46,7 +57,7 @@ class SimulatorTests(unittest.TestCase):
             self.assertAlmostEqual(total, residual + incremental)
 
     def test_jsonl_output_is_byte_stable(self) -> None:
-        result = Simulator(ScenarioConfig.from_dict(self._scenario(10.0))).run()
+        result = self._bounded_run(ScenarioConfig.from_dict(self._scenario(10.0)))
         with tempfile.TemporaryDirectory() as directory:
             first, second = Path(directory) / "first.jsonl", Path(directory) / "second.jsonl"
             result.write_jsonl(first)
@@ -59,7 +70,7 @@ class SimulatorTests(unittest.TestCase):
             ))
 
     def test_parquet_output_has_canonical_schema_and_nested_upfs(self) -> None:
-        result = Simulator(ScenarioConfig.from_dict(self._scenario(10.0))).run()
+        result = self._bounded_run(ScenarioConfig.from_dict(self._scenario(10.0)))
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.parquet"
             result.write_parquet(path)
@@ -90,7 +101,7 @@ class SimulatorTests(unittest.TestCase):
             {"step": 2, "event_type": "arrival_factor", "group_id": group_id, "arrival_factor": 5},
             {"step": 2, "event_type": "path_latency", "upf_id": "upf-a", "zone": "zone-a", "latency_ms": 50},
         ]
-        result = Simulator(ScenarioConfig.from_dict(payload)).run()
+        result = self._bounded_run(ScenarioConfig.from_dict(payload))
         before = sum(result.steps[index].group_arrivals[group_id] for index in range(2))
         after = sum(result.steps[index].group_arrivals[group_id] for index in range(2, 8))
         self.assertGreater(after / 6, before / 2)
@@ -135,27 +146,29 @@ class SimulatorTests(unittest.TestCase):
         self.assertEqual(third.upfs[0].health, "unavailable")
         self.assertEqual(simulator.current_step, 3)
 
-    def test_selection_audit_stride_retains_a_deterministic_sample(self) -> None:
+    def test_simulator_emits_every_audit_for_sink_controlled_retention(self) -> None:
         config = replace(ScenarioConfig.from_dict(self._scenario(100.0)), selection_audit_stride=3)
-        first = Simulator(config).run()
-        second = Simulator(config).run()
+        first = self._bounded_run(config)
+        second = self._bounded_run(config)
         total_arrivals = sum(sum(step.group_arrivals.values()) for step in first.steps)
-        self.assertEqual(len(first.selection_audits), (total_arrivals + 2) // 3)
+        self.assertEqual(len(first.selection_audits), total_arrivals)
         self.assertEqual(
             [item.to_dict() for item in first.selection_audits],
             [item.to_dict() for item in second.selection_audits],
         )
-        self.assertEqual(first.summary["selection_audit_stride"], 3)
+        self.assertEqual(first.summary["selection_audit_stride"], 1)
 
     def test_run_reports_bounded_progress_and_completion(self) -> None:
         updates: list[tuple[int, int]] = []
         config = ScenarioConfig.from_dict(self._scenario(100.0))
-        result = Simulator(config).run(
+        simulator = Simulator(config)
+        result = simulator.run(
+            simulator.make_summary_sink(),
             progress_interval_steps=3,
             progress_callback=lambda completed, total: updates.append((completed, total)),
         )
         self.assertEqual(updates, [(3, 8), (6, 8), (8, 8)])
-        self.assertEqual(len(result.steps), 8)
+        self.assertEqual(result.step_count, 8)
 
     @staticmethod
     def _scenario(capacity: float) -> dict:

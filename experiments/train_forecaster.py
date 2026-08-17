@@ -12,6 +12,7 @@ from typing import Any
 from forecasting import DemandObservation, ResidualObservation, train_forecast_bundle, write_forecast_bundle
 from schemas import TimeWindow
 from simulator.macro.config import ScenarioConfig, load_scenario
+from experiments.artifacts import validate_published_shard
 
 
 def _duration(seconds: float | None) -> str:
@@ -112,10 +113,20 @@ def collect_training_series(
     controller: str,
 ) -> dict[str, list[list[DemandObservation]]]:
     result: dict[str, list[list[DemandObservation]]] = defaultdict(list)
-    candidates = sorted(campaign_root.rglob("run.parquet"))
-    selected = [path for path in candidates if f"controller={controller}" in str(path)]
+    candidates: list[tuple[Path, dict[str, Any]]] = []
+    for metadata_path in sorted(campaign_root.rglob("metadata.json")):
+        metadata = validate_published_shard(metadata_path.parent)
+        if metadata["retention"]["tier"] not in {"silver", "gold"}:
+            continue
+        detailed = next(
+            (item for item in metadata["artifacts"] if item["kind"] == "detailed_steps"),
+            None,
+        )
+        if detailed is not None:
+            candidates.append((metadata_path.parent / detailed["path"], metadata))
+    selected = [path for path, metadata in candidates if metadata["controller"] == controller]
     if not selected:
-        selected = candidates
+        selected = [path for path, _ in candidates]
     for path in selected:
         sequence = _bucket_sequence(path, config)
         for group_id, observations in sequence.items():

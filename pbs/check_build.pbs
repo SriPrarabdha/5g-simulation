@@ -25,7 +25,7 @@ trap 'rm -rf "$SMOKE_DIR"' EXIT
     --output-root "$SMOKE_DIR"
 
 "$PYTHON_BIN" -m experiments.aggregate_campaign \
-    --root "$SMOKE_DIR/schema_major=1/campaign=compute-node-smoke" \
+    --root "$SMOKE_DIR/schema_major=2/campaign=compute-node-smoke" \
     --expected-shards 1 \
     --output "$SMOKE_DIR/summary.json"
 test -s "$SMOKE_DIR/summary.json"

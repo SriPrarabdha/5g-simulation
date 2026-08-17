@@ -4,19 +4,28 @@ import hashlib
 import json
 import math
 import random
-from collections import Counter, defaultdict
-from dataclasses import dataclass, field
+import time
+from collections import Counter, defaultdict, deque
+from dataclasses import asdict, dataclass, field
 from datetime import timedelta
 from pathlib import Path
 from typing import Any, Callable
 
-from schemas import Capacity, GroupKey, SelectionAudit, TimeWindow, UPFState
+from schemas import Capacity, GroupKey, Policy, SelectionAudit, TimeWindow, UPFState
+from schemas.common import iso_utc
 from forecasting import DemandObservation, ResidualObservation
 from steering import rendezvous_select
 
-from .config import GroupProfile, ScenarioConfig, UPFProfile
-from .controllers import ControlContext, Controller, StaticCapacityController
+from .config import GroupProfile, ScenarioConfig, ScenarioEvent, UPFProfile
+from .controllers import (
+    ControlContext,
+    Controller,
+    StaticCapacityController,
+    restore_controller,
+    snapshot_controller,
+)
 from .model import DirectionResult, GroupUPFBucketResult, StepResult, UPFStepResult
+from .sinks import ArtifactDescriptor, BoundedMemorySink, CompositeSink, SummarySink
 
 
 @dataclass(slots=True)
@@ -38,7 +47,8 @@ class _UPFRuntime:
 
 
 @dataclass(slots=True)
-class SimulationResult:
+class _DetachedArtifactWriter:
+    """Private legacy-format helper; never constructed or retained by Simulator."""
     scenario_id: str
     seed: int
     step_seconds: int
@@ -301,6 +311,18 @@ class SimulationResult:
                 writer.write_table(pa.Table.from_pylist(rows, schema=schema))
 
 
+@dataclass(frozen=True, slots=True)
+class RunOutcome:
+    summary: dict[str, Any]
+    step_count: int
+    audit_count: int
+    artifacts: tuple[ArtifactDescriptor, ...]
+    timings: dict[str, float]
+    completed: bool
+    completion_status: str
+    checkpoint: str | None = None
+
+
 class Simulator:
     def __init__(self, config: ScenarioConfig, controller: Controller | None = None) -> None:
         self.config = config
@@ -317,7 +339,11 @@ class Simulator:
         self._departures_by_step: dict[int, Counter[tuple[str, str, float, float]]] = defaultdict(Counter)
         self._new_window_departures_by_step: dict[int, Counter[tuple[str, str, float, float]]] = defaultdict(Counter)
         self._session_sequence: Counter[str] = Counter()
-        self._history_by_group: dict[str, list[DemandObservation]] = defaultdict(list)
+        required_history = int(getattr(self.controller, "required_history_windows", 0))
+        self._required_history_windows = required_history
+        self._history_by_group: dict[str, deque[DemandObservation]] = defaultdict(
+            lambda: deque(maxlen=required_history or 1)
+        )
         self._interval_arrivals: Counter[str] = Counter()
         self._arrival_factors = {group.key.selection_id: 1.0 for group in config.groups}
         self._scheduled_forecast_multipliers = {
@@ -357,14 +383,16 @@ class Simulator:
         self._history_closed_at_step: int | None = None
         self._events_applied_at_step: int | None = None
         self._planned_at_step: int | None = None
-        self.result = SimulationResult(
-            scenario_id=self.config.scenario_id,
-            seed=self.config.seed,
-            step_seconds=self.config.step_seconds,
-            controller=self.controller.name,
-            primary_overload_metric=self.config.primary_overload_metric,
-            selection_audit_stride=self.config.selection_audit_stride,
-        )
+        self._event_sink: CompositeSink | None = None
+        self._advance_sink: BoundedMemorySink | None = None
+        self._timings: defaultdict[str, float] = defaultdict(float)
+        for phase in (
+            "arrival_generation_seconds", "lifetime_generation_seconds",
+            "rendezvous_selection_seconds", "controller_work_seconds",
+            "result_construction_seconds", "sink_writes_seconds",
+            "checkpointing_seconds", "stage_out_seconds",
+        ):
+            self._timings[phase] = 0.0
 
     @property
     def current_step(self) -> int:
@@ -393,9 +421,41 @@ class Simulator:
 
     def replace_controller(self, controller: Controller) -> None:
         self.controller = controller
-        self.result.controller = controller.name
-        self.result._summary_cache = None
+        if self._advance_sink is not None:
+            self._advance_sink.summary_sink.controller = controller.name
+        required_history = int(getattr(controller, "required_history_windows", 0))
+        if required_history != self._required_history_windows:
+            self._required_history_windows = required_history
+            self._history_by_group = defaultdict(
+                lambda: deque(maxlen=required_history or 1),
+                {
+                    key: deque(items, maxlen=required_history or 1)
+                    for key, items in self._history_by_group.items()
+                },
+            )
         self._planned_at_step = None
+
+    def make_summary_sink(self) -> SummarySink:
+        return SummarySink(
+            scenario_id=self.config.scenario_id,
+            seed=self.config.seed,
+            step_seconds=self.config.step_seconds,
+            controller=self.controller.name,
+            primary_overload_metric=self.config.primary_overload_metric,
+            selection_audit_stride=1,
+        )
+
+    def attach_bounded_advance_sink(self, sink: BoundedMemorySink) -> None:
+        """Attach the explicit fixed-size collector used only by the causal demo."""
+        if self._step_index or self._event_sink is not None:
+            raise RuntimeError("a bounded advance sink must be attached before execution")
+        self._advance_sink = sink
+
+    def _accept_audit(self, audit: SelectionAudit) -> None:
+        if self._event_sink is not None:
+            self._event_sink.accept_audit(audit)
+        elif self._advance_sink is not None:
+            self._advance_sink.accept_audit(audit)
 
     def _random_stream(self, name: str) -> random.Random:
         digest = hashlib.sha256(f"{self.config.seed}:{name}".encode()).digest()
@@ -479,6 +539,9 @@ class Simulator:
         }
 
     def _close_history_window(self, window_end) -> None:
+        if self._required_history_windows == 0:
+            self._interval_arrivals.clear()
+            return
         duration = timedelta(seconds=self.config.step_seconds * self.config.decision_interval_steps)
         window = TimeWindow(window_end - duration, window_end)
         residual = self._residual_by_upf()
@@ -635,6 +698,7 @@ class Simulator:
         window_start, _ = self._prepare_current_step()
         states = self._states(window_start)
         self._policy_version += 1
+        started = time.perf_counter()
         try:
             self._policy = self.controller.build_policy(
                 self.config,
@@ -646,8 +710,50 @@ class Simulator:
             )
         except RuntimeError:
             self._policy = None
+        finally:
+            self._timings["controller_work_seconds"] += time.perf_counter() - started
+        if self._event_sink is not None:
+            self._event_sink.accept_policy(
+                self._policy, self._step_index, self._decision_trace_details()
+            )
         self._planned_at_step = self._step_index
         return self._policy
+
+    def _decision_trace_details(self) -> dict[str, Any]:
+        details: dict[str, Any] = {
+            "controller": self.controller.name,
+            "controller_state": snapshot_controller(self.controller),
+            "forecasts": [
+                item.to_dict() for item in getattr(self.controller, "last_forecasts", ())
+            ],
+        }
+        gate = getattr(self.controller, "last_gate_decision", None)
+        if gate is not None:
+            details["policy_gate"] = gate.to_dict()
+        optimization = getattr(self.controller, "last_optimization", None)
+        if optimization is not None:
+            details["optimization"] = {
+                "status": optimization.status, "message": optimization.message,
+                "projected_ul_mbps_by_upf": optimization.projected_ul_mbps_by_upf,
+                "projected_dl_mbps_by_upf": optimization.projected_dl_mbps_by_upf,
+                "projected_sessions_by_upf": optimization.projected_sessions_by_upf,
+                "max_safe_utilization": optimization.max_safe_utilization,
+            }
+        mpc = getattr(self.controller, "last_result", None)
+        if mpc is not None:
+            details["mpc"] = {
+                "status": mpc.status, "message": mpc.message,
+                "runtime_ms": mpc.runtime_ms,
+                "first_allocation": mpc.first_allocation,
+                "static_first_allocation": mpc.static_first_allocation,
+                "planned_allocation": [
+                    {"group_id": key[0], "horizon": key[1], "weights": weights}
+                    for key, weights in sorted(mpc.planned_allocation.items())
+                ],
+                "certificate": asdict(mpc.certificate) if mpc.certificate is not None else None,
+                "known_future_events": mpc.known_future_events,
+            }
+        return details
 
     def advance(self) -> StepResult:
         """Advance exactly one 30-second tick using the policy selected beforehand."""
@@ -662,8 +768,6 @@ class Simulator:
             {item.key.selection_id: item.weights for item in policy.groups}
             if policy is not None else {}
         )
-        result = self.result
-
         active_before = self._active_counts()
         arrivals: dict[str, int] = {}
         rejections: Counter[str] = Counter()
@@ -675,10 +779,12 @@ class Simulator:
 
         for group in self.config.groups:
             group_id = group.key.selection_id
+            phase_started = time.perf_counter()
             arrival_count = self._poisson(
                 group.arrivals_per_step * self._arrival_factors[group_id],
                 self._streams[f"arrivals:{group_id}"],
             )
+            self._timings["arrival_generation_seconds"] += time.perf_counter() - phase_started
             arrivals[group_id] = arrival_count
             self._interval_arrivals[group_id] += arrival_count
             requested = policy_weights_by_group.get(group_id, {})
@@ -697,13 +803,11 @@ class Simulator:
             for _ in range(arrival_count):
                 sequence = self._session_sequence[group_id]
                 self._session_sequence[group_id] += 1
-                retain_audit = sequence % self.config.selection_audit_stride == 0
                 if not weights:
                     rejections[group_id] += 1
                     unplaced_rejections[group_id] += 1
-                    if retain_audit:
-                        session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
-                        result.selection_audits.append(SelectionAudit(
+                    session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
+                    self._accept_audit(SelectionAudit(
                             timestamp=window_start,
                             session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
                             session_hash_value=hashlib.sha256(f"{session_key}\x1fno-policy".encode()).hexdigest(),
@@ -715,7 +819,7 @@ class Simulator:
                             requested_weights={}, selected_upf=None,
                             policy_id=policy.policy_id if policy is not None else None,
                             reason="no_eligible_upf",
-                        ))
+                    ))
                     continue
                 session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
                 # Keep the rendezvous hash namespace stable across controller
@@ -726,14 +830,15 @@ class Simulator:
                 selection_namespace = (
                     f"{self.config.scenario_id}:weighted-rendezvous-v1"
                 )
+                phase_started = time.perf_counter()
                 selected, hash_value = rendezvous_select(
                     session_key, selection_namespace, weights
                 )
+                self._timings["rendezvous_selection_seconds"] += time.perf_counter() - phase_started
                 reason = "fallback_static" if policy.fallback.used else "optimizer_weighted"
                 if policy.fallback.source_policy_id:
                     reason = "fallback_last_safe"
-                if retain_audit:
-                    result.selection_audits.append(SelectionAudit(
+                self._accept_audit(SelectionAudit(
                         timestamp=window_start,
                         session_id_hash=hashlib.sha256(session_key.encode()).hexdigest(),
                         session_hash_value=hash_value,
@@ -741,7 +846,7 @@ class Simulator:
                         eligible_upfs=retained_eligible,
                         requested_weights=weights, selected_upf=selected,
                         policy_id=policy.policy_id, reason=reason,
-                    ))
+                ))
                 runtime = self._upfs[selected]
                 if active_before[selected] + admitted[selected] >= runtime.profile.session_capacity:
                     rejections[group_id] += 1
@@ -749,9 +854,11 @@ class Simulator:
                     rejected_by_upf_group[(selected, group_id)] += 1
                     self._interval_rejected_by_group_upf[(group_id, selected)] += 1
                     continue
+                phase_started = time.perf_counter()
                 lifetime = self._streams[f"lifetimes:{group_id}"].randint(
                     group.lifetime_steps_min, group.lifetime_steps_max
                 )
+                self._timings["lifetime_generation_seconds"] += time.perf_counter() - phase_started
                 admitted[selected] += 1
                 new_cohorts[(
                     group_id, selected, lifetime,
@@ -854,6 +961,7 @@ class Simulator:
             self._interval_admitted_by_group_upf.clear()
             self._interval_rejected_by_group_upf.clear()
 
+        phase_started = time.perf_counter()
         step_result = StepResult(
             scenario_id=self.config.scenario_id, seed=self.config.seed, step=step,
             window_start=window_start, window_end=window_end,
@@ -864,7 +972,7 @@ class Simulator:
             unplaced_rejected_ul_bytes=unplaced_ul_mbps * 1_000_000 / 8 * self.config.step_seconds,
             unplaced_rejected_dl_bytes=unplaced_dl_mbps * 1_000_000 / 8 * self.config.step_seconds,
         )
-        result.steps.append(step_result)
+        self._timings["result_construction_seconds"] += time.perf_counter() - phase_started
         for (group_id, upf_id, ul_mbps, dl_mbps), count in self._departures_by_step.pop(step, {}).items():
             self._active_sessions[upf_id] -= count
             self._active_ul_mbps[upf_id] -= count * ul_mbps
@@ -886,30 +994,238 @@ class Simulator:
             if abs(self._new_window_dl_mbps[upf_id]) < 1e-7:
                 del self._new_window_dl_mbps[upf_id]
         self._step_index += 1
+        if self._advance_sink is not None:
+            self._advance_sink.accept_step(step_result)
         return step_result
+
+    @staticmethod
+    def _counter_state(counter: Counter[Any]) -> list[list[Any]]:
+        # Counter insertion order is causal state: floating-point cohort
+        # removals must replay in the same order for bit-exact artifacts.
+        return [[list(key) if isinstance(key, tuple) else key, value] for key, value in counter.items()]
+
+    @staticmethod
+    def _restore_counter(items: list[list[Any]], *, tuple_key: bool = False) -> Counter[Any]:
+        return Counter({tuple(key) if tuple_key else key: value for key, value in items})
+
+    @staticmethod
+    def _observation_state(item: DemandObservation) -> dict[str, Any]:
+        return {
+            "window": {"start": iso_utc(item.window.start), "end": iso_utc(item.window.end)},
+            "group": asdict(item.group), "new_session_count": item.new_session_count,
+            "new_ul_mbps": item.new_ul_mbps, "new_dl_mbps": item.new_dl_mbps,
+            "existing_load_by_upf": {
+                key: asdict(value) for key, value in item.existing_load_by_upf.items()
+            },
+            "quality_flags": list(item.quality_flags),
+        }
+
+    @staticmethod
+    def _restore_observation(item: dict[str, Any]) -> DemandObservation:
+        return DemandObservation(
+            window=TimeWindow.from_dict(item["window"]),
+            group=GroupKey.from_dict(item["group"]),
+            new_session_count=float(item["new_session_count"]),
+            new_ul_mbps=float(item["new_ul_mbps"]),
+            new_dl_mbps=float(item["new_dl_mbps"]),
+            existing_load_by_upf={
+                key: ResidualObservation(**value)
+                for key, value in item["existing_load_by_upf"].items()
+            },
+            quality_flags=tuple(item.get("quality_flags", [])),
+        )
+
+    def snapshot_state(self) -> dict[str, Any]:
+        """Return the complete JSON-safe causal state at a post-step boundary."""
+        return {
+            "codec_version": "simulator-state/1.0",
+            "current_step": self._step_index,
+            "policy_version": self._policy_version,
+            "policy": self._policy.to_dict() if self._policy is not None else None,
+            "boundary_markers": {
+                "history_closed_at_step": self._history_closed_at_step,
+                "events_applied_at_step": self._events_applied_at_step,
+                "planned_at_step": self._planned_at_step,
+            },
+            "upfs": {
+                key: {
+                    "health": value.health, "ul_factor": value.ul_factor,
+                    "dl_factor": value.dl_factor, "ul_queue_bytes": value.ul_queue_bytes,
+                    "dl_queue_bytes": value.dl_queue_bytes,
+                } for key, value in sorted(self._upfs.items())
+            },
+            "counters": {
+                "active_sessions": self._counter_state(self._active_sessions),
+                "active_ul_mbps": self._counter_state(self._active_ul_mbps),
+                "active_dl_mbps": self._counter_state(self._active_dl_mbps),
+                "active_sessions_by_group_upf": self._counter_state(self._active_sessions_by_group_upf),
+                "interval_admitted_by_group_upf": self._counter_state(self._interval_admitted_by_group_upf),
+                "interval_rejected_by_group_upf": self._counter_state(self._interval_rejected_by_group_upf),
+                "new_window_ul_mbps": self._counter_state(self._new_window_ul_mbps),
+                "new_window_dl_mbps": self._counter_state(self._new_window_dl_mbps),
+                "interval_arrivals": self._counter_state(self._interval_arrivals),
+                "session_sequence": self._counter_state(self._session_sequence),
+            },
+            "departure_schedules": {
+                "active": [[step, self._counter_state(counter)] for step, counter in sorted(self._departures_by_step.items())],
+                "new_window": [[step, self._counter_state(counter)] for step, counter in sorted(self._new_window_departures_by_step.items())],
+            },
+            "forecast_history": {
+                key: [self._observation_state(item) for item in values]
+                for key, values in sorted(self._history_by_group.items())
+            },
+            "arrival_factors": dict(self._arrival_factors),
+            "scheduled_forecast_multipliers": dict(self._scheduled_forecast_multipliers),
+            "path_latency_overrides": [
+                [list(key), value] for key, value in sorted(self._path_latency_overrides.items())
+            ],
+            "events": [[step, [asdict(event) for event in events]] for step, events in sorted(self._events_by_step.items())],
+            "rng_states": {key: stream.getstate() for key, stream in sorted(self._streams.items())},
+            "controller": snapshot_controller(self.controller),
+        }
+
+    def restore_state(self, state: dict[str, Any]) -> None:
+        if state.get("codec_version") != "simulator-state/1.0":
+            raise ValueError("unsupported simulator checkpoint codec")
+        if self._step_index != 0:
+            raise RuntimeError("resume requires a fresh Simulator")
+        self._step_index = int(state["current_step"])
+        if not 0 <= self._step_index <= self.config.steps:
+            raise ValueError("checkpoint step lies outside the scenario")
+        self._policy_version = int(state["policy_version"])
+        self._policy = Policy.from_dict(state["policy"]) if state.get("policy") is not None else None
+        markers = state["boundary_markers"]
+        self._history_closed_at_step = markers["history_closed_at_step"]
+        self._events_applied_at_step = markers["events_applied_at_step"]
+        self._planned_at_step = markers["planned_at_step"]
+        if set(state["upfs"]) != set(self._upfs):
+            raise ValueError("checkpoint topology does not match simulator UPFs")
+        for key, values in state["upfs"].items():
+            runtime = self._upfs[key]
+            runtime.health = values["health"]
+            runtime.ul_factor = float(values["ul_factor"])
+            runtime.dl_factor = float(values["dl_factor"])
+            runtime.ul_queue_bytes = float(values["ul_queue_bytes"])
+            runtime.dl_queue_bytes = float(values["dl_queue_bytes"])
+        counters = state["counters"]
+        for name in ("active_sessions", "active_ul_mbps", "active_dl_mbps", "new_window_ul_mbps", "new_window_dl_mbps", "interval_arrivals", "session_sequence"):
+            setattr(self, f"_{name}", self._restore_counter(counters[name]))
+        for name in ("active_sessions_by_group_upf", "interval_admitted_by_group_upf", "interval_rejected_by_group_upf"):
+            setattr(self, f"_{name}", self._restore_counter(counters[name], tuple_key=True))
+        self._departures_by_step = defaultdict(Counter, {
+            int(step): self._restore_counter(items, tuple_key=True)
+            for step, items in state["departure_schedules"]["active"]
+        })
+        self._new_window_departures_by_step = defaultdict(Counter, {
+            int(step): self._restore_counter(items, tuple_key=True)
+            for step, items in state["departure_schedules"]["new_window"]
+        })
+        self._history_by_group = defaultdict(
+            lambda: deque(maxlen=self._required_history_windows or 1),
+            {
+                key: deque(
+                    (self._restore_observation(item) for item in values),
+                    maxlen=self._required_history_windows or 1,
+                ) for key, values in state["forecast_history"].items()
+            },
+        )
+        self._arrival_factors = {str(k): float(v) for k, v in state["arrival_factors"].items()}
+        self._scheduled_forecast_multipliers = {
+            str(k): float(v) for k, v in state["scheduled_forecast_multipliers"].items()
+        }
+        self._path_latency_overrides = {
+            tuple(key): float(value) for key, value in state["path_latency_overrides"]
+        }
+        self._events_by_step = defaultdict(list, {
+            int(step): [ScenarioEvent(**event) for event in events]
+            for step, events in state["events"]
+        })
+        if set(state["rng_states"]) != set(self._streams):
+            raise ValueError("checkpoint RNG stream identities mismatch")
+        def tuples(value: Any) -> Any:
+            return tuple(tuples(item) for item in value) if isinstance(value, list) else value
+        for key, random_state in state["rng_states"].items():
+            self._streams[key].setstate(tuples(random_state))
+        restore_controller(self.controller, state["controller"])
 
     def run(
         self,
+        sinks: CompositeSink | list[Any] | tuple[Any, ...],
+        checkpoint_manager: Any | None = None,
+        progress_callback: Callable[[int, int], None] | None = None,
         *,
         progress_interval_steps: int | None = None,
-        progress_callback: Callable[[int, int], None] | None = None,
-    ) -> SimulationResult:
-        if (progress_interval_steps is None) != (progress_callback is None):
-            raise ValueError("progress interval and callback must be provided together")
+    ) -> RunOutcome:
+        if progress_callback is not None and progress_interval_steps is None:
+            progress_interval_steps = 1
+        if progress_interval_steps is not None and progress_callback is None:
+            raise ValueError("a progress interval requires a progress callback")
         if progress_interval_steps is not None and progress_interval_steps <= 0:
             raise ValueError("progress_interval_steps must be positive")
-        while self._step_index < self.config.steps:
-            self.advance()
-            if (
-                progress_callback is not None
-                and progress_interval_steps is not None
-                and (
-                    self._step_index % progress_interval_steps == 0
-                    or self._step_index == self.config.steps
-                )
-            ):
-                progress_callback(self._step_index, self.config.steps)
-        return self.result
+        if self._advance_sink is not None:
+            raise RuntimeError("run() cannot be combined with the demo's bounded advance sink")
+        composite = (
+            sinks if isinstance(sinks, CompositeSink)
+            else CompositeSink(sinks if isinstance(sinks, (list, tuple)) else [sinks])
+        )
+        summary_sinks = [sink for sink in composite.sinks if isinstance(sink, SummarySink)]
+        if len(summary_sinks) != 1:
+            raise ValueError("exactly one SummarySink is required")
+        summary_sink = summary_sinks[0]
+        checkpoint_path: str | None = None
+        completed = False
+        self._event_sink = composite
+        try:
+            if checkpoint_manager is not None and self._step_index == 0:
+                restored = checkpoint_manager.restore_latest(self, composite)
+                checkpoint_path = str(restored) if restored is not None else None
+            while self._step_index < self.config.steps:
+                if checkpoint_manager is not None and checkpoint_manager.stop_requested:
+                    if not checkpoint_manager.is_checkpoint_current(self._step_index):
+                        checkpoint_started = time.perf_counter()
+                        checkpoint_path = str(checkpoint_manager.save(self, composite))
+                        self._timings["checkpointing_seconds"] += time.perf_counter() - checkpoint_started
+                    break
+                step = self.advance()
+                sink_started = time.perf_counter()
+                composite.accept_step(step)
+                self._timings["sink_writes_seconds"] += time.perf_counter() - sink_started
+                if checkpoint_manager is not None and checkpoint_manager.should_checkpoint(self._step_index):
+                    checkpoint_started = time.perf_counter()
+                    checkpoint_path = str(checkpoint_manager.save(self, composite))
+                    self._timings["checkpointing_seconds"] += time.perf_counter() - checkpoint_started
+                if (
+                    progress_callback is not None
+                    and progress_interval_steps is not None
+                    and (
+                        self._step_index % progress_interval_steps == 0
+                        or self._step_index == self.config.steps
+                    )
+                ):
+                    progress_callback(self._step_index, self.config.steps)
+                if checkpoint_manager is not None and checkpoint_manager.stop_requested:
+                    if not checkpoint_manager.is_checkpoint_current(self._step_index):
+                        checkpoint_started = time.perf_counter()
+                        checkpoint_path = str(checkpoint_manager.save(self, composite))
+                        self._timings["checkpointing_seconds"] += time.perf_counter() - checkpoint_started
+                    break
+            completed = self._step_index == self.config.steps
+            composite.close(success=completed)
+        except BaseException:
+            composite.close(success=False)
+            raise
+        finally:
+            self._event_sink = None
+        return RunOutcome(
+            summary=summary_sink.summary,
+            step_count=summary_sink.step_count,
+            audit_count=summary_sink.audit_count,
+            artifacts=tuple(composite.artifacts),
+            timings=dict(self._timings),
+            completed=completed,
+            completion_status="complete" if completed else "checkpointed",
+            checkpoint=checkpoint_path,
+        )
 
     def _serve_direction(
         self,

@@ -1,0 +1,40 @@
+#!/bin/bash
+#PBS -N cdot-stage1-characterize
+#PBS -q workq
+#PBS -l select=1:ncpus=128
+#PBS -l place=excl
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${WORKER_COUNT:?set WORKER_COUNT to 8, 16, 32, or 64}"
+: "${REPETITION:?set REPETITION to 1, 2, or 3}"
+: "${WORK_LIST:?set WORK_LIST to the frozen interleaved work-list JSON}"
+: "${CAMPAIGN_ROOT:?set CAMPAIGN_ROOT to shared campaign storage}"
+: "${ALLOCATED_MEMORY_BYTES:?record the PBS memory allocation in bytes}"
+: "${SCRATCH_ALLOCATION_BYTES:?record PBS_JOBFS allocation in bytes}"
+: "${PBS_JOBFS:?Stage 1 requires PBS job-local scratch}"
+
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export VECLIB_MAXIMUM_THREADS=1
+export BLIS_NUM_THREADS=1
+
+REPORT_DIR="${CAMPAIGN_ROOT}/characterization/rung-${WORKER_COUNT}"
+mkdir -p "$REPORT_DIR"
+
+"$PYTHON_BIN" -m experiments.packed_runner \
+  --work-list "$WORK_LIST" \
+  --workers "$WORKER_COUNT" \
+  --repetition "$REPETITION" \
+  --campaign-id "stage1-w${WORKER_COUNT}-r${REPETITION}" \
+  --output-root "$CAMPAIGN_ROOT/shards" \
+  --scratch-root "$PBS_JOBFS" \
+  --allocated-memory-bytes "$ALLOCATED_MEMORY_BYTES" \
+  --scratch-allocation-bytes "$SCRATCH_ALLOCATION_BYTES" \
+  --report "$REPORT_DIR/repetition-${REPETITION}.json"

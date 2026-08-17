@@ -12,6 +12,9 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
 
 - [`docs/README.md`](docs/README.md) — documentation map and implementation
   status language.
+- [`docs/workshop-facilitator-guide.md`](docs/workshop-facilitator-guide.md) —
+  90-minute interactive lab timing, materials, fallbacks, evidence language,
+  rehearsal, and acceptance checks.
 - [`docs/system-architecture-decisions.md`](docs/system-architecture-decisions.md)
   — stage-by-stage architecture decisions, boundaries, and communication paths.
 - [`docs/end-to-end-runbook.md`](docs/end-to-end-runbook.md) — workstation and
@@ -114,6 +117,21 @@ Build and run the self-contained demo:
 npm --prefix frontend ci
 ./scripts/start-demo.sh
 ```
+
+Prepare and run the browser-hosted workshop on one rehearsed venue host:
+
+```bash
+env/bin/pip install -e '.[workshop]'
+./scripts/start-workshop.sh
+```
+
+The launcher creates 4–6 team-specific notebook copies, starts a credential-free
+participant Jupyter service, and starts the presenter-authenticated dashboard on
+a separate port. The participant notebook is
+[`workshop/CDOT_UPF_Closed_Loop_Lab.ipynb`](workshop/CDOT_UPF_Closed_Loop_Lab.ipynb);
+the pre-executed notebook and standalone HTML in `workshop/fallback/` are the
+offline fallbacks. Participant notebooks emit `WorkshopDecision.json`; they do
+not publish a policy or receive presenter credentials.
 
 On a Conda-managed cluster where the login node has internet access, use the
 single login-node launcher after confirming that the cluster permits a

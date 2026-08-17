@@ -37,8 +37,8 @@ class PBSScriptTests(unittest.TestCase):
         for name in ("aggregate_campaign.pbs", "check_build.pbs", "smoke_test.sh"):
             with self.subTest(name=name):
                 content = (PBS_DIR / name).read_text(encoding="utf-8")
-                self.assertIn("schema_major=1", content)
-                self.assertNotIn("schema_major=0", content)
+                self.assertIn("schema_major=2", content)
+                self.assertNotIn("schema_major=1", content)
 
     def test_demo_job_bootstraps_conda_dependencies_and_tunnel(self) -> None:
         content = (PBS_DIR / "start_demo.pbs").read_text(encoding="utf-8")

@@ -18,11 +18,10 @@ class CampaignTests(unittest.TestCase):
             first = run_shard(manifest, root, "unit-campaign", 10)
             second = run_shard(manifest, root, "unit-campaign", 11)
             self.assertNotEqual(first, second)
-            self.assertTrue((first / "run.jsonl").is_file())
+            self.assertFalse((first / "run.jsonl").exists())
             self.assertTrue((first / "metadata.json").is_file())
-            self.assertTrue((first / "run.parquet").is_file())
-            self.assertTrue((first / "selection-audits.parquet").is_file())
-            summary = aggregate(root / "schema_major=1" / "campaign=unit-campaign", expected_shards=2)
+            self.assertTrue((first / "summary.json").is_file())
+            summary = aggregate(root / "schema_major=2" / "campaign=unit-campaign", expected_shards=2)
             self.assertEqual(summary["seeds"], [10, 11])
             self.assertEqual(summary["shard_count"], 2)
 
@@ -41,7 +40,7 @@ class CampaignTests(unittest.TestCase):
             root = Path(directory)
             run_shard(manifest, root, "incomplete", 1)
             with self.assertRaisesRegex(CampaignError, "expected 2"):
-                aggregate(root / "schema_major=1" / "campaign=incomplete", expected_shards=2)
+                aggregate(root / "schema_major=2" / "campaign=incomplete", expected_shards=2)
 
     def test_controller_is_explicit_in_partition_and_metadata(self) -> None:
         manifest = Path("configs/demo_scenario.json")

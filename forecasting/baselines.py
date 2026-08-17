@@ -175,6 +175,10 @@ class MovingAverageForecaster:
         self.window_size = window_size
         self.model_version = f"moving-average/{window_size}"
 
+    @property
+    def required_history_windows(self) -> int:
+        return self.window_size
+
     def predict(
         self,
         history: Iterable[DemandObservation],

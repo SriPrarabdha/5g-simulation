@@ -64,6 +64,35 @@ def main() -> int:
         digest = hashlib.sha256(bundle.read_bytes()).hexdigest()[:12]
         checks.append(("bundle checksum", True, digest))
 
+    notebook_path = ROOT / "workshop" / "CDOT_UPF_Closed_Loop_Lab.ipynb"
+    try:
+        notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
+        todo_count = sum(
+            "todo" in cell.get("metadata", {}).get("tags", [])
+            for cell in notebook.get("cells", [])
+        )
+        stages = notebook.get("metadata", {}).get("workshop", {}).get("visible_stages", [])
+        checks.append((
+            "workshop notebook",
+            notebook.get("nbformat") == 4 and todo_count == 3 and len(stages) == 5,
+            f"{todo_count} TODOs / {len(stages)} stages",
+        ))
+    except (OSError, json.JSONDecodeError) as error:
+        checks.append(("workshop notebook", False, str(error)))
+
+    frozen_html = ROOT / "workshop" / "fallback" / "CDOT_UPF_Closed_Loop_Lab_Frozen.html"
+    checks.append(("workshop fallback", frozen_html.is_file(), str(frozen_html.relative_to(ROOT))))
+
+    fallback_video = ROOT / "workshop" / "fallback" / "CDOT_UPF_Closed_Loop_Dashboard_Reveal.webm"
+    checks.append((
+        "fallback recording",
+        fallback_video.is_file() and fallback_video.stat().st_size > 100_000,
+        f"{fallback_video.relative_to(ROOT)} / {fallback_video.stat().st_size if fallback_video.is_file() else 0} bytes",
+    ))
+
+    canvas = ROOT / "workshop" / "decision_canvas.html"
+    checks.append(("decision canvas", canvas.is_file(), str(canvas.relative_to(ROOT))))
+
     for name, passed, detail in checks:
         print(f"{'PASS' if passed else 'FAIL':4}  {name:20} {detail}")
     failed = [name for name, passed, _ in checks if not passed]

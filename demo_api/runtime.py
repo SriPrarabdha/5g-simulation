@@ -22,6 +22,7 @@ from simulator.macro.controllers import (
     controller_by_name,
 )
 from simulator.macro.engine import Simulator
+from simulator.macro.sinks import BoundedMemorySink
 from steering import PolicyGateConfig
 
 from .interfaces import SimulationActuator
@@ -142,7 +143,10 @@ class DemoRun:
     def _reset_simulator(self) -> None:
         self.controller_instance = self._controller_instance()
         self.simulator = Simulator(self.config, self.controller_instance)
-        self.result = self.simulator.result
+        self.result = BoundedMemorySink(
+            self.simulator.make_summary_sink(), max_steps=100, max_audits=0
+        )
+        self.simulator.attach_bounded_advance_sink(self.result)
         self.index = 0
 
     @property
@@ -907,7 +911,7 @@ class DemoRun:
             bundle = copy.deepcopy(self._story_checkpoints[checkpoint_id])
             preserved_sequence = self.sequence
             self.simulator = bundle["simulator"]
-            self.result = self.simulator.result
+            self.result = self.simulator._advance_sink
             self.controller_instance = self.simulator.controller
             self.index = bundle["step"]
             self.controls = bundle["controls"]

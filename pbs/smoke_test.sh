@@ -12,7 +12,7 @@ trap 'rm -rf "$SMOKE_ROOT"' EXIT
     --manifest configs/demo_scenario.json --campaign-id local-smoke \
     --seed 1 --output-root "$SMOKE_ROOT"
 "$PYTHON_BIN" -m experiments.aggregate_campaign \
-    --root "$SMOKE_ROOT/schema_major=1/campaign=local-smoke" \
+    --root "$SMOKE_ROOT/schema_major=2/campaign=local-smoke" \
     --expected-shards 1 --output "$SMOKE_ROOT/summary.json"
 test -s "$SMOKE_ROOT/summary.json"
 echo "LOCAL CAMPAIGN SMOKE TEST PASSED"

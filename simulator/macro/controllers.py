@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from typing import Any, Protocol
 
@@ -85,6 +85,7 @@ class StaticCapacityController:
     """Static baseline weighted by the current directional safe envelope."""
 
     name = "static-capacity-v1"
+    required_history_windows = 0
 
     def build_policy(
         self,
@@ -135,6 +136,7 @@ class ReactiveThresholdController:
     """Reactive baseline using only residual load observed at decision time."""
 
     name = "reactive-threshold-v1"
+    required_history_windows = 0
 
     def __init__(self, threshold: float = 0.8) -> None:
         if not 0 < threshold <= 1:
@@ -233,6 +235,10 @@ class PredictiveHiGHSController:
         self.last_optimization: Any | None = None
         self.last_candidate: Policy | None = None
         self.last_gate_decision: PolicyGateDecision | None = None
+
+    @property
+    def required_history_windows(self) -> int:
+        return int(getattr(self.forecaster, "required_history_windows", 144))
 
     def build_policy(
         self,
@@ -605,6 +611,7 @@ class OracleHiGHSController(PredictiveHiGHSController):
     """Non-deployable evaluator that peeks at the target arrival stream."""
 
     name = "oracle-highs-v1"
+    required_history_windows = 0
 
     def build_policy(
         self,
@@ -679,6 +686,10 @@ class CohortMPCController:
         self.last_forecasts: list[Forecast] = []
         self.decision_count = 0
         self.certified_decision_count = 0
+
+    @property
+    def required_history_windows(self) -> int:
+        return int(getattr(self.forecaster, "required_history_windows", 144))
 
     def build_policy(
         self,
@@ -1053,6 +1064,61 @@ def controller_by_name(
         return controllers[name]
     except KeyError as error:
         raise ValueError(f"unknown controller {name!r}; choose from {sorted(controllers)}") from error
+
+
+def snapshot_controller(controller: Controller) -> dict[str, Any]:
+    """JSON-safe causal controller state; diagnostic solver objects are excluded."""
+    state: dict[str, Any] = {"codec_version": "controller-state/1.0", "name": controller.name}
+    if isinstance(controller, PredictiveHiGHSController):
+        state.update({
+            "previous_policy": (
+                controller._previous_policy.to_dict()
+                if controller._previous_policy is not None else None
+            ),
+            "gate": {
+                "last_applied_epoch": controller.gate.last_applied_epoch,
+                "last_decision": (
+                    asdict(controller.gate.last_decision)
+                    if controller.gate.last_decision is not None else None
+                ),
+            },
+        })
+    if isinstance(controller, CohortMPCController):
+        state.update({
+            "decision_count": controller.decision_count,
+            "certified_decision_count": controller.certified_decision_count,
+        })
+    forecaster = getattr(controller, "forecaster", None)
+    alpha = getattr(forecaster, "_alpha_by_group", None)
+    if alpha is not None:
+        state["adaptive_conformal"] = {str(key): float(value) for key, value in alpha.items()}
+    return state
+
+
+def restore_controller(controller: Controller, state: dict[str, Any]) -> None:
+    if state.get("codec_version") != "controller-state/1.0":
+        raise ValueError("unsupported controller checkpoint codec")
+    if state.get("name") != controller.name:
+        raise ValueError("checkpoint controller identity mismatch")
+    if isinstance(controller, PredictiveHiGHSController):
+        previous = state.get("previous_policy")
+        controller._previous_policy = Policy.from_dict(previous) if previous is not None else None
+        gate = state.get("gate", {})
+        controller.gate.last_applied_epoch = gate.get("last_applied_epoch")
+        decision = gate.get("last_decision")
+        controller.gate.last_decision = (
+            PolicyGateDecision(**decision) if decision is not None else None
+        )
+    if isinstance(controller, CohortMPCController):
+        controller.decision_count = int(state.get("decision_count", 0))
+        controller.certified_decision_count = int(state.get("certified_decision_count", 0))
+    alpha = state.get("adaptive_conformal")
+    forecaster = getattr(controller, "forecaster", None)
+    if alpha is not None:
+        current = getattr(forecaster, "_alpha_by_group", None)
+        if current is None or set(current) != set(alpha):
+            raise ValueError("checkpoint adaptive-conformal groups mismatch")
+        forecaster._alpha_by_group = {str(key): float(value) for key, value in alpha.items()}
 
 
 def normalized_healthy_weights(

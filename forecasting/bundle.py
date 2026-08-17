@@ -296,6 +296,12 @@ class TrainedForecastBundle:
         return str(self.payload["model_version"])
 
     @property
+    def required_history_windows(self) -> int:
+        # The calendar feature contract reaches back exactly one day at the
+        # ten-minute training cadence (origin - 143 inclusive).
+        return 144
+
+    @property
     def metadata(self) -> dict[str, Any]:
         return {
             key: self.payload[key]

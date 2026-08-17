@@ -298,14 +298,16 @@ def evaluate_pilot(
                     f"pilot {completed + 1}/{total} scenario={kind} seed={seed} controller=static",
                     flush=True,
                 )
-            static = Simulator(scenario, StaticCapacityController()).run().summary
+            static_simulator = Simulator(scenario, StaticCapacityController())
+            static = static_simulator.run(static_simulator.make_summary_sink()).summary
             controller = CohortMPCController(forecaster=bundle, mpc_config=settings)
             if progress:
                 print(
                     f"pilot {completed + 1}/{total} scenario={kind} seed={seed} controller=mpc",
                     flush=True,
                 )
-            mpc = Simulator(scenario, controller).run().summary
+            mpc_simulator = Simulator(scenario, controller)
+            mpc = mpc_simulator.run(mpc_simulator.make_summary_sink()).summary
             reductions = {
                 metric: {
                     direction: _relative_reduction(

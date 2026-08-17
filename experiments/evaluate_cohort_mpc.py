@@ -100,9 +100,11 @@ def evaluate(
         scenario, fault = _development_scenario(
             base, seed, steps, max(2, settings.horizon_windows // 2)
         )
-        static = Simulator(scenario, StaticCapacityController()).run().summary
+        static_simulator = Simulator(scenario, StaticCapacityController())
+        static = static_simulator.run(static_simulator.make_summary_sink()).summary
         controller = CohortMPCController(forecaster=bundle, mpc_config=settings)
-        mpc = Simulator(scenario, controller).run().summary
+        mpc_simulator = Simulator(scenario, controller)
+        mpc = mpc_simulator.run(mpc_simulator.make_summary_sink()).summary
         reductions = {
             direction: (
                 (static["overload_area_seconds"][direction] - mpc["overload_area_seconds"][direction])

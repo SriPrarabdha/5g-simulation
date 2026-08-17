@@ -7,6 +7,7 @@ from statistics import mean
 from typing import Any
 
 from .run_campaign_shard import atomic_json
+from .artifacts import validate_published_shard
 
 
 class CampaignError(ValueError):
@@ -14,21 +15,21 @@ class CampaignError(ValueError):
 
 
 def load_shard(path: Path) -> dict[str, Any]:
-    with path.open(encoding="utf-8") as stream:
-        first_line = stream.readline()
-    if not first_line:
-        raise CampaignError(f"empty shard: {path}")
-    record = json.loads(first_line)
-    if record.get("record_type") != "simulation_metadata":
-        raise CampaignError(f"invalid first record in {path}")
-    record["path"] = str(path)
-    return record
+    metadata_path = path if path.name == "metadata.json" else path / "metadata.json"
+    try:
+        record = validate_published_shard(metadata_path.parent)
+    except ValueError as error:
+        raise CampaignError(str(error)) from error
+    summary = dict(record["summary"])
+    summary["path"] = str(metadata_path)
+    summary["retention"] = record["retention"]
+    return summary
 
 
 def aggregate(root: Path, expected_shards: int | None = None) -> dict[str, Any]:
-    shard_paths = sorted(root.rglob("run.jsonl"))
+    shard_paths = sorted(root.rglob("metadata.json"))
     if not shard_paths:
-        raise CampaignError(f"no run.jsonl shards below {root}")
+        raise CampaignError(f"no committed experiment-shard/2.0 metadata below {root}")
     shards = [load_shard(path) for path in shard_paths]
     identities = {(item["scenario_id"], item["controller"], item["seed"]) for item in shards}
     if len(identities) != len(shards):
@@ -73,4 +74,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

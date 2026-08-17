@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from experiments.train_forecaster import _bucket_sequence
-from simulator.macro import ScenarioConfig, Simulator
+from simulator.macro import BoundedMemorySink, ScenarioConfig, Simulator
 
 
 class ForecasterTrainingInputTests(unittest.TestCase):
@@ -36,7 +36,13 @@ class ForecasterTrainingInputTests(unittest.TestCase):
             }],
             "events": [],
         })
-        result = Simulator(config).run()
+        simulator = Simulator(config)
+        result = BoundedMemorySink(
+            simulator.make_summary_sink(), max_steps=config.steps, max_audits=0
+        )
+        simulator.attach_bounded_advance_sink(result)
+        while simulator.current_step < config.steps:
+            simulator.advance()
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.parquet"
             result.write_parquet(path)
