@@ -7,7 +7,7 @@ the sole in-memory exception: it attaches an explicit 100-step bounded sink so
 its rewind story remains deterministic.
 
 Campaign workers write bounded, immutable Parquet segments below job-local
-scratch (`PBS_JOBFS`, then `TMPDIR`). A checkpoint seals those segments before
+scratch (`PBS_JOBFS`, then `TMPDIR`, then compute-node `/tmp`). A checkpoint seals those segments before
 atomically writing gzip JSON simulator, RNG, controller, and sink state. Resume
 requires exact manifest, artifact-policy, model/profile, topology, controller,
 and source fingerprints. The latest two checkpoints remain in scratch until the
@@ -37,10 +37,25 @@ env/bin/python -m experiments.build_stage1_worklist \
 ```
 
 Submit `pbs/characterize_stage1.pbs` three times for each of 8, 16, 32, and 64
-workers, setting `WORKER_COUNT`, `REPETITION`, `WORK_LIST`, `CAMPAIGN_ROOT`,
-`ALLOCATED_MEMORY_BYTES`, and `SCRATCH_ALLOCATION_BYTES`. Each job owns one full
-node and starts no PBS array children. Build the final report from all twelve
-packed-run reports with `experiments.build_stage1_report`.
+workers, setting `WORKER_COUNT`, `REPETITION`, `WORK_LIST`, `CAMPAIGN_ROOT`, and
+`ALLOCATED_MEMORY_BYTES`. Each job owns one full node and starts no PBS array
+children. `SCRATCH_ALLOCATION_BYTES` is optional: use it for a conservative
+operator-defined local-scratch budget; otherwise the script records the free
+bytes visible at job start. This fallback is required on C-DOT, whose PBS
+server does not define a `jobfs` resource or export `PBS_JOBFS`. Build the final
+report from all twelve packed-run reports with `experiments.build_stage1_report`.
+
+For the 125 GiB C-DOT nodes, the first 8-worker demo submission is:
+
+```bash
+qsub \
+  -v WORKER_COUNT=8,REPETITION=1,WORK_LIST="$HOME/5g-stage1/worklists/work-list-8.json",CAMPAIGN_ROOT="$HOME/5g-stage1/campaign",ALLOCATED_MEMORY_BYTES=128849018880 \
+  pbs/characterize_stage1.pbs
+```
+
+Do not request `-l jobfs=...` on this cluster. The script prints `df` for both
+the selected compute-node scratch and shared Lustre campaign storage before it
+starts workers.
 
 Sequential controller and artifact profiling are provided by
 `experiments.profile_stage1` and `experiments.characterize_stage1_artifacts`.
