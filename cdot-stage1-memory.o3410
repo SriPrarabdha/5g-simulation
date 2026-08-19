@@ -1,0 +1,146 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s1b1n0 job=3410.wlm array_index=none
+{
+  "criterion": "After a common cohort warm-up at least as long as the maximum session lifetime, the 7-day Bronze peak RSS remains within the configured tolerance of the 1-day Bronze peak RSS",
+  "max_peak_rss_growth_fraction": 0.2,
+  "measurement_days": [
+    1,
+    7
+  ],
+  "observed_peak_rss_growth_fraction": 0.04108641637992139,
+  "passed": true,
+  "required_warmup_days": 2,
+  "runs": [
+    {
+      "exit_code": 0,
+      "label": "warmup_plus_one_day",
+      "manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-warmup-plus-1d-s20260817.json",
+      "peak_rss_bytes": 479719424,
+      "scratch_bytes": 8463226,
+      "status": "complete",
+      "steps": 8640,
+      "summary": {
+        "carried_bytes": {
+          "dl": 2.8449311782067178e+17,
+          "ul": 1.1522986251201832e+17
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02316427156921194,
+          "ul": 0.03102559882952607
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 204936589568353.8,
+          "ul": 81687139935846.28
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 450.21948584401457,
+          "ul": 812.4321769016499
+        },
+        "new_session_offered_bytes": {
+          "dl": 6594823047585036.0,
+          "ul": 3577609879912510.5
+        },
+        "offered_bytes": {
+          "dl": 2.8469805441023824e+17,
+          "ul": 1.1531154965195429e+17
+        },
+        "overload_area_seconds": {
+          "dl": 155605.83625150315,
+          "ul": 167306.3142963854
+        },
+        "overload_duration_seconds": {
+          "dl": 28590.0,
+          "ul": 37320.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 155155.61676565916,
+          "ul": 166493.8821194839
+        },
+        "scenario_id": "extreme-national-training-16w-s20260817",
+        "seed": 95001,
+        "selection_audit_count": 116413837,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 116413837,
+        "session_migration_supported": false,
+        "steps": 8640
+      }
+    },
+    {
+      "exit_code": 0,
+      "label": "warmup_plus_seven_days",
+      "manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-warmup-plus-7d-s20260817.json",
+      "peak_rss_bytes": 499429376,
+      "scratch_bytes": 8709317,
+      "status": "complete",
+      "steps": 25920,
+      "summary": {
+        "carried_bytes": {
+          "dl": 8.99073377817663e+17,
+          "ul": 3.4534829297730157e+17
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02136123701882597,
+          "ul": 0.02952905933652986
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 3409813934289532.5,
+          "ul": 1137557968614784.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 1950.6353593788333,
+          "ul": 2024.6292358059309
+        },
+        "new_session_offered_bytes": {
+          "dl": 1.927815736452003e+16,
+          "ul": 1.023140125185001e+16
+        },
+        "offered_bytes": {
+          "dl": 9.024831917519529e+17,
+          "ul": 3.4648585094591654e+17
+        },
+        "overload_area_seconds": {
+          "dl": 1370200.1973107078,
+          "ul": 943604.2146109943
+        },
+        "overload_duration_seconds": {
+          "dl": 69900.0,
+          "ul": 64800.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 1368249.5619513306,
+          "ul": 941579.5853751879
+        },
+        "scenario_id": "extreme-national-training-16w-s20260817",
+        "seed": 95001,
+        "selection_audit_count": 337871875,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 337871875,
+        "session_migration_supported": false,
+        "steps": 25920
+      }
+    }
+  ],
+  "schema_version": "stage1-memory-regression/1.1",
+  "total_duration_days": [
+    3.0,
+    9.0
+  ],
+  "warmup_days": 2
+}

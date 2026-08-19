@@ -1,0 +1,154 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n0 job=3405.wlm array_index=none
+{
+  "inputs": {
+    "forecast_bundle": {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "sha256": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49"
+    },
+    "manifest": {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "sha256": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+    },
+    "mpc_profile": {
+      "path": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "sha256": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+    }
+  },
+  "runs": [
+    {
+      "checkpoint_lineage": [
+        {
+          "bytes": 3891363,
+          "file": "checkpoint-000000000720-c76f17f1e327.json.gz",
+          "sha256": "c76f17f1e327924f5b9742991d2eebf06fd5bf4b7c70e3483c1cdeebe9a4cdf3",
+          "step": 720
+        },
+        {
+          "bytes": 4182557,
+          "file": "checkpoint-000000001440-2f273407dff5.json.gz",
+          "sha256": "2f273407dff5c834499e8cfdf17773dd728e3cc256351e9bb55b160eb9a963b5",
+          "step": 1440
+        },
+        {
+          "bytes": 4316431,
+          "file": "checkpoint-000000002160-c795fc0a03a1.json.gz",
+          "sha256": "c795fc0a03a1534c074b9eb8655a56199c8d910dc1cfe0c12d388ce629e17019",
+          "step": 2160
+        },
+        {
+          "bytes": 4118875,
+          "file": "checkpoint-000000002880-51d006aaf132.json.gz",
+          "sha256": "51d006aaf132046d844291bee5358044eddf3524c9792f1b47f0e3398c80e2a8",
+          "step": 2880
+        }
+      ],
+      "controller": "static-capacity-v1",
+      "cpu_seconds": 647.943597636,
+      "peak_rss_bytes": 465580032,
+      "phase_timings": {
+        "arrival_generation_seconds": 2.5940534621477127,
+        "checkpointing_seconds": 12.253417022526264,
+        "controller_work_seconds": 0.11912322044372559,
+        "lifetime_generation_seconds": 24.183565810788423,
+        "rendezvous_selection_seconds": 303.7009450462647,
+        "result_construction_seconds": 0.023899739608168602,
+        "sink_writes_seconds": 0.20900027314200997,
+        "stage_out_seconds": 0.025824550073593855
+      },
+      "seed": 91001,
+      "wall_seconds": 648.2909885118715
+    },
+    {
+      "checkpoint_lineage": [
+        {
+          "bytes": 3972029,
+          "file": "checkpoint-000000000720-9e2290ee51a0.json.gz",
+          "sha256": "9e2290ee51a0142959255411b90ee0373df2b92aa2f48e5f13c4e44ab53d20b7",
+          "step": 720
+        },
+        {
+          "bytes": 4239051,
+          "file": "checkpoint-000000001440-357b713fe20d.json.gz",
+          "sha256": "357b713fe20d0d098ce324cd52a71111b9d45047cb3572a31ef9dc5339011d53",
+          "step": 1440
+        },
+        {
+          "bytes": 4380021,
+          "file": "checkpoint-000000002160-82eaafcb0e31.json.gz",
+          "sha256": "82eaafcb0e314db9512ceed6923632e4fd223146bde0a5c9385e7414d52c2c7f",
+          "step": 2160
+        },
+        {
+          "bytes": 4187831,
+          "file": "checkpoint-000000002880-7c1d1a9a9c52.json.gz",
+          "sha256": "7c1d1a9a9c52b71997a475a39243ad04c81c483ff0bd903e9046765b2f08a759",
+          "step": 2880
+        }
+      ],
+      "controller": "reactive-threshold-v1",
+      "cpu_seconds": 882.8139655570001,
+      "peak_rss_bytes": 478801920,
+      "phase_timings": {
+        "arrival_generation_seconds": 2.591647658497095,
+        "checkpointing_seconds": 11.770902138203382,
+        "controller_work_seconds": 251.5852731638588,
+        "lifetime_generation_seconds": 23.46432352019474,
+        "rendezvous_selection_seconds": 295.1357445954345,
+        "result_construction_seconds": 0.02596768969669938,
+        "sink_writes_seconds": 0.22182603273540735,
+        "stage_out_seconds": 0.02303019305691123
+      },
+      "seed": 91002,
+      "wall_seconds": 883.3767566080205
+    },
+    {
+      "checkpoint_lineage": [
+        {
+          "bytes": 5957516,
+          "file": "checkpoint-000000000720-1c828dd4b824.json.gz",
+          "sha256": "1c828dd4b824369ab84dddc151a3f1110b9bf6a6fbcb1c9c095356b1ef65f064",
+          "step": 720
+        },
+        {
+          "bytes": 8390925,
+          "file": "checkpoint-000000001440-be82518958a2.json.gz",
+          "sha256": "be82518958a2914108c83c71d4e2abf5688c4f67c4ba648ce11be1eaf448e204",
+          "step": 1440
+        },
+        {
+          "bytes": 10684142,
+          "file": "checkpoint-000000002160-dadbd2f7f38d.json.gz",
+          "sha256": "dadbd2f7f38d6a34421332861c5fdcabf5023ebc7853c00a8b8576773a671e32",
+          "step": 2160
+        },
+        {
+          "bytes": 12689750,
+          "file": "checkpoint-000000002880-477dab05bd7e.json.gz",
+          "sha256": "477dab05bd7e874e23ae7430b66c7903c7a635fc5012fc025b18997a629f46eb",
+          "step": 2880
+        }
+      ],
+      "controller": "cohort-mpc-v1",
+      "cpu_seconds": 1828.7738070369999,
+      "peak_rss_bytes": 715005952,
+      "phase_timings": {
+        "arrival_generation_seconds": 2.594506694935262,
+        "checkpointing_seconds": 17.906688482966274,
+        "controller_work_seconds": 1182.7046607346274,
+        "lifetime_generation_seconds": 23.253535982221365,
+        "rendezvous_selection_seconds": 300.9249786133878,
+        "result_construction_seconds": 0.024547548033297062,
+        "sink_writes_seconds": 0.218744486104697,
+        "stage_out_seconds": 0.02360964333638549
+      },
+      "seed": 91003,
+      "wall_seconds": 1829.275476763025
+    }
+  ],
+  "scenario_id": "extreme-optimizer-pilot-1d-s20260817",
+  "schema_version": "stage1-sequential-profile/1.1",
+  "source_fingerprint": "ffb946ad5ec15cb999e5fdc2d7fb0121226db07d7b47d9a451faf6d28b46d833",
+  "topology_id": "topology-4b9eda70bb7a3724"
+}

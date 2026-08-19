@@ -1,0 +1,41 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s3b1n0 job=3423.wlm array_index=none
+[stage1] scratch_root=/var/tmp/pbs.3423.wlm/cdot-stage1-3423.wlm.y8tQuJ
+[stage1] scratch_capacity_bytes=51149701120
+Filesystem                                   Size  Used Avail Use% Mounted on
+tmpfs                                         63G   15G   48G  24% /
+124@kfi,60@kfi:125@kfi,61@kfi:/lustre1/home  1.5P  335T  1.1P  24% /home
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/abharadwaj/Projects/5g-simulation/experiments/packed_runner.py", line 374, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/abharadwaj/Projects/5g-simulation/experiments/packed_runner.py", line 357, in main
+    report = run_pool(
+             ^^^^^^^^^
+  File "/home/abharadwaj/Projects/5g-simulation/experiments/packed_runner.py", line 258, in run_pool
+    sum(path.stat().st_size for path in scratch_root.rglob("*") if path.is_file()),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abharadwaj/Projects/5g-simulation/experiments/packed_runner.py", line 258, in <genexpr>
+    sum(path.stat().st_size for path in scratch_root.rglob("*") if path.is_file()),
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 968, in rglob
+    for p in selector.select_from(self):
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 407, in _select_from
+    for starting_point in self._iterate_directories(parent_path, is_dir, scandir):
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 397, in _iterate_directories
+    for p in self._iterate_directories(path, is_dir, scandir):
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 397, in _iterate_directories
+    for p in self._iterate_directories(path, is_dir, scandir):
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 397, in _iterate_directories
+    for p in self._iterate_directories(path, is_dir, scandir):
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 386, in _iterate_directories
+    with scandir(parent_path) as scandir_it:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 938, in _scandir
+    return os.scandir(self)
+           ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/var/tmp/pbs.3423.wlm/cdot-stage1-3423.wlm.y8tQuJ/cdot-stage1/8b6983ca21cccba002227969/checkpoints'
+=>> PBS: job killed: walltime 28872 exceeded limit 28800

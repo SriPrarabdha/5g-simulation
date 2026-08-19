@@ -1,0 +1,24 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n1 job=3436.wlm array_index=none
+[stage1-report] unavailable rung=16 repetition=3 path=/home/abharadwaj/5g-stage1/extreme/packing/characterization/rung-16/repetition-3.json
+[stage1-report] unavailable rung=64 repetition=1 path=/home/abharadwaj/5g-stage1/extreme/packing/characterization/rung-64/repetition-1.json
+[stage1-report] unavailable rung=64 repetition=2 path=/home/abharadwaj/5g-stage1/extreme/packing/characterization/rung-64/repetition-2.json
+[stage1-report] unavailable rung=64 repetition=3 path=/home/abharadwaj/5g-stage1/extreme/packing/characterization/rung-64/repetition-3.json
+{
+  "created_at": "2026-08-18T06:10:48.157291Z",
+  "projected_eight_node_throughput_shards_per_hour": 144.1942397707495,
+  "projection_basis": "linear eight-node projection from median selected-rung one-node throughput",
+  "recommended_pbs_resources": {
+    "job_local_scratch_bytes": 51145633792,
+    "memory_bytes": 128849018880,
+    "ncpus": 8,
+    "nodes": 1,
+    "stage_out_concurrency": 2,
+    "threads_per_worker": 1
+  },
+  "schema_version": "stage1-characterization-report/1.0",
+  "selected_worker_count": 8,
+  "selection_policy": "highest contiguous passing rung beginning at 8 workers",
+  "status": "passed"
+}

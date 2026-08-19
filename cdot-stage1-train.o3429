@@ -1,0 +1,107 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n0 job=3429.wlm array_index=none
+[2026-08-17T20:11:10Z] phase=load status=started campaign_root=/home/abharadwaj/5g-stage1/overnight-20260817/forecaster-14d/shards/schema_major=2/campaign=extreme-forecast-training-14d-s20260818 controller=static-capacity-v1
+[2026-08-17T20:11:22Z] phase=load status=complete groups=96 observations=193536 elapsed=00:00:12 peak_rss_gib=0.63
+[2026-08-17T20:11:22Z] phase=train status=started targets=3 horizons=8
+[2026-08-17T20:11:22Z] phase=train status=running progress=1.04% group=1/96 group_id=airport|edge-inference|5-500001 elapsed=00:00:00 eta=00:00:06 peak_rss_gib=0.63
+[2026-08-17T20:11:22Z] phase=train status=running progress=2.08% group=2/96 group_id=airport|enterprise-backup|1-100007 elapsed=00:00:00 eta=00:00:05 peak_rss_gib=0.63
+[2026-08-17T20:11:22Z] phase=train status=running progress=3.12% group=3/96 group_id=airport|enterprise-rtc|1-100006 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:22Z] phase=train status=running progress=4.17% group=4/96 group_id=airport|enterprise|1-100005 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:22Z] phase=train status=running progress=5.21% group=5/96 group_id=airport|factory-control|2-200001 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:22Z] phase=train status=running progress=6.25% group=6/96 group_id=airport|gaming|1-100003 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:22Z] phase=train status=running progress=7.29% group=7/96 group_id=airport|ims-voice|1-100004 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:22Z] phase=train status=running progress=8.33% group=8/96 group_id=airport|internet-video|1-100001 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=9.38% group=9/96 group_id=airport|mission-critical|6-600001 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=10.42% group=10/96 group_id=airport|mmtc|3-300001 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=11.46% group=11/96 group_id=airport|social-live|1-100002 elapsed=00:00:00 eta=00:00:04 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=12.50% group=12/96 group_id=airport|v2x|4-400001 elapsed=00:00:00 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=13.54% group=13/96 group_id=east-urban|edge-inference|5-500001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=14.58% group=14/96 group_id=east-urban|enterprise-backup|1-100007 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=15.62% group=15/96 group_id=east-urban|enterprise-rtc|1-100006 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=16.67% group=16/96 group_id=east-urban|enterprise|1-100005 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=17.71% group=17/96 group_id=east-urban|factory-control|2-200001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=18.75% group=18/96 group_id=east-urban|gaming|1-100003 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=19.79% group=19/96 group_id=east-urban|ims-voice|1-100004 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=20.83% group=20/96 group_id=east-urban|internet-video|1-100001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=21.88% group=21/96 group_id=east-urban|mission-critical|6-600001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=22.92% group=22/96 group_id=east-urban|mmtc|3-300001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=23.96% group=23/96 group_id=east-urban|social-live|1-100002 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=25.00% group=24/96 group_id=east-urban|v2x|4-400001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=26.04% group=25/96 group_id=industrial|edge-inference|5-500001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=27.08% group=26/96 group_id=industrial|enterprise-backup|1-100007 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=28.12% group=27/96 group_id=industrial|enterprise-rtc|1-100006 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=29.17% group=28/96 group_id=industrial|enterprise|1-100005 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=30.21% group=29/96 group_id=industrial|factory-control|2-200001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=31.25% group=30/96 group_id=industrial|gaming|1-100003 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=32.29% group=31/96 group_id=industrial|ims-voice|1-100004 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=33.33% group=32/96 group_id=industrial|internet-video|1-100001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:23Z] phase=train status=running progress=34.38% group=33/96 group_id=industrial|mission-critical|6-600001 elapsed=00:00:01 eta=00:00:03 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=35.42% group=34/96 group_id=industrial|mmtc|3-300001 elapsed=00:00:01 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=36.46% group=35/96 group_id=industrial|social-live|1-100002 elapsed=00:00:01 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=37.50% group=36/96 group_id=industrial|v2x|4-400001 elapsed=00:00:01 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=38.54% group=37/96 group_id=north-urban|edge-inference|5-500001 elapsed=00:00:01 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=39.58% group=38/96 group_id=north-urban|enterprise-backup|1-100007 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=40.62% group=39/96 group_id=north-urban|enterprise-rtc|1-100006 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=41.67% group=40/96 group_id=north-urban|enterprise|1-100005 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=42.71% group=41/96 group_id=north-urban|factory-control|2-200001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=43.75% group=42/96 group_id=north-urban|gaming|1-100003 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=44.79% group=43/96 group_id=north-urban|ims-voice|1-100004 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=45.83% group=44/96 group_id=north-urban|internet-video|1-100001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=46.88% group=45/96 group_id=north-urban|mission-critical|6-600001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=47.92% group=46/96 group_id=north-urban|mmtc|3-300001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=48.96% group=47/96 group_id=north-urban|social-live|1-100002 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=50.00% group=48/96 group_id=north-urban|v2x|4-400001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=51.04% group=49/96 group_id=rural|edge-inference|5-500001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=52.08% group=50/96 group_id=rural|enterprise-backup|1-100007 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=53.12% group=51/96 group_id=rural|enterprise-rtc|1-100006 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=54.17% group=52/96 group_id=rural|enterprise|1-100005 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=55.21% group=53/96 group_id=rural|factory-control|2-200001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=56.25% group=54/96 group_id=rural|gaming|1-100003 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=57.29% group=55/96 group_id=rural|ims-voice|1-100004 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=58.33% group=56/96 group_id=rural|internet-video|1-100001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=59.38% group=57/96 group_id=rural|mission-critical|6-600001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=60.42% group=58/96 group_id=rural|mmtc|3-300001 elapsed=00:00:02 eta=00:00:02 peak_rss_gib=0.63
+[2026-08-17T20:11:24Z] phase=train status=running progress=61.46% group=59/96 group_id=rural|social-live|1-100002 elapsed=00:00:02 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=62.50% group=60/96 group_id=rural|v2x|4-400001 elapsed=00:00:02 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=63.54% group=61/96 group_id=south-urban|edge-inference|5-500001 elapsed=00:00:02 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=64.58% group=62/96 group_id=south-urban|enterprise-backup|1-100007 elapsed=00:00:02 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=65.62% group=63/96 group_id=south-urban|enterprise-rtc|1-100006 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=66.67% group=64/96 group_id=south-urban|enterprise|1-100005 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=67.71% group=65/96 group_id=south-urban|factory-control|2-200001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=68.75% group=66/96 group_id=south-urban|gaming|1-100003 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=69.79% group=67/96 group_id=south-urban|ims-voice|1-100004 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=70.83% group=68/96 group_id=south-urban|internet-video|1-100001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=71.88% group=69/96 group_id=south-urban|mission-critical|6-600001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=72.92% group=70/96 group_id=south-urban|mmtc|3-300001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=73.96% group=71/96 group_id=south-urban|social-live|1-100002 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=75.00% group=72/96 group_id=south-urban|v2x|4-400001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=76.04% group=73/96 group_id=stadium|edge-inference|5-500001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=77.08% group=74/96 group_id=stadium|enterprise-backup|1-100007 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=78.12% group=75/96 group_id=stadium|enterprise-rtc|1-100006 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=79.17% group=76/96 group_id=stadium|enterprise|1-100005 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=80.21% group=77/96 group_id=stadium|factory-control|2-200001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=81.25% group=78/96 group_id=stadium|gaming|1-100003 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=82.29% group=79/96 group_id=stadium|ims-voice|1-100004 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=83.33% group=80/96 group_id=stadium|internet-video|1-100001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=84.38% group=81/96 group_id=stadium|mission-critical|6-600001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=85.42% group=82/96 group_id=stadium|mmtc|3-300001 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=86.46% group=83/96 group_id=stadium|social-live|1-100002 elapsed=00:00:03 eta=00:00:01 peak_rss_gib=0.63
+[2026-08-17T20:11:25Z] phase=train status=running progress=87.50% group=84/96 group_id=stadium|v2x|4-400001 elapsed=00:00:03 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=88.54% group=85/96 group_id=west-urban|edge-inference|5-500001 elapsed=00:00:03 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=89.58% group=86/96 group_id=west-urban|enterprise-backup|1-100007 elapsed=00:00:03 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=90.62% group=87/96 group_id=west-urban|enterprise-rtc|1-100006 elapsed=00:00:03 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=91.67% group=88/96 group_id=west-urban|enterprise|1-100005 elapsed=00:00:03 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=92.71% group=89/96 group_id=west-urban|factory-control|2-200001 elapsed=00:00:04 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=93.75% group=90/96 group_id=west-urban|gaming|1-100003 elapsed=00:00:04 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=94.79% group=91/96 group_id=west-urban|ims-voice|1-100004 elapsed=00:00:04 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=95.83% group=92/96 group_id=west-urban|internet-video|1-100001 elapsed=00:00:04 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=96.88% group=93/96 group_id=west-urban|mission-critical|6-600001 elapsed=00:00:04 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=97.92% group=94/96 group_id=west-urban|mmtc|3-300001 elapsed=00:00:04 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=98.96% group=95/96 group_id=west-urban|social-live|1-100002 elapsed=00:00:04 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=running progress=100.00% group=96/96 group_id=west-urban|v2x|4-400001 elapsed=00:00:04 eta=00:00:00 peak_rss_gib=0.63
+[2026-08-17T20:11:26Z] phase=train status=complete elapsed=00:00:04
+[2026-08-17T20:11:26Z] phase=publish status=started output=/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-14d-s20260818.json
+[2026-08-17T20:11:26Z] phase=complete status=published elapsed=00:00:16 output=/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-14d-s20260818.json sha256=c629a5429047738d31bb671e175ff39eb8f7ddf1d05ffd45d9e4261261b4dffa mean_test_wape_pct=8.704
+{"groups": 96, "model_version": "extreme-calendar-ridge-conformal-stage1/1.0", "output": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-14d-s20260818.json", "sha256": "c629a5429047738d31bb671e175ff39eb8f7ddf1d05ffd45d9e4261261b4dffa"}
+{"freeze_record_sha256": "86487724dca5a5a21587e628867dcda7c5fd1b2ea49c1610f35f2355f40639f9", "model_bundle_sha256": "c629a5429047738d31bb671e175ff39eb8f7ddf1d05ffd45d9e4261261b4dffa", "output": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-14d-s20260818.freeze.json", "status": "frozen-provisional"}

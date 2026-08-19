@@ -1,0 +1,94 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n1 job=3439.wlm array_index=none
+{
+  "aggregate_peak_rss_bytes": 10293903360,
+  "allocated_memory_bytes": 257698037760,
+  "artifact_bytes": 105320,
+  "campaign_id": "extreme-2node-pilot-s20260818",
+  "campaign_input_sha256": "c7e748a532eb4aad32acfae6cacfa745bba1a640432db39f14a3033c9dbdbfb8",
+  "cpu_efficiency": 0.6473412036031525,
+  "cpu_seconds": 38273.38462900699,
+  "failures": 0,
+  "hosts": [
+    "x8000c0s0b1n0",
+    "x8000c0s0b1n1"
+  ],
+  "node_count": 2,
+  "peak_swap_bytes": 0,
+  "repetition": 1,
+  "schema_version": "packed-multinode-run/1.0",
+  "scratch_allocation_bytes": 102311612416,
+  "scratch_peak_bytes": 299735799,
+  "shared_stage_out_throughput_bytes_per_second": 138655.2663262028,
+  "stage_out_measurement": "mean per-node conservative summed worker service fraction",
+  "stage_out_seconds": 0.7595816790126264,
+  "stage_out_wall_fraction": 0.00010277816254677958,
+  "total_worker_count": 16,
+  "wall_seconds": 3695.248388328124,
+  "work_items": 33,
+  "work_list_sha256": "81b55a11a55e05cfaf12ab9314fb86ec12eb7541c319059ae71cbd7fe5285547",
+  "workers_per_node": 8
+}
+{
+  "controllers": [
+    "cohort-mpc-v1",
+    "reactive-threshold-v1",
+    "static-capacity-v1"
+  ],
+  "mean_carried_bytes": {
+    "dl": 8.978228994838373e+16,
+    "ul": 4.037770228608347e+16
+  },
+  "mean_dropped_bytes": {
+    "dl": 102609027317418.55,
+    "ul": 68666560607532.516
+  },
+  "mean_offered_bytes": {
+    "dl": 8.988489897570117e+16,
+    "ul": 4.0446368846690904e+16
+  },
+  "root": "/home/abharadwaj/5g-stage1/overnight-20260817/production/campaigns/shards/schema_major=2/campaign=extreme-2node-pilot-s20260818",
+  "scenarios": [
+    "extreme-optimizer-pilot-1d-s20260817"
+  ],
+  "schema_version": "campaign-summary/1.0",
+  "seeds": [
+    39000,
+    39000,
+    39000,
+    39001,
+    39001,
+    39001,
+    39002,
+    39002,
+    39002,
+    39003,
+    39003,
+    39003,
+    39004,
+    39004,
+    39004,
+    39005,
+    39005,
+    39005,
+    39006,
+    39006,
+    39006,
+    39007,
+    39007,
+    39007,
+    39008,
+    39008,
+    39008,
+    39009,
+    39009,
+    39009,
+    39010,
+    39010,
+    39010
+  ],
+  "shard_count": 33,
+  "total_establishment_failures": 0
+}
+{"campaign_id": "extreme-2node-pilot-s20260818", "campaign_input_sha256": "c7e748a532eb4aad32acfae6cacfa745bba1a640432db39f14a3033c9dbdbfb8", "created_at": "2026-08-18T07:13:19.699632Z", "node_count": 2, "reasons": ["node_0:cpu_efficiency_below_70_percent"], "schema_version": "stage2-pilot-report/1.0", "status": "failed", "work_list_sha256": "81b55a11a55e05cfaf12ab9314fb86ec12eb7541c319059ae71cbd7fe5285547", "worker_count": 8}

@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N cdot-stage1-memory
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=120gb
+#PBS -l walltime=08:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${ONE_DAY_MANIFEST:?set frozen one-day manifest}"
+: "${SEVEN_DAY_MANIFEST:?set frozen seven-day manifest}"
+: "${OUTPUT_ROOT:?set shared output root}"
+: "${REPORT:?set shared report path}"
+
+SCRATCH_BASE="${PBS_JOBFS:-${TMPDIR:-/tmp}}"
+JOB_TOKEN="${PBS_JOBID//[^[:alnum:]_.-]/_}"
+SCRATCH_ROOT="$(mktemp -d "$SCRATCH_BASE/cdot-stage1-memory-${JOB_TOKEN}.XXXXXX")"
+mkdir -p "$OUTPUT_ROOT" "$(dirname "$REPORT")"
+
+"$PYTHON_BIN" -m experiments.memory_regression \
+  --one-day-manifest "$ONE_DAY_MANIFEST" \
+  --seven-day-manifest "$SEVEN_DAY_MANIFEST" \
+  --output-root "$OUTPUT_ROOT" \
+  --scratch-root "$SCRATCH_ROOT" \
+  --report "$REPORT"
+
+find "$SCRATCH_ROOT" -depth -type d -empty -delete

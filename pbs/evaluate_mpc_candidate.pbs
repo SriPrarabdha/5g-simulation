@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N cdot-mpc-eval
+#PBS -q workq
+#PBS -l select=1:ncpus=8:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=08:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST:?set frozen one-day extreme manifest}"
+: "${FORECAST_BUNDLE:?set frozen forecast bundle}"
+: "${MPC_PROFILE:?set development MPC candidate}"
+: "${EVALUATION_ROOT:?set durable shared evaluation root}"
+
+mkdir -p "$EVALUATION_ROOT/pairs"
+"$PYTHON_BIN" scripts/run_mpc_candidate_parallel.py \
+  --manifest "$MANIFEST" \
+  --forecast-bundle "$FORECAST_BUNDLE" \
+  --mpc-profile "$MPC_PROFILE" \
+  --seed-start "${SEED_START:-33001}" \
+  --total-seeds "${TOTAL_SEEDS:-30}" \
+  --steps "${STEPS:-2880}" \
+  --workers "${WORKERS:-8}" \
+  --work-dir "$EVALUATION_ROOT/pairs" \
+  --evaluation-stage "${EVALUATION_STAGE:-promotion}" \
+  --output "$EVALUATION_ROOT/evaluation.json"

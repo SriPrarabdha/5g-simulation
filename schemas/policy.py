@@ -15,7 +15,9 @@ class SolverReport:
     runtime_ms: int
 
     def __post_init__(self) -> None:
-        if self.status not in {"optimal", "feasible_with_slack", "infeasible", "timeout", "error"}:
+        if self.status not in {
+            "optimal", "feasible_with_slack", "infeasible", "timeout", "error", "skipped",
+        }:
             raise ValueError(f"unsupported solver status: {self.status}")
         require_non_negative("runtime_ms", self.runtime_ms)
 

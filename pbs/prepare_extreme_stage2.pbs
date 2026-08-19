@@ -1,0 +1,87 @@
+#!/bin/bash
+#PBS -N cdot-extreme-prepare
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=8gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${STAGE1_REPORT:?set the passing Stage 1 packing report}"
+: "${MPC_EVALUATION:?set the completed held-out MPC evaluation}"
+: "${MPC_CANDIDATE:?set the development MPC profile}"
+: "${MANIFEST:?set the frozen one-day extreme manifest}"
+: "${FORECAST_BUNDLE:?set the held-out-tested forecast bundle}"
+: "${ARTIFACT_POLICY:?set the deterministic campaign artifact policy}"
+: "${PIPELINE_ROOT:?set the new durable overnight pipeline root}"
+
+INPUT_ROOT="$PIPELINE_ROOT/inputs"
+WORKLIST_ROOT="$PIPELINE_ROOT/worklists"
+CAMPAIGN_ROOT="$PIPELINE_ROOT/campaigns"
+PROMOTED_PROFILE="$INPUT_ROOT/cohort-mpc-production-s20260818.json"
+FROZEN_INPUTS="$INPUT_ROOT/extreme-production-inputs-s20260818.freeze.json"
+mkdir -p "$INPUT_ROOT" "$WORKLIST_ROOT" "$CAMPAIGN_ROOT"
+
+"$PYTHON_BIN" -m experiments.promote_mpc_profile \
+  --candidate "$MPC_CANDIDATE" \
+  --evaluation "$MPC_EVALUATION" \
+  --profile-id cohort-state-mpc-extreme-production-s20260818 \
+  --output "$PROMOTED_PROFILE"
+
+"$PYTHON_BIN" -m experiments.freeze_stage1_inputs \
+  --manifest "$MANIFEST" \
+  --forecast-bundle "$FORECAST_BUNDLE" \
+  --mpc-profile "$PROMOTED_PROFILE" \
+  --artifact-policy "$ARTIFACT_POLICY" \
+  --output "$FROZEN_INPUTS"
+
+WORKER_COUNT="$($PYTHON_BIN -c '
+import json, sys
+report = json.load(open(sys.argv[1]))
+if report.get("status") != "passed": raise SystemExit("Stage 1 report did not pass")
+workers = report.get("selected_worker_count")
+if workers not in (8, 16, 32, 64): raise SystemExit("invalid selected worker rung")
+print(workers)
+' "$STAGE1_REPORT")"
+
+for node_count in 2 4 12; do
+  if [ "$node_count" -eq 12 ]; then
+    waves=4
+  else
+    waves=2
+  fi
+  seed_count=$(((node_count * WORKER_COUNT * waves + 2) / 3))
+  "$PYTHON_BIN" -m experiments.build_stage2_worklist \
+    --manifest "$MANIFEST" \
+    --seed-base $((37000 + node_count * 1000)) \
+    --seeds "$seed_count" \
+    --workers "$WORKER_COUNT" \
+    --nodes "$node_count" \
+    --forecast-bundle "$FORECAST_BUNDLE" \
+    --mpc-profile "$PROMOTED_PROFILE" \
+    --frozen-inputs "$FROZEN_INPUTS" \
+    --output "$WORKLIST_ROOT/extreme-${node_count}node.json"
+done
+
+SUBMISSION="$(
+  NODE_COUNT=2 \
+  WORKER_COUNT="$WORKER_COUNT" \
+  WORK_LIST="$WORKLIST_ROOT/extreme-2node.json" \
+  CAMPAIGN_ROOT="$CAMPAIGN_ROOT" \
+  CAMPAIGN_ID=extreme-2node-pilot-s20260818 \
+  STAGE1_REPORT="$STAGE1_REPORT" \
+  bash pbs/submit_stage2_campaign.sh
+)"
+printf '%s\n' "$SUBMISSION"
+AGGREGATE_JOB="$(printf '%s\n' "$SUBMISSION" | sed -n 's/^aggregate_job=\([^ ]*\).*/\1/p')"
+test -n "$AGGREGATE_JOB"
+
+EXPORTS="PHASE=4,PIPELINE_ROOT=$PIPELINE_ROOT,STAGE1_REPORT=$STAGE1_REPORT,WORKER_COUNT=$WORKER_COUNT"
+NEXT_JOB="$(qsub -W "depend=afterok:$AGGREGATE_JOB" -v "$EXPORTS" pbs/launch_extreme_stage2_phase.pbs)"
+echo "next_launcher=$NEXT_JOB phase=4 dependency=afterok:$AGGREGATE_JOB"
+echo "production_profile=$PROMOTED_PROFILE"
+echo "frozen_inputs=$FROZEN_INPUTS"
+

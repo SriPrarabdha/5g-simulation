@@ -1,0 +1,70 @@
+#!/bin/bash
+#PBS -N cdot-stage1-2node
+#PBS -q workq
+#PBS -l select=2:ncpus=128:mem=120gb
+#PBS -l place=scatter:excl
+#PBS -l walltime=00:30:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${WORKER_COUNT:?set workers per node}"
+: "${REPETITION:?set repetition}"
+: "${WORK_LIST:?set frozen work-list JSON}"
+: "${CAMPAIGN_ROOT:?set shared campaign storage}"
+: "${ALLOCATED_MEMORY_BYTES:?set per-node allocated memory in bytes}"
+CAMPAIGN_ID="${CAMPAIGN_ID:-stage1-demo-2node-w${WORKER_COUNT}-r${REPETITION}}"
+NODE_COUNT=2
+export WORKER_COUNT REPETITION WORK_LIST CAMPAIGN_ROOT ALLOCATED_MEMORY_BYTES CAMPAIGN_ID
+
+test -n "${PBS_NODEFILE:-}"
+mapfile -t NODEFILE_LINES < "$PBS_NODEFILE"
+declare -A SEEN_NODES=()
+NODES=()
+VNODE_INDICES=()
+for index in "${!NODEFILE_LINES[@]}"; do
+  node="${NODEFILE_LINES[$index]}"
+  if [ -z "${SEEN_NODES[$node]+present}" ]; then
+    SEEN_NODES[$node]=1
+    NODES+=("$node")
+    VNODE_INDICES+=("$index")
+  fi
+done
+if [ "${#NODES[@]}" -ne "$NODE_COUNT" ]; then
+  echo "ERROR: expected $NODE_COUNT distinct nodes, got ${#NODES[@]}" >&2
+  exit 1
+fi
+printf '[stage1-2node] node=%s\n' "${NODES[@]}"
+
+PIDS=()
+for node_index in 0 1; do
+  pbsdsh -n "${VNODE_INDICES[$node_index]}" -- /bin/bash \
+    "$PBS_O_WORKDIR/pbs/stage1_node_worker.sh" "$node_index" "$NODE_COUNT" "$PYTHON_BIN" &
+  PIDS+=("$!")
+done
+
+status=0
+for pid in "${PIDS[@]}"; do
+  if ! wait "$pid"; then
+    status=1
+  fi
+done
+if [ "$status" -ne 0 ]; then
+  echo "ERROR: at least one Stage 1 node worker failed" >&2
+  exit "$status"
+fi
+
+REPORT_DIR="$CAMPAIGN_ROOT/multinode/$CAMPAIGN_ID"
+for node_index in 0 1; do
+  if [ ! -s "$REPORT_DIR/node-${node_index}.json" ]; then
+    echo "ERROR: node $node_index did not publish its packed-run report" >&2
+    exit 1
+  fi
+done
+"$PYTHON_BIN" -m experiments.aggregate_packed_nodes \
+  --report "$REPORT_DIR/node-0.json" \
+  --report "$REPORT_DIR/node-1.json" \
+  --output "$REPORT_DIR/combined.json"

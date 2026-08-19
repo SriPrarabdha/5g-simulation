@@ -1,0 +1,10 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n0 job=3459.wlm array_index=none
+[mpc-wave] profiles=6 workers_each=12 total_workers=72 available_cpus=128
+[mpc-wave] complete profile=baseline
+[mpc-wave] complete profile=adaptive-a0
+[mpc-wave] complete profile=adaptive-a05
+[mpc-wave] complete profile=adaptive-a10
+[mpc-wave] complete profile=failure-domain
+[mpc-wave] failed profile=churn-trigger status=1

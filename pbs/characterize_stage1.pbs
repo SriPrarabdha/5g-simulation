@@ -1,10 +1,9 @@
 #!/bin/bash
 #PBS -N cdot-stage1-characterize
 #PBS -q workq
-#PBS -l select=1:ncpus=128
+#PBS -l select=1:ncpus=128:mem=120gb
 #PBS -l place=excl
 #PBS -l walltime=08:00:00
-#PBS -l mem=120gb
 #PBS -j oe
 
 set -euo pipefail

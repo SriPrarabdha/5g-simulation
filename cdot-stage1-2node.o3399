@@ -1,0 +1,28 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n0 job=3399.wlm array_index=none
+[stage1-2node] node=x8000c0s0b0n0
+[stage1-2node] node=x8000c0s0b0n1
+ERROR: no usable Python found; set PROJECT_PYTHON or CONDA_ENV_NAME
+pbsdsh: task 0x00000000 exit status 1
+ERROR: no usable Python found; set PROJECT_PYTHON or CONDA_ENV_NAME
+pbsdsh: task 0x00000000 exit status 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/abharadwaj/Projects/5g-simulation/experiments/aggregate_packed_nodes.py", line 78, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/abharadwaj/Projects/5g-simulation/experiments/aggregate_packed_nodes.py", line 71, in main
+    combined = aggregate([json.loads(path.read_text(encoding="utf-8")) for path in args.report])
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abharadwaj/Projects/5g-simulation/experiments/aggregate_packed_nodes.py", line 71, in <listcomp>
+    combined = aggregate([json.loads(path.read_text(encoding="utf-8")) for path in args.report])
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 1058, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abharadwaj/.conda/envs/penv/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/abharadwaj/5g-stage1/campaign/multinode/stage1-demo-2node-w8-r1/node-0.json'

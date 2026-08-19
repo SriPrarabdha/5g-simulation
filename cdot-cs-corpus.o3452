@@ -1,0 +1,37 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b1n0 job=3452.wlm array_index=none
+[control-science-corpus] manifest=/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/manifests/delhi-v2-28d-s46003-test.json seed=46003 campaign=control-science-v1-corpus-test-untouched
+Filesystem                                   Size  Used Avail Use% Mounted on
+tmpfs                                         63G   15G   48G  24% /
+124@kfi,60@kfi:125@kfi,61@kfi:/lustre1/home  1.5P  335T  1.1P  24% /home
+[2026-08-19T05:50:42Z] phase=simulate status=running step=2880/80640 elapsed=00:00:25 eta=00:11:26
+[2026-08-19T05:51:05Z] phase=simulate status=running step=5760/80640 elapsed=00:00:48 eta=00:10:22
+[2026-08-19T05:51:27Z] phase=simulate status=running step=8640/80640 elapsed=00:01:10 eta=00:09:46
+[2026-08-19T05:51:50Z] phase=simulate status=running step=11520/80640 elapsed=00:01:33 eta=00:09:17
+[2026-08-19T05:52:12Z] phase=simulate status=running step=14400/80640 elapsed=00:01:55 eta=00:08:51
+[2026-08-19T05:52:35Z] phase=simulate status=running step=17280/80640 elapsed=00:02:18 eta=00:08:26
+[2026-08-19T05:52:58Z] phase=simulate status=running step=20160/80640 elapsed=00:02:41 eta=00:08:02
+[2026-08-19T05:53:20Z] phase=simulate status=running step=23040/80640 elapsed=00:03:03 eta=00:07:38
+[2026-08-19T05:53:43Z] phase=simulate status=running step=25920/80640 elapsed=00:03:26 eta=00:07:15
+[2026-08-19T05:54:06Z] phase=simulate status=running step=28800/80640 elapsed=00:03:49 eta=00:06:51
+[2026-08-19T05:54:28Z] phase=simulate status=running step=31680/80640 elapsed=00:04:11 eta=00:06:28
+[2026-08-19T05:54:51Z] phase=simulate status=running step=34560/80640 elapsed=00:04:34 eta=00:06:05
+[2026-08-19T05:55:14Z] phase=simulate status=running step=37440/80640 elapsed=00:04:57 eta=00:05:42
+[2026-08-19T05:55:36Z] phase=simulate status=running step=40320/80640 elapsed=00:05:19 eta=00:05:19
+[2026-08-19T05:55:59Z] phase=simulate status=running step=43200/80640 elapsed=00:05:42 eta=00:04:57
+[2026-08-19T05:56:22Z] phase=simulate status=running step=46080/80640 elapsed=00:06:05 eta=00:04:34
+[2026-08-19T05:56:45Z] phase=simulate status=running step=48960/80640 elapsed=00:06:28 eta=00:04:11
+[2026-08-19T05:57:08Z] phase=simulate status=running step=51840/80640 elapsed=00:06:51 eta=00:03:48
+[2026-08-19T05:57:30Z] phase=simulate status=running step=54720/80640 elapsed=00:07:13 eta=00:03:25
+[2026-08-19T05:57:53Z] phase=simulate status=running step=57600/80640 elapsed=00:07:36 eta=00:03:03
+[2026-08-19T05:58:16Z] phase=simulate status=running step=60480/80640 elapsed=00:07:59 eta=00:02:40
+[2026-08-19T05:58:39Z] phase=simulate status=running step=63360/80640 elapsed=00:08:22 eta=00:02:17
+[2026-08-19T05:59:02Z] phase=simulate status=running step=66240/80640 elapsed=00:08:45 eta=00:01:54
+[2026-08-19T05:59:25Z] phase=simulate status=running step=69120/80640 elapsed=00:09:08 eta=00:01:31
+[2026-08-19T05:59:47Z] phase=simulate status=running step=72000/80640 elapsed=00:09:30 eta=00:01:08
+[2026-08-19T06:00:10Z] phase=simulate status=running step=74880/80640 elapsed=00:09:53 eta=00:00:46
+[2026-08-19T06:00:33Z] phase=simulate status=running step=77760/80640 elapsed=00:10:16 eta=00:00:23
+[2026-08-19T06:00:56Z] phase=simulate status=running step=80640/80640 elapsed=00:10:39 eta=00:00:00
+[2026-08-19T06:01:31Z] phase=complete status=published tier=silver metadata=/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/corpora/schema_major=2/campaign=control-science-v1-corpus-test-untouched/scenario=cdot-delhi-national-v2-28d-s46003/controller=static-capacity-v1/seed=046003/metadata.json
+/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/corpora/schema_major=2/campaign=control-science-v1-corpus-test-untouched/scenario=cdot-delhi-national-v2-28d-s46003/controller=static-capacity-v1/seed=046003

@@ -1,0 +1,61 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n1 job=3448[0].wlm array_index=0
+none
+{
+  "aggregate_peak_rss_bytes": 5671899136,
+  "allocated_memory_bytes": 128849018880,
+  "artifact_bytes": 5954476,
+  "campaign_id": "extreme-12node-campaign-s20260818",
+  "campaign_input_sha256": "e85a9e7f24c6d6d22d00a8571550cd106e18398d871f0abd6efab414952d772b",
+  "cpu_efficiency": 0.9257231725368138,
+  "cpu_seconds": 37778.470140705,
+  "exit_status": {
+    "stage1-worker-000": 0,
+    "stage1-worker-001": 0,
+    "stage1-worker-002": 0,
+    "stage1-worker-003": 0,
+    "stage1-worker-004": 0,
+    "stage1-worker-005": 0,
+    "stage1-worker-006": 0,
+    "stage1-worker-007": 0
+  },
+  "failures": 0,
+  "host": "x8000c0s0b0n1",
+  "major_faults": {
+    "0": 33,
+    "1": 27,
+    "2": 42,
+    "3": 25,
+    "4": 2003,
+    "5": 15,
+    "6": 553,
+    "7": 73
+  },
+  "partition_count": 12,
+  "partition_index": 0,
+  "peak_swap_bytes": 0,
+  "per_worker_peak_rss_bytes": {
+    "0": 709361664,
+    "1": 708460544,
+    "2": 731095040,
+    "3": 734322688,
+    "4": 760250368,
+    "5": 676941824,
+    "6": 672051200,
+    "7": 679415808
+  },
+  "repetition": 1,
+  "schema_version": "packed-node-run/1.0",
+  "scratch_allocation_bytes": 51156107264,
+  "scratch_peak_bytes": 192797475,
+  "scratch_write_throughput_bytes_per_second": 86545.86220728801,
+  "shared_stage_out_throughput_bytes_per_second": 3896233.880336928,
+  "stage_out_measurement": "conservative summed worker service time; at most two stage-outs execute concurrently",
+  "stage_out_seconds": 1.5282645197585225,
+  "stage_out_wall_fraction": 0.0002995886015367182,
+  "wall_seconds": 5101.210499729961,
+  "work_items": 32,
+  "work_list_sha256": "0b06991e0394328a7e8fbd001f77cd34d4a6e3acd455a6299cfc431138aca4b7",
+  "worker_count": 8
+}

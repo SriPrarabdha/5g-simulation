@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from schemas import Capacity, GroupKey, Policy, SelectionAudit, TimeWindow, UPFState
-from schemas.common import iso_utc
+from schemas.common import iso_utc, parse_utc
 from forecasting import DemandObservation, ResidualObservation
 from steering import rendezvous_select
 
@@ -25,6 +25,7 @@ from .controllers import (
     snapshot_controller,
 )
 from .model import DirectionResult, GroupUPFBucketResult, StepResult, UPFStepResult
+from .realism import TelemetryObservationV2, TrafficRealismRuntimeV2
 from .sinks import ArtifactDescriptor, BoundedMemorySink, CompositeSink, SummarySink
 
 
@@ -220,6 +221,10 @@ class _DetachedArtifactWriter:
             ("offered_ul_mbps", pa.float64()),
             ("offered_dl_mbps", pa.float64()),
         ])
+        group_generated_load = pa.struct([
+            ("group_id", pa.string()), ("ul_mbps", pa.float64()),
+            ("dl_mbps", pa.float64()),
+        ])
         schema = pa.schema([
             ("scenario_id", pa.string()),
             ("seed", pa.int64()),
@@ -230,6 +235,7 @@ class _DetachedArtifactWriter:
             ("group_arrivals", pa.list_(group_count)),
             ("group_rejections", pa.list_(group_count)),
             ("group_upf_buckets", pa.list_(group_upf_bucket)),
+            ("group_generated_load_mbps", pa.list_(group_generated_load)),
             ("unplaced_rejected_ul_bytes", pa.float64()),
             ("unplaced_rejected_dl_bytes", pa.float64()),
             ("upfs", pa.list_(upf)),
@@ -257,6 +263,10 @@ class _DetachedArtifactWriter:
                 row["group_rejections"] = [
                     {"group_id": key, "count": value}
                     for key, value in sorted(step.group_rejections.items())
+                ]
+                row["group_generated_load_mbps"] = [
+                    {"group_id": key, "ul_mbps": value["ul"], "dl_mbps": value["dl"]}
+                    for key, value in sorted(step.group_generated_load_mbps.items())
                 ]
                 rows.append(row)
                 if len(rows) == 4096:
@@ -332,6 +342,8 @@ class Simulator:
         self._active_ul_mbps: Counter[str] = Counter()
         self._active_dl_mbps: Counter[str] = Counter()
         self._active_sessions_by_group_upf: Counter[tuple[str, str]] = Counter()
+        self._active_ul_by_group_upf: Counter[tuple[str, str]] = Counter()
+        self._active_dl_by_group_upf: Counter[tuple[str, str]] = Counter()
         self._interval_admitted_by_group_upf: Counter[tuple[str, str]] = Counter()
         self._interval_rejected_by_group_upf: Counter[tuple[str, str]] = Counter()
         self._new_window_ul_mbps: Counter[str] = Counter()
@@ -345,6 +357,8 @@ class Simulator:
             lambda: deque(maxlen=required_history or 1)
         )
         self._interval_arrivals: Counter[str] = Counter()
+        self._interval_new_ul_by_group: Counter[str] = Counter()
+        self._interval_new_dl_by_group: Counter[str] = Counter()
         self._arrival_factors = {group.key.selection_id: 1.0 for group in config.groups}
         self._scheduled_forecast_multipliers = {
             group.key.selection_id: 1.0 for group in config.groups
@@ -377,6 +391,20 @@ class Simulator:
             f"lifetimes:{group.key.selection_id}": self._random_stream(f"lifetimes:{group.key.selection_id}")
             for group in config.groups
         })
+        self._realism_v2: TrafficRealismRuntimeV2 | None = None
+        self._latest_telemetry_v2: tuple[TelemetryObservationV2, ...] = ()
+        if config.traffic_model is not None:
+            for group in config.groups:
+                group_id = group.key.selection_id
+                for purpose in ("demand", "burst", "rates", "holding"):
+                    name = f"v2:{purpose}:{group_id}"
+                    self._streams[name] = self._random_stream(name)
+            for upf in config.upfs:
+                name = f"v2:telemetry:{upf.upf_id}"
+                self._streams[name] = self._random_stream(name)
+            self._realism_v2 = TrafficRealismRuntimeV2(
+                config.traffic_model, config.groups, self._streams
+            )
         self._step_index = 0
         self._policy = None
         self._policy_version = 0
@@ -401,6 +429,14 @@ class Simulator:
     @property
     def current_policy(self):
         return self._policy
+
+    @property
+    def traffic_model_version(self) -> str:
+        return "traffic-model/2.0" if self._realism_v2 is not None else "traffic-model/1.0"
+
+    @property
+    def latest_telemetry_v2(self) -> tuple[TelemetryObservationV2, ...]:
+        return self._latest_telemetry_v2
 
     @property
     def decision_due(self) -> bool:
@@ -541,21 +577,31 @@ class Simulator:
     def _close_history_window(self, window_end) -> None:
         if self._required_history_windows == 0:
             self._interval_arrivals.clear()
+            self._interval_new_ul_by_group.clear()
+            self._interval_new_dl_by_group.clear()
             return
         duration = timedelta(seconds=self.config.step_seconds * self.config.decision_interval_steps)
         window = TimeWindow(window_end - duration, window_end)
         residual = self._residual_by_upf()
         for group in self.config.groups:
             arrivals = self._interval_arrivals[group.key.selection_id]
+            if self._realism_v2 is None:
+                new_ul_mbps = arrivals * group.offered_ul_mbps_per_session
+                new_dl_mbps = arrivals * group.offered_dl_mbps_per_session
+            else:
+                new_ul_mbps = self._interval_new_ul_by_group[group.key.selection_id]
+                new_dl_mbps = self._interval_new_dl_by_group[group.key.selection_id]
             self._history_by_group[group.key.selection_id].append(DemandObservation(
                 window=window,
                 group=group.key,
                 new_session_count=float(arrivals),
-                new_ul_mbps=arrivals * group.offered_ul_mbps_per_session,
-                new_dl_mbps=arrivals * group.offered_dl_mbps_per_session,
+                new_ul_mbps=new_ul_mbps,
+                new_dl_mbps=new_dl_mbps,
                 existing_load_by_upf=residual,
             ))
         self._interval_arrivals.clear()
+        self._interval_new_ul_by_group.clear()
+        self._interval_new_dl_by_group.clear()
 
     def _control_context(
         self,
@@ -661,14 +707,25 @@ class Simulator:
             group_id = group.key.selection_id
             clone = random.Random()
             clone.setstate(self._streams[f"arrivals:{group_id}"].getstate())
+            realism_multiplier = (
+                self._realism_v2.current_arrival_multiplier(group, self._step_index)
+                if self._realism_v2 is not None else 1.0
+            )
             count = sum(
-                self._poisson(group.arrivals_per_step * self._arrival_factors[group_id], clone)
+                self._poisson(group.arrivals_per_step * self._arrival_factors[group_id]
+                              * realism_multiplier, clone)
                 for _ in range(self.config.decision_interval_steps)
+            )
+            expected_ul, expected_dl = (
+                self._realism_v2.expected_rates(group)
+                if self._realism_v2 is not None else (
+                    group.offered_ul_mbps_per_session, group.offered_dl_mbps_per_session
+                )
             )
             result[group_id] = ResidualObservation(
                 count,
-                count * group.offered_ul_mbps_per_session,
-                count * group.offered_dl_mbps_per_session,
+                count * expected_ul,
+                count * expected_dl,
             )
         return result
 
@@ -691,6 +748,8 @@ class Simulator:
         if self._events_applied_at_step != step:
             self._apply_events(step)
             self._events_applied_at_step = step
+        if self._realism_v2 is not None:
+            self._realism_v2.prepare_step(step)
         return window_start, window_end
 
     def replan(self):
@@ -752,6 +811,7 @@ class Simulator:
                 ],
                 "certificate": asdict(mpc.certificate) if mpc.certificate is not None else None,
                 "known_future_events": mpc.known_future_events,
+                "survival": mpc.survival_audit,
             }
         return details
 
@@ -774,14 +834,24 @@ class Simulator:
         admitted: Counter[str] = Counter()
         rejected_by_upf: Counter[str] = Counter()
         rejected_by_upf_group: Counter[tuple[str, str]] = Counter()
+        rejected_ul_by_upf: Counter[str] = Counter()
+        rejected_dl_by_upf: Counter[str] = Counter()
         unplaced_rejections: Counter[str] = Counter()
+        unplaced_ul_mbps = 0.0
+        unplaced_dl_mbps = 0.0
         new_cohorts: Counter[tuple[str, str, int, float, float]] = Counter()
+        generated_ul_by_group: Counter[str] = Counter()
+        generated_dl_by_group: Counter[str] = Counter()
 
         for group in self.config.groups:
             group_id = group.key.selection_id
             phase_started = time.perf_counter()
+            realism_multiplier = (
+                self._realism_v2.arrival_multiplier(group, step)
+                if self._realism_v2 is not None else 1.0
+            )
             arrival_count = self._poisson(
-                group.arrivals_per_step * self._arrival_factors[group_id],
+                group.arrivals_per_step * self._arrival_factors[group_id] * realism_multiplier,
                 self._streams[f"arrivals:{group_id}"],
             )
             self._timings["arrival_generation_seconds"] += time.perf_counter() - phase_started
@@ -801,11 +871,23 @@ class Simulator:
             )
             retained_eligible = sorted(weights)
             for _ in range(arrival_count):
+                if self._realism_v2 is None:
+                    session_ul_mbps = group.offered_ul_mbps_per_session
+                    session_dl_mbps = group.offered_dl_mbps_per_session
+                else:
+                    session_ul_mbps, session_dl_mbps = self._realism_v2.sample_rates(group)
+                    self._interval_new_ul_by_group[group_id] += session_ul_mbps
+                    self._interval_new_dl_by_group[group_id] += session_dl_mbps
+                generated_ul_by_group[group_id] += session_ul_mbps
+                generated_dl_by_group[group_id] += session_dl_mbps
                 sequence = self._session_sequence[group_id]
                 self._session_sequence[group_id] += 1
                 if not weights:
                     rejections[group_id] += 1
                     unplaced_rejections[group_id] += 1
+                    if self._realism_v2 is not None:
+                        unplaced_ul_mbps += session_ul_mbps
+                        unplaced_dl_mbps += session_dl_mbps
                     session_key = f"{self.config.scenario_id}:{self.config.seed}:{group_id}:{sequence}"
                     self._accept_audit(SelectionAudit(
                             timestamp=window_start,
@@ -852,17 +934,22 @@ class Simulator:
                     rejections[group_id] += 1
                     rejected_by_upf[selected] += 1
                     rejected_by_upf_group[(selected, group_id)] += 1
+                    if self._realism_v2 is not None:
+                        rejected_ul_by_upf[selected] += session_ul_mbps
+                        rejected_dl_by_upf[selected] += session_dl_mbps
                     self._interval_rejected_by_group_upf[(group_id, selected)] += 1
                     continue
                 phase_started = time.perf_counter()
-                lifetime = self._streams[f"lifetimes:{group_id}"].randint(
-                    group.lifetime_steps_min, group.lifetime_steps_max
+                lifetime = (
+                    self._streams[f"lifetimes:{group_id}"].randint(
+                        group.lifetime_steps_min, group.lifetime_steps_max
+                    ) if self._realism_v2 is None else self._realism_v2.sample_lifetime(group)
                 )
                 self._timings["lifetime_generation_seconds"] += time.perf_counter() - phase_started
                 admitted[selected] += 1
                 new_cohorts[(
                     group_id, selected, lifetime,
-                    group.offered_ul_mbps_per_session, group.offered_dl_mbps_per_session,
+                    session_ul_mbps, session_dl_mbps,
                 )] += 1
 
         for key, count in new_cohorts.items():
@@ -873,6 +960,9 @@ class Simulator:
             self._active_ul_mbps[upf_id] += ul_load
             self._active_dl_mbps[upf_id] += dl_load
             self._active_sessions_by_group_upf[(group_id, upf_id)] += count
+            if self._realism_v2 is not None:
+                self._active_ul_by_group_upf[(group_id, upf_id)] += ul_load
+                self._active_dl_by_group_upf[(group_id, upf_id)] += dl_load
             self._interval_admitted_by_group_upf[(group_id, upf_id)] += count
             self._new_window_ul_mbps[upf_id] += ul_load
             self._new_window_dl_mbps[upf_id] += dl_load
@@ -897,9 +987,9 @@ class Simulator:
 
         upf_results: list[UPFStepResult] = []
         for upf_id, runtime in self._upfs.items():
-            rejected_ul_mbps = 0.0
-            rejected_dl_mbps = 0.0
-            if rejected_by_upf[upf_id]:
+            rejected_ul_mbps = rejected_ul_by_upf[upf_id]
+            rejected_dl_mbps = rejected_dl_by_upf[upf_id]
+            if self._realism_v2 is None and rejected_by_upf[upf_id]:
                 for group in self.config.groups:
                     count = rejected_by_upf_group[(upf_id, group.key.selection_id)]
                     rejected_ul_mbps += count * group.offered_ul_mbps_per_session
@@ -921,14 +1011,15 @@ class Simulator:
                 establishment_failures=rejected_by_upf[upf_id], ul=ul_result, dl=dl_result,
             ))
 
-        unplaced_ul_mbps = sum(
-            unplaced_rejections[group.key.selection_id] * group.offered_ul_mbps_per_session
-            for group in self.config.groups
-        )
-        unplaced_dl_mbps = sum(
-            unplaced_rejections[group.key.selection_id] * group.offered_dl_mbps_per_session
-            for group in self.config.groups
-        )
+        if self._realism_v2 is None:
+            unplaced_ul_mbps = sum(
+                unplaced_rejections[group.key.selection_id] * group.offered_ul_mbps_per_session
+                for group in self.config.groups
+            )
+            unplaced_dl_mbps = sum(
+                unplaced_rejections[group.key.selection_id] * group.offered_dl_mbps_per_session
+                for group in self.config.groups
+            )
         group_upf_buckets: list[GroupUPFBucketResult] = []
         closes_bucket = (
             (step + 1) % self.config.decision_interval_steps == 0
@@ -944,6 +1035,12 @@ class Simulator:
             for group_id, upf_id in sorted(keys):
                 group = self._group_profiles[group_id]
                 active = self._active_sessions_by_group_upf[(group_id, upf_id)]
+                if self._realism_v2 is None:
+                    group_ul_mbps = active * group.offered_ul_mbps_per_session
+                    group_dl_mbps = active * group.offered_dl_mbps_per_session
+                else:
+                    group_ul_mbps = self._active_ul_by_group_upf[(group_id, upf_id)]
+                    group_dl_mbps = self._active_dl_by_group_upf[(group_id, upf_id)]
                 group_upf_buckets.append(GroupUPFBucketResult(
                     group_id=group_id,
                     zone=group.key.zone,
@@ -955,8 +1052,8 @@ class Simulator:
                     active_sessions=active,
                     admitted_sessions=self._interval_admitted_by_group_upf[(group_id, upf_id)],
                     establishment_failures=self._interval_rejected_by_group_upf[(group_id, upf_id)],
-                    offered_ul_mbps=active * group.offered_ul_mbps_per_session,
-                    offered_dl_mbps=active * group.offered_dl_mbps_per_session,
+                    offered_ul_mbps=group_ul_mbps,
+                    offered_dl_mbps=group_dl_mbps,
                 ))
             self._interval_admitted_by_group_upf.clear()
             self._interval_rejected_by_group_upf.clear()
@@ -969,15 +1066,27 @@ class Simulator:
             group_arrivals=arrivals, group_rejections=dict(rejections), upfs=upf_results,
             group_upf_admissions=group_upf_admissions,
             group_upf_buckets=group_upf_buckets,
+            group_generated_load_mbps={
+                group.key.selection_id: {
+                    "ul": float(generated_ul_by_group[group.key.selection_id]),
+                    "dl": float(generated_dl_by_group[group.key.selection_id]),
+                }
+                for group in self.config.groups
+            } if self._realism_v2 is not None else {},
             unplaced_rejected_ul_bytes=unplaced_ul_mbps * 1_000_000 / 8 * self.config.step_seconds,
             unplaced_rejected_dl_bytes=unplaced_dl_mbps * 1_000_000 / 8 * self.config.step_seconds,
         )
         self._timings["result_construction_seconds"] += time.perf_counter() - phase_started
+        if self._realism_v2 is not None:
+            self._latest_telemetry_v2 = self._realism_v2.observe(step_result)
         for (group_id, upf_id, ul_mbps, dl_mbps), count in self._departures_by_step.pop(step, {}).items():
             self._active_sessions[upf_id] -= count
             self._active_ul_mbps[upf_id] -= count * ul_mbps
             self._active_dl_mbps[upf_id] -= count * dl_mbps
             self._active_sessions_by_group_upf[(group_id, upf_id)] -= count
+            if self._realism_v2 is not None:
+                self._active_ul_by_group_upf[(group_id, upf_id)] -= count * ul_mbps
+                self._active_dl_by_group_upf[(group_id, upf_id)] -= count * dl_mbps
             if self._active_sessions[upf_id] == 0:
                 del self._active_sessions[upf_id]
             if abs(self._active_ul_mbps[upf_id]) < 1e-7:
@@ -986,6 +1095,11 @@ class Simulator:
                 del self._active_dl_mbps[upf_id]
             if self._active_sessions_by_group_upf[(group_id, upf_id)] == 0:
                 del self._active_sessions_by_group_upf[(group_id, upf_id)]
+            if self._realism_v2 is not None:
+                if abs(self._active_ul_by_group_upf[(group_id, upf_id)]) < 1e-7:
+                    del self._active_ul_by_group_upf[(group_id, upf_id)]
+                if abs(self._active_dl_by_group_upf[(group_id, upf_id)]) < 1e-7:
+                    del self._active_dl_by_group_upf[(group_id, upf_id)]
         for (_, upf_id, ul_mbps, dl_mbps), count in self._new_window_departures_by_step.pop(step, {}).items():
             self._new_window_ul_mbps[upf_id] -= count * ul_mbps
             self._new_window_dl_mbps[upf_id] -= count * dl_mbps
@@ -1018,6 +1132,14 @@ class Simulator:
                 key: asdict(value) for key, value in item.existing_load_by_upf.items()
             },
             "quality_flags": list(item.quality_flags),
+            "regime": item.regime,
+            "event_features": dict(item.event_features),
+            "available_at": {
+                key: iso_utc(value) for key, value in item.available_at.items()
+            },
+            "telemetry_age_seconds": item.telemetry_age_seconds,
+            "telemetry_missing": item.telemetry_missing,
+            "counter_reset": item.counter_reset,
         }
 
     @staticmethod
@@ -1033,11 +1155,23 @@ class Simulator:
                 for key, value in item["existing_load_by_upf"].items()
             },
             quality_flags=tuple(item.get("quality_flags", [])),
+            regime=str(item.get("regime", "normal")),
+            event_features={
+                str(key): float(value)
+                for key, value in item.get("event_features", {}).items()
+            },
+            available_at={
+                str(key): parse_utc(value)
+                for key, value in item.get("available_at", {}).items()
+            },
+            telemetry_age_seconds=float(item.get("telemetry_age_seconds", 0.0)),
+            telemetry_missing=bool(item.get("telemetry_missing", False)),
+            counter_reset=bool(item.get("counter_reset", False)),
         )
 
     def snapshot_state(self) -> dict[str, Any]:
         """Return the complete JSON-safe causal state at a post-step boundary."""
-        return {
+        state = {
             "codec_version": "simulator-state/1.0",
             "current_step": self._step_index,
             "policy_version": self._policy_version,
@@ -1083,6 +1217,22 @@ class Simulator:
             "rng_states": {key: stream.getstate() for key, stream in sorted(self._streams.items())},
             "controller": snapshot_controller(self.controller),
         }
+        if self._realism_v2 is not None:
+            state["traffic_model_version"] = "traffic-model/2.0"
+            state["counters"]["interval_new_ul_by_group"] = self._counter_state(
+                self._interval_new_ul_by_group
+            )
+            state["counters"]["interval_new_dl_by_group"] = self._counter_state(
+                self._interval_new_dl_by_group
+            )
+            state["counters"]["active_ul_by_group_upf"] = self._counter_state(
+                self._active_ul_by_group_upf
+            )
+            state["counters"]["active_dl_by_group_upf"] = self._counter_state(
+                self._active_dl_by_group_upf
+            )
+            state["realism_v2"] = self._realism_v2.snapshot_state()
+        return state
 
     def restore_state(self, state: dict[str, Any]) -> None:
         if state.get("codec_version") != "simulator-state/1.0":
@@ -1112,6 +1262,25 @@ class Simulator:
             setattr(self, f"_{name}", self._restore_counter(counters[name]))
         for name in ("active_sessions_by_group_upf", "interval_admitted_by_group_upf", "interval_rejected_by_group_upf"):
             setattr(self, f"_{name}", self._restore_counter(counters[name], tuple_key=True))
+        if self._realism_v2 is not None:
+            if state.get("traffic_model_version") != "traffic-model/2.0" or "realism_v2" not in state:
+                raise ValueError("traffic-model/2.0 checkpoint is missing realism state")
+            self._interval_new_ul_by_group = self._restore_counter(
+                counters["interval_new_ul_by_group"]
+            )
+            self._interval_new_dl_by_group = self._restore_counter(
+                counters["interval_new_dl_by_group"]
+            )
+            self._active_ul_by_group_upf = self._restore_counter(
+                counters["active_ul_by_group_upf"], tuple_key=True
+            )
+            self._active_dl_by_group_upf = self._restore_counter(
+                counters["active_dl_by_group_upf"], tuple_key=True
+            )
+            self._realism_v2.restore_state(state["realism_v2"])
+            self._latest_telemetry_v2 = tuple(self._realism_v2.telemetry)
+        elif state.get("traffic_model_version") is not None:
+            raise ValueError("traffic-model checkpoint does not match this v1 scenario")
         self._departures_by_step = defaultdict(Counter, {
             int(step): self._restore_counter(items, tuple_key=True)
             for step, items in state["departure_schedules"]["active"]

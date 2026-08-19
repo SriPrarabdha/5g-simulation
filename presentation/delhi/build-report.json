@@ -1,0 +1,44 @@
+{
+  "appendix_slides": 4,
+  "charts": {
+    "accounting": "charts/04_accounting_waterfall.png",
+    "controllability": "charts/11_controllability_surface.png",
+    "distribution": "charts/01_distribution_fidelity.png",
+    "fingerprint": "charts/02_traffic_fingerprint.png",
+    "forecast": "charts/06_forecast_horizon.png",
+    "forecast_control": "charts/07_forecast_vs_control.png",
+    "oracle": "charts/09_oracle_ladder.png",
+    "outcomes": "charts/08_pair_distribution.png",
+    "packing": "charts/10_packing_ladder.png",
+    "telemetry": "charts/05_telemetry_pathology.png",
+    "upf_day": "charts/03_representative_upf_day.png"
+  },
+  "created_at": "2026-08-18T07:02:52.512650Z",
+  "main_slides": 22,
+  "manifest": "/home/abharadwaj/Projects/5g-simulation/presentation/delhi_evidence_manifest.json",
+  "manifest_sha256": "3b23051f8542c688d030f1730203d4b4cb820571d01c30d8235e7d76753957d4",
+  "outputs": {
+    "CDOT_Predictive_UPF_Steering_Delhi_2026.pdf": {
+      "bytes": 2590764,
+      "path": "/home/abharadwaj/Projects/5g-simulation/presentation/delhi/CDOT_Predictive_UPF_Steering_Delhi_2026.pdf",
+      "sha256": "980479dab858ebba764c941bbe03b1285ba47513d044b7207ede6b17376c73c3"
+    },
+    "CDOT_Predictive_UPF_Steering_Delhi_2026.pptx": {
+      "bytes": 2199760,
+      "path": "/home/abharadwaj/Projects/5g-simulation/presentation/delhi/CDOT_Predictive_UPF_Steering_Delhi_2026.pptx",
+      "sha256": "f91771c149d761003c30be4a12aec6a3769f798a9ff86de87cdd6684fdfa4781"
+    },
+    "demo-reveal.gif": {
+      "bytes": 212389,
+      "path": "/home/abharadwaj/Projects/5g-simulation/presentation/delhi/demo-reveal.gif",
+      "sha256": "9bbccaa81a806fa36c5fa1f0920db4882efe1a46ea69e28d43c7a68a93d9b709"
+    },
+    "index.html": {
+      "bytes": 3150386,
+      "path": "/home/abharadwaj/Projects/5g-simulation/presentation/delhi/index.html",
+      "sha256": "8e501c9acee2e0814595246e151f0ea10331d98e18ff545ca42e18a47ddea5b6"
+    }
+  },
+  "schema_version": "delhi-presentation-build/1.0",
+  "slides": 26
+}

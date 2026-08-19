@@ -1,0 +1,25 @@
+{
+  "schema_version": "cohort-mpc-profile/1.0",
+  "profile_id": "cohort-mpc-control-science-baseline-v1",
+  "development_only": true,
+  "mpc": {
+    "horizon_windows": 12,
+    "timeout_seconds": 2.0,
+    "max_group_upf_weight": 0.75,
+    "overload_cost": 1.0,
+    "drop_cost": 10.0,
+    "terminal_exposure_cost": 1.0,
+    "static_deviation_cost": 0.0001,
+    "action_blend_fraction": 0.5,
+    "min_relative_improvement": 0.0001,
+    "guardrail_margin_fraction": 0.0,
+    "guardrail_tolerance": 1e-7,
+    "adaptive_forecast_risk_enabled": false,
+    "failure_domain_protection_enabled": false,
+    "max_policy_l1_change_per_group": 2.0,
+    "minimum_hold_epochs": 0,
+    "solve_trigger_safe_utilization": 0.0,
+    "fallback_on_stale_survival": true,
+    "retain_last_safe_on_failure": false
+  }
+}

@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -N cdot-forecast-eval
+#PBS -q workq
+#PBS -l select=1:ncpus=8:mem=120gb
+#PBS -l walltime=04:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${FORECAST_BUNDLE:?set the newly trained forecast bundle}"
+: "${TRAINING_CAMPAIGN_ROOT:?set the verified Silver training campaign root}"
+: "${MANIFEST:?set the matching training manifest}"
+: "${EVALUATION_OUTPUT:?set immutable baseline-evaluation output}"
+
+"$PYTHON_BIN" -m experiments.evaluate_forecaster_baselines \
+  --bundle "$FORECAST_BUNDLE" \
+  --campaign-root "$TRAINING_CAMPAIGN_ROOT" \
+  --manifest "$MANIFEST" \
+  --controller static-capacity-v1 \
+  --output "$EVALUATION_OUTPUT"
+

@@ -1,0 +1,40 @@
+#!/bin/bash
+#PBS -N cdot-cs-corpus
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=120gb
+#PBS -l walltime=12:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST:?set the versioned 28-day traffic-v2 manifest}"
+: "${CAMPAIGN_ID:?set the immutable corpus campaign ID}"
+: "${OUTPUT_ROOT:?set the versioned control-science output root}"
+: "${SEED:?set the corpus seed}"
+
+ARTIFACT_POLICY="${ARTIFACT_POLICY:-output/stage1/policies/silver.json}"
+SCRATCH_BASE="${PBS_JOBFS:-${TMPDIR:-/tmp}}"
+if [ ! -d "$SCRATCH_BASE" ] || [ ! -w "$SCRATCH_BASE" ]; then
+  echo "ERROR: scratch base is not writable: $SCRATCH_BASE" >&2
+  exit 1
+fi
+JOB_TOKEN="${PBS_JOBID//[^[:alnum:]_.-]/_}"
+SCRATCH_ROOT="$(mktemp -d "$SCRATCH_BASE/cdot-cs-corpus-${JOB_TOKEN}.XXXXXX")"
+mkdir -p "$OUTPUT_ROOT"
+
+echo "[control-science-corpus] manifest=$MANIFEST seed=$SEED campaign=$CAMPAIGN_ID"
+df -h "$SCRATCH_ROOT" "$OUTPUT_ROOT"
+"$PYTHON_BIN" -m experiments.run_campaign_shard \
+  --manifest "$MANIFEST" \
+  --output-root "$OUTPUT_ROOT" \
+  --campaign-id "$CAMPAIGN_ID" \
+  --seed "$SEED" \
+  --controller static \
+  --artifact-policy "$ARTIFACT_POLICY" \
+  --scratch-root "$SCRATCH_ROOT" \
+  --progress-every-simulated-hours "${PROGRESS_HOURS:-24}"
+
+find "$SCRATCH_ROOT" -depth -type d -empty -delete

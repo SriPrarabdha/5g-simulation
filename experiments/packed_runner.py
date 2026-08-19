@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import multiprocessing as mp
 import os
 import queue
 import signal
+import socket
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -23,6 +25,7 @@ class WorkItem:
     model: str | None
     optimizer_profile: str | None
     artifact_policy: dict[str, Any]
+    input_sha256: dict[str, str] | None = None
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "WorkItem":
@@ -30,6 +33,7 @@ class WorkItem:
         schema = payload.pop("schema_version", "stage1-work-item/1.0")
         if schema != "stage1-work-item/1.0":
             raise ValueError("unsupported work-item schema")
+        payload.setdefault("input_sha256", None)
         item = cls(**payload)
         ArtifactPolicy.from_dict(item.artifact_policy)
         if item.controller not in {"static", "reactive", "forecast-capacity", "predictive", "mpc", "oracle"}:
@@ -38,6 +42,83 @@ class WorkItem:
 
     def to_dict(self) -> dict[str, Any]:
         return {"schema_version": "stage1-work-item/1.0", **asdict(self)}
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def work_list_sha256(payload: dict[str, Any]) -> str:
+    canonical = dict(payload)
+    canonical.pop("work_list_sha256", None)
+    encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def verify_work_item_inputs(work: WorkItem) -> dict[str, Any]:
+    manifest = Path(work.scenario_manifest)
+    paths = {"manifest": manifest}
+    if work.model:
+        paths["model"] = Path(work.model)
+    if work.optimizer_profile:
+        paths["optimizer_profile"] = Path(work.optimizer_profile)
+    if work.input_sha256 is not None:
+        if set(work.input_sha256) != set(paths):
+            raise ValueError("work-item input hash keys do not match its input paths")
+        for name, path in paths.items():
+            if file_sha256(path) != work.input_sha256[name]:
+                raise ValueError(f"work-item {name} SHA-256 does not match frozen input")
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    if topology_identity(payload) != work.topology_id:
+        raise ValueError("work-item topology_id does not match its manifest")
+    return payload
+
+
+_CONTROLLER_DISPATCH_ORDER = {
+    # Start the expensive controllers first.  With only two worker waves,
+    # queueing short Static shards ahead of long MPC shards leaves most CPUs
+    # idle while the final MPC shard drains.  The ordering is deliberately
+    # coarse: it is scheduling metadata, not a runtime estimate.
+    "mpc": 0,
+    "oracle": 0,
+    "predictive": 1,
+    "forecast-capacity": 1,
+    "reactive": 2,
+    "static": 3,
+}
+
+
+def partition_items(items: list[WorkItem], partition_index: int, partition_count: int) -> list[WorkItem]:
+    """Return one deterministic controller-balanced, longest-first partition.
+
+    A plain strided split aliases badly with the Stage 2 work-list order
+    ``seed -> (static, reactive, mpc)``.  In particular, a 12-node split sends
+    every Static shard to one set of nodes and every MPC shard to another.
+    Distributing each controller bucket across all nodes keeps paired campaign
+    work balanced, while starting expensive buckets first minimizes the drain
+    tail inside each node's shared worker queue.
+    """
+    if partition_count < 1:
+        raise ValueError("partition_count must be positive")
+    if partition_index < 0 or partition_index >= partition_count:
+        raise ValueError("partition_index must be in [0, partition_count)")
+    partitions: list[list[WorkItem]] = [[] for _ in range(partition_count)]
+    cursor = 0
+    grouped: dict[str, list[WorkItem]] = {}
+    for item in items:
+        grouped.setdefault(item.controller, []).append(item)
+    for controller in sorted(
+        grouped,
+        key=lambda name: (_CONTROLLER_DISPATCH_ORDER.get(name, 2), name),
+    ):
+        for item in grouped[controller]:
+            partitions[cursor].append(item)
+            cursor = (cursor + 1) % partition_count
+    return partitions[partition_index]
 
 
 def _set_single_thread_environment() -> None:
@@ -58,6 +139,7 @@ def _worker(
     output_root: str,
     campaign_id: str,
     scratch_root: str,
+    skip_existing: bool,
 ) -> None:
     _set_single_thread_environment()
     if hasattr(os, "sched_setaffinity"):
@@ -74,18 +156,17 @@ def _worker(
         started = time.monotonic()
         try:
             manifest = Path(work.scenario_manifest)
-            manifest_payload = json.loads(manifest.read_text(encoding="utf-8"))
-            if topology_identity(manifest_payload) != work.topology_id:
-                raise ValueError("work-item topology_id does not match its manifest")
+            verify_work_item_inputs(work)
             profile = Path(work.optimizer_profile) if work.optimizer_profile else None
             destination = run_shard(
                 manifest, Path(output_root), campaign_id, work.seed,
+                skip_existing=skip_existing,
                 controller=work.controller,
                 forecast_bundle=Path(work.model) if work.model else None,
                 predictive_profile=profile if work.controller in {"predictive", "forecast-capacity"} else None,
                 mpc_profile=profile if work.controller == "mpc" else None,
                 artifact_policy=ArtifactPolicy.from_dict(work.artifact_policy),
-                scratch_root=Path(scratch_root) / f"worker-{worker_id:03d}",
+                scratch_root=Path(scratch_root),
                 stage_out_semaphore=stage_out_semaphore, stop_event=stop_event,
                 progress_every_simulated_hours=None,
             )
@@ -129,11 +210,33 @@ def _proc_metrics(pid: int) -> tuple[int, int, int]:
     return rss, swap, faults
 
 
+def _scratch_size_bytes(root: Path) -> int:
+    """Return a best-effort live scratch size while workers mutate *root*.
+
+    Worker checkpoint directories are intentionally short-lived.  A file may
+    therefore disappear after ``os.walk`` enumerates its name but before it is
+    measured.  Live monitoring must treat that as a zero-byte observation, not
+    abort the manager and strand its result queue.
+    """
+    total = 0
+    for directory, _subdirectories, filenames in os.walk(root):
+        for filename in filenames:
+            try:
+                total += os.stat(
+                    os.path.join(directory, filename), follow_symlinks=False,
+                ).st_size
+            except (FileNotFoundError, NotADirectoryError):
+                continue
+    return total
+
+
 def run_pool(
     items: list[WorkItem], *, worker_count: int, output_root: Path,
     campaign_id: str, scratch_root: Path, report_path: Path | None = None,
     repetition: int | None = None, allocated_memory_bytes: int | None = None,
     scratch_allocation_bytes: int | None = None,
+    partition_index: int = 0, partition_count: int = 1,
+    skip_existing: bool = False,
 ) -> dict[str, Any]:
     if worker_count not in {8, 16, 32, 64}:
         raise ValueError("Stage 1 packing uses exactly 8, 16, 32, or 64 workers")
@@ -158,6 +261,7 @@ def run_pool(
             args=(
                 index, available[index], work_queue, result_queue, stop_event,
                 stage_out_semaphore, str(output_root), campaign_id, str(scratch_root),
+                skip_existing,
             ),
             name=f"stage1-worker-{index:03d}",
         ) for index in range(worker_count)
@@ -181,9 +285,15 @@ def run_pool(
                 completed = result_queue.get(timeout=0.25)
                 results.append(completed)
                 worker_id = int(completed["worker_id"])
+                per_worker_peak[worker_id] = max(
+                    per_worker_peak[worker_id], int(completed.get("peak_rss_bytes", 0))
+                )
                 per_worker_scratch_peak[worker_id] = max(
                     per_worker_scratch_peak[worker_id], int(completed.get("scratch_bytes", 0))
                 )
+                # Summed per-worker high-water marks are conservative when
+                # individual peaks fall between /proc sampling intervals.
+                aggregate_peak_rss = max(aggregate_peak_rss, sum(per_worker_peak.values()))
                 scratch_peak = max(scratch_peak, sum(per_worker_scratch_peak.values()))
             except queue.Empty:
                 pass
@@ -199,7 +309,7 @@ def run_pool(
             aggregate_peak_rss = max(aggregate_peak_rss, current_rss)
             scratch_peak = max(
                 scratch_peak,
-                sum(path.stat().st_size for path in scratch_root.rglob("*") if path.is_file()),
+                _scratch_size_bytes(scratch_root),
             )
             if all(not process.is_alive() for process in processes) and len(results) < len(items):
                 break
@@ -217,6 +327,8 @@ def run_pool(
     total_stage_out_seconds = sum(float(item.get("stage_out_seconds", 0)) for item in results)
     report = {
         "schema_version": "packed-node-run/1.0", "campaign_id": campaign_id,
+        "host": socket.gethostname(), "partition_index": partition_index,
+        "partition_count": partition_count,
         "repetition": repetition,
         "worker_count": worker_count, "work_items": len(items), "wall_seconds": wall,
         "cpu_seconds": cpu_seconds,
@@ -231,12 +343,16 @@ def run_pool(
         "artifact_bytes": artifact_bytes,
         "stage_out_seconds": total_stage_out_seconds,
         "shared_stage_out_throughput_bytes_per_second": (
-            artifact_bytes / (total_stage_out_seconds / 2) if total_stage_out_seconds else 0.0
+            artifact_bytes / total_stage_out_seconds if total_stage_out_seconds else 0.0
         ),
         "stage_out_wall_fraction": (
-            total_stage_out_seconds / 2 / wall if wall else 0.0
+            total_stage_out_seconds / wall if wall else 0.0
         ),
-        "failures": sum(item["status"] != "complete" for item in results),
+        "stage_out_measurement": "conservative summed worker service time; at most two stage-outs execute concurrently",
+        "failures": (
+            sum(item["status"] != "complete" for item in results)
+            + max(0, len(items) - len(results))
+        ),
         "exit_status": {process.name: process.exitcode for process in processes},
         "results": results,
     }
@@ -256,14 +372,36 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--repetition", type=int)
     parser.add_argument("--allocated-memory-bytes", type=int)
     parser.add_argument("--scratch-allocation-bytes", type=int)
+    parser.add_argument("--partition-index", type=int, default=0)
+    parser.add_argument("--partition-count", type=int, default=1)
+    parser.add_argument("--skip-existing", action="store_true")
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
     payload = json.loads(args.work_list.read_text(encoding="utf-8"))
+    if isinstance(payload, dict):
+        frozen_hash = payload.get("work_list_sha256")
+        if frozen_hash is not None and frozen_hash != work_list_sha256(payload):
+            raise ValueError("frozen work-list SHA-256 does not match its content")
+        frozen_source = payload.get("source_fingerprint")
+        if frozen_source is not None:
+            from .run_campaign_shard import source_fingerprint
+            project_root = Path(__file__).resolve().parent.parent
+            if frozen_source != source_fingerprint(project_root):
+                raise ValueError("source code does not match frozen work list")
+        declared_workers = payload.get("worker_count")
+        declared_nodes = payload.get("node_count")
+        if declared_workers is not None and int(declared_workers) != args.workers:
+            raise ValueError("work-list worker_count does not match --workers")
+        if declared_nodes is not None and int(declared_nodes) != args.partition_count:
+            raise ValueError("work-list node_count does not match --partition-count")
     raw_items = payload.get("work_items", payload) if isinstance(payload, dict) else payload
-    items = [WorkItem.from_dict(item) for item in raw_items]
+    items = partition_items(
+        [WorkItem.from_dict(item) for item in raw_items],
+        args.partition_index, args.partition_count,
+    )
     scratch = args.scratch_root
     if scratch is None:
         value = os.environ.get("PBS_JOBFS") or os.environ.get("TMPDIR")
@@ -275,7 +413,13 @@ def main() -> int:
         campaign_id=args.campaign_id, scratch_root=scratch, report_path=args.report,
         repetition=args.repetition, allocated_memory_bytes=args.allocated_memory_bytes,
         scratch_allocation_bytes=args.scratch_allocation_bytes,
+        partition_index=args.partition_index, partition_count=args.partition_count,
+        skip_existing=args.skip_existing,
     )
+    if isinstance(payload, dict):
+        report["work_list_sha256"] = payload.get("work_list_sha256")
+        report["campaign_input_sha256"] = payload.get("campaign_input_sha256")
+        atomic_json(args.report, report)
     print(json.dumps({key: value for key, value in report.items() if key != "results"}, indent=2, sort_keys=True))
     return 1 if report["failures"] else 0
 

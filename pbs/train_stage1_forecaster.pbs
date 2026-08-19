@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -N cdot-stage1-train
+#PBS -q workq
+#PBS -l select=1:ncpus=8:mem=120gb
+#PBS -l walltime=04:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${TRAINING_CAMPAIGN_ROOT:?set committed Silver campaign root}"
+: "${MANIFEST:?set matching frozen manifest}"
+: "${CAMPAIGN_METADATA:?set training shard metadata.json}"
+: "${MODEL_OUTPUT:?set output bundle path}"
+: "${FREEZE_OUTPUT:?set freeze-record path}"
+
+mkdir -p "$(dirname "$MODEL_OUTPUT")" "$(dirname "$FREEZE_OUTPUT")"
+"$PYTHON_BIN" -m experiments.train_forecaster \
+  --campaign-root "$TRAINING_CAMPAIGN_ROOT" \
+  --manifest "$MANIFEST" \
+  --controller static-capacity-v1 \
+  --model-version extreme-calendar-ridge-conformal-stage1/1.0 \
+  --output "$MODEL_OUTPUT"
+
+"$PYTHON_BIN" -m experiments.freeze_forecast_bundle \
+  --bundle "$MODEL_OUTPUT" \
+  --manifest "$MANIFEST" \
+  --campaign-metadata "$CAMPAIGN_METADATA" \
+  --output "$FREEZE_OUTPUT"

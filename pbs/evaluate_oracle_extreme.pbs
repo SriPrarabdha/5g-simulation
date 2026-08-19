@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -N cdot-extreme-oracle
+#PBS -q workq
+#PBS -l select=1:ncpus=8:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=08:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST_1:?set first oracle manifest}"
+: "${MANIFEST_2:?set second oracle manifest}"
+: "${STATIC_METADATA_1:?set first verified static shard metadata}"
+: "${STATIC_METADATA_2:?set second verified static shard metadata}"
+: "${KNOWLEDGE_OVERLAY:?set evaluator-only scheduled-fault knowledge}"
+: "${ORACLE_OUTPUT:?set immutable oracle result path}"
+
+"$PYTHON_BIN" -m experiments.evaluate_oracle_bounds \
+  --manifest "$MANIFEST_1" --static-metadata "$STATIC_METADATA_1" \
+  --manifest "$MANIFEST_2" --static-metadata "$STATIC_METADATA_2" \
+  --fault-knowledge-overlay "$KNOWLEDGE_OVERLAY" \
+  --migration-fraction 0.10 \
+  --timeout-seconds 900 \
+  --output "$ORACLE_OUTPUT"
+

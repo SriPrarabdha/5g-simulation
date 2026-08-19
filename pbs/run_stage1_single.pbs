@@ -1,0 +1,49 @@
+#!/bin/bash
+#PBS -N cdot-stage1-single
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=120gb
+#PBS -l walltime=08:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST:?set the frozen scenario manifest}"
+: "${CAMPAIGN_ID:?set a unique campaign ID}"
+: "${OUTPUT_ROOT:?set shared campaign storage}"
+: "${SEED:?set the shard seed}"
+: "${CONTROLLER:?set static, reactive, predictive, or mpc}"
+: "${ARTIFACT_POLICY:?set the frozen artifact policy}"
+
+SCRATCH_BASE="${PBS_JOBFS:-${TMPDIR:-/tmp}}"
+if [ ! -d "$SCRATCH_BASE" ] || [ ! -w "$SCRATCH_BASE" ]; then
+  echo "ERROR: scratch base is not writable: $SCRATCH_BASE" >&2
+  exit 1
+fi
+JOB_TOKEN="${PBS_JOBID//[^[:alnum:]_.-]/_}"
+SCRATCH_ROOT="$(mktemp -d "$SCRATCH_BASE/cdot-stage1-single-${JOB_TOKEN}.XXXXXX")"
+mkdir -p "$OUTPUT_ROOT"
+
+ARGS=(
+  --manifest "$MANIFEST"
+  --output-root "$OUTPUT_ROOT"
+  --campaign-id "$CAMPAIGN_ID"
+  --seed "$SEED"
+  --controller "$CONTROLLER"
+  --artifact-policy "$ARTIFACT_POLICY"
+  --scratch-root "$SCRATCH_ROOT"
+  --progress-every-simulated-hours "${PROGRESS_HOURS:-24}"
+)
+if [ -n "${FORECAST_BUNDLE:-}" ]; then
+  ARGS+=(--forecast-bundle "$FORECAST_BUNDLE")
+fi
+if [ -n "${MPC_PROFILE:-}" ]; then
+  ARGS+=(--mpc-profile "$MPC_PROFILE")
+fi
+
+echo "[stage1-single] host=$(hostname) scratch=$SCRATCH_ROOT controller=$CONTROLLER"
+df -h "$SCRATCH_ROOT" "$OUTPUT_ROOT"
+"$PYTHON_BIN" -m experiments.run_campaign_shard "${ARGS[@]}"
+find "$SCRATCH_ROOT" -depth -type d -empty -delete

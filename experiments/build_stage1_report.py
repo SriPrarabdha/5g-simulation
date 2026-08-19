@@ -46,21 +46,31 @@ def build_report(runs: list[dict[str, Any]]) -> dict[str, Any]:
             "rejected_reasons": reasons, "metrics": run,
         })
     rung_rows: list[dict[str, Any]] = []
-    passing: list[int] = []
+    individually_passing: set[int] = set()
     for rung in RUNGS:
         repetitions = sorted(by_rung[rung], key=lambda row: row["repetition"] or 0)
-        complete = len(repetitions) == 3 and {row["repetition"] for row in repetitions} == {1, 2, 3}
+        observed_repetitions = {row["repetition"] for row in repetitions}
+        missing_repetitions = sorted({1, 2, 3} - observed_repetitions)
+        complete = len(repetitions) == 3 and not missing_repetitions
         passed = complete and all(row["passed"] for row in repetitions)
         reasons = [] if complete else ["requires_exactly_three_repetitions"]
         reasons.extend(sorted({reason for row in repetitions for reason in row["rejected_reasons"]}))
         rung_rows.append({
             "worker_count": rung, "passed": passed,
+            "missing_repetitions": missing_repetitions,
             "rejected_reasons": reasons, "repetitions": repetitions,
         })
         if passed:
-            passing.append(rung)
-    selected = max(passing) if passing else None
-    stage1_passed = selected is not None and 8 in passing
+            individually_passing.add(rung)
+    selected = None
+    for rung in RUNGS:
+        if rung not in individually_passing:
+            break
+        selected = rung
+    for row in rung_rows:
+        if row["passed"] and row["worker_count"] != selected:
+            row["rejected_reasons"].append("lower_density_rung_did_not_pass")
+    stage1_passed = selected is not None
     selected_runs = [row["metrics"] for row in by_rung.get(selected or -1, [])]
     throughput = (
         statistics.median(row["work_items"] / row["wall_seconds"] for row in selected_runs)
@@ -73,6 +83,7 @@ def build_report(runs: list[dict[str, Any]]) -> dict[str, Any]:
         "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "status": "passed" if stage1_passed else "failed",
         "rungs": rung_rows, "selected_worker_count": selected,
+        "selection_policy": "highest contiguous passing rung beginning at 8 workers",
         "recommended_pbs_resources": {
             "nodes": 1, "ncpus": selected, "memory_bytes": memory,
             "job_local_scratch_bytes": scratch, "stage_out_concurrency": 2,

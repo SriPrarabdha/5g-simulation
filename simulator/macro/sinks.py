@@ -84,6 +84,10 @@ def step_schema(*, controller: str, summary: dict[str, Any] | None = None):
         ("admitted_sessions", pa.int64()), ("establishment_failures", pa.int64()),
         ("offered_ul_mbps", pa.float64()), ("offered_dl_mbps", pa.float64()),
     ])
+    group_generated_load = pa.struct([
+        ("group_id", pa.string()), ("ul_mbps", pa.float64()),
+        ("dl_mbps", pa.float64()),
+    ])
     metadata = {b"schema_version": b"simulation-step/1.1", b"controller": controller.encode()}
     if summary is not None:
         metadata[b"summary"] = json.dumps(summary, sort_keys=True, separators=(",", ":")).encode()
@@ -94,6 +98,7 @@ def step_schema(*, controller: str, summary: dict[str, Any] | None = None):
         ("group_arrivals", pa.list_(group_count)),
         ("group_rejections", pa.list_(group_count)),
         ("group_upf_buckets", pa.list_(group_upf_bucket)),
+        ("group_generated_load_mbps", pa.list_(group_generated_load)),
         ("unplaced_rejected_ul_bytes", pa.float64()),
         ("unplaced_rejected_dl_bytes", pa.float64()), ("upfs", pa.list_(upf)),
     ], metadata=metadata)
@@ -123,6 +128,10 @@ def _step_row(step: StepResult) -> dict[str, Any]:
     ]
     row["group_rejections"] = [
         {"group_id": key, "count": value} for key, value in sorted(step.group_rejections.items())
+    ]
+    row["group_generated_load_mbps"] = [
+        {"group_id": key, "ul_mbps": value["ul"], "dl_mbps": value["dl"]}
+        for key, value in sorted(step.group_generated_load_mbps.items())
     ]
     # This field supports the live demo but is intentionally not part of the
     # canonical offline schema; group_upf_buckets is the compact equivalent.

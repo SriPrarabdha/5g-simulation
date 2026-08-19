@@ -13,6 +13,7 @@ from optimization import (
     OptimizationConfig,
     solve_allocation,
     solve_cohort_mpc,
+    SurvivalTable,
 )
 
 from schemas import (
@@ -677,11 +678,15 @@ class CohortMPCController:
         forecaster: Any | None = None,
         mpc_config: CohortMPCConfig | None = None,
         forecast_adjustment: ForecastAdjustmentConfig | None = None,
+        survival_by_group: dict[str, SurvivalTable] | None = None,
     ) -> None:
         self.forecaster = forecaster or MovingAverageForecaster(6)
         self.mpc_config = mpc_config or CohortMPCConfig()
         self.forecast_adjustment = forecast_adjustment or ForecastAdjustmentConfig()
+        self.survival_by_group = dict(survival_by_group) if survival_by_group is not None else None
         self._fallback = StaticCapacityController()
+        self._previous_policy: Policy | None = None
+        self._last_applied_epoch: int | None = None
         self.last_result: CohortMPCResult | None = None
         self.last_forecasts: list[Forecast] = []
         self.decision_count = 0
@@ -703,6 +708,27 @@ class CohortMPCController:
         self.decision_count += 1
         context = context or ControlContext()
         duration = timedelta(seconds=config.step_seconds * config.decision_interval_steps)
+        if (
+            self._previous_policy is not None
+            and self._last_applied_epoch is not None
+            and version - self._last_applied_epoch <= self.mpc_config.minimum_hold_epochs
+            and _policy_routes_safely(self._previous_policy, upf_states)
+        ):
+            return self._retain_previous(
+                config, created_at, version, "minimum_hold_period"
+            )
+        if self.survival_by_group is not None:
+            unusable = [
+                group_id for group_id, table in self.survival_by_group.items()
+                if (
+                    self.mpc_config.fallback_on_stale_survival and table.stale
+                ) or table.sample_count < self.mpc_config.minimum_survival_samples
+            ]
+            if unusable:
+                return self._static_fallback(
+                    config, groups, upf_states, created_at, version,
+                    "stale_or_insufficient_survival:" + ",".join(sorted(unusable)),
+                )
         demand_by_group: dict[str, list[ResidualObservation]] = {}
         forecasts: list[Forecast] = []
         try:
@@ -743,10 +769,18 @@ class CohortMPCController:
                         flags.append("scheduled_event_knowledge")
                     if anomaly_multiplier != 1.0:
                         flags.append("surprise_anomaly_adaptation")
+                    def planning_value(values: Quantiles) -> float:
+                        if not self.mpc_config.adaptive_forecast_risk_enabled:
+                            return values.p95
+                        p90 = values.p90 if values.p90 is not None else values.p95
+                        return values.p50 + self.mpc_config.forecast_risk_alpha * (
+                            p90 - values.p50
+                        )
+
                     horizon.append(ResidualObservation(
-                        predicted.new_session_count.p95 * multiplier,
-                        predicted.new_load_ul_mbps.p95 * multiplier,
-                        predicted.new_load_dl_mbps.p95 * multiplier,
+                        planning_value(predicted.new_session_count) * multiplier,
+                        planning_value(predicted.new_load_ul_mbps) * multiplier,
+                        planning_value(predicted.new_load_dl_mbps) * multiplier,
                     ))
                     if horizon_step == 1:
                         if multiplier != 1.0:
@@ -774,6 +808,24 @@ class CohortMPCController:
         current_step = round(
             (created_at - config.start_time).total_seconds() / config.step_seconds
         )
+        if (
+            self.mpc_config.solve_trigger_safe_utilization > 0
+            and not _known_future_capacity_event(config, current_step)
+            and _projected_demand_is_safe(
+                demand_by_group, upf_states,
+                self.mpc_config.solve_trigger_safe_utilization,
+            )
+        ):
+            if self._previous_policy is not None and _policy_routes_safely(
+                self._previous_policy, upf_states
+            ):
+                return self._retain_previous(
+                    config, created_at, version, "solve_trigger_safe"
+                )
+            return self._static_fallback(
+                config, groups, upf_states, created_at, version,
+                "solve_trigger_safe",
+            )
         result = solve_cohort_mpc(
             config,
             groups,
@@ -782,6 +834,14 @@ class CohortMPCController:
             demand_by_group,
             current_step=current_step,
             settings=self.mpc_config,
+            survival_by_group=self.survival_by_group,
+            previous_allocation=(
+                {
+                    item.key.selection_id: item.weights
+                    for item in self._previous_policy.groups
+                }
+                if self._previous_policy is not None else None
+            ),
         )
         self.last_result = result
         profile_by_id = {profile.upf_id: profile for profile in config.upfs}
@@ -851,6 +911,8 @@ class CohortMPCController:
         )
         policy.validate()
         self.certified_decision_count += 1
+        self._previous_policy = policy
+        self._last_applied_epoch = version
         return policy
 
     def _observed_anomaly_multiplier(
@@ -883,6 +945,12 @@ class CohortMPCController:
         version: int,
         reason: str,
     ) -> Policy:
+        if (
+            self.mpc_config.retain_last_safe_on_failure
+            and self._previous_policy is not None
+            and _policy_routes_safely(self._previous_policy, upf_states)
+        ):
+            return self._retain_previous(config, created_at, version, reason)
         policy = self._fallback.build_policy(
             config, groups, upf_states, created_at, version
         )
@@ -898,6 +966,32 @@ class CohortMPCController:
         policy.validator_version = "same-state-static-certificate/1.0"
         policy.validate()
         return policy
+
+    def _retain_previous(
+        self,
+        config: ScenarioConfig,
+        created_at: datetime,
+        version: int,
+        reason: str,
+    ) -> Policy:
+        assert self._previous_policy is not None
+        duration = timedelta(seconds=config.step_seconds * config.decision_interval_steps)
+        retained = Policy(
+            policy_id=f"{config.scenario_id}:cohort-mpc-retained:{version}",
+            policy_version=version,
+            created_at=created_at,
+            validity=TimeWindow(created_at, created_at + duration),
+            forecast_id=self._previous_policy.forecast_id,
+            upf_state_time=created_at,
+            solver=SolverReport(self.name, "skipped", 0),
+            constraint_slack=ConstraintSlack(),
+            groups=[PolicyGroup(item.key, dict(item.weights)) for item in self._previous_policy.groups],
+            fallback=Fallback(True, reason, self._previous_policy.policy_id),
+            validator_version="cohort-mpc-hold-trigger/1.0",
+        )
+        retained.validate()
+        self._previous_policy = retained
+        return retained
 
 
 def _residual_contract(context: ControlContext) -> list[ExistingLoad]:
@@ -1017,6 +1111,45 @@ def _policy_routes_safely(policy: Policy, states: list[UPFState]) -> bool:
     )
 
 
+def _known_future_capacity_event(config: ScenarioConfig, current_step: int) -> bool:
+    return any(
+        event.event_type in {"capacity_factor", "health"}
+        and event.step > current_step
+        and event.known_at_step is not None
+        and event.known_at_step <= current_step
+        for event in config.events
+    )
+
+
+def _projected_demand_is_safe(
+    demand_by_group: dict[str, list[ResidualObservation]],
+    states: list[UPFState],
+    threshold: float,
+) -> bool:
+    """Cheap solve trigger using aggregate directional/session envelopes."""
+
+    if not demand_by_group or not states:
+        return False
+    healthy = [state for state in states if state.health in {"healthy", "degraded"}]
+    if not healthy:
+        return False
+    capacities = (
+        sum(state.safe_capacity_mbps.ul for state in healthy),
+        sum(state.safe_capacity_mbps.dl for state in healthy),
+        sum(state.safe_session_capacity for state in healthy),
+    )
+    horizon = max(len(values) for values in demand_by_group.values())
+    for index in range(horizon):
+        totals = (
+            sum(values[index].ul_mbps for values in demand_by_group.values()),
+            sum(values[index].dl_mbps for values in demand_by_group.values()),
+            sum(values[index].surviving_sessions for values in demand_by_group.values()),
+        )
+        if any(capacity <= 0 or value / capacity >= threshold for value, capacity in zip(totals, capacities)):
+            return False
+    return True
+
+
 def controller_by_name(
     name: str,
     *,
@@ -1087,6 +1220,11 @@ def snapshot_controller(controller: Controller) -> dict[str, Any]:
         state.update({
             "decision_count": controller.decision_count,
             "certified_decision_count": controller.certified_decision_count,
+            "previous_policy": (
+                controller._previous_policy.to_dict()
+                if controller._previous_policy is not None else None
+            ),
+            "last_applied_epoch": controller._last_applied_epoch,
         })
     forecaster = getattr(controller, "forecaster", None)
     alpha = getattr(forecaster, "_alpha_by_group", None)
@@ -1112,6 +1250,9 @@ def restore_controller(controller: Controller, state: dict[str, Any]) -> None:
     if isinstance(controller, CohortMPCController):
         controller.decision_count = int(state.get("decision_count", 0))
         controller.certified_decision_count = int(state.get("certified_decision_count", 0))
+        previous = state.get("previous_policy")
+        controller._previous_policy = Policy.from_dict(previous) if previous is not None else None
+        controller._last_applied_epoch = state.get("last_applied_epoch")
     alpha = state.get("adaptive_conformal")
     forecaster = getattr(controller, "forecaster", None)
     if alpha is not None:

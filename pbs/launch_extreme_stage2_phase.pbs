@@ -1,0 +1,54 @@
+#!/bin/bash
+#PBS -N cdot-extreme-advance
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=8gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${PHASE:?set 4 or 12}"
+: "${PIPELINE_ROOT:?set the durable overnight pipeline root}"
+: "${STAGE1_REPORT:?set the passing Stage 1 packing report}"
+: "${WORKER_COUNT:?set the selected worker count}"
+
+case "$PHASE" in
+  4)
+    PRIOR_REPORT="$PIPELINE_ROOT/campaigns/multinode/extreme-2node-pilot-s20260818/pilot-report.json"
+    CAMPAIGN_ID=extreme-4node-pilot-s20260818
+    ;;
+  12)
+    PRIOR_REPORT="$PIPELINE_ROOT/campaigns/multinode/extreme-4node-pilot-s20260818/pilot-report.json"
+    CAMPAIGN_ID=extreme-12node-campaign-s20260818
+    ;;
+  *)
+    echo "PHASE must be 4 or 12" >&2
+    exit 2
+    ;;
+esac
+
+SUBMISSION="$(
+  NODE_COUNT="$PHASE" \
+  WORKER_COUNT="$WORKER_COUNT" \
+  WORK_LIST="$PIPELINE_ROOT/worklists/extreme-${PHASE}node.json" \
+  CAMPAIGN_ROOT="$PIPELINE_ROOT/campaigns" \
+  CAMPAIGN_ID="$CAMPAIGN_ID" \
+  STAGE1_REPORT="$STAGE1_REPORT" \
+  PRIOR_PILOT_REPORT="$PRIOR_REPORT" \
+  bash pbs/submit_stage2_campaign.sh
+)"
+printf '%s\n' "$SUBMISSION"
+AGGREGATE_JOB="$(printf '%s\n' "$SUBMISSION" | sed -n 's/^aggregate_job=\([^ ]*\).*/\1/p')"
+test -n "$AGGREGATE_JOB"
+
+if [ "$PHASE" -eq 4 ]; then
+  EXPORTS="PHASE=12,PIPELINE_ROOT=$PIPELINE_ROOT,STAGE1_REPORT=$STAGE1_REPORT,WORKER_COUNT=$WORKER_COUNT"
+  NEXT_JOB="$(qsub -W "depend=afterok:$AGGREGATE_JOB" -v "$EXPORTS" pbs/launch_extreme_stage2_phase.pbs)"
+  echo "next_launcher=$NEXT_JOB phase=12 dependency=afterok:$AGGREGATE_JOB"
+else
+  echo "final_aggregate_job=$AGGREGATE_JOB campaign_id=$CAMPAIGN_ID"
+fi
+

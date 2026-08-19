@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N cdot-stage1-report
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${CAMPAIGN_ROOT:?set Stage 1 characterization root}"
+ARGS=()
+for workers in 8 16 32 64; do
+  for repetition in 1 2 3; do
+    report="$CAMPAIGN_ROOT/characterization/rung-${workers}/repetition-${repetition}.json"
+    if [ -s "$report" ]; then
+      ARGS+=(--run "$report")
+    else
+      echo "[stage1-report] unavailable rung=$workers repetition=$repetition path=$report"
+    fi
+  done
+done
+if [ "${#ARGS[@]}" -eq 0 ]; then
+  echo "no Stage 1 packed-run reports are available" >&2
+  exit 1
+fi
+"$PYTHON_BIN" -m experiments.build_stage1_report \
+  "${ARGS[@]}" --output "$CAMPAIGN_ROOT/characterization/stage1-report.json"

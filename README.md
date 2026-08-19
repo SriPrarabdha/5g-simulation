@@ -10,6 +10,9 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
 
 ## Documentation
 
+- [`docs/delhi-presenter-guide.md`](docs/delhi-presenter-guide.md) — the
+  45-minute Delhi run of show, evidence language, live/offline fallback, and
+  rehearsal checklist. The additive deck package is in `presentation/delhi/`.
 - [`docs/README.md`](docs/README.md) — documentation map and implementation
   status language.
 - [`docs/workshop-facilitator-guide.md`](docs/workshop-facilitator-guide.md) —
@@ -116,6 +119,16 @@ Build and run the self-contained demo:
 ```bash
 npm --prefix frontend ci
 ./scripts/start-demo.sh
+```
+
+Rebuild the additive Delhi traffic-model/2.0 evidence and presentation without
+changing the frozen v1 decks or campaign results:
+
+```bash
+python scripts/build_delhi_v2_scenario.py
+python -m experiments.evaluate_traffic_realism_v2
+python scripts/build_delhi_evidence_manifest.py
+python presentation/build_delhi_deck.py
 ```
 
 Prepare and run the browser-hosted workshop on one rehearsed venue host:

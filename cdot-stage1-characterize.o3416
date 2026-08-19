@@ -1,0 +1,89 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s1b1n0 job=3416.wlm array_index=none
+[stage1] scratch_root=/var/tmp/pbs.3416.wlm/cdot-stage1-3416.wlm.xYXnsq
+[stage1] scratch_capacity_bytes=51149082624
+Filesystem                                   Size  Used Avail Use% Mounted on
+tmpfs                                         63G   15G   48G  24% /
+124@kfi,60@kfi:125@kfi,61@kfi:/lustre1/home  1.5P  335T  1.1P  24% /home
+{
+  "aggregate_peak_rss_bytes": 10087960576,
+  "allocated_memory_bytes": 128849018880,
+  "artifact_bytes": 5954235,
+  "campaign_id": "stage1-w16-r2",
+  "campaign_input_sha256": null,
+  "cpu_efficiency": 0.6702085830087874,
+  "cpu_seconds": 37524.01548123799,
+  "exit_status": {
+    "stage1-worker-000": 0,
+    "stage1-worker-001": 0,
+    "stage1-worker-002": 0,
+    "stage1-worker-003": 0,
+    "stage1-worker-004": 0,
+    "stage1-worker-005": 0,
+    "stage1-worker-006": 0,
+    "stage1-worker-007": 0,
+    "stage1-worker-008": 0,
+    "stage1-worker-009": 0,
+    "stage1-worker-010": 0,
+    "stage1-worker-011": 0,
+    "stage1-worker-012": 0,
+    "stage1-worker-013": 0,
+    "stage1-worker-014": 0,
+    "stage1-worker-015": 0
+  },
+  "failures": 0,
+  "host": "x8000c0s1b1n0",
+  "major_faults": {
+    "0": 3,
+    "1": 101,
+    "2": 0,
+    "3": 1954,
+    "4": 0,
+    "5": 9,
+    "6": 2,
+    "7": 0,
+    "8": 16,
+    "9": 5,
+    "10": 3,
+    "11": 0,
+    "12": 0,
+    "13": 1,
+    "14": 3,
+    "15": 0
+  },
+  "partition_count": 1,
+  "partition_index": 0,
+  "peak_swap_bytes": 0,
+  "per_worker_peak_rss_bytes": {
+    "0": 694509568,
+    "1": 754671616,
+    "2": 466526208,
+    "3": 675688448,
+    "4": 514203648,
+    "5": 676741120,
+    "6": 739516416,
+    "7": 703660032,
+    "8": 659525632,
+    "9": 474181632,
+    "10": 650461184,
+    "11": 473817088,
+    "12": 721887232,
+    "13": 480432128,
+    "14": 675110912,
+    "15": 727027712
+  },
+  "repetition": 2,
+  "schema_version": "packed-node-run/1.0",
+  "scratch_allocation_bytes": 51149082624,
+  "scratch_peak_bytes": 290578460,
+  "scratch_write_throughput_bytes_per_second": 121845.73878935349,
+  "shared_stage_out_throughput_bytes_per_second": 4528180.197723689,
+  "stage_out_measurement": "conservative summed worker service time; at most two stage-outs execute concurrently",
+  "stage_out_seconds": 1.314928898587823,
+  "stage_out_wall_fraction": 0.0003757707154003232,
+  "wall_seconds": 3499.2851882749237,
+  "work_items": 32,
+  "work_list_sha256": null,
+  "worker_count": 16
+}

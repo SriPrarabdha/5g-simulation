@@ -1,0 +1,42 @@
+#!/bin/bash
+#PBS -N cdot-showcase
+#PBS -q workq
+#PBS -l select=1:ncpus=2:mem=8gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${CAMPAIGN_ROOT:?set Stage 1 packing campaign root}"
+: "${PREREQUISITE_ROOT:?set Stage 1 prerequisite report root}"
+: "${MULTINODE_REPORT_1:?set first multinode validation report}"
+: "${MULTINODE_REPORT_2:?set second multinode validation report}"
+: "${SHOWCASE_OUTPUT:?set shared showcase output directory}"
+
+SCRATCH_BASE="${PBS_JOBFS:-${TMPDIR:-/tmp}}"
+JOB_TOKEN="${PBS_JOBID//[^[:alnum:]_.-]/_}"
+export MPLCONFIGDIR="$(mktemp -d "$SCRATCH_BASE/cdot-showcase-mpl-${JOB_TOKEN}.XXXXXX")"
+export XDG_CACHE_HOME="$(mktemp -d "$SCRATCH_BASE/cdot-showcase-cache-${JOB_TOKEN}.XXXXXX")"
+
+mapfile -t RUN_REPORTS < <(find "$CAMPAIGN_ROOT/characterization" -type f -name 'repetition-*.json' | sort)
+LADDER_REPORT="$CAMPAIGN_ROOT/stage1-report.json"
+if [ "${#RUN_REPORTS[@]}" -eq 12 ]; then
+  REPORT_ARGS=()
+  for report in "${RUN_REPORTS[@]}"; do REPORT_ARGS+=(--run "$report"); done
+  "$PYTHON_BIN" -m experiments.build_stage1_report \
+    "${REPORT_ARGS[@]}" --output "$LADDER_REPORT" || true
+fi
+
+PLOT_ARGS=(
+  --memory "$PREREQUISITE_ROOT/memory-regression-steady-state.json"
+  --profile "$PREREQUISITE_ROOT/sequential-profile.json"
+  --artifacts "$PREREQUISITE_ROOT/artifact-characterization.json"
+  --multinode "$MULTINODE_REPORT_1"
+  --multinode "$MULTINODE_REPORT_2"
+  --output "$SHOWCASE_OUTPUT"
+)
+if [ -s "$LADDER_REPORT" ]; then PLOT_ARGS+=(--ladder "$LADDER_REPORT"); fi
+"$PYTHON_BIN" scripts/build_cdot_showcase.py "${PLOT_ARGS[@]}"

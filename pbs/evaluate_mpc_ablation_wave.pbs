@@ -1,0 +1,75 @@
+#!/bin/bash
+#PBS -N cdot-mpc-wave
+#PBS -q workq
+#PBS -l select=1:ncpus=72:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=04:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST:?set frozen one-day extreme manifest}"
+: "${FORECAST_BUNDLE:?set frozen forecast bundle}"
+: "${EVALUATION_ROOT:?set durable control-science evaluation root}"
+
+SEED_START="${SEED_START:-46101}"
+TOTAL_SEEDS="${TOTAL_SEEDS:-12}"
+WORKERS_PER_ABLATION="${WORKERS_PER_ABLATION:-12}"
+STEPS="${STEPS:-2880}"
+
+profiles=(
+  "baseline:configs/cohort_mpc_control_science_baseline_v1.json"
+  "adaptive-a0:configs/cohort_mpc_cs_adaptive_a0_v1.json"
+  "adaptive-a05:configs/cohort_mpc_cs_adaptive_a05_v1.json"
+  "adaptive-a10:configs/cohort_mpc_cs_adaptive_a10_v1.json"
+  "failure-domain:configs/cohort_mpc_cs_failure_domain_v1.json"
+  "churn-trigger:configs/cohort_mpc_cs_churn_trigger_v1.json"
+)
+
+required_cpus=$((${#profiles[@]} * WORKERS_PER_ABLATION))
+available_cpus="$($PYTHON_BIN -c 'import os; print(len(os.sched_getaffinity(0)))')"
+if [ "$available_cpus" -lt "$required_cpus" ]; then
+  echo "ERROR: allocation exposes $available_cpus CPUs; wave needs $required_cpus" >&2
+  exit 1
+fi
+
+echo "[mpc-wave] profiles=${#profiles[@]} workers_each=$WORKERS_PER_ABLATION total_workers=$required_cpus available_cpus=$available_cpus"
+mkdir -p "$EVALUATION_ROOT"
+
+pids=()
+names=()
+for spec in "${profiles[@]}"; do
+  name="${spec%%:*}"
+  profile="${spec#*:}"
+  root="$EVALUATION_ROOT/$name"
+  mkdir -p "$root/pairs"
+  "$PYTHON_BIN" scripts/run_mpc_candidate_parallel.py \
+    --manifest "$MANIFEST" \
+    --forecast-bundle "$FORECAST_BUNDLE" \
+    --mpc-profile "$profile" \
+    --seed-start "$SEED_START" \
+    --total-seeds "$TOTAL_SEEDS" \
+    --steps "$STEPS" \
+    --workers "$WORKERS_PER_ABLATION" \
+    --work-dir "$root/pairs" \
+    --evaluation-stage development \
+    --output "$root/evaluation.json" \
+    >"$root/runner.log" 2>&1 &
+  pids+=("$!")
+  names+=("$name")
+done
+
+status=0
+for index in "${!pids[@]}"; do
+  if wait "${pids[$index]}"; then
+    echo "[mpc-wave] complete profile=${names[$index]}"
+  else
+    code=$?
+    echo "[mpc-wave] failed profile=${names[$index]} status=$code" >&2
+    status=1
+  fi
+done
+exit "$status"

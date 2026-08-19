@@ -1,0 +1,61 @@
+{
+  "schema_version": "control-science-plan/1.0",
+  "package_id": "control-science-v1",
+  "production_evidence": {
+    "path": "output/showcase/cdot-production-final",
+    "immutable": true
+  },
+  "forecast": {
+    "corpora": {
+      "train": {"seed": 46001, "days": 28},
+      "selection_calibration": {"seed": 46002, "days": 28},
+      "untouched_test": {"seed": 46003, "days": 28}
+    },
+    "families": [
+      "ridge-v2",
+      "hist-gradient-quantile",
+      "regime-ensemble",
+      "lightgbm-quantile"
+    ],
+    "horizon_minutes": [10, 20, 30, 80],
+    "quantiles": [0.5, 0.9, 0.95],
+    "promotion": {
+      "max_overall_wape": 0.087,
+      "min_peak_underprediction_reduction": 0.2,
+      "p90_coverage_range": [0.88, 0.95],
+      "max_horizon_regression": 0.05,
+      "requires_closed_loop_improvement": true
+    }
+  },
+  "survival": {
+    "regimes": ["oracle", "empirical", "uniform", "stale_empirical"],
+    "sample_sizes": [100, 1000, 10000],
+    "right_censoring": true,
+    "pooled_fallback": true,
+    "static_fallback": true
+  },
+  "mpc": {
+    "seed_splits": {
+      "development": [46101, 46112],
+      "validation": [46201, 46216],
+      "untouched_release": [46301, 46330]
+    },
+    "ablations": [
+      "baseline",
+      "empirical_survival",
+      "adaptive_risk",
+      "failure_domain_protection",
+      "churn_and_solve_trigger",
+      "best_compatible_combination"
+    ],
+    "release_seeds_may_be_used_for_tuning": false,
+    "promotion": {
+      "min_mean_pair_ul_improvement": 0.1,
+      "bootstrap_lower_bound_above_zero": true,
+      "positive_severity_weighted_ul_improvement": true,
+      "max_unknown_outage_mixed_regression": 0.02,
+      "min_worst_pair_improvement": -0.1,
+      "no_guardrail_or_solver_regression": true
+    }
+  }
+}

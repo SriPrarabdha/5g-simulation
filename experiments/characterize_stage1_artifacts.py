@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .artifacts import ArtifactPolicy, atomic_json, gold_pair_key, topology_identity
+from .packed_runner import file_sha256
 from .run_campaign_shard import run_shard
 
 
@@ -15,6 +16,17 @@ def characterize(
 ) -> dict[str, Any]:
     payload = json.loads(manifest.read_text(encoding="utf-8"))
     topology = topology_identity(payload)
+    inputs = {
+        "manifest": {"path": str(manifest.resolve()), "sha256": file_sha256(manifest)},
+        "forecast_bundle": (
+            {"path": str(forecast_bundle.resolve()), "sha256": file_sha256(forecast_bundle)}
+            if forecast_bundle else None
+        ),
+        "mpc_profile": (
+            {"path": str(mpc_profile.resolve()), "sha256": file_sha256(mpc_profile)}
+            if mpc_profile else None
+        ),
+    }
     rows: list[dict[str, Any]] = []
     tier_seeds = {"bronze": 93001, "silver": 93002, "gold": 93003}
     for tier, seed in tier_seeds.items():
@@ -36,10 +48,15 @@ def characterize(
                 progress_every_simulated_hours=None,
             )
             metadata = json.loads((destination / "metadata.json").read_text(encoding="utf-8"))
+            row_groups = {
+                artifact["kind"]: int(artifact["row_groups"])
+                for artifact in metadata["artifacts"] if artifact.get("row_groups") is not None
+            }
             rows.append({
                 "tier": tier, "controller": metadata["controller"],
                 "artifact_bytes": sum(item["bytes"] for item in metadata["artifacts"]),
                 "artifacts": metadata["artifacts"],
+                "row_group_counts": row_groups,
                 "checkpoint_count": len(metadata["checkpoint_lineage"]),
                 "checkpoint_bytes": sum(item["bytes"] for item in metadata["checkpoint_lineage"]),
                 "checkpoint_seconds": json.loads(
@@ -47,8 +64,19 @@ def characterize(
                 )["phase_timings"]["checkpointing_seconds"],
                 "stage_out_seconds": metadata["stage_out_seconds"],
                 "scratch_bytes": metadata["scratch_bytes"],
+                "source_fingerprint": metadata["source_fingerprint"],
             })
-    return {"schema_version": "stage1-artifact-characterization/1.0", "runs": rows}
+    source_fingerprints = {row.pop("source_fingerprint") for row in rows}
+    if len(source_fingerprints) != 1:
+        raise ValueError("source fingerprint changed during artifact characterization")
+    return {
+        "schema_version": "stage1-artifact-characterization/1.1",
+        "scenario_id": payload["scenario_id"],
+        "topology_id": topology,
+        "inputs": inputs,
+        "source_fingerprint": source_fingerprints.pop(),
+        "runs": rows,
+    }
 
 
 def main() -> int:

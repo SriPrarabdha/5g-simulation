@@ -75,9 +75,14 @@ class StepResult:
     unplaced_rejected_dl_bytes: float
     group_upf_buckets: list[GroupUPFBucketResult]
     upfs: list[UPFStepResult]
+    group_generated_load_mbps: dict[str, dict[str, float]]
 
     def to_dict(self) -> dict[str, Any]:
         result = asdict(self)
+        # Preserve the frozen v1 JSON contract byte-for-byte. Variable-rate
+        # traffic-v2 steps populate this extension; v1 steps leave it absent.
+        if not result["group_generated_load_mbps"]:
+            result.pop("group_generated_load_mbps")
         result["window_start"] = iso_utc(self.window_start)
         result["window_end"] = iso_utc(self.window_end)
         return result

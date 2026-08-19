@@ -10,6 +10,13 @@ from .cohort_mpc import (
     bucket_survival,
     solve_cohort_mpc,
 )
+from .survival import (
+    EmpiricalSurvivalProvider,
+    SessionLifecycle,
+    SurvivalTable,
+    kaplan_meier_table,
+    static_survival_table,
+)
 from .oracle_bounds import (
     OracleBoundResult,
     OracleMetrics,
@@ -40,4 +47,9 @@ __all__ = [
     "solve_new_session_bound",
     "static_capacity_allocation",
     "bucket_survival",
+    "EmpiricalSurvivalProvider",
+    "SessionLifecycle",
+    "SurvivalTable",
+    "kaplan_meier_table",
+    "static_survival_table",
 ]

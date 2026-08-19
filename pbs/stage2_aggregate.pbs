@@ -1,0 +1,36 @@
+#!/bin/bash
+#PBS -N cdot-stage2-aggregate
+#PBS -q workq
+#PBS -l select=1:ncpus=4:mem=16gb
+#PBS -l walltime=01:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${NODE_COUNT:?set campaign node count}"
+: "${CAMPAIGN_ROOT:?set shared campaign storage}"
+: "${CAMPAIGN_ID:?set campaign ID}"
+: "${EXPECTED_SHARDS:?set expected committed shard count}"
+
+REPORT_DIR="$CAMPAIGN_ROOT/multinode/$CAMPAIGN_ID"
+REPORT_ARGS=()
+for ((index=0; index<NODE_COUNT; index++)); do
+  report="$REPORT_DIR/node-${index}.json"
+  test -s "$report"
+  REPORT_ARGS+=(--report "$report")
+done
+"$PYTHON_BIN" -m experiments.aggregate_packed_nodes \
+  "${REPORT_ARGS[@]}" --output "$REPORT_DIR/combined.json"
+
+SHARD_ROOT="$CAMPAIGN_ROOT/shards/schema_major=2/campaign=$CAMPAIGN_ID"
+"$PYTHON_BIN" -m experiments.aggregate_campaign \
+  --root "$SHARD_ROOT" \
+  --expected-shards "$EXPECTED_SHARDS" \
+  --output "$REPORT_DIR/campaign-summary.json"
+
+"$PYTHON_BIN" -m experiments.build_stage2_pilot_report \
+  --combined "$REPORT_DIR/combined.json" \
+  --output "$REPORT_DIR/pilot-report.json"

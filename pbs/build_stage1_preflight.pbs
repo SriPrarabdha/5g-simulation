@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -N cdot-stage1-preflight
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${REPORT_ROOT:?set shared Stage 1 report directory}"
+"$PYTHON_BIN" -m experiments.build_stage1_preflight \
+  --memory "$REPORT_ROOT/memory-regression-steady-state.json" \
+  --profile "$REPORT_ROOT/sequential-profile.json" \
+  --artifacts "$REPORT_ROOT/artifact-characterization.json" \
+  --output "$REPORT_ROOT/precharacterization-gate.json"

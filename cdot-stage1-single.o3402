@@ -1,0 +1,16 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n0 job=3402.wlm array_index=none
+[stage1-single] host=x8000c0s0b0n0 scratch=/var/tmp/pbs.3402.wlm/cdot-stage1-single-3402.wlm.gv0cCM controller=static
+Filesystem                                   Size  Used Avail Use% Mounted on
+tmpfs                                         63G   15G   48G  24% /
+124@kfi,60@kfi:125@kfi,61@kfi:/lustre1/home  1.5P  335T  1.1P  24% /home
+[2026-08-17T10:32:56Z] phase=simulate status=running step=2880/20160 elapsed=00:12:46 eta=01:16:36
+[2026-08-17T10:45:13Z] phase=simulate status=running step=5760/20160 elapsed=00:25:03 eta=01:02:38
+[2026-08-17T10:57:20Z] phase=simulate status=running step=8640/20160 elapsed=00:37:10 eta=00:49:34
+[2026-08-17T11:09:41Z] phase=simulate status=running step=11520/20160 elapsed=00:49:31 eta=00:37:08
+[2026-08-17T11:22:04Z] phase=simulate status=running step=14400/20160 elapsed=01:01:54 eta=00:24:46
+[2026-08-17T11:34:17Z] phase=simulate status=running step=17280/20160 elapsed=01:14:07 eta=00:12:21
+[2026-08-17T11:45:59Z] phase=simulate status=running step=20160/20160 elapsed=01:25:50 eta=00:00:00
+[2026-08-17T11:46:11Z] phase=complete status=published tier=silver metadata=/home/abharadwaj/5g-stage1/extreme/shards/schema_major=2/campaign=stage1-forecast-training-7d-s20260817/scenario=extreme-national-training-16w-s20260817/controller=static-capacity-v1/seed=20260817/metadata.json
+/home/abharadwaj/5g-stage1/extreme/shards/schema_major=2/campaign=stage1-forecast-training-7d-s20260817/scenario=extreme-national-training-16w-s20260817/controller=static-capacity-v1/seed=20260817

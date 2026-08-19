@@ -15,6 +15,19 @@ from .bundle import (
     train_forecast_bundle,
     write_forecast_bundle,
 )
+from .candidates import (
+    CAUSAL_FEATURE_NAMES,
+    CAUSAL_LAGS,
+    CalendarRidgeV2Forecaster,
+    CausalRegimeEnsemble,
+    HistGradientBoostingQuantileForecaster,
+    causal_features,
+)
+from .evaluation import (
+    ForecastEvaluationRecord,
+    evaluate_forecast_records,
+    forecast_promotion_gates,
+)
 
 __all__ = [
     "DemandObservation",
@@ -29,4 +42,13 @@ __all__ = [
     "TrainedForecastBundle",
     "train_forecast_bundle",
     "write_forecast_bundle",
+    "CAUSAL_FEATURE_NAMES",
+    "CAUSAL_LAGS",
+    "CalendarRidgeV2Forecaster",
+    "CausalRegimeEnsemble",
+    "HistGradientBoostingQuantileForecaster",
+    "causal_features",
+    "ForecastEvaluationRecord",
+    "evaluate_forecast_records",
+    "forecast_promotion_gates",
 ]

@@ -21,9 +21,12 @@ def _sha256(path: Path) -> str:
 
 
 def _git_commit() -> str | None:
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"], check=False, capture_output=True, text=True
-    )
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"], check=False, capture_output=True, text=True
+        )
+    except OSError:
+        return None
     return result.stdout.strip() if result.returncode == 0 else None
 
 

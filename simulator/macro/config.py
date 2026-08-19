@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from statistics import NormalDist
 from typing import Any
 
 from schemas import GroupKey
@@ -19,6 +21,7 @@ class GroupProfile:
     offered_ul_mbps_per_session: float
     offered_dl_mbps_per_session: float
     eligible_upfs: tuple[str, ...]
+    realism: "GroupRealismV2 | None" = None
 
     def __post_init__(self) -> None:
         if self.arrivals_per_step < 0:
@@ -29,6 +32,227 @@ class GroupProfile:
             raise ValueError("offered demand must be non-negative")
         if not self.eligible_upfs:
             raise ValueError(f"group {self.key.selection_id} must declare eligible UPFs")
+
+
+@dataclass(frozen=True, slots=True)
+class HoldingTimeV2:
+    distribution: str
+    shape: float
+    scale_steps: float
+    min_steps: int
+    max_steps: int
+
+    def __post_init__(self) -> None:
+        if self.distribution not in {"lognormal", "pareto"}:
+            raise ValueError("v2 holding-time distribution must be lognormal or pareto")
+        if self.shape <= 0 or self.scale_steps <= 0:
+            raise ValueError("v2 holding-time shape and scale must be positive")
+        if self.min_steps < 1 or self.max_steps < self.min_steps:
+            raise ValueError("invalid bounded v2 holding-time range")
+
+
+@dataclass(frozen=True, slots=True)
+class DemandResidualV2:
+    ar1_phi: float
+    innovation_sigma: float
+    burst_enter_probability: float
+    burst_exit_probability: float
+    burst_pareto_alpha: float
+    burst_max_multiplier: float
+
+    def __post_init__(self) -> None:
+        if not -0.999 < self.ar1_phi < 0.999:
+            raise ValueError("v2 AR(1) coefficient must lie in (-0.999, 0.999)")
+        if self.innovation_sigma < 0:
+            raise ValueError("v2 innovation sigma must be non-negative")
+        if not 0 <= self.burst_enter_probability <= 1 or not 0 <= self.burst_exit_probability <= 1:
+            raise ValueError("v2 burst transition probabilities must lie in [0, 1]")
+        if self.burst_pareto_alpha <= 1 or self.burst_max_multiplier < 1:
+            raise ValueError("v2 burst tail must have alpha > 1 and a multiplier bound >= 1")
+
+
+@dataclass(frozen=True, slots=True)
+class JointRateBinV2:
+    ul_mbps: float
+    dl_mbps: float
+    probability: float
+
+    def __post_init__(self) -> None:
+        if self.ul_mbps < 0 or self.dl_mbps < 0 or self.probability <= 0:
+            raise ValueError("v2 joint rate bins require bounded non-negative rates and positive mass")
+
+
+@dataclass(frozen=True, slots=True)
+class JointRateModelV2:
+    correlation: float
+    ul_median_mbps: float
+    dl_median_mbps: float
+    ul_sigma: float
+    dl_sigma: float
+    ul_min_mbps: float
+    ul_max_mbps: float
+    dl_min_mbps: float
+    dl_max_mbps: float
+    bins: tuple[JointRateBinV2, ...]
+
+    def __post_init__(self) -> None:
+        if len(self.bins) != 16:
+            raise ValueError("traffic-model/2.0 requires exactly sixteen joint UL/DL rate bins")
+        if not -0.999 <= self.correlation <= 0.999:
+            raise ValueError("v2 UL/DL Gaussian-copula correlation is invalid")
+        if min(self.ul_median_mbps, self.dl_median_mbps) <= 0:
+            raise ValueError("v2 median rates must be positive")
+        if min(self.ul_sigma, self.dl_sigma) < 0:
+            raise ValueError("v2 lognormal sigmas must be non-negative")
+        if not 0 <= self.ul_min_mbps <= self.ul_max_mbps:
+            raise ValueError("v2 UL rate bounds are invalid")
+        if not 0 <= self.dl_min_mbps <= self.dl_max_mbps:
+            raise ValueError("v2 DL rate bounds are invalid")
+        if abs(sum(item.probability for item in self.bins) - 1.0) > 1e-12:
+            raise ValueError("v2 joint rate-bin probabilities must sum to one")
+        for item in self.bins:
+            if not self.ul_min_mbps <= item.ul_mbps <= self.ul_max_mbps:
+                raise ValueError("v2 UL rate bin falls outside its configured bounds")
+            if not self.dl_min_mbps <= item.dl_mbps <= self.dl_max_mbps:
+                raise ValueError("v2 DL rate bin falls outside its configured bounds")
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "JointRateModelV2":
+        correlation = float(data["correlation"])
+        ul = data["ul_lognormal"]
+        dl = data["dl_lognormal"]
+        explicit = data.get("bins")
+        if explicit is None:
+            normal = NormalDist()
+            bins: list[JointRateBinV2] = []
+            # A fixed copula lattice is intentionally finite: the stochastic
+            # simulator can create no more than sixteen rate cohorts per group.
+            permutation = (5, 13, 1, 9, 7, 15, 3, 11, 4, 12, 0, 8, 6, 14, 2, 10)
+            for index in range(16):
+                z_ul = normal.inv_cdf((index + 0.5) / 16)
+                z_independent = normal.inv_cdf((permutation[index] + 0.5) / 16)
+                z_dl = correlation * z_ul + math.sqrt(1 - correlation * correlation) * z_independent
+                ul_rate = float(ul["median_mbps"]) * math.exp(float(ul["sigma"]) * z_ul)
+                dl_rate = float(dl["median_mbps"]) * math.exp(float(dl["sigma"]) * z_dl)
+                bins.append(JointRateBinV2(
+                    ul_mbps=min(float(ul["max_mbps"]), max(float(ul["min_mbps"]), ul_rate)),
+                    dl_mbps=min(float(dl["max_mbps"]), max(float(dl["min_mbps"]), dl_rate)),
+                    probability=1 / 16,
+                ))
+        else:
+            bins = [JointRateBinV2(**item) for item in explicit]
+        return cls(
+            correlation=correlation,
+            ul_median_mbps=float(ul["median_mbps"]),
+            dl_median_mbps=float(dl["median_mbps"]),
+            ul_sigma=float(ul["sigma"]), dl_sigma=float(dl["sigma"]),
+            ul_min_mbps=float(ul["min_mbps"]), ul_max_mbps=float(ul["max_mbps"]),
+            dl_min_mbps=float(dl["min_mbps"]), dl_max_mbps=float(dl["max_mbps"]),
+            bins=tuple(bins),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class GroupRealismV2:
+    holding_time: HoldingTimeV2
+    demand: DemandResidualV2
+    rates: JointRateModelV2
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "GroupRealismV2":
+        return cls(
+            holding_time=HoldingTimeV2(**data["holding_time"]),
+            demand=DemandResidualV2(**data["demand"]),
+            rates=JointRateModelV2.from_dict(data["joint_rates"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MobilityPhaseV2:
+    start_step: int
+    transition_by_origin: dict[str, dict[str, float]]
+
+
+@dataclass(frozen=True, slots=True)
+class StadiumPhaseV2:
+    name: str
+    start_step: int
+    end_step: int
+    group_ids: tuple[str, ...]
+    arrival_multiplier: float
+
+
+@dataclass(frozen=True, slots=True)
+class TelemetryPathologyV2:
+    missing_scrape_probability: float = 0.0
+    reset_probability: float = 0.0
+    restart_probability: float = 0.0
+    stale_probability: float = 0.0
+
+    def __post_init__(self) -> None:
+        values = (
+            self.missing_scrape_probability, self.reset_probability,
+            self.restart_probability, self.stale_probability,
+        )
+        if any(not 0 <= value <= 1 for value in values):
+            raise ValueError("v2 telemetry pathology probabilities must lie in [0, 1]")
+
+
+@dataclass(frozen=True, slots=True)
+class TrafficModelV2:
+    schema_version: str
+    aggregate_population_by_zone: dict[str, int]
+    mobility_phases: tuple[MobilityPhaseV2, ...]
+    stadium_phases: tuple[StadiumPhaseV2, ...]
+    telemetry: TelemetryPathologyV2
+
+    def __post_init__(self) -> None:
+        if self.schema_version != "traffic-model/2.0":
+            raise ValueError("the optional realism block must use traffic-model/2.0")
+        if not self.aggregate_population_by_zone or any(
+            not zone or int(count) < 0 for zone, count in self.aggregate_population_by_zone.items()
+        ):
+            raise ValueError("v2 aggregate zone populations are invalid")
+        if sum(self.aggregate_population_by_zone.values()) != 16_000_000:
+            raise ValueError("traffic-model/2.0 zone populations must sum exactly to 16,000,000")
+        zones = set(self.aggregate_population_by_zone)
+        previous = -1
+        for phase in self.mobility_phases:
+            if phase.start_step <= previous:
+                raise ValueError("v2 mobility phases must have strictly increasing start steps")
+            previous = phase.start_step
+            if set(phase.transition_by_origin) != zones:
+                raise ValueError("each v2 transition matrix must include every origin zone")
+            for origin, row in phase.transition_by_origin.items():
+                if set(row) != zones or any(value < 0 for value in row.values()):
+                    raise ValueError(f"v2 transition row for {origin} must cover every zone")
+                if abs(sum(row.values()) - 1.0) > 1e-12:
+                    raise ValueError(f"v2 transition row for {origin} must sum to one")
+        allowed = {"ingress", "kickoff", "match", "halftime_upload", "final_whistle", "egress"}
+        for phase in self.stadium_phases:
+            if phase.name not in allowed or not 0 <= phase.start_step < phase.end_step:
+                raise ValueError("invalid correlated stadium phase")
+            if phase.arrival_multiplier < 0 or not phase.group_ids:
+                raise ValueError("stadium phases require groups and a non-negative multiplier")
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "TrafficModelV2":
+        return cls(
+            schema_version=data["schema_version"],
+            aggregate_population_by_zone={str(k): int(v) for k, v in data["aggregate_population_by_zone"].items()},
+            mobility_phases=tuple(MobilityPhaseV2(
+                start_step=int(item["start_step"]),
+                transition_by_origin={
+                    str(origin): {str(destination): float(probability) for destination, probability in row.items()}
+                    for origin, row in item["transition_by_origin"].items()
+                },
+            ) for item in data.get("mobility_phases", [])),
+            stadium_phases=tuple(StadiumPhaseV2(
+                name=item["name"], start_step=int(item["start_step"]), end_step=int(item["end_step"]),
+                group_ids=tuple(item["group_ids"]), arrival_multiplier=float(item["arrival_multiplier"]),
+            ) for item in data.get("stadium_phases", [])),
+            telemetry=TelemetryPathologyV2(**data.get("telemetry", {})),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,6 +339,7 @@ class ScenarioConfig:
     groups: tuple[GroupProfile, ...] = field(default_factory=tuple)
     upfs: tuple[UPFProfile, ...] = field(default_factory=tuple)
     events: tuple[ScenarioEvent, ...] = field(default_factory=tuple)
+    traffic_model: TrafficModelV2 | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "start_time", parse_utc(self.start_time))
@@ -146,9 +371,30 @@ class ScenarioConfig:
                 raise ValueError(f"event references unknown group: {event.group_id}")
             if event.step >= self.steps:
                 raise ValueError("event step falls outside the scenario")
+        if self.traffic_model is not None:
+            zones = set(self.traffic_model.aggregate_population_by_zone)
+            unknown_group_zones = {group.key.zone for group in self.groups} - zones
+            if unknown_group_zones:
+                raise ValueError(f"v2 groups reference zones without population cohorts: {sorted(unknown_group_zones)}")
+            for phase in self.traffic_model.mobility_phases:
+                if phase.start_step >= self.steps:
+                    raise ValueError("v2 mobility phase falls outside the scenario")
+            for phase in self.traffic_model.stadium_phases:
+                unknown = set(phase.group_ids) - group_ids
+                if unknown:
+                    raise ValueError(f"v2 stadium phase references unknown groups: {sorted(unknown)}")
+                if phase.end_step > self.steps:
+                    raise ValueError("v2 stadium phase falls outside the scenario")
+            missing_realism = [group.key.selection_id for group in self.groups if group.realism is None]
+            if missing_realism:
+                raise ValueError(f"every traffic-model/2.0 group requires a realism block: {missing_realism[:3]}")
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "ScenarioConfig":
+        traffic_model = (
+            TrafficModelV2.from_dict(data["traffic_model"])
+            if data.get("traffic_model") is not None else None
+        )
         groups = tuple(
             GroupProfile(
                 key=GroupKey.from_dict(item["key"]), arrivals_per_step=item["arrivals_per_step"],
@@ -157,6 +403,7 @@ class ScenarioConfig:
                 offered_ul_mbps_per_session=item["offered_mbps_per_session"]["ul"],
                 offered_dl_mbps_per_session=item["offered_mbps_per_session"]["dl"],
                 eligible_upfs=tuple(item["eligible_upfs"]),
+                realism=GroupRealismV2.from_dict(item["realism"]) if item.get("realism") else None,
             ) for item in data["groups"]
         )
         upfs = tuple(
@@ -179,7 +426,7 @@ class ScenarioConfig:
             decision_interval_steps=data.get("decision_interval_steps", 20),
             selection_audit_stride=data.get("selection_audit_stride", 1),
             primary_overload_metric=data.get("primary_overload_metric", "overload_area_seconds.ul"),
-            groups=groups, upfs=upfs, events=events,
+            groups=groups, upfs=upfs, events=events, traffic_model=traffic_model,
         )
 
 

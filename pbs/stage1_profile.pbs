@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -N cdot-stage1-profile
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=120gb
+#PBS -l walltime=08:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST:?set frozen one-day extreme manifest}"
+: "${OUTPUT_ROOT:?set shared output root}"
+: "${REPORT:?set shared report path}"
+: "${MPC_PROFILE:?set frozen MPC profile}"
+
+SCRATCH_BASE="${PBS_JOBFS:-${TMPDIR:-/tmp}}"
+JOB_TOKEN="${PBS_JOBID//[^[:alnum:]_.-]/_}"
+SCRATCH_ROOT="$(mktemp -d "$SCRATCH_BASE/cdot-stage1-profile-${JOB_TOKEN}.XXXXXX")"
+mkdir -p "$OUTPUT_ROOT" "$(dirname "$REPORT")"
+ARGS=(--manifest "$MANIFEST" --output-root "$OUTPUT_ROOT" --scratch-root "$SCRATCH_ROOT" --mpc-profile "$MPC_PROFILE" --report "$REPORT")
+if [ -n "${FORECAST_BUNDLE:-}" ]; then
+  ARGS+=(--forecast-bundle "$FORECAST_BUNDLE")
+fi
+"$PYTHON_BIN" -m experiments.profile_stage1 "${ARGS[@]}"
+find "$SCRATCH_ROOT" -depth -type d -empty -delete

@@ -12,6 +12,7 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass
+from datetime import timedelta
 from typing import TYPE_CHECKING, Mapping, Sequence
 
 import numpy as np
@@ -20,6 +21,7 @@ from scipy.sparse import coo_matrix, csr_matrix, eye, hstack, vstack
 
 from forecasting import ResidualObservation
 from schemas import UPFState
+from .survival import SurvivalTable
 
 if TYPE_CHECKING:
     from simulator.macro.config import GroupProfile, ScenarioConfig, ScenarioEvent
@@ -61,6 +63,18 @@ class CohortMPCConfig:
     fallback_on_unplanned_capacity_state: bool = False
     guardrail_margin_fraction: float = 0.01
     guardrail_tolerance: float = 1e-7
+    adaptive_forecast_risk_enabled: bool = False
+    forecast_risk_alpha: float = 1.0
+    failure_domain_protection_enabled: bool = False
+    max_failure_domain_share: float = 1.0
+    n_minus_one_exposure_cost: float = 0.0
+    max_policy_l1_change_per_group: float = 2.0
+    minimum_hold_epochs: int = 0
+    solve_trigger_safe_utilization: float = 0.0
+    fallback_on_stale_survival: bool = True
+    minimum_survival_samples: int = 0
+    retain_last_safe_on_failure: bool = False
+    low_confidence_survival_safety_factor: float = 1.10
 
     def __post_init__(self) -> None:
         if self.horizon_windows < 2:
@@ -80,6 +94,7 @@ class CohortMPCConfig:
             self.min_ul_overload_relative_improvement,
             self.guardrail_margin_fraction,
             self.guardrail_tolerance,
+            self.n_minus_one_exposure_cost,
         ) < 0:
             raise ValueError("MPC costs and tolerances must be non-negative")
         if self.guardrail_margin_fraction >= 1:
@@ -88,6 +103,18 @@ class CohortMPCConfig:
             raise ValueError("min_ul_overload_relative_improvement must be less than one")
         if not 0 < self.action_blend_fraction <= 1:
             raise ValueError("action_blend_fraction must be in (0, 1]")
+        if not 0 <= self.forecast_risk_alpha <= 1:
+            raise ValueError("forecast_risk_alpha must be in [0, 1]")
+        if not 0 < self.max_failure_domain_share <= 1:
+            raise ValueError("max_failure_domain_share must be in (0, 1]")
+        if not 0 <= self.max_policy_l1_change_per_group <= 2:
+            raise ValueError("max_policy_l1_change_per_group must be in [0, 2]")
+        if self.minimum_hold_epochs < 0 or self.minimum_survival_samples < 0:
+            raise ValueError("hold epochs and survival samples must be non-negative")
+        if not 0 <= self.solve_trigger_safe_utilization < 1:
+            raise ValueError("solve_trigger_safe_utilization must be in [0, 1)")
+        if self.low_confidence_survival_safety_factor < 1:
+            raise ValueError("low-confidence survival safety factor must be at least one")
 
 
 @dataclass(frozen=True, slots=True)
@@ -121,6 +148,7 @@ class CohortMPCResult:
     planned_allocation: dict[tuple[str, int], dict[str, float]]
     certificate: MPCCertificate | None
     known_future_events: int
+    survival_audit: dict[str, dict[str, object]] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -142,6 +170,8 @@ def solve_cohort_mpc(
     *,
     current_step: int,
     settings: CohortMPCConfig | None = None,
+    survival_by_group: Mapping[str, SurvivalTable] | None = None,
+    previous_allocation: Mapping[str, Mapping[str, float]] | None = None,
 ) -> CohortMPCResult:
     """Plan a causal horizon and certify its first-action plan against static."""
 
@@ -162,18 +192,42 @@ def solve_cohort_mpc(
     for cohort in active_cohorts:
         if cohort.group_id not in group_by_id or cohort.upf_id not in state_by_id:
             raise ValueError("active cohort references an unknown group or UPF")
+    if survival_by_group is not None and set(survival_by_group) != set(group_by_id):
+        raise ValueError("survival tables must exactly match controller groups")
+    survival_audit = (
+        {
+            group_id: table.audit(
+                now=scenario.start_time + timedelta(seconds=current_step * scenario.step_seconds)
+            )
+            for group_id, table in survival_by_group.items()
+        }
+        if survival_by_group is not None else {
+            group_id: {
+                "source": "configured-uniform-compatibility",
+                "age_seconds": 0.0,
+                "sample_count": 0,
+                "confidence": "oracle",
+                "upper_confidence": False,
+                "stale": False,
+            }
+            for group_id in group_by_id
+        }
+    )
 
     path, known_count = _known_capacity_path(
         scenario, states, current_step, config.horizon_windows
     )
     model = _PlanningModel(
-        scenario, groups, active_cohorts, demand_by_group, config.horizon_windows
+        scenario, groups, active_cohorts, demand_by_group, config.horizon_windows,
+        survival_by_group=survival_by_group,
+        low_confidence_safety_factor=config.low_confidence_survival_safety_factor,
     )
     static_vector = _static_plan(groups, path, model)
     if static_vector is None:
         return CohortMPCResult(
             "infeasible", "no static allocation exists across the planning horizon",
             round((time.perf_counter() - started) * 1000), {}, {}, {}, None, known_count,
+            survival_audit,
         )
 
     nx = len(model.x_keys)
@@ -205,7 +259,7 @@ def solve_cohort_mpc(
     objective[ddl] = config.drop_cost * seconds / nominal_dl.reshape(-1)
     objective[terminal] = config.terminal_exposure_cost
     objective[failure_exposure] = (
-        config.terminal_failure_exposure_cost
+        config.terminal_failure_exposure_cost + config.n_minus_one_exposure_cost
         / max(1e-9, float(np.mean(nominal_ul)))
     )
     objective[change] = config.static_deviation_cost / max(1, nx)
@@ -324,7 +378,7 @@ def solve_cohort_mpc(
         inequalities.extend(terminal_rows)
         rhs.append(np.asarray(terminal_rhs))
 
-    if config.terminal_failure_exposure_cost > 0:
+    if config.terminal_failure_exposure_cost + config.n_minus_one_exposure_cost > 0:
         failure_rows: list[csr_matrix] = []
         failure_rhs: list[float] = []
         for upf_index in range(len(states)):
@@ -337,13 +391,37 @@ def solve_cohort_mpc(
         inequalities.extend(failure_rows)
         rhs.append(np.asarray(failure_rhs))
 
+    reference_vector = static_vector
+    if previous_allocation is not None:
+        reference_vector = _allocation_vector(previous_allocation, model, static_vector)
     change_identity = eye(nx, format="csr")
     change_prefix = csr_matrix((nx, variable_count - nx - nx))
     inequalities.extend([
         hstack([change_identity, change_prefix, -change_identity], format="csr"),
         hstack([-change_identity, change_prefix, -change_identity], format="csr"),
     ])
-    rhs.extend([static_vector, -static_vector])
+    rhs.extend([reference_vector, -reference_vector])
+
+    if config.max_policy_l1_change_per_group < 2:
+        for group in groups:
+            row = np.zeros(variable_count)
+            for column in model.columns_by_group_window[(group.key.selection_id, 0)]:
+                row[change.start + column] = 1.0
+            inequalities.append(csr_matrix(row[None, :]))
+            rhs.append(np.asarray([config.max_policy_l1_change_per_group]))
+
+    if config.failure_domain_protection_enabled and config.max_failure_domain_share < 1:
+        domain_by_upf = {upf.upf_id: upf.zone for upf in scenario.upfs}
+        for group in groups:
+            domains = sorted({domain_by_upf[upf_id] for upf_id in group.eligible_upfs})
+            for window in range(config.horizon_windows):
+                for domain in domains:
+                    row = np.zeros(variable_count)
+                    for column in model.columns_by_group_window[(group.key.selection_id, window)]:
+                        if domain_by_upf[model.x_keys[column][2]] == domain:
+                            row[column] = 1.0
+                    inequalities.append(csr_matrix(row[None, :]))
+                    rhs.append(np.asarray([config.max_failure_domain_share]))
 
     lower = np.zeros(variable_count)
     upper = np.full(variable_count, np.inf)
@@ -378,11 +456,15 @@ def solve_cohort_mpc(
         return CohortMPCResult(
             "error", f"HiGHS error: {error}",
             round((time.perf_counter() - started) * 1000), {}, {}, {}, None, known_count,
+            survival_audit,
         )
     runtime_ms = round((time.perf_counter() - started) * 1000)
     if not solution.success or solution.x is None:
         status = "timeout" if solution.status == 1 else "infeasible" if solution.status == 2 else "error"
-        return CohortMPCResult(status, solution.message, runtime_ms, {}, {}, {}, None, known_count)
+        return CohortMPCResult(
+            status, solution.message, runtime_ms, {}, {}, {}, None, known_count,
+            survival_audit,
+        )
 
     candidate = np.asarray(solution.x[:nx])
     if config.action_blend_fraction < 1:
@@ -404,7 +486,7 @@ def solve_cohort_mpc(
     }
     return CohortMPCResult(
         "optimal", solution.message, runtime_ms, first, static_first, planned,
-        certificate, known_count,
+        certificate, known_count, survival_audit,
     )
 
 
@@ -416,6 +498,9 @@ class _PlanningModel:
         cohorts: Sequence[ActiveCohort],
         demands: Mapping[str, Sequence[ResidualObservation]],
         horizon: int,
+        *,
+        survival_by_group: Mapping[str, SurvivalTable] | None = None,
+        low_confidence_safety_factor: float = 1.0,
     ) -> None:
         self.horizon = horizon
         self.upf_index = {upf.upf_id: index for index, upf in enumerate(scenario.upfs)}
@@ -437,11 +522,15 @@ class _PlanningModel:
         dl_data: list[float] = []
         group_by_id = {group.key.selection_id: group for group in groups}
         survival = {
-            group_id: bucket_survival(
-                group.lifetime_steps_min,
-                group.lifetime_steps_max,
-                scenario.decision_interval_steps,
-                horizon,
+            group_id: (
+                survival_by_group[group_id].values(horizon)
+                if survival_by_group is not None
+                else bucket_survival(
+                    group.lifetime_steps_min,
+                    group.lifetime_steps_max,
+                    scenario.decision_interval_steps,
+                    horizon,
+                )
             )
             for group_id, group in group_by_id.items()
         }
@@ -449,6 +538,11 @@ class _PlanningModel:
             upf = self.upf_index[upf_id]
             for target in range(source, horizon):
                 fraction = survival[group_id][target - source]
+                if (
+                    survival_by_group is not None
+                    and survival_by_group[group_id].confidence == "low"
+                ):
+                    fraction = min(1.0, fraction * low_confidence_safety_factor)
                 if fraction <= 0:
                     continue
                 demand = demands[group_id][source]
@@ -619,6 +713,27 @@ def _allocation_dict(
             upf_id: value / total for upf_id, value in weights.items()
         } if total > 0 else {}
     return result
+
+
+def _allocation_vector(
+    allocation: Mapping[str, Mapping[str, float]],
+    model: _PlanningModel,
+    fallback: np.ndarray,
+) -> np.ndarray:
+    """Expand a first-epoch policy across the horizon for churn accounting."""
+
+    vector = fallback.copy()
+    for (group_id, _window), columns in model.columns_by_group_window.items():
+        weights = allocation.get(group_id)
+        if not weights:
+            continue
+        eligible = {model.x_keys[column][2] for column in columns}
+        total = sum(float(value) for upf_id, value in weights.items() if upf_id in eligible)
+        if total <= 0:
+            continue
+        for column in columns:
+            vector[column] = float(weights.get(model.x_keys[column][2], 0.0)) / total
+    return vector
 
 
 def _metrics(

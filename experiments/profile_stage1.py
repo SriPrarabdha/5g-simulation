@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .artifacts import ArtifactPolicy, atomic_json
+from .artifacts import ArtifactPolicy, atomic_json, topology_identity
+from .packed_runner import file_sha256
 from .run_campaign_shard import run_shard
 
 
@@ -13,6 +14,18 @@ def profile(
     manifest: Path, output_root: Path, scratch_root: Path, *,
     forecast_bundle: Path | None, mpc_profile: Path | None,
 ) -> dict[str, Any]:
+    manifest_payload = json.loads(manifest.read_text(encoding="utf-8"))
+    inputs = {
+        "manifest": {"path": str(manifest.resolve()), "sha256": file_sha256(manifest)},
+        "forecast_bundle": (
+            {"path": str(forecast_bundle.resolve()), "sha256": file_sha256(forecast_bundle)}
+            if forecast_bundle else None
+        ),
+        "mpc_profile": (
+            {"path": str(mpc_profile.resolve()), "sha256": file_sha256(mpc_profile)}
+            if mpc_profile else None
+        ),
+    }
     rows = []
     for index, controller in enumerate(("static", "reactive", "mpc")):
         destination = run_shard(
@@ -36,8 +49,19 @@ def profile(
                 "stage_out_seconds": metadata["stage_out_seconds"],
             },
             "checkpoint_lineage": metadata["checkpoint_lineage"],
+            "source_fingerprint": metadata["source_fingerprint"],
         })
-    return {"schema_version": "stage1-sequential-profile/1.0", "runs": rows}
+    source_fingerprints = {row.pop("source_fingerprint") for row in rows}
+    if len(source_fingerprints) != 1:
+        raise ValueError("source fingerprint changed during sequential profiling")
+    return {
+        "schema_version": "stage1-sequential-profile/1.1",
+        "scenario_id": manifest_payload["scenario_id"],
+        "topology_id": topology_identity(manifest_payload),
+        "inputs": inputs,
+        "source_fingerprint": source_fingerprints.pop(),
+        "runs": rows,
+    }
 
 
 def main() -> int:

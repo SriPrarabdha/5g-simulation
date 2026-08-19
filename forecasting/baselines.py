@@ -5,7 +5,7 @@ import math
 import statistics
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Iterable, Protocol
+from typing import Iterable, Mapping, Protocol
 
 from schemas import ExistingLoad, Forecast, GroupKey, Quantiles, TimeWindow
 from schemas.common import iso_utc, parse_utc
@@ -35,10 +35,45 @@ class DemandObservation:
     new_dl_mbps: float
     existing_load_by_upf: dict[str, ResidualObservation] = field(default_factory=dict)
     quality_flags: tuple[str, ...] = ()
+    regime: str = "normal"
+    event_features: Mapping[str, float] = field(default_factory=dict)
+    available_at: Mapping[str, datetime] = field(default_factory=dict)
+    telemetry_age_seconds: float = 0.0
+    telemetry_missing: bool = False
+    counter_reset: bool = False
 
     def __post_init__(self) -> None:
         if min(self.new_session_count, self.new_ul_mbps, self.new_dl_mbps) < 0:
             raise ValueError("demand observations must be non-negative")
+        if self.telemetry_age_seconds < 0:
+            raise ValueError("telemetry age must be non-negative")
+        if self.regime not in {
+            "normal", "scheduled_event", "unknown_surge", "detected_surge",
+            "outage", "recovery",
+        }:
+            raise ValueError("unsupported causal demand regime")
+        unknown_availability = set(self.available_at) - set(self.event_features)
+        if unknown_availability:
+            raise ValueError("available_at names must correspond to event features")
+        for name, available in self.available_at.items():
+            if parse_utc(available) > self.window.end:
+                raise ForecastingError(
+                    f"event feature {name!r} was unavailable at observation time"
+                )
+
+    @property
+    def actual_generated_ul_mbps(self) -> float:
+        return self.new_ul_mbps
+
+    @property
+    def actual_generated_dl_mbps(self) -> float:
+        return self.new_dl_mbps
+
+    def assert_causal_at(self, origin: datetime) -> None:
+        origin = parse_utc(origin)
+        leaked = [name for name, available in self.available_at.items() if parse_utc(available) > origin]
+        if leaked:
+            raise ForecastingError(f"future event features are unavailable at origin: {sorted(leaked)}")
 
 
 class Forecaster(Protocol):

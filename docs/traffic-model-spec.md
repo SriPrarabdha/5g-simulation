@@ -105,3 +105,48 @@ retrying the same shard either verifies the identical artifact or fails loudly.
 - Bounded migration and replica scale-out are simulation-only actions.
 - Oracle policies are evaluator upper bounds and are never deployable.
 - No autonomous C-DOT SMF/EMS claim is made without a supported operator interface.
+# Optional traffic-model/2.0 realism layer
+
+The Delhi showcase adds an opt-in `traffic_model` block. Scenarios without
+this block execute the original v1 path with the same random-stream identities
+and output bytes. The v2 block does not revise or replace any frozen v1
+campaign.
+
+`configs/delhi_traffic_v2.json` is the reference 24-UPF, eight-zone,
+96-group configuration. It models exactly 16,000,000 aggregate UE cohorts;
+these are population masses, not persistent subscriber identities. Scheduled
+integer mobility transitions conserve the total exactly and change only the
+origins of future sessions. Established sessions remain anchored.
+
+Each v2 group declares:
+
+- bounded lognormal or Pareto holding times;
+- an AR(1) residual and two-state bounded heavy-tailed burst process; and
+- exactly sixteen deterministic joint UL/DL rate bins generated from a
+  Gaussian-copula lattice.
+
+The finite rate lattice bounds cohort cardinality. The simulator carries the
+actual sampled directional rates in admission and departure state and records
+actual group/UPF load; it does not reconstruct variable-rate load from session
+count multiplied by a group constant. Mobility populations, AR residuals,
+burst state/dwell, telemetry epochs, last observations, and every v2 random
+stream participate in exact checkpoint/resume.
+
+The observed telemetry channel is separate from ground truth and can inject
+missing scrapes, resets, restarts, and stale samples. These observations are
+explicitly synthetic. The defensible claim remains:
+
+> Standards-grounded and statistically verified synthetic modeling at
+> national scale, but not yet calibrated to C-DOT production traffic.
+
+Generate and evaluate the reference scenario with:
+
+```bash
+python scripts/build_delhi_v2_scenario.py
+python -m experiments.evaluate_traffic_realism_v2
+```
+
+The evaluator checks rate means, holding-time quantiles, the fitted AR
+coefficient, exact population conservation, eligibility/health placement, and
+directional accounting residuals. Its output is one source in the Delhi
+presentation evidence manifest.

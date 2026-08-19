@@ -1,0 +1,13 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n1 job=3437.wlm array_index=none
+{"output": "/home/abharadwaj/5g-stage1/overnight-20260817/production/inputs/cohort-mpc-production-s20260818.json", "profile_id": "cohort-state-mpc-extreme-production-s20260818"}
+{"output": "/home/abharadwaj/5g-stage1/overnight-20260817/production/inputs/extreme-production-inputs-s20260818.freeze.json", "record_sha256": "5d0a986915a28ac875dee89905744a05de70aec3dadb67e0d4beb3dec2c7d5d9", "status": "frozen-production"}
+/home/abharadwaj/5g-stage1/overnight-20260817/production/worklists/extreme-2node.json
+/home/abharadwaj/5g-stage1/overnight-20260817/production/worklists/extreme-4node.json
+/home/abharadwaj/5g-stage1/overnight-20260817/production/worklists/extreme-12node.json
+array_job=3438[].wlm nodes=2 workers_per_node=8 expected_shards=33
+aggregate_job=3439.wlm dependency=afterok:3438[].wlm
+next_launcher=3440.wlm phase=4 dependency=afterok:3439.wlm
+production_profile=/home/abharadwaj/5g-stage1/overnight-20260817/production/inputs/cohort-mpc-production-s20260818.json
+frozen_inputs=/home/abharadwaj/5g-stage1/overnight-20260817/production/inputs/extreme-production-inputs-s20260818.freeze.json

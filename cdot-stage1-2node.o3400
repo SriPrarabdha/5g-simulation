@@ -1,0 +1,153 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n0 job=3400.wlm array_index=none
+[stage1-2node] node=x8000c0s0b0n0
+[stage1-2node] node=x8000c0s0b0n1
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n0 job=3400.wlm array_index=none
+[stage1-node] index=0/2 host=x8000c0s0b0n0 scratch=/var/tmp/pbs.3400.wlm/cdot-stage1-3400.wlm-node-0.c20WVp capacity=51143307264
+Filesystem                                   Size  Used Avail Use% Mounted on
+tmpfs                                         63G   15G   48G  24% /
+124@kfi,60@kfi:125@kfi,61@kfi:/lustre1/home  1.5P  335T  1.1P  24% /home
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n1 job=3400.wlm array_index=none
+[stage1-node] index=1/2 host=x8000c0s0b0n1 scratch=/var/tmp/pbs.3400.wlm/cdot-stage1-3400.wlm-node-1.ID8yle capacity=51146592256
+Filesystem                                   Size  Used Avail Use% Mounted on
+tmpfs                                         63G   15G   48G  24% /
+124@kfi,60@kfi:125@kfi,61@kfi:/lustre1/home  1.5P  335T  1.1P  24% /home
+{
+  "aggregate_peak_rss_bytes": 374009856,
+  "allocated_memory_bytes": 128849018880,
+  "artifact_bytes": 23389,
+  "campaign_id": "stage1-demo-2node-w8-r1",
+  "cpu_efficiency": 0.051174443724331775,
+  "cpu_seconds": 0.7777594130000001,
+  "exit_status": {
+    "stage1-worker-000": 0,
+    "stage1-worker-001": 0,
+    "stage1-worker-002": 0,
+    "stage1-worker-003": 0,
+    "stage1-worker-004": 0,
+    "stage1-worker-005": 0,
+    "stage1-worker-006": 0,
+    "stage1-worker-007": 0
+  },
+  "failures": 0,
+  "host": "x8000c0s0b0n0",
+  "major_faults": {
+    "0": 71,
+    "1": 4,
+    "2": 4,
+    "3": 0,
+    "4": 87,
+    "5": 5,
+    "6": 93,
+    "7": 0
+  },
+  "partition_count": 2,
+  "partition_index": 0,
+  "peak_swap_bytes": 0,
+  "per_worker_peak_rss_bytes": {
+    "0": 45330432,
+    "1": 44605440,
+    "2": 43069440,
+    "3": 46706688,
+    "4": 51912704,
+    "5": 49762304,
+    "6": 46690304,
+    "7": 45932544
+  },
+  "repetition": 1,
+  "schema_version": "packed-node-run/1.0",
+  "scratch_allocation_bytes": 51143307264,
+  "scratch_peak_bytes": 0,
+  "scratch_write_throughput_bytes_per_second": 0.0,
+  "shared_stage_out_throughput_bytes_per_second": 116045.07375957424,
+  "stage_out_seconds": 0.40310198860242963,
+  "stage_out_wall_fraction": 0.10609203661750481,
+  "wall_seconds": 1.8997749569825828,
+  "work_items": 8,
+  "worker_count": 8
+}
+{
+  "aggregate_peak_rss_bytes": 362446848,
+  "allocated_memory_bytes": 128849018880,
+  "artifact_bytes": 23399,
+  "campaign_id": "stage1-demo-2node-w8-r1",
+  "cpu_efficiency": 0.04416757091693955,
+  "cpu_seconds": 0.6527386400000001,
+  "exit_status": {
+    "stage1-worker-000": 0,
+    "stage1-worker-001": 0,
+    "stage1-worker-002": 0,
+    "stage1-worker-003": 0,
+    "stage1-worker-004": 0,
+    "stage1-worker-005": 0,
+    "stage1-worker-006": 0,
+    "stage1-worker-007": 0
+  },
+  "failures": 0,
+  "host": "x8000c0s0b0n1",
+  "major_faults": {
+    "0": 0,
+    "1": 0,
+    "2": 92,
+    "3": 3,
+    "4": 3,
+    "5": 19,
+    "6": 88,
+    "7": 1
+  },
+  "partition_count": 2,
+  "partition_index": 1,
+  "peak_swap_bytes": 0,
+  "per_worker_peak_rss_bytes": {
+    "0": 49319936,
+    "1": 43577344,
+    "2": 52367360,
+    "3": 43098112,
+    "4": 40169472,
+    "5": 40923136,
+    "6": 49061888,
+    "7": 48123904
+  },
+  "repetition": 1,
+  "schema_version": "packed-node-run/1.0",
+  "scratch_allocation_bytes": 51146592256,
+  "scratch_peak_bytes": 0,
+  "scratch_write_throughput_bytes_per_second": 0.0,
+  "shared_stage_out_throughput_bytes_per_second": 125215.25068581424,
+  "stage_out_seconds": 0.3737404169514775,
+  "stage_out_wall_fraction": 0.1011566060819132,
+  "wall_seconds": 1.8473356878384948,
+  "work_items": 8,
+  "worker_count": 8
+}
+{
+  "aggregate_peak_rss_bytes": 736456704,
+  "allocated_memory_bytes": 257698037760,
+  "artifact_bytes": 46788,
+  "campaign_id": "stage1-demo-2node-w8-r1",
+  "cpu_efficiency": 0.04706143113629837,
+  "cpu_seconds": 1.4304980530000002,
+  "failures": 0,
+  "hosts": [
+    "x8000c0s0b0n0",
+    "x8000c0s0b0n1"
+  ],
+  "node_count": 2,
+  "peak_swap_bytes": 0,
+  "repetition": 1,
+  "schema_version": "packed-multinode-run/1.0",
+  "scratch_allocation_bytes": 102289899520,
+  "scratch_peak_bytes": 0,
+  "shared_stage_out_throughput_bytes_per_second": 240913.72801225516,
+  "stage_out_seconds": 0.7768424055539072,
+  "stage_out_wall_fraction": 0.102228214281202,
+  "total_worker_count": 16,
+  "wall_seconds": 1.8997749569825828,
+  "work_items": 16,
+  "workers_per_node": 8
+}

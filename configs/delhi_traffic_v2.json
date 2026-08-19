@@ -1,0 +1,6182 @@
+{
+  "decision_interval_steps": 20,
+  "events": [
+    {
+      "event_type": "capacity_factor",
+      "known_at_step": 1260,
+      "step": 1500,
+      "ul_factor": 0.45,
+      "upf_id": "upf-01-edge"
+    },
+    {
+      "event_type": "capacity_factor",
+      "known_at_step": 1260,
+      "step": 1680,
+      "ul_factor": 1.0,
+      "upf_id": "upf-01-edge"
+    },
+    {
+      "event_type": "health",
+      "health": "unavailable",
+      "step": 2040,
+      "upf_id": "upf-05-edge"
+    },
+    {
+      "event_type": "health",
+      "health": "healthy",
+      "step": 2160,
+      "upf_id": "upf-05-edge"
+    }
+  ],
+  "groups": [
+    {
+      "arrivals_per_step": 7.0,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "consumer-internet",
+        "five_qi": 9,
+        "snssai": "1-010101",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.85,
+        "ul": 0.2
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 70,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.58,
+          "dl_lognormal": {
+            "max_mbps": 5.95,
+            "median_mbps": 0.85,
+            "min_mbps": 0.102,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.4000000000000001,
+            "median_mbps": 0.2,
+            "min_mbps": 0.024,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 5.0,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "consumer-video",
+        "five_qi": 8,
+        "snssai": "1-010102",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 2.4,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 79,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.62,
+          "dl_lognormal": {
+            "max_mbps": 16.8,
+            "median_mbps": 2.4,
+            "min_mbps": 0.288,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "consumer-voice",
+        "five_qi": 1,
+        "snssai": "1-010103",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.08,
+        "ul": 0.08
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 88,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.72,
+          "dl_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 3.4,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "enterprise-internet",
+        "five_qi": 9,
+        "snssai": "1-112233",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.75,
+        "ul": 0.35
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 97,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.6,
+          "dl_lognormal": {
+            "max_mbps": 5.25,
+            "median_mbps": 0.75,
+            "min_mbps": 0.09,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 2.4499999999999997,
+            "median_mbps": 0.35,
+            "min_mbps": 0.041999999999999996,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.8,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "enterprise-vpn",
+        "five_qi": 7,
+        "snssai": "1-112234",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.7,
+        "ul": 0.55
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 106,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.67,
+          "dl_lognormal": {
+            "max_mbps": 4.8999999999999995,
+            "median_mbps": 0.7,
+            "min_mbps": 0.08399999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 3.8500000000000005,
+            "median_mbps": 0.55,
+            "min_mbps": 0.066,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.2,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "industry-telemetry",
+        "five_qi": 6,
+        "snssai": "1-223344",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.09,
+        "ul": 0.07
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 115,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.48,
+          "dl_lognormal": {
+            "max_mbps": 0.63,
+            "median_mbps": 0.09,
+            "min_mbps": 0.010799999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.49000000000000005,
+            "median_mbps": 0.07,
+            "min_mbps": 0.008400000000000001,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.2,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "industry-control",
+        "five_qi": 5,
+        "snssai": "1-223345",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.1,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 124,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.56,
+          "dl_lognormal": {
+            "max_mbps": 0.7000000000000001,
+            "median_mbps": 0.1,
+            "min_mbps": 0.012,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "mobility-vehicle",
+        "five_qi": 7,
+        "snssai": "1-334455",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.16,
+        "ul": 0.14
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 133,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.52,
+          "dl_lognormal": {
+            "max_mbps": 1.12,
+            "median_mbps": 0.16,
+            "min_mbps": 0.0192,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.9800000000000001,
+            "median_mbps": 0.14,
+            "min_mbps": 0.016800000000000002,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.7,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "public-safety",
+        "five_qi": 2,
+        "snssai": "1-445566",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.28,
+        "ul": 0.22
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 142,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.65,
+          "dl_lognormal": {
+            "max_mbps": 1.9600000000000002,
+            "median_mbps": 0.28,
+            "min_mbps": 0.033600000000000005,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.54,
+            "median_mbps": 0.22,
+            "min_mbps": 0.0264,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.8,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "stadium-media",
+        "five_qi": 8,
+        "snssai": "1-556677",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 1.4,
+        "ul": 0.9
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 151,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.78,
+          "dl_lognormal": {
+            "max_mbps": 9.799999999999999,
+            "median_mbps": 1.4,
+            "min_mbps": 0.16799999999999998,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 6.3,
+            "median_mbps": 0.9,
+            "min_mbps": 0.108,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 4.0,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "iot-massive",
+        "five_qi": 9,
+        "snssai": "1-667788",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.05,
+        "ul": 0.04
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 160,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.42,
+          "dl_lognormal": {
+            "max_mbps": 0.35000000000000003,
+            "median_mbps": 0.05,
+            "min_mbps": 0.006,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.28,
+            "median_mbps": 0.04,
+            "min_mbps": 0.0048,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.5,
+      "eligible_upfs": [
+        "upf-01-edge",
+        "upf-01-regional",
+        "upf-01-central"
+      ],
+      "key": {
+        "dnn": "roaming-internet",
+        "five_qi": 9,
+        "snssai": "1-778899",
+        "zone": "delhi-ncr"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.65,
+        "ul": 0.18
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 169,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.55,
+          "dl_lognormal": {
+            "max_mbps": 4.55,
+            "median_mbps": 0.65,
+            "min_mbps": 0.078,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.26,
+            "median_mbps": 0.18,
+            "min_mbps": 0.021599999999999998,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 7.0,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "consumer-internet",
+        "five_qi": 9,
+        "snssai": "1-010101",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.85,
+        "ul": 0.2
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 70,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.58,
+          "dl_lognormal": {
+            "max_mbps": 5.95,
+            "median_mbps": 0.85,
+            "min_mbps": 0.102,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.4000000000000001,
+            "median_mbps": 0.2,
+            "min_mbps": 0.024,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 5.0,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "consumer-video",
+        "five_qi": 8,
+        "snssai": "1-010102",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 2.4,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 79,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.62,
+          "dl_lognormal": {
+            "max_mbps": 16.8,
+            "median_mbps": 2.4,
+            "min_mbps": 0.288,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "consumer-voice",
+        "five_qi": 1,
+        "snssai": "1-010103",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.08,
+        "ul": 0.08
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 88,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.72,
+          "dl_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 3.4,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "enterprise-internet",
+        "five_qi": 9,
+        "snssai": "1-112233",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.75,
+        "ul": 0.35
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 97,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.6,
+          "dl_lognormal": {
+            "max_mbps": 5.25,
+            "median_mbps": 0.75,
+            "min_mbps": 0.09,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 2.4499999999999997,
+            "median_mbps": 0.35,
+            "min_mbps": 0.041999999999999996,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.8,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "enterprise-vpn",
+        "five_qi": 7,
+        "snssai": "1-112234",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.7,
+        "ul": 0.55
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 106,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.67,
+          "dl_lognormal": {
+            "max_mbps": 4.8999999999999995,
+            "median_mbps": 0.7,
+            "min_mbps": 0.08399999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 3.8500000000000005,
+            "median_mbps": 0.55,
+            "min_mbps": 0.066,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.2,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "industry-telemetry",
+        "five_qi": 6,
+        "snssai": "1-223344",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.09,
+        "ul": 0.07
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 115,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.48,
+          "dl_lognormal": {
+            "max_mbps": 0.63,
+            "median_mbps": 0.09,
+            "min_mbps": 0.010799999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.49000000000000005,
+            "median_mbps": 0.07,
+            "min_mbps": 0.008400000000000001,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.2,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "industry-control",
+        "five_qi": 5,
+        "snssai": "1-223345",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.1,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 124,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.56,
+          "dl_lognormal": {
+            "max_mbps": 0.7000000000000001,
+            "median_mbps": 0.1,
+            "min_mbps": 0.012,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "mobility-vehicle",
+        "five_qi": 7,
+        "snssai": "1-334455",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.16,
+        "ul": 0.14
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 133,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.52,
+          "dl_lognormal": {
+            "max_mbps": 1.12,
+            "median_mbps": 0.16,
+            "min_mbps": 0.0192,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.9800000000000001,
+            "median_mbps": 0.14,
+            "min_mbps": 0.016800000000000002,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.7,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "public-safety",
+        "five_qi": 2,
+        "snssai": "1-445566",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.28,
+        "ul": 0.22
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 142,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.65,
+          "dl_lognormal": {
+            "max_mbps": 1.9600000000000002,
+            "median_mbps": 0.28,
+            "min_mbps": 0.033600000000000005,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.54,
+            "median_mbps": 0.22,
+            "min_mbps": 0.0264,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.8,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "stadium-media",
+        "five_qi": 8,
+        "snssai": "1-556677",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 1.4,
+        "ul": 0.9
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 151,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.78,
+          "dl_lognormal": {
+            "max_mbps": 9.799999999999999,
+            "median_mbps": 1.4,
+            "min_mbps": 0.16799999999999998,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 6.3,
+            "median_mbps": 0.9,
+            "min_mbps": 0.108,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 4.0,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "iot-massive",
+        "five_qi": 9,
+        "snssai": "1-667788",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.05,
+        "ul": 0.04
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 160,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.42,
+          "dl_lognormal": {
+            "max_mbps": 0.35000000000000003,
+            "median_mbps": 0.05,
+            "min_mbps": 0.006,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.28,
+            "median_mbps": 0.04,
+            "min_mbps": 0.0048,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.5,
+      "eligible_upfs": [
+        "upf-02-edge",
+        "upf-02-regional",
+        "upf-02-central"
+      ],
+      "key": {
+        "dnn": "roaming-internet",
+        "five_qi": 9,
+        "snssai": "1-778899",
+        "zone": "north"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.65,
+        "ul": 0.18
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 169,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.55,
+          "dl_lognormal": {
+            "max_mbps": 4.55,
+            "median_mbps": 0.65,
+            "min_mbps": 0.078,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.26,
+            "median_mbps": 0.18,
+            "min_mbps": 0.021599999999999998,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 7.0,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "consumer-internet",
+        "five_qi": 9,
+        "snssai": "1-010101",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.85,
+        "ul": 0.2
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 70,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.58,
+          "dl_lognormal": {
+            "max_mbps": 5.95,
+            "median_mbps": 0.85,
+            "min_mbps": 0.102,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.4000000000000001,
+            "median_mbps": 0.2,
+            "min_mbps": 0.024,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 5.0,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "consumer-video",
+        "five_qi": 8,
+        "snssai": "1-010102",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 2.4,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 79,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.62,
+          "dl_lognormal": {
+            "max_mbps": 16.8,
+            "median_mbps": 2.4,
+            "min_mbps": 0.288,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "consumer-voice",
+        "five_qi": 1,
+        "snssai": "1-010103",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.08,
+        "ul": 0.08
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 88,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.72,
+          "dl_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 3.4,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "enterprise-internet",
+        "five_qi": 9,
+        "snssai": "1-112233",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.75,
+        "ul": 0.35
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 97,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.6,
+          "dl_lognormal": {
+            "max_mbps": 5.25,
+            "median_mbps": 0.75,
+            "min_mbps": 0.09,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 2.4499999999999997,
+            "median_mbps": 0.35,
+            "min_mbps": 0.041999999999999996,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.8,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "enterprise-vpn",
+        "five_qi": 7,
+        "snssai": "1-112234",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.7,
+        "ul": 0.55
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 106,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.67,
+          "dl_lognormal": {
+            "max_mbps": 4.8999999999999995,
+            "median_mbps": 0.7,
+            "min_mbps": 0.08399999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 3.8500000000000005,
+            "median_mbps": 0.55,
+            "min_mbps": 0.066,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.2,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "industry-telemetry",
+        "five_qi": 6,
+        "snssai": "1-223344",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.09,
+        "ul": 0.07
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 115,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.48,
+          "dl_lognormal": {
+            "max_mbps": 0.63,
+            "median_mbps": 0.09,
+            "min_mbps": 0.010799999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.49000000000000005,
+            "median_mbps": 0.07,
+            "min_mbps": 0.008400000000000001,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.2,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "industry-control",
+        "five_qi": 5,
+        "snssai": "1-223345",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.1,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 124,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.56,
+          "dl_lognormal": {
+            "max_mbps": 0.7000000000000001,
+            "median_mbps": 0.1,
+            "min_mbps": 0.012,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "mobility-vehicle",
+        "five_qi": 7,
+        "snssai": "1-334455",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.16,
+        "ul": 0.14
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 133,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.52,
+          "dl_lognormal": {
+            "max_mbps": 1.12,
+            "median_mbps": 0.16,
+            "min_mbps": 0.0192,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.9800000000000001,
+            "median_mbps": 0.14,
+            "min_mbps": 0.016800000000000002,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.7,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "public-safety",
+        "five_qi": 2,
+        "snssai": "1-445566",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.28,
+        "ul": 0.22
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 142,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.65,
+          "dl_lognormal": {
+            "max_mbps": 1.9600000000000002,
+            "median_mbps": 0.28,
+            "min_mbps": 0.033600000000000005,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.54,
+            "median_mbps": 0.22,
+            "min_mbps": 0.0264,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.8,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "stadium-media",
+        "five_qi": 8,
+        "snssai": "1-556677",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 1.4,
+        "ul": 0.9
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 151,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.78,
+          "dl_lognormal": {
+            "max_mbps": 9.799999999999999,
+            "median_mbps": 1.4,
+            "min_mbps": 0.16799999999999998,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 6.3,
+            "median_mbps": 0.9,
+            "min_mbps": 0.108,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 4.0,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "iot-massive",
+        "five_qi": 9,
+        "snssai": "1-667788",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.05,
+        "ul": 0.04
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 160,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.42,
+          "dl_lognormal": {
+            "max_mbps": 0.35000000000000003,
+            "median_mbps": 0.05,
+            "min_mbps": 0.006,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.28,
+            "median_mbps": 0.04,
+            "min_mbps": 0.0048,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.5,
+      "eligible_upfs": [
+        "upf-03-edge",
+        "upf-03-regional",
+        "upf-03-central"
+      ],
+      "key": {
+        "dnn": "roaming-internet",
+        "five_qi": 9,
+        "snssai": "1-778899",
+        "zone": "south"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.65,
+        "ul": 0.18
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 169,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.55,
+          "dl_lognormal": {
+            "max_mbps": 4.55,
+            "median_mbps": 0.65,
+            "min_mbps": 0.078,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.26,
+            "median_mbps": 0.18,
+            "min_mbps": 0.021599999999999998,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 7.0,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "consumer-internet",
+        "five_qi": 9,
+        "snssai": "1-010101",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.85,
+        "ul": 0.2
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 70,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.58,
+          "dl_lognormal": {
+            "max_mbps": 5.95,
+            "median_mbps": 0.85,
+            "min_mbps": 0.102,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.4000000000000001,
+            "median_mbps": 0.2,
+            "min_mbps": 0.024,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 5.0,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "consumer-video",
+        "five_qi": 8,
+        "snssai": "1-010102",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 2.4,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 79,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.62,
+          "dl_lognormal": {
+            "max_mbps": 16.8,
+            "median_mbps": 2.4,
+            "min_mbps": 0.288,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "consumer-voice",
+        "five_qi": 1,
+        "snssai": "1-010103",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.08,
+        "ul": 0.08
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 88,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.72,
+          "dl_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 3.4,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "enterprise-internet",
+        "five_qi": 9,
+        "snssai": "1-112233",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.75,
+        "ul": 0.35
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 97,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.6,
+          "dl_lognormal": {
+            "max_mbps": 5.25,
+            "median_mbps": 0.75,
+            "min_mbps": 0.09,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 2.4499999999999997,
+            "median_mbps": 0.35,
+            "min_mbps": 0.041999999999999996,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.8,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "enterprise-vpn",
+        "five_qi": 7,
+        "snssai": "1-112234",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.7,
+        "ul": 0.55
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 106,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.67,
+          "dl_lognormal": {
+            "max_mbps": 4.8999999999999995,
+            "median_mbps": 0.7,
+            "min_mbps": 0.08399999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 3.8500000000000005,
+            "median_mbps": 0.55,
+            "min_mbps": 0.066,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.2,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "industry-telemetry",
+        "five_qi": 6,
+        "snssai": "1-223344",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.09,
+        "ul": 0.07
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 115,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.48,
+          "dl_lognormal": {
+            "max_mbps": 0.63,
+            "median_mbps": 0.09,
+            "min_mbps": 0.010799999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.49000000000000005,
+            "median_mbps": 0.07,
+            "min_mbps": 0.008400000000000001,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.2,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "industry-control",
+        "five_qi": 5,
+        "snssai": "1-223345",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.1,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 124,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.56,
+          "dl_lognormal": {
+            "max_mbps": 0.7000000000000001,
+            "median_mbps": 0.1,
+            "min_mbps": 0.012,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "mobility-vehicle",
+        "five_qi": 7,
+        "snssai": "1-334455",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.16,
+        "ul": 0.14
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 133,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.52,
+          "dl_lognormal": {
+            "max_mbps": 1.12,
+            "median_mbps": 0.16,
+            "min_mbps": 0.0192,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.9800000000000001,
+            "median_mbps": 0.14,
+            "min_mbps": 0.016800000000000002,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.7,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "public-safety",
+        "five_qi": 2,
+        "snssai": "1-445566",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.28,
+        "ul": 0.22
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 142,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.65,
+          "dl_lognormal": {
+            "max_mbps": 1.9600000000000002,
+            "median_mbps": 0.28,
+            "min_mbps": 0.033600000000000005,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.54,
+            "median_mbps": 0.22,
+            "min_mbps": 0.0264,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.8,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "stadium-media",
+        "five_qi": 8,
+        "snssai": "1-556677",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 1.4,
+        "ul": 0.9
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 151,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.78,
+          "dl_lognormal": {
+            "max_mbps": 9.799999999999999,
+            "median_mbps": 1.4,
+            "min_mbps": 0.16799999999999998,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 6.3,
+            "median_mbps": 0.9,
+            "min_mbps": 0.108,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 4.0,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "iot-massive",
+        "five_qi": 9,
+        "snssai": "1-667788",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.05,
+        "ul": 0.04
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 160,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.42,
+          "dl_lognormal": {
+            "max_mbps": 0.35000000000000003,
+            "median_mbps": 0.05,
+            "min_mbps": 0.006,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.28,
+            "median_mbps": 0.04,
+            "min_mbps": 0.0048,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.5,
+      "eligible_upfs": [
+        "upf-04-edge",
+        "upf-04-regional",
+        "upf-04-central"
+      ],
+      "key": {
+        "dnn": "roaming-internet",
+        "five_qi": 9,
+        "snssai": "1-778899",
+        "zone": "east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.65,
+        "ul": 0.18
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 169,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.55,
+          "dl_lognormal": {
+            "max_mbps": 4.55,
+            "median_mbps": 0.65,
+            "min_mbps": 0.078,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.26,
+            "median_mbps": 0.18,
+            "min_mbps": 0.021599999999999998,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 7.0,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "consumer-internet",
+        "five_qi": 9,
+        "snssai": "1-010101",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.85,
+        "ul": 0.2
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 70,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.58,
+          "dl_lognormal": {
+            "max_mbps": 5.95,
+            "median_mbps": 0.85,
+            "min_mbps": 0.102,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.4000000000000001,
+            "median_mbps": 0.2,
+            "min_mbps": 0.024,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 5.0,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "consumer-video",
+        "five_qi": 8,
+        "snssai": "1-010102",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 2.4,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 79,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.62,
+          "dl_lognormal": {
+            "max_mbps": 16.8,
+            "median_mbps": 2.4,
+            "min_mbps": 0.288,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "consumer-voice",
+        "five_qi": 1,
+        "snssai": "1-010103",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.08,
+        "ul": 0.08
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 88,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.72,
+          "dl_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 3.4,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "enterprise-internet",
+        "five_qi": 9,
+        "snssai": "1-112233",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.75,
+        "ul": 0.35
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 97,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.6,
+          "dl_lognormal": {
+            "max_mbps": 5.25,
+            "median_mbps": 0.75,
+            "min_mbps": 0.09,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 2.4499999999999997,
+            "median_mbps": 0.35,
+            "min_mbps": 0.041999999999999996,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.8,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "enterprise-vpn",
+        "five_qi": 7,
+        "snssai": "1-112234",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.7,
+        "ul": 0.55
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 106,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.67,
+          "dl_lognormal": {
+            "max_mbps": 4.8999999999999995,
+            "median_mbps": 0.7,
+            "min_mbps": 0.08399999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 3.8500000000000005,
+            "median_mbps": 0.55,
+            "min_mbps": 0.066,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.2,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "industry-telemetry",
+        "five_qi": 6,
+        "snssai": "1-223344",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.09,
+        "ul": 0.07
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 115,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.48,
+          "dl_lognormal": {
+            "max_mbps": 0.63,
+            "median_mbps": 0.09,
+            "min_mbps": 0.010799999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.49000000000000005,
+            "median_mbps": 0.07,
+            "min_mbps": 0.008400000000000001,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.2,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "industry-control",
+        "five_qi": 5,
+        "snssai": "1-223345",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.1,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 124,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.56,
+          "dl_lognormal": {
+            "max_mbps": 0.7000000000000001,
+            "median_mbps": 0.1,
+            "min_mbps": 0.012,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "mobility-vehicle",
+        "five_qi": 7,
+        "snssai": "1-334455",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.16,
+        "ul": 0.14
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 133,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.52,
+          "dl_lognormal": {
+            "max_mbps": 1.12,
+            "median_mbps": 0.16,
+            "min_mbps": 0.0192,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.9800000000000001,
+            "median_mbps": 0.14,
+            "min_mbps": 0.016800000000000002,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.7,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "public-safety",
+        "five_qi": 2,
+        "snssai": "1-445566",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.28,
+        "ul": 0.22
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 142,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.65,
+          "dl_lognormal": {
+            "max_mbps": 1.9600000000000002,
+            "median_mbps": 0.28,
+            "min_mbps": 0.033600000000000005,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.54,
+            "median_mbps": 0.22,
+            "min_mbps": 0.0264,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.8,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "stadium-media",
+        "five_qi": 8,
+        "snssai": "1-556677",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 1.4,
+        "ul": 0.9
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 151,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.78,
+          "dl_lognormal": {
+            "max_mbps": 9.799999999999999,
+            "median_mbps": 1.4,
+            "min_mbps": 0.16799999999999998,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 6.3,
+            "median_mbps": 0.9,
+            "min_mbps": 0.108,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 4.0,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "iot-massive",
+        "five_qi": 9,
+        "snssai": "1-667788",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.05,
+        "ul": 0.04
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 160,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.42,
+          "dl_lognormal": {
+            "max_mbps": 0.35000000000000003,
+            "median_mbps": 0.05,
+            "min_mbps": 0.006,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.28,
+            "median_mbps": 0.04,
+            "min_mbps": 0.0048,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.5,
+      "eligible_upfs": [
+        "upf-05-edge",
+        "upf-05-regional",
+        "upf-05-central"
+      ],
+      "key": {
+        "dnn": "roaming-internet",
+        "five_qi": 9,
+        "snssai": "1-778899",
+        "zone": "west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.65,
+        "ul": 0.18
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 169,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.55,
+          "dl_lognormal": {
+            "max_mbps": 4.55,
+            "median_mbps": 0.65,
+            "min_mbps": 0.078,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.26,
+            "median_mbps": 0.18,
+            "min_mbps": 0.021599999999999998,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 7.0,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "consumer-internet",
+        "five_qi": 9,
+        "snssai": "1-010101",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.85,
+        "ul": 0.2
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 70,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.58,
+          "dl_lognormal": {
+            "max_mbps": 5.95,
+            "median_mbps": 0.85,
+            "min_mbps": 0.102,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.4000000000000001,
+            "median_mbps": 0.2,
+            "min_mbps": 0.024,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 5.0,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "consumer-video",
+        "five_qi": 8,
+        "snssai": "1-010102",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 2.4,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 79,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.62,
+          "dl_lognormal": {
+            "max_mbps": 16.8,
+            "median_mbps": 2.4,
+            "min_mbps": 0.288,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "consumer-voice",
+        "five_qi": 1,
+        "snssai": "1-010103",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.08,
+        "ul": 0.08
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 88,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.72,
+          "dl_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 3.4,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "enterprise-internet",
+        "five_qi": 9,
+        "snssai": "1-112233",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.75,
+        "ul": 0.35
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 97,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.6,
+          "dl_lognormal": {
+            "max_mbps": 5.25,
+            "median_mbps": 0.75,
+            "min_mbps": 0.09,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 2.4499999999999997,
+            "median_mbps": 0.35,
+            "min_mbps": 0.041999999999999996,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.8,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "enterprise-vpn",
+        "five_qi": 7,
+        "snssai": "1-112234",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.7,
+        "ul": 0.55
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 106,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.67,
+          "dl_lognormal": {
+            "max_mbps": 4.8999999999999995,
+            "median_mbps": 0.7,
+            "min_mbps": 0.08399999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 3.8500000000000005,
+            "median_mbps": 0.55,
+            "min_mbps": 0.066,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.2,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "industry-telemetry",
+        "five_qi": 6,
+        "snssai": "1-223344",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.09,
+        "ul": 0.07
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 115,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.48,
+          "dl_lognormal": {
+            "max_mbps": 0.63,
+            "median_mbps": 0.09,
+            "min_mbps": 0.010799999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.49000000000000005,
+            "median_mbps": 0.07,
+            "min_mbps": 0.008400000000000001,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.2,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "industry-control",
+        "five_qi": 5,
+        "snssai": "1-223345",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.1,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 124,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.56,
+          "dl_lognormal": {
+            "max_mbps": 0.7000000000000001,
+            "median_mbps": 0.1,
+            "min_mbps": 0.012,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "mobility-vehicle",
+        "five_qi": 7,
+        "snssai": "1-334455",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.16,
+        "ul": 0.14
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 133,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.52,
+          "dl_lognormal": {
+            "max_mbps": 1.12,
+            "median_mbps": 0.16,
+            "min_mbps": 0.0192,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.9800000000000001,
+            "median_mbps": 0.14,
+            "min_mbps": 0.016800000000000002,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.7,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "public-safety",
+        "five_qi": 2,
+        "snssai": "1-445566",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.28,
+        "ul": 0.22
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 142,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.65,
+          "dl_lognormal": {
+            "max_mbps": 1.9600000000000002,
+            "median_mbps": 0.28,
+            "min_mbps": 0.033600000000000005,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.54,
+            "median_mbps": 0.22,
+            "min_mbps": 0.0264,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.8,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "stadium-media",
+        "five_qi": 8,
+        "snssai": "1-556677",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 1.4,
+        "ul": 0.9
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 151,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.78,
+          "dl_lognormal": {
+            "max_mbps": 9.799999999999999,
+            "median_mbps": 1.4,
+            "min_mbps": 0.16799999999999998,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 6.3,
+            "median_mbps": 0.9,
+            "min_mbps": 0.108,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 4.0,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "iot-massive",
+        "five_qi": 9,
+        "snssai": "1-667788",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.05,
+        "ul": 0.04
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 160,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.42,
+          "dl_lognormal": {
+            "max_mbps": 0.35000000000000003,
+            "median_mbps": 0.05,
+            "min_mbps": 0.006,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.28,
+            "median_mbps": 0.04,
+            "min_mbps": 0.0048,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.5,
+      "eligible_upfs": [
+        "upf-06-edge",
+        "upf-06-regional",
+        "upf-06-central"
+      ],
+      "key": {
+        "dnn": "roaming-internet",
+        "five_qi": 9,
+        "snssai": "1-778899",
+        "zone": "central"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.65,
+        "ul": 0.18
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 169,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.55,
+          "dl_lognormal": {
+            "max_mbps": 4.55,
+            "median_mbps": 0.65,
+            "min_mbps": 0.078,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.26,
+            "median_mbps": 0.18,
+            "min_mbps": 0.021599999999999998,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 7.0,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "consumer-internet",
+        "five_qi": 9,
+        "snssai": "1-010101",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.85,
+        "ul": 0.2
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 70,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.58,
+          "dl_lognormal": {
+            "max_mbps": 5.95,
+            "median_mbps": 0.85,
+            "min_mbps": 0.102,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.4000000000000001,
+            "median_mbps": 0.2,
+            "min_mbps": 0.024,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 5.0,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "consumer-video",
+        "five_qi": 8,
+        "snssai": "1-010102",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 2.4,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 79,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.62,
+          "dl_lognormal": {
+            "max_mbps": 16.8,
+            "median_mbps": 2.4,
+            "min_mbps": 0.288,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "consumer-voice",
+        "five_qi": 1,
+        "snssai": "1-010103",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.08,
+        "ul": 0.08
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 88,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.72,
+          "dl_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 3.4,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "enterprise-internet",
+        "five_qi": 9,
+        "snssai": "1-112233",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.75,
+        "ul": 0.35
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 97,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.6,
+          "dl_lognormal": {
+            "max_mbps": 5.25,
+            "median_mbps": 0.75,
+            "min_mbps": 0.09,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 2.4499999999999997,
+            "median_mbps": 0.35,
+            "min_mbps": 0.041999999999999996,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.8,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "enterprise-vpn",
+        "five_qi": 7,
+        "snssai": "1-112234",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.7,
+        "ul": 0.55
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 106,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.67,
+          "dl_lognormal": {
+            "max_mbps": 4.8999999999999995,
+            "median_mbps": 0.7,
+            "min_mbps": 0.08399999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 3.8500000000000005,
+            "median_mbps": 0.55,
+            "min_mbps": 0.066,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.2,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "industry-telemetry",
+        "five_qi": 6,
+        "snssai": "1-223344",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.09,
+        "ul": 0.07
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 115,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.48,
+          "dl_lognormal": {
+            "max_mbps": 0.63,
+            "median_mbps": 0.09,
+            "min_mbps": 0.010799999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.49000000000000005,
+            "median_mbps": 0.07,
+            "min_mbps": 0.008400000000000001,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.2,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "industry-control",
+        "five_qi": 5,
+        "snssai": "1-223345",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.1,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 124,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.56,
+          "dl_lognormal": {
+            "max_mbps": 0.7000000000000001,
+            "median_mbps": 0.1,
+            "min_mbps": 0.012,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "mobility-vehicle",
+        "five_qi": 7,
+        "snssai": "1-334455",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.16,
+        "ul": 0.14
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 133,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.52,
+          "dl_lognormal": {
+            "max_mbps": 1.12,
+            "median_mbps": 0.16,
+            "min_mbps": 0.0192,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.9800000000000001,
+            "median_mbps": 0.14,
+            "min_mbps": 0.016800000000000002,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.7,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "public-safety",
+        "five_qi": 2,
+        "snssai": "1-445566",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.28,
+        "ul": 0.22
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 142,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.65,
+          "dl_lognormal": {
+            "max_mbps": 1.9600000000000002,
+            "median_mbps": 0.28,
+            "min_mbps": 0.033600000000000005,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.54,
+            "median_mbps": 0.22,
+            "min_mbps": 0.0264,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.8,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "stadium-media",
+        "five_qi": 8,
+        "snssai": "1-556677",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 1.4,
+        "ul": 0.9
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 151,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.78,
+          "dl_lognormal": {
+            "max_mbps": 9.799999999999999,
+            "median_mbps": 1.4,
+            "min_mbps": 0.16799999999999998,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 6.3,
+            "median_mbps": 0.9,
+            "min_mbps": 0.108,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 4.0,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "iot-massive",
+        "five_qi": 9,
+        "snssai": "1-667788",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.05,
+        "ul": 0.04
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 160,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.42,
+          "dl_lognormal": {
+            "max_mbps": 0.35000000000000003,
+            "median_mbps": 0.05,
+            "min_mbps": 0.006,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.28,
+            "median_mbps": 0.04,
+            "min_mbps": 0.0048,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.5,
+      "eligible_upfs": [
+        "upf-07-edge",
+        "upf-07-regional",
+        "upf-07-central"
+      ],
+      "key": {
+        "dnn": "roaming-internet",
+        "five_qi": 9,
+        "snssai": "1-778899",
+        "zone": "north-east"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.65,
+        "ul": 0.18
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 169,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.55,
+          "dl_lognormal": {
+            "max_mbps": 4.55,
+            "median_mbps": 0.65,
+            "min_mbps": 0.078,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.26,
+            "median_mbps": 0.18,
+            "min_mbps": 0.021599999999999998,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 7.0,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "consumer-internet",
+        "five_qi": 9,
+        "snssai": "1-010101",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.85,
+        "ul": 0.2
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 70,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.58,
+          "dl_lognormal": {
+            "max_mbps": 5.95,
+            "median_mbps": 0.85,
+            "min_mbps": 0.102,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.4000000000000001,
+            "median_mbps": 0.2,
+            "min_mbps": 0.024,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 5.0,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "consumer-video",
+        "five_qi": 8,
+        "snssai": "1-010102",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 2.4,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 79,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.62,
+          "dl_lognormal": {
+            "max_mbps": 16.8,
+            "median_mbps": 2.4,
+            "min_mbps": 0.288,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "consumer-voice",
+        "five_qi": 1,
+        "snssai": "1-010103",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.08,
+        "ul": 0.08
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 88,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.72,
+          "dl_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.56,
+            "median_mbps": 0.08,
+            "min_mbps": 0.0096,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 3.4,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "enterprise-internet",
+        "five_qi": 9,
+        "snssai": "1-112233",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.75,
+        "ul": 0.35
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 97,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.6,
+          "dl_lognormal": {
+            "max_mbps": 5.25,
+            "median_mbps": 0.75,
+            "min_mbps": 0.09,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 2.4499999999999997,
+            "median_mbps": 0.35,
+            "min_mbps": 0.041999999999999996,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.8,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "enterprise-vpn",
+        "five_qi": 7,
+        "snssai": "1-112234",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.7,
+        "ul": 0.55
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 106,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.67,
+          "dl_lognormal": {
+            "max_mbps": 4.8999999999999995,
+            "median_mbps": 0.7,
+            "min_mbps": 0.08399999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 3.8500000000000005,
+            "median_mbps": 0.55,
+            "min_mbps": 0.066,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.2,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "industry-telemetry",
+        "five_qi": 6,
+        "snssai": "1-223344",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.09,
+        "ul": 0.07
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 115,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.48,
+          "dl_lognormal": {
+            "max_mbps": 0.63,
+            "median_mbps": 0.09,
+            "min_mbps": 0.010799999999999999,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.49000000000000005,
+            "median_mbps": 0.07,
+            "min_mbps": 0.008400000000000001,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.2,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "industry-control",
+        "five_qi": 5,
+        "snssai": "1-223345",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.1,
+        "ul": 0.12
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 124,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.56,
+          "dl_lognormal": {
+            "max_mbps": 0.7000000000000001,
+            "median_mbps": 0.1,
+            "min_mbps": 0.012,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.84,
+            "median_mbps": 0.12,
+            "min_mbps": 0.0144,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 2.0,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "mobility-vehicle",
+        "five_qi": 7,
+        "snssai": "1-334455",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.16,
+        "ul": 0.14
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 133,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.52,
+          "dl_lognormal": {
+            "max_mbps": 1.12,
+            "median_mbps": 0.16,
+            "min_mbps": 0.0192,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.9800000000000001,
+            "median_mbps": 0.14,
+            "min_mbps": 0.016800000000000002,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.7,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "public-safety",
+        "five_qi": 2,
+        "snssai": "1-445566",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.28,
+        "ul": 0.22
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 142,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.65,
+          "dl_lognormal": {
+            "max_mbps": 1.9600000000000002,
+            "median_mbps": 0.28,
+            "min_mbps": 0.033600000000000005,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.54,
+            "median_mbps": 0.22,
+            "min_mbps": 0.0264,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 0.8,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "stadium-media",
+        "five_qi": 8,
+        "snssai": "1-556677",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 1.4,
+        "ul": 0.9
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "pareto",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 151,
+          "shape": 1.7
+        },
+        "joint_rates": {
+          "correlation": 0.78,
+          "dl_lognormal": {
+            "max_mbps": 9.799999999999999,
+            "median_mbps": 1.4,
+            "min_mbps": 0.16799999999999998,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 6.3,
+            "median_mbps": 0.9,
+            "min_mbps": 0.108,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 4.0,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "iot-massive",
+        "five_qi": 9,
+        "snssai": "1-667788",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.05,
+        "ul": 0.04
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 160,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.42,
+          "dl_lognormal": {
+            "max_mbps": 0.35000000000000003,
+            "median_mbps": 0.05,
+            "min_mbps": 0.006,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 0.28,
+            "median_mbps": 0.04,
+            "min_mbps": 0.0048,
+            "sigma": 0.68
+          }
+        }
+      }
+    },
+    {
+      "arrivals_per_step": 1.5,
+      "eligible_upfs": [
+        "upf-08-edge",
+        "upf-08-regional",
+        "upf-08-central"
+      ],
+      "key": {
+        "dnn": "roaming-internet",
+        "five_qi": 9,
+        "snssai": "1-778899",
+        "zone": "south-west"
+      },
+      "lifetime_steps": {
+        "max": 720,
+        "min": 10
+      },
+      "offered_mbps_per_session": {
+        "dl": 0.65,
+        "ul": 0.18
+      },
+      "realism": {
+        "demand": {
+          "ar1_phi": 0.82,
+          "burst_enter_probability": 0.004,
+          "burst_exit_probability": 0.09,
+          "burst_max_multiplier": 4.0,
+          "burst_pareto_alpha": 2.4,
+          "innovation_sigma": 0.025
+        },
+        "holding_time": {
+          "distribution": "lognormal",
+          "max_steps": 720,
+          "min_steps": 10,
+          "scale_steps": 169,
+          "shape": 0.62
+        },
+        "joint_rates": {
+          "correlation": 0.55,
+          "dl_lognormal": {
+            "max_mbps": 4.55,
+            "median_mbps": 0.65,
+            "min_mbps": 0.078,
+            "sigma": 0.72
+          },
+          "ul_lognormal": {
+            "max_mbps": 1.26,
+            "median_mbps": 0.18,
+            "min_mbps": 0.021599999999999998,
+            "sigma": 0.68
+          }
+        }
+      }
+    }
+  ],
+  "primary_overload_metric": "overload_area_seconds.ul",
+  "scenario_id": "cdot-delhi-national-v2-1d-s20260828",
+  "seed": 20260828,
+  "selection_audit_stride": 100,
+  "start_time": "2026-08-28T00:00:00Z",
+  "step_seconds": 30,
+  "steps": 2880,
+  "traffic_model": {
+    "aggregate_population_by_zone": {
+      "central": 1450000,
+      "delhi-ncr": 3200000,
+      "east": 1850000,
+      "north": 2150000,
+      "north-east": 1700000,
+      "south": 2000000,
+      "south-west": 1750000,
+      "west": 1900000
+    },
+    "mobility_phases": [
+      {
+        "start_step": 720,
+        "transition_by_origin": {
+          "central": {
+            "central": 0.985,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.015000000000000013,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "delhi-ncr": {
+            "central": 0.0,
+            "delhi-ncr": 0.985,
+            "east": 0.0,
+            "north": 0.015000000000000013,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "east": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.985,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.015000000000000013
+          },
+          "north": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.985,
+            "north-east": 0.0,
+            "south": 0.015000000000000013,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "north-east": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.985,
+            "south": 0.0,
+            "south-west": 0.015000000000000013,
+            "west": 0.0
+          },
+          "south": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.015000000000000013,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.985,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "south-west": {
+            "central": 0.0,
+            "delhi-ncr": 0.015000000000000013,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.985,
+            "west": 0.0
+          },
+          "west": {
+            "central": 0.015000000000000013,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.985
+          }
+        }
+      },
+      {
+        "start_step": 1440,
+        "transition_by_origin": {
+          "central": {
+            "central": 0.99,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.010000000000000009
+          },
+          "delhi-ncr": {
+            "central": 0.0,
+            "delhi-ncr": 0.99,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.010000000000000009,
+            "west": 0.0
+          },
+          "east": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.99,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.010000000000000009,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "north": {
+            "central": 0.0,
+            "delhi-ncr": 0.010000000000000009,
+            "east": 0.0,
+            "north": 0.99,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "north-east": {
+            "central": 0.010000000000000009,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.99,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "south": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.010000000000000009,
+            "north-east": 0.0,
+            "south": 0.99,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "south-west": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.010000000000000009,
+            "south": 0.0,
+            "south-west": 0.99,
+            "west": 0.0
+          },
+          "west": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.010000000000000009,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.99
+          }
+        }
+      },
+      {
+        "start_step": 2160,
+        "transition_by_origin": {
+          "central": {
+            "central": 0.987,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.013000000000000012,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "delhi-ncr": {
+            "central": 0.0,
+            "delhi-ncr": 0.987,
+            "east": 0.0,
+            "north": 0.013000000000000012,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "east": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.987,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.013000000000000012
+          },
+          "north": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.987,
+            "north-east": 0.0,
+            "south": 0.013000000000000012,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "north-east": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.987,
+            "south": 0.0,
+            "south-west": 0.013000000000000012,
+            "west": 0.0
+          },
+          "south": {
+            "central": 0.0,
+            "delhi-ncr": 0.0,
+            "east": 0.013000000000000012,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.987,
+            "south-west": 0.0,
+            "west": 0.0
+          },
+          "south-west": {
+            "central": 0.0,
+            "delhi-ncr": 0.013000000000000012,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.987,
+            "west": 0.0
+          },
+          "west": {
+            "central": 0.013000000000000012,
+            "delhi-ncr": 0.0,
+            "east": 0.0,
+            "north": 0.0,
+            "north-east": 0.0,
+            "south": 0.0,
+            "south-west": 0.0,
+            "west": 0.987
+          }
+        }
+      }
+    ],
+    "schema_version": "traffic-model/2.0",
+    "stadium_phases": [
+      {
+        "arrival_multiplier": 1.5,
+        "end_step": 1440,
+        "group_ids": [
+          "delhi-ncr|consumer-internet|1-010101",
+          "delhi-ncr|consumer-video|1-010102",
+          "delhi-ncr|consumer-voice|1-010103",
+          "delhi-ncr|stadium-media|1-556677",
+          "delhi-ncr|roaming-internet|1-778899"
+        ],
+        "name": "ingress",
+        "start_step": 1320
+      },
+      {
+        "arrival_multiplier": 2.1,
+        "end_step": 1500,
+        "group_ids": [
+          "delhi-ncr|consumer-internet|1-010101",
+          "delhi-ncr|consumer-video|1-010102",
+          "delhi-ncr|consumer-voice|1-010103",
+          "delhi-ncr|stadium-media|1-556677",
+          "delhi-ncr|roaming-internet|1-778899"
+        ],
+        "name": "kickoff",
+        "start_step": 1440
+      },
+      {
+        "arrival_multiplier": 1.7,
+        "end_step": 1620,
+        "group_ids": [
+          "delhi-ncr|consumer-internet|1-010101",
+          "delhi-ncr|consumer-video|1-010102",
+          "delhi-ncr|consumer-voice|1-010103",
+          "delhi-ncr|stadium-media|1-556677",
+          "delhi-ncr|roaming-internet|1-778899"
+        ],
+        "name": "match",
+        "start_step": 1500
+      },
+      {
+        "arrival_multiplier": 3.2,
+        "end_step": 1680,
+        "group_ids": [
+          "delhi-ncr|consumer-internet|1-010101",
+          "delhi-ncr|consumer-video|1-010102",
+          "delhi-ncr|consumer-voice|1-010103",
+          "delhi-ncr|stadium-media|1-556677",
+          "delhi-ncr|roaming-internet|1-778899"
+        ],
+        "name": "halftime_upload",
+        "start_step": 1620
+      },
+      {
+        "arrival_multiplier": 2.6,
+        "end_step": 1740,
+        "group_ids": [
+          "delhi-ncr|consumer-internet|1-010101",
+          "delhi-ncr|consumer-video|1-010102",
+          "delhi-ncr|consumer-voice|1-010103",
+          "delhi-ncr|stadium-media|1-556677",
+          "delhi-ncr|roaming-internet|1-778899"
+        ],
+        "name": "final_whistle",
+        "start_step": 1680
+      },
+      {
+        "arrival_multiplier": 1.9,
+        "end_step": 1920,
+        "group_ids": [
+          "delhi-ncr|consumer-internet|1-010101",
+          "delhi-ncr|consumer-video|1-010102",
+          "delhi-ncr|consumer-voice|1-010103",
+          "delhi-ncr|stadium-media|1-556677",
+          "delhi-ncr|roaming-internet|1-778899"
+        ],
+        "name": "egress",
+        "start_step": 1740
+      }
+    ],
+    "telemetry": {
+      "missing_scrape_probability": 0.008,
+      "reset_probability": 0.0008,
+      "restart_probability": 0.0004,
+      "stale_probability": 0.004
+    }
+  },
+  "upfs": [
+    {
+      "capacity_mbps": {
+        "dl": 5200,
+        "ul": 2600
+      },
+      "path_latency_ms_by_zone": {
+        "central": 22.0,
+        "delhi-ncr": 7.0,
+        "east": 22.0,
+        "north": 22.0,
+        "north-east": 22.0,
+        "south": 22.0,
+        "south-west": 22.0,
+        "west": 22.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 170000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-01-edge",
+      "zone": "delhi-ncr"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 8600,
+        "ul": 4300
+      },
+      "path_latency_ms_by_zone": {
+        "central": 27.0,
+        "delhi-ncr": 11.0,
+        "east": 27.0,
+        "north": 27.0,
+        "north-east": 27.0,
+        "south": 27.0,
+        "south-west": 27.0,
+        "west": 27.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 290000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-01-regional",
+      "zone": "delhi-ncr"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 13000,
+        "ul": 6500
+      },
+      "path_latency_ms_by_zone": {
+        "central": 32.0,
+        "delhi-ncr": 15.0,
+        "east": 32.0,
+        "north": 32.0,
+        "north-east": 32.0,
+        "south": 32.0,
+        "south-west": 32.0,
+        "west": 32.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 430000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-01-central",
+      "zone": "delhi-ncr"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 5200,
+        "ul": 2600
+      },
+      "path_latency_ms_by_zone": {
+        "central": 22.0,
+        "delhi-ncr": 22.0,
+        "east": 22.0,
+        "north": 7.0,
+        "north-east": 22.0,
+        "south": 22.0,
+        "south-west": 22.0,
+        "west": 22.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 170000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-02-edge",
+      "zone": "north"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 8600,
+        "ul": 4300
+      },
+      "path_latency_ms_by_zone": {
+        "central": 27.0,
+        "delhi-ncr": 27.0,
+        "east": 27.0,
+        "north": 11.0,
+        "north-east": 27.0,
+        "south": 27.0,
+        "south-west": 27.0,
+        "west": 27.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 290000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-02-regional",
+      "zone": "north"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 13000,
+        "ul": 6500
+      },
+      "path_latency_ms_by_zone": {
+        "central": 32.0,
+        "delhi-ncr": 32.0,
+        "east": 32.0,
+        "north": 15.0,
+        "north-east": 32.0,
+        "south": 32.0,
+        "south-west": 32.0,
+        "west": 32.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 430000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-02-central",
+      "zone": "north"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 5200,
+        "ul": 2600
+      },
+      "path_latency_ms_by_zone": {
+        "central": 22.0,
+        "delhi-ncr": 22.0,
+        "east": 22.0,
+        "north": 22.0,
+        "north-east": 22.0,
+        "south": 7.0,
+        "south-west": 22.0,
+        "west": 22.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 170000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-03-edge",
+      "zone": "south"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 8600,
+        "ul": 4300
+      },
+      "path_latency_ms_by_zone": {
+        "central": 27.0,
+        "delhi-ncr": 27.0,
+        "east": 27.0,
+        "north": 27.0,
+        "north-east": 27.0,
+        "south": 11.0,
+        "south-west": 27.0,
+        "west": 27.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 290000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-03-regional",
+      "zone": "south"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 13000,
+        "ul": 6500
+      },
+      "path_latency_ms_by_zone": {
+        "central": 32.0,
+        "delhi-ncr": 32.0,
+        "east": 32.0,
+        "north": 32.0,
+        "north-east": 32.0,
+        "south": 15.0,
+        "south-west": 32.0,
+        "west": 32.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 430000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-03-central",
+      "zone": "south"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 5200,
+        "ul": 2600
+      },
+      "path_latency_ms_by_zone": {
+        "central": 22.0,
+        "delhi-ncr": 22.0,
+        "east": 7.0,
+        "north": 22.0,
+        "north-east": 22.0,
+        "south": 22.0,
+        "south-west": 22.0,
+        "west": 22.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 170000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-04-edge",
+      "zone": "east"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 8600,
+        "ul": 4300
+      },
+      "path_latency_ms_by_zone": {
+        "central": 27.0,
+        "delhi-ncr": 27.0,
+        "east": 11.0,
+        "north": 27.0,
+        "north-east": 27.0,
+        "south": 27.0,
+        "south-west": 27.0,
+        "west": 27.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 290000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-04-regional",
+      "zone": "east"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 13000,
+        "ul": 6500
+      },
+      "path_latency_ms_by_zone": {
+        "central": 32.0,
+        "delhi-ncr": 32.0,
+        "east": 15.0,
+        "north": 32.0,
+        "north-east": 32.0,
+        "south": 32.0,
+        "south-west": 32.0,
+        "west": 32.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 430000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-04-central",
+      "zone": "east"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 5200,
+        "ul": 2600
+      },
+      "path_latency_ms_by_zone": {
+        "central": 22.0,
+        "delhi-ncr": 22.0,
+        "east": 22.0,
+        "north": 22.0,
+        "north-east": 22.0,
+        "south": 22.0,
+        "south-west": 22.0,
+        "west": 7.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 170000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-05-edge",
+      "zone": "west"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 8600,
+        "ul": 4300
+      },
+      "path_latency_ms_by_zone": {
+        "central": 27.0,
+        "delhi-ncr": 27.0,
+        "east": 27.0,
+        "north": 27.0,
+        "north-east": 27.0,
+        "south": 27.0,
+        "south-west": 27.0,
+        "west": 11.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 290000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-05-regional",
+      "zone": "west"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 13000,
+        "ul": 6500
+      },
+      "path_latency_ms_by_zone": {
+        "central": 32.0,
+        "delhi-ncr": 32.0,
+        "east": 32.0,
+        "north": 32.0,
+        "north-east": 32.0,
+        "south": 32.0,
+        "south-west": 32.0,
+        "west": 15.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 430000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-05-central",
+      "zone": "west"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 5200,
+        "ul": 2600
+      },
+      "path_latency_ms_by_zone": {
+        "central": 7.0,
+        "delhi-ncr": 22.0,
+        "east": 22.0,
+        "north": 22.0,
+        "north-east": 22.0,
+        "south": 22.0,
+        "south-west": 22.0,
+        "west": 22.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 170000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-06-edge",
+      "zone": "central"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 8600,
+        "ul": 4300
+      },
+      "path_latency_ms_by_zone": {
+        "central": 11.0,
+        "delhi-ncr": 27.0,
+        "east": 27.0,
+        "north": 27.0,
+        "north-east": 27.0,
+        "south": 27.0,
+        "south-west": 27.0,
+        "west": 27.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 290000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-06-regional",
+      "zone": "central"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 13000,
+        "ul": 6500
+      },
+      "path_latency_ms_by_zone": {
+        "central": 15.0,
+        "delhi-ncr": 32.0,
+        "east": 32.0,
+        "north": 32.0,
+        "north-east": 32.0,
+        "south": 32.0,
+        "south-west": 32.0,
+        "west": 32.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 430000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-06-central",
+      "zone": "central"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 5200,
+        "ul": 2600
+      },
+      "path_latency_ms_by_zone": {
+        "central": 22.0,
+        "delhi-ncr": 22.0,
+        "east": 22.0,
+        "north": 22.0,
+        "north-east": 7.0,
+        "south": 22.0,
+        "south-west": 22.0,
+        "west": 22.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 170000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-07-edge",
+      "zone": "north-east"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 8600,
+        "ul": 4300
+      },
+      "path_latency_ms_by_zone": {
+        "central": 27.0,
+        "delhi-ncr": 27.0,
+        "east": 27.0,
+        "north": 27.0,
+        "north-east": 11.0,
+        "south": 27.0,
+        "south-west": 27.0,
+        "west": 27.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 290000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-07-regional",
+      "zone": "north-east"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 13000,
+        "ul": 6500
+      },
+      "path_latency_ms_by_zone": {
+        "central": 32.0,
+        "delhi-ncr": 32.0,
+        "east": 32.0,
+        "north": 32.0,
+        "north-east": 15.0,
+        "south": 32.0,
+        "south-west": 32.0,
+        "west": 32.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 430000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-07-central",
+      "zone": "north-east"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 5200,
+        "ul": 2600
+      },
+      "path_latency_ms_by_zone": {
+        "central": 22.0,
+        "delhi-ncr": 22.0,
+        "east": 22.0,
+        "north": 22.0,
+        "north-east": 22.0,
+        "south": 22.0,
+        "south-west": 7.0,
+        "west": 22.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 170000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-08-edge",
+      "zone": "south-west"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 8600,
+        "ul": 4300
+      },
+      "path_latency_ms_by_zone": {
+        "central": 27.0,
+        "delhi-ncr": 27.0,
+        "east": 27.0,
+        "north": 27.0,
+        "north-east": 27.0,
+        "south": 27.0,
+        "south-west": 11.0,
+        "west": 27.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 290000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-08-regional",
+      "zone": "south-west"
+    },
+    {
+      "capacity_mbps": {
+        "dl": 13000,
+        "ul": 6500
+      },
+      "path_latency_ms_by_zone": {
+        "central": 32.0,
+        "delhi-ncr": 32.0,
+        "east": 32.0,
+        "north": 32.0,
+        "north-east": 32.0,
+        "south": 32.0,
+        "south-west": 15.0,
+        "west": 32.0
+      },
+      "queue_limit_seconds": 0.25,
+      "safe_utilization": {
+        "dl": 0.8,
+        "ul": 0.78
+      },
+      "session_capacity": 430000,
+      "session_safe_utilization": 0.82,
+      "upf_id": "upf-08-central",
+      "zone": "south-west"
+    }
+  ]
+}

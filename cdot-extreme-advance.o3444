@@ -1,0 +1,6 @@
+[env] root=/home/abharadwaj/Projects/5g-simulation
+[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
+[env] host=x8000c0s0b0n0 job=3444.wlm array_index=none
+array_job=3445[].wlm nodes=4 workers_per_node=8 expected_shards=66
+aggregate_job=3446.wlm dependency=afterok:3445[].wlm
+next_launcher=3447.wlm phase=12 dependency=afterok:3446.wlm

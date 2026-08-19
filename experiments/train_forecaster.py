@@ -49,9 +49,16 @@ def _bucket_sequence(path: Path, config: ScenarioConfig) -> dict[str, list[Deman
         ):
             return
         arrivals: dict[str, int] = defaultdict(int)
+        generated_ul: dict[str, float] = defaultdict(float)
+        generated_dl: dict[str, float] = defaultdict(float)
+        has_generated_labels = all(bool(row.get("group_generated_load_mbps")) for row in chunk)
         for row in chunk:
             for group_id, count in _group_counts(row["group_arrivals"]).items():
                 arrivals[group_id] += count
+            for item in row.get("group_generated_load_mbps", ()) or ():
+                group_id = str(item["group_id"])
+                generated_ul[group_id] += float(item["ul_mbps"])
+                generated_dl[group_id] += float(item["dl_mbps"])
         # These are duration means across the complete decision bucket, not a
         # single sample from its final 30-second tick.  That matches the live
         # telemetry contract and prevents one noisy scrape from becoming the
@@ -79,20 +86,36 @@ def _bucket_sequence(path: Path, config: ScenarioConfig) -> dict[str, list[Deman
         window = TimeWindow(last["window_end"] - timedelta(seconds=duration), last["window_end"])
         for group in config.groups:
             count = arrivals[group.key.selection_id]
+            group_id = group.key.selection_id
             by_group[group.key.selection_id].append(DemandObservation(
                 window=window, group=group.key, new_session_count=float(count),
-                new_ul_mbps=count * group.offered_ul_mbps_per_session,
-                new_dl_mbps=count * group.offered_dl_mbps_per_session,
+                new_ul_mbps=(
+                    generated_ul[group_id]
+                    if has_generated_labels
+                    else count * group.offered_ul_mbps_per_session
+                ),
+                new_dl_mbps=(
+                    generated_dl[group_id]
+                    if has_generated_labels
+                    else count * group.offered_dl_mbps_per_session
+                ),
                 existing_load_by_upf=residual,
-                quality_flags=("synthetic_training",),
+                quality_flags=(
+                    "synthetic_training",
+                    "actual_generated_rate_bin_load" if has_generated_labels
+                    else "legacy_nominal_rate_label",
+                ),
             ))
 
     pending: list[dict[str, Any]] = []
     previous_step: int | None = None
     parquet = pq.ParquetFile(path)
+    columns = ["step", "window_end", "group_arrivals", "upfs"]
+    if "group_generated_load_mbps" in parquet.schema_arrow.names:
+        columns.append("group_generated_load_mbps")
     for batch in parquet.iter_batches(
         batch_size=4096,
-        columns=["step", "window_end", "group_arrivals", "upfs"],
+        columns=columns,
     ):
         for row in batch.to_pylist():
             step = int(row["step"])

@@ -17,6 +17,10 @@ SELECTION_GROUP = GroupKey("zone-a", "internet", "1-010203")
 
 
 class ContractTests(unittest.TestCase):
+    def test_solver_report_accepts_an_intentional_skipped_solve(self) -> None:
+        report = SolverReport("cohort-mpc-v1", "skipped", 0)
+        self.assertEqual(report.status, "skipped")
+
     def test_frozen_v1_schema_fixtures_round_trip(self) -> None:
         fixtures = {
             "telemetry-sample-v1.json": TelemetrySample,

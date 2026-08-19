@@ -1,0 +1,84 @@
+#!/bin/bash
+#PBS -N cdot-stage2-node
+#PBS -q workq
+#PBS -l select=1:ncpus=8:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=08:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${NODE_COUNT:?set campaign node count}"
+: "${WORKER_COUNT:?set selected workers per node}"
+: "${WORK_LIST:?set the frozen campaign work list}"
+: "${CAMPAIGN_ROOT:?set shared campaign storage}"
+: "${CAMPAIGN_ID:?set unique campaign ID}"
+: "${ALLOCATED_MEMORY_BYTES:?set per-node memory allocation in bytes}"
+: "${CHECKPOINT_ROOT:?set durable shared checkpoint root}"
+PARTITION_INDEX="${PBS_ARRAY_INDEX:-${PARTITION_INDEX:?set partition index or submit as an array}}"
+REPETITION="${REPETITION:-1}"
+
+SCRATCH_BASE="${PBS_JOBFS:-${TMPDIR:-/tmp}}"
+JOB_TOKEN="${PBS_JOBID//[^[:alnum:]_.-]/_}"
+SCRATCH_ROOT="$(mktemp -d "$SCRATCH_BASE/cdot-stage2-${JOB_TOKEN}-p${PARTITION_INDEX}.XXXXXX")"
+read -r SCRATCH_BLOCKS SCRATCH_BLOCK_SIZE < <(stat -f -c '%a %S' "$SCRATCH_ROOT")
+SCRATCH_ALLOCATION_BYTES=$((SCRATCH_BLOCKS * SCRATCH_BLOCK_SIZE))
+REPORT_DIR="$CAMPAIGN_ROOT/multinode/$CAMPAIGN_ID"
+mkdir -p "$REPORT_DIR" "$CHECKPOINT_ROOT"
+
+"$PYTHON_BIN" -m experiments.checkpoint_stage restore \
+  --root "$CHECKPOINT_ROOT/$CAMPAIGN_ID" \
+  --partition-index "$PARTITION_INDEX" \
+  --scratch "$SCRATCH_ROOT"
+
+save_incomplete() {
+  status=$?
+  trap - EXIT
+  if [ "$status" -ne 0 ]; then
+    echo "[stage2] staging incomplete scratch for partition=$PARTITION_INDEX status=$status" >&2
+    "$PYTHON_BIN" -m experiments.checkpoint_stage save \
+      --root "$CHECKPOINT_ROOT/$CAMPAIGN_ID" \
+      --partition-index "$PARTITION_INDEX" \
+      --scratch "$SCRATCH_ROOT" \
+      --attempt "$JOB_TOKEN" || true
+  fi
+  exit "$status"
+}
+trap save_incomplete EXIT
+
+"$PYTHON_BIN" -m experiments.packed_runner \
+  --work-list "$WORK_LIST" \
+  --workers "$WORKER_COUNT" \
+  --partition-index "$PARTITION_INDEX" \
+  --partition-count "$NODE_COUNT" \
+  --repetition "$REPETITION" \
+  --campaign-id "$CAMPAIGN_ID" \
+  --output-root "$CAMPAIGN_ROOT/shards" \
+  --scratch-root "$SCRATCH_ROOT" \
+  --allocated-memory-bytes "$ALLOCATED_MEMORY_BYTES" \
+  --scratch-allocation-bytes "$SCRATCH_ALLOCATION_BYTES" \
+  --report "$REPORT_DIR/node-${PARTITION_INDEX}.json" \
+  --skip-existing &
+RUNNER_PID=$!
+
+terminate_runner() {
+  echo "[stage2] termination requested; checkpointing partition=$PARTITION_INDEX" >&2
+  kill -TERM "$RUNNER_PID" 2>/dev/null || true
+  wait "$RUNNER_PID" 2>/dev/null || true
+  exit 143
+}
+trap terminate_runner TERM INT
+set +e
+wait "$RUNNER_PID"
+RUNNER_STATUS=$?
+set -e
+trap - TERM INT
+if [ "$RUNNER_STATUS" -ne 0 ]; then
+  exit "$RUNNER_STATUS"
+fi
+
+find "$SCRATCH_ROOT" -depth -type d -empty -delete
+trap - EXIT

@@ -12,6 +12,7 @@ dependencies = [
   "uvicorn[standard]>=0.30",
   "numpy>=1.26",
   "scipy>=1.11",
+  "scikit-learn>=1.4",
   "pyarrow>=14",
   "lightgbm>=4",
   "duckdb>=1.1",
