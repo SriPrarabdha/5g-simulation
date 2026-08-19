@@ -432,7 +432,7 @@ def _scenario_figure(evaluations: dict[str, dict[str, Any]], figures: Path) -> l
     fig.colorbar(image, ax=ax, label="Severity-weighted UL improvement (%)")
     fig.suptitle("Controllability is scenario-dependent—not a single headline number", x=0.06, y=0.99,
                  ha="left", fontsize=19, fontweight="bold", color=NAVY)
-    ax.set_title("Scheduled notice is valuable; unknown outages expose persistent-cohort limits",
+    ax.set_title("Scheduled notice is valuable; mixed stress exposes brittle controller interactions",
                  loc="left", color=NAVY, pad=16)
     fig.subplots_adjust(top=0.78, left=0.20)
     return _save(fig, figures, "05_mpc_scenario_controllability")
@@ -553,7 +553,7 @@ def _plan_rows(evaluations: dict[str, dict[str, Any]], churn_running: bool) -> l
         {"work": "Three 28-day traffic-v2 corpora", "status": "complete", "finding": "Seeds 46001/2/3 published and validated"},
         {"work": "Forecast challenger training/test", "status": "not_run", "finding": "Promotion criteria not yet testable"},
         {"work": "Empirical survival experiments", "status": "not_run", "finding": "Estimator implemented; outcome evidence pending"},
-        {"work": "MPC development ablations", "status": "partial", "finding": f"{completed_ablation_count} of 6 complete; no promotion candidate"},
+        {"work": "MPC development ablations", "status": "complete" if completed_ablation_count == 6 else "partial", "finding": f"{completed_ablation_count} of 6 complete; no promotion candidate"},
         {"work": "Churn + solve-trigger rerun", "status": churn, "finding": "12 development pairs after contract fix"},
         {"work": "MPC validation seeds 46201–46216", "status": "not_run", "finding": "Correctly untouched"},
         {"work": "MPC release seeds 46301–46330", "status": "not_run", "finding": "Correctly untouched"},
@@ -701,6 +701,11 @@ def _ledger(
                 "worst_pair": row["worst_pair_ul_overload_area_relative_reduction"],
                 "mean_controller_epochs": float(np.mean([pair["controller_decisions"] for pair in row["pairs"]])),
                 "mean_accepted_new_policies": float(np.mean([pair["certified_decisions"] for pair in row["pairs"]])),
+                "pbs_accounting": ({
+                    "job": "3460.wlm", "nodes": 1, "ncpus": 12, "parallel_pairs": 12,
+                    "wall_seconds": 2287, "cpu_seconds": 21259, "cpu_percent": 1192,
+                    "peak_memory_kb": 4951176, "exit_status": 0,
+                } if key == "churn-trigger" else None),
                 "gate_checks": gate,
             },
             "expectation": "Clear every MPC development promotion gate.",
@@ -749,7 +754,7 @@ def _report_markdown(
         "",
         "Three 28-day traffic-v2 corpora are complete with actual generated UL/DL rate-bin labels. Forecast challenger training, untouched forecast testing and survival experiments have not yet run, so their promotion criteria cannot be claimed.",
         "",
-        f"The {len(evaluations)} completed MPC development ablations preserve aggregate DL/drop/session guardrails, but none clears every promotion gate. Validation and release seeds remain untouched.",
+        f"{sum(all(row['aggregate_guardrails'].values()) for row in evaluations.values())} of {len(evaluations)} completed MPC development ablations preserve aggregate DL/drop/session guardrails; churn/trigger does not, and none clears every promotion gate. Validation and release seeds remain untouched.",
         "",
         "## Reconciliation result",
         "",

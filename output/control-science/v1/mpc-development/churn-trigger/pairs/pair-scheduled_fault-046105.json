@@ -1,0 +1,184 @@
+{
+  "certified_decisions": 3,
+  "controller_decisions": 144,
+  "events": [
+    {
+      "arrival_factor": null,
+      "dl_factor": 0.30160702428431685,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 720,
+      "latency_ms": null,
+      "step": 960,
+      "ul_factor": 0.15160702428431688,
+      "upf_id": "upf-edge-north-urban-b",
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 1.0,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 720,
+      "latency_ms": null,
+      "step": 1560,
+      "ul_factor": 1.0,
+      "upf_id": "upf-edge-north-urban-b",
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 0.4641462301702308,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 1440,
+      "latency_ms": null,
+      "step": 1680,
+      "ul_factor": 0.31414623017023086,
+      "upf_id": "upf-edge-rural-b",
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 1.0,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 1440,
+      "latency_ms": null,
+      "step": 2300,
+      "ul_factor": 1.0,
+      "upf_id": "upf-edge-rural-b",
+      "zone": null
+    }
+  ],
+  "mpc": {
+    "carried_bytes": {
+      "dl": 1.0483371254938918e+17,
+      "ul": 4.235926627869274e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.024708964031391202,
+      "ul": 0.03263551842098131
+    },
+    "controller": "cohort-mpc-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "new_session_offered_bytes": {
+      "dl": 2590332432660062.0,
+      "ul": 1382416614937529.0
+    },
+    "offered_bytes": {
+      "dl": 1.0483371254938918e+17,
+      "ul": 4.235926627869274e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+    "seed": 46105,
+    "selection_audit_count": 43344306,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43344306,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "relative_reduction": {
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    }
+  },
+  "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+  "scenario_kind": "scheduled_fault",
+  "schema_version": "cohort-mpc-candidate-pair/1.0",
+  "seed": 46105,
+  "static": {
+    "carried_bytes": {
+      "dl": 1.0483371254940363e+17,
+      "ul": 4.235926627868354e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.024708964031387802,
+      "ul": 0.03263551842098839
+    },
+    "controller": "static-capacity-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "new_session_offered_bytes": {
+      "dl": 2590332432660062.5,
+      "ul": 1382416614937529.0
+    },
+    "offered_bytes": {
+      "dl": 1.0483371254940363e+17,
+      "ul": 4.235926627868354e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+    "seed": 46105,
+    "selection_audit_count": 43344306,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43344306,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "wall_seconds": 2262.369832175318,
+  "work_fingerprint": "2b468ddab81b0951c9cbdad75f744f328c1420c8b71bbdc67054e52a41346e68"
+}

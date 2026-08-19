@@ -71,12 +71,21 @@
     },
     "churn_trigger_rerun": {
       "job_id": "3460.wlm",
-      "status": "running",
+      "status": "complete",
       "node_count": 1,
       "allocated_cpus": 12,
       "parallel_pairs": 12,
       "seeds": "46101-46112",
-      "contract_regression_tests_passed": 22
+      "contract_regression_tests_passed": 22,
+      "exit_status": 0,
+      "wall_seconds": 2287,
+      "cpu_seconds": 21259,
+      "cpu_percent": 1192,
+      "peak_memory_kb": 4951176,
+      "mean_pair_ul_improvement": -0.22346686448894146,
+      "severity_weighted_ul_improvement": -0.28528488042493433,
+      "worst_pair_ul_improvement": -2.4062904844498907,
+      "decision": "stop_or_retune_without_release_seeds"
     }
   },
   "launch_artifacts": {

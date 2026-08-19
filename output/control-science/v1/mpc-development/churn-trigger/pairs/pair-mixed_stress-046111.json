@@ -1,0 +1,268 @@
+{
+  "certified_decisions": 2,
+  "controller_decisions": 144,
+  "events": [
+    {
+      "arrival_factor": 2.1220729012009505,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "south-urban|mission-critical|6-600001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 500,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 0.4604759372540371,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 540,
+      "latency_ms": null,
+      "step": 780,
+      "ul_factor": 0.3104759372540371,
+      "upf_id": "upf-edge-rural-b",
+      "zone": null
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "south-urban|mission-critical|6-600001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1160,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": null,
+      "event_type": "path_latency",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": 99.99982567777336,
+      "step": 1260,
+      "ul_factor": null,
+      "upf_id": "upf-edge-south-urban-a",
+      "zone": "industrial"
+    },
+    {
+      "arrival_factor": 2.0972658594399474,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "rural|social-live|1-100002",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1480,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 1.0,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 540,
+      "latency_ms": null,
+      "step": 1500,
+      "ul_factor": 1.0,
+      "upf_id": "upf-edge-rural-b",
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 0.16,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1820,
+      "ul_factor": 0.01,
+      "upf_id": "upf-central-2",
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": null,
+      "event_type": "path_latency",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": 19.0,
+      "step": 1860,
+      "ul_factor": null,
+      "upf_id": "upf-edge-south-urban-a",
+      "zone": "industrial"
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "rural|social-live|1-100002",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1960,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 1.0,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 2100,
+      "ul_factor": 1.0,
+      "upf_id": "upf-central-2",
+      "zone": null
+    }
+  ],
+  "mpc": {
+    "carried_bytes": {
+      "dl": 1.0428312540440558e+17,
+      "ul": 4.19528195299473e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.024755517900813713,
+      "ul": 0.03278985987882905
+    },
+    "controller": "cohort-mpc-v1",
+    "dropped_bytes": {
+      "dl": 600442279295714.8,
+      "ul": 543763647348437.94
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 470.5398231771698,
+      "ul": 8983.520833334673
+    },
+    "new_session_offered_bytes": {
+      "dl": 2596447037295063.0,
+      "ul": 1393457007712526.2
+    },
+    "offered_bytes": {
+      "dl": 1.0488356768370085e+17,
+      "ul": 4.249658317729559e+16
+    },
+    "overload_area_seconds": {
+      "dl": 13229.67845999505,
+      "ul": 304896.24852690945
+    },
+    "overload_duration_seconds": {
+      "dl": 8400.0,
+      "ul": 8400.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 12759.138636817894,
+      "ul": 295912.7276935753
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46111",
+    "seed": 46111,
+    "selection_audit_count": 43494840,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43494840,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "relative_reduction": {
+    "dropped_bytes": {
+      "dl": -0.1211890372764265,
+      "ul": -0.31038270009052105
+    },
+    "overload_area_seconds": {
+      "dl": -0.09309864056062958,
+      "ul": -0.30665114762331463
+    }
+  },
+  "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46111",
+  "scenario_kind": "mixed_stress",
+  "schema_version": "cohort-mpc-candidate-pair/1.0",
+  "seed": 46111,
+  "static": {
+    "carried_bytes": {
+      "dl": 1.0434802705725909e+17,
+      "ul": 4.208161765064899e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.02475551790083214,
+      "ul": 0.03278985987877272
+    },
+    "controller": "static-capacity-v1",
+    "dropped_bytes": {
+      "dl": 535540626364220.44,
+      "ul": 414965526720457.2
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 79.14234765624846,
+      "ul": 1341.469479166662
+    },
+    "new_session_offered_bytes": {
+      "dl": 2596447037295063.0,
+      "ul": 1393457007712529.8
+    },
+    "offered_bytes": {
+      "dl": 1.0488356768362278e+17,
+      "ul": 4.24965831773687e+16
+    },
+    "overload_area_seconds": {
+      "dl": 12102.913652156587,
+      "ul": 233341.73706692053
+    },
+    "overload_duration_seconds": {
+      "dl": 8400.0,
+      "ul": 8400.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 12023.771304500357,
+      "ul": 232000.2675877541
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46111",
+    "seed": 46111,
+    "selection_audit_count": 43494840,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43494840,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "wall_seconds": 1864.2944137491286,
+  "work_fingerprint": "2b468ddab81b0951c9cbdad75f744f328c1420c8b71bbdc67054e52a41346e68"
+}

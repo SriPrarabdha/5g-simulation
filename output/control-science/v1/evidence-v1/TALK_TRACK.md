@@ -18,7 +18,7 @@ The same UL overload-area direction reverses: development +18.76%, production -1
 
 ## Figure 4 — MPC ablation waterfall
 
-Walk left to right across independently switchable changes. The churn/trigger rerun is still active; do not quote a result yet. Whiskers crossing zero and tail regressions prevent promotion even when a mean bar looks encouraging.
+Walk left to right across independently switchable changes. Churn/trigger delivered -22.3% mean and -28.5% severity-weighted UL improvement. Whiskers crossing zero and tail regressions prevent promotion even when a mean bar looks encouraging.
 
 ## Figure 5 — Scenario controllability
 

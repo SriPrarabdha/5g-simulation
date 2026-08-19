@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-08-19T07:47:16.122489Z",
+  "created_at": "2026-08-19T08:04:04.569965Z",
   "experiments": [
     {
       "assessment": "matched",
@@ -148,6 +148,7 @@
         "mean_accepted_new_policies": 37.083333333333336,
         "mean_controller_epochs": 144.0,
         "mean_pair_ul_improvement": 0.11557959904796611,
+        "pbs_accounting": null,
         "severity_weighted_ul_improvement": 0.03964724941425541,
         "worst_pair": -0.1140534497815352
       },
@@ -179,6 +180,7 @@
         "mean_accepted_new_policies": 69.66666666666667,
         "mean_controller_epochs": 144.0,
         "mean_pair_ul_improvement": 0.01830222126238938,
+        "pbs_accounting": null,
         "severity_weighted_ul_improvement": -0.031532484621194214,
         "worst_pair": -0.43450193715960156
       },
@@ -210,6 +212,7 @@
         "mean_accepted_new_policies": 61.833333333333336,
         "mean_controller_epochs": 144.0,
         "mean_pair_ul_improvement": 0.035064122721478304,
+        "pbs_accounting": null,
         "severity_weighted_ul_improvement": -0.024778712443628767,
         "worst_pair": -0.35306170522577746
       },
@@ -241,6 +244,7 @@
         "mean_accepted_new_policies": 54.833333333333336,
         "mean_controller_epochs": 144.0,
         "mean_pair_ul_improvement": 0.07199056937924057,
+        "pbs_accounting": null,
         "severity_weighted_ul_improvement": 0.010077657212465714,
         "worst_pair": -0.23817893350972927
       },
@@ -272,18 +276,53 @@
         "mean_accepted_new_policies": 20.166666666666668,
         "mean_controller_epochs": 144.0,
         "mean_pair_ul_improvement": 0.012770176760084753,
+        "pbs_accounting": null,
         "severity_weighted_ul_improvement": 0.002635088405183864,
         "worst_pair": -0.20120653564401744
       },
       "status": "complete"
     },
     {
-      "assessment": "pending",
+      "artifact": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/mpc-development/churn-trigger/evaluation.json",
+      "artifact_sha256": "cf391f4d24ad8bb7c21b2a5791570e6710b038282329eb33a4d95657db7a688b",
+      "assessment": "did_not_match",
       "expectation": "Clear every MPC development promotion gate.",
       "experiment_id": "mpc-development-churn-trigger",
       "job": "3460.wlm",
       "label": "Churn + trigger",
-      "status": "running"
+      "result": {
+        "bootstrap_ci95": [
+          -0.7256255114328926,
+          0.16429848298932004
+        ],
+        "gate_checks": {
+          "aggregate_guardrails": false,
+          "bootstrap_lower_above_zero": false,
+          "empirical_survival_robustness": null,
+          "mean_at_least_10_percent": false,
+          "routing_churn_not_increased": null,
+          "severity_weighted_positive": false,
+          "unknown_and_mixed_regression_within_2_percent": false,
+          "worst_pair_better_than_minus_10_percent": false
+        },
+        "mean_accepted_new_policies": 3.8333333333333335,
+        "mean_controller_epochs": 144.0,
+        "mean_pair_ul_improvement": -0.22346686448894146,
+        "pbs_accounting": {
+          "cpu_percent": 1192,
+          "cpu_seconds": 21259,
+          "exit_status": 0,
+          "job": "3460.wlm",
+          "ncpus": 12,
+          "nodes": 1,
+          "parallel_pairs": 12,
+          "peak_memory_kb": 4951176,
+          "wall_seconds": 2287
+        },
+        "severity_weighted_ul_improvement": -0.28528488042493433,
+        "worst_pair": -2.4062904844498907
+      },
+      "status": "complete"
     },
     {
       "assessment": "pending",

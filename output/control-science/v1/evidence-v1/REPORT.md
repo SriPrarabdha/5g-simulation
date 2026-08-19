@@ -1,6 +1,6 @@
 # C-DOT Control-Science Experiment Report
 
-Generated: 2026-08-19T07:47:16.122489Z
+Generated: 2026-08-19T08:04:04.569965Z
 
 ## Executive conclusion
 
@@ -10,7 +10,7 @@ The controller conclusion is intentionally conservative: **Static remains the pr
 
 Three 28-day traffic-v2 corpora are complete with actual generated UL/DL rate-bin labels. Forecast challenger training, untouched forecast testing and survival experiments have not yet run, so their promotion criteria cannot be claimed.
 
-The 5 completed MPC development ablations preserve aggregate DL/drop/session guardrails, but none clears every promotion gate. Validation and release seeds remain untouched.
+5 of 6 completed MPC development ablations preserve aggregate DL/drop/session guardrails; churn/trigger does not, and none clears every promotion gate. Validation and release seeds remain untouched.
 
 ## Reconciliation result
 
@@ -27,7 +27,7 @@ The 5 completed MPC development ablations preserve aggregate DL/drop/session gua
 | Adaptive α=0.5 | 3.51% | -12.36% to 20.85% | -2.48% | -35.31% | 61.8 / 144 | FAIL / incomplete evidence |
 | Adaptive α=1.0 | 7.20% | -6.50% to 23.35% | 1.01% | -23.82% | 54.8 / 144 | FAIL / incomplete evidence |
 | Failure domain | 1.28% | -3.94% to 5.82% | 0.26% | -20.12% | 20.2 / 144 | FAIL / incomplete evidence |
-| Churn + trigger | — | — | — | — | — | Pending rerun |
+| Churn + trigger | -22.35% | -72.56% to 16.43% | -28.53% | -240.63% | 3.8 / 144 | FAIL / incomplete evidence |
 
 Accepted-new-policy counts quantify optimization activity and the solve-trigger effect. Exact L1 routing churn and imperfect-empirical-survival acceptance checks are not present in the current evaluator output; they remain explicitly pending rather than being treated as passes.
 
@@ -38,7 +38,7 @@ Accepted-new-policy counts quantify optimization activity and the solve-trigger 
 - **Adaptive α=0.5:** does not match promotion expectation — mean < 10%; bootstrap lower bound ≤ 0; severity-weighted result ≤ 0; unknown/mixed regression > 2%; worst pair ≤ −10%; exact L1 churn unmeasured; imperfect-survival robustness unmeasured.
 - **Adaptive α=1.0:** does not match promotion expectation — mean < 10%; bootstrap lower bound ≤ 0; worst pair ≤ −10%; exact L1 churn unmeasured; imperfect-survival robustness unmeasured.
 - **Failure domain:** does not match promotion expectation — mean < 10%; bootstrap lower bound ≤ 0; worst pair ≤ −10%; exact L1 churn unmeasured; imperfect-survival robustness unmeasured.
-- **Churn + trigger:** pending rerun.
+- **Churn + trigger:** does not match promotion expectation — mean < 10%; bootstrap lower bound ≤ 0; severity-weighted result ≤ 0; unknown/mixed regression > 2%; worst pair ≤ −10%; aggregate DL/drop/session guardrail; exact L1 churn unmeasured; imperfect-survival robustness unmeasured.
 
 ## Initial-plan coverage
 
@@ -49,8 +49,8 @@ Accepted-new-policy counts quantify optimization activity and the solve-trigger 
 | Three 28-day traffic-v2 corpora | COMPLETE | Seeds 46001/2/3 published and validated |
 | Forecast challenger training/test | NOT_RUN | Promotion criteria not yet testable |
 | Empirical survival experiments | NOT_RUN | Estimator implemented; outcome evidence pending |
-| MPC development ablations | PARTIAL | 5 of 6 complete; no promotion candidate |
-| Churn + solve-trigger rerun | RUNNING | 12 development pairs after contract fix |
+| MPC development ablations | COMPLETE | 6 of 6 complete; no promotion candidate |
+| Churn + solve-trigger rerun | COMPLETE | 12 development pairs after contract fix |
 | MPC validation seeds 46201–46216 | NOT_RUN | Correctly untouched |
 | MPC release seeds 46301–46330 | NOT_RUN | Correctly untouched |
 | New control-science report | COMPLETE | Separate from frozen production package |
@@ -69,7 +69,7 @@ Accepted-new-policy counts quantify optimization activity and the solve-trigger 
 | `mpc-development-adaptive-a05` | complete | Clear every MPC development promotion gate. | did_not_match |
 | `mpc-development-adaptive-a10` | complete | Clear every MPC development promotion gate. | did_not_match |
 | `mpc-development-failure-domain` | complete | Clear every MPC development promotion gate. | did_not_match |
-| `mpc-development-churn-trigger` | running | Clear every MPC development promotion gate. | pending |
+| `mpc-development-churn-trigger` | complete | Clear every MPC development promotion gate. | did_not_match |
 | `forecast-challenger-comparison` | not_run | Compare ridge-v2, histogram-gradient quantile, regime ensemble and LightGBM. | pending |
 | `survival-provider-sample-size-and-drift` | not_run | Compare oracle, empirical, uniform and stale curves at 100/1,000/10,000 samples. | pending |
 | `mpc-validation-and-release` | not_run | Use validation then untouched release seeds only after development promotion. | correctly_deferred |

@@ -1,19 +1,19 @@
 {
   "artifacts": [
     {
-      "bytes": 7931,
+      "bytes": 8270,
       "path": "REPORT.md",
-      "sha256": "8a3bbbded7c2a0ae50ba67f38a9ff6940d8b3b03ab59a8bedb1770349e244e89"
+      "sha256": "887a872a5f90e9b7b071ffc7ff1bc7e250e30582a688266f2782d3acd0c3ed68"
     },
     {
-      "bytes": 2813,
+      "bytes": 2826,
       "path": "TALK_TRACK.md",
-      "sha256": "a721c7b469c1ed192b1b55e9f770c3cd325e3bf5f6e8862c30c480f7c26619ce"
+      "sha256": "94799664f9d8fd2cc1711d16801b0d598e2f1721b43fce8b8125008b2af928dc"
     },
     {
-      "bytes": 926373,
+      "bytes": 943797,
       "path": "cdot_control_science_report.pdf",
-      "sha256": "2f6088f19a7c874ad22320a259c1a5f1aa56c8362f53504dfb19e24938a7e6e1"
+      "sha256": "baa0cd546cc26f3e80fa910611ad277d8d30cec9caad1cf104cf66ef2cf4266d"
     },
     {
       "bytes": 423356,
@@ -21,9 +21,9 @@
       "sha256": "bf1c38fd29b8f462b866a0fc041561242b5366b6d8d45e57225db713ac358a62"
     },
     {
-      "bytes": 12738,
+      "bytes": 14264,
       "path": "experiment-ledger.json",
-      "sha256": "580ea2f4d844cf199bc1fb011d4dc246b0ba7063a1f238d416327fa066214a01"
+      "sha256": "5212d7027056417069da7d76c3c171778a60b968c95aeacd5744e47b772cb2db"
     },
     {
       "bytes": 479026,
@@ -33,7 +33,7 @@
     {
       "bytes": 176570,
       "path": "figures/01_traffic_v2_realism_fingerprint.svg",
-      "sha256": "ad4657cf046b1aa1dfc15df0630c644201b690b863fe7ca81020244289a3b66d"
+      "sha256": "75e07e0bf4b4589a2b3dc614d0ce5859bb6c4024f671b540f323834a73935532"
     },
     {
       "bytes": 229662,
@@ -43,7 +43,7 @@
     {
       "bytes": 99630,
       "path": "figures/02_corpus_execution_integrity.svg",
-      "sha256": "79ce5c8d007e1a5adc9225f1ff3af527b929e83bcf6e0110b2d83d99d9a2b602"
+      "sha256": "b22d6c4e02d1ebfb15b60f42fa647b538b17d59b94bcd2df219a5ae7d0ddf083"
     },
     {
       "bytes": 277927,
@@ -53,65 +53,65 @@
     {
       "bytes": 138972,
       "path": "figures/03_mpc_30_vs_128_reconciliation.svg",
-      "sha256": "0021a76547a15b48bfe328f9fd48e2d7ce9b2b959d82386fb4006c2569967dfa"
+      "sha256": "d930c176937f85f0ce3a1535aa3892d7dc7e8ace7bbfa9868691eb720ed6155f"
     },
     {
-      "bytes": 178974,
+      "bytes": 181945,
       "path": "figures/04_mpc_ablation_waterfall.png",
-      "sha256": "15312856e4848fd58c70742ce2f12d9f9b1926c2ba0daa38d6a2b10d8fd97a1a"
+      "sha256": "6463357e85165703cd3bed03b2f59748af7ebe41dfd2eecc35a53fe5919bc6a2"
     },
     {
-      "bytes": 81520,
+      "bytes": 80932,
       "path": "figures/04_mpc_ablation_waterfall.svg",
-      "sha256": "d932e90e2f8dc77a329af391686065b18679a6d20ebc59ccf5a9e8da13c880f3"
+      "sha256": "62e692aa613dcb5c0005bc9d3925410509a9811c5ddde952ae89a4b5ffbaf250"
     },
     {
-      "bytes": 184335,
+      "bytes": 199869,
       "path": "figures/05_mpc_scenario_controllability.png",
-      "sha256": "30b1bb0428bc8c6bbe8acd2fafa7de76d944ef02be200b8bd1dd33864fe8445c"
+      "sha256": "efe0970f3f88327dcfd4074d6ce5223ce36150836a2c63ac3405bb329c24a798"
     },
     {
-      "bytes": 79483,
+      "bytes": 85135,
       "path": "figures/05_mpc_scenario_controllability.svg",
-      "sha256": "e5589a0cfb89310231308df2a4d224972d4e12a807ef81db66247074419f1c86"
+      "sha256": "dfca8e3e6b2bc857e4ba20f7acde8053303ea00959fff0bca6a840ac7d957a0c"
     },
     {
-      "bytes": 196180,
+      "bytes": 212785,
       "path": "figures/06_mpc_mean_vs_tail_risk.png",
-      "sha256": "6c3a8919bdbe39a744ddbc41fd65fd96ea223ff8563f08fc03f47176944a6d52"
+      "sha256": "91b585a0825e3e955a09ccb420790c31938d107c054a6cb532d6198e43179ebd"
     },
     {
-      "bytes": 90433,
+      "bytes": 96575,
       "path": "figures/06_mpc_mean_vs_tail_risk.svg",
-      "sha256": "1159d70ae92d562b7ed6662807675f7c4d922ae0cae7e3a2b12cce5490eb1981"
+      "sha256": "0667a3e527c244f2e415c1bf9c0eb69f21d342c6c009e1b4af5e59eb7aa9819c"
     },
     {
-      "bytes": 245926,
+      "bytes": 246352,
       "path": "figures/07_plan_coverage_and_release_discipline.png",
-      "sha256": "cc1197f8c9bcac2944f4b8fcb07485a500a9fcd3d04f8fc31f2f2f585bdc27b4"
+      "sha256": "7c6e3166ac94793bc6175525ee90cfb044c8e5311cd7b3848653343dc29bd5de"
     },
     {
-      "bytes": 113903,
+      "bytes": 112620,
       "path": "figures/07_plan_coverage_and_release_discipline.svg",
-      "sha256": "e6fbe8d32387a785b4ee12322598974535830f00ee21e675f3ea3fd0266ac227"
+      "sha256": "b66a970f21784bd96d00740f597da0203130f9576fa3e3d66909b141d5e0a36c"
     },
     {
-      "bytes": 233722,
+      "bytes": 248621,
       "path": "figures/08_mpc_solve_activity_tradeoff.png",
-      "sha256": "7cdd792d7eb013ba8cd624d1ce1d3b3a7c566fd22c688ad691fac33222eab115"
+      "sha256": "60f2377b2f94070635b69690f0739f4b4e96aa3bfd9ea9681325810d8967e308"
     },
     {
-      "bytes": 105645,
+      "bytes": 110703,
       "path": "figures/08_mpc_solve_activity_tradeoff.svg",
-      "sha256": "d5e0d21b084d3d4cd6f092809538aa2654ffe78d57936b072ebe7c9f28837ca6"
+      "sha256": "6496a221c1182af743c98347bfd179e14c4adfb076d8d2c9caaf9fef88875f57"
     },
     {
       "bytes": 3839,
       "path": "index.html",
-      "sha256": "49c233d01f44a6e8c6cf317175ff716acd3248f012add4ab4e1749cb5e53cb8b"
+      "sha256": "64bb88b1ca05743d770690ff24e9654d786d687df72f4664e22b1440cdbaccbe"
     }
   ],
-  "created_at": "2026-08-19T07:47:19.074583Z",
+  "created_at": "2026-08-19T08:04:07.522299Z",
   "production_package_modified": false,
   "release_seeds_consumed": false,
   "schema_version": "control-science-evidence-manifest/1.0"

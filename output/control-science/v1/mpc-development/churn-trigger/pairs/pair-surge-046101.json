@@ -1,0 +1,212 @@
+{
+  "certified_decisions": 0,
+  "controller_decisions": 144,
+  "events": [
+    {
+      "arrival_factor": 4.487626234951851,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "east-urban|mission-critical|6-600001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 680,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 4.449046002494705,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "north-urban|ims-voice|1-100004",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1380,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "east-urban|mission-critical|6-600001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1400,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 3.077973570608941,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "east-urban|enterprise-rtc|1-100006",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1900,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "north-urban|ims-voice|1-100004",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 2000,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "east-urban|enterprise-rtc|1-100006",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 2540,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    }
+  ],
+  "mpc": {
+    "carried_bytes": {
+      "dl": 1.052770328634375e+17,
+      "ul": 4.2891852643414984e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.02476573560652239,
+      "ul": 0.03267084310422452
+    },
+    "controller": "cohort-mpc-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "new_session_offered_bytes": {
+      "dl": 2607263161335062.0,
+      "ul": 1401312988162528.8
+    },
+    "offered_bytes": {
+      "dl": 1.052770328634375e+17,
+      "ul": 4.2891852643414984e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46101",
+    "seed": 46101,
+    "selection_audit_count": 43806632,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43806632,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "relative_reduction": {
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    }
+  },
+  "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46101",
+  "scenario_kind": "surge",
+  "schema_version": "cohort-mpc-candidate-pair/1.0",
+  "seed": 46101,
+  "static": {
+    "carried_bytes": {
+      "dl": 1.052770328634375e+17,
+      "ul": 4.2891852643414984e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.02476573560652239,
+      "ul": 0.03267084310422452
+    },
+    "controller": "static-capacity-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "new_session_offered_bytes": {
+      "dl": 2607263161335062.0,
+      "ul": 1401312988162528.8
+    },
+    "offered_bytes": {
+      "dl": 1.052770328634375e+17,
+      "ul": 4.2891852643414984e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46101",
+    "seed": 46101,
+    "selection_audit_count": 43806632,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43806632,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "wall_seconds": 1672.6009533358738,
+  "work_fingerprint": "2b468ddab81b0951c9cbdad75f744f328c1420c8b71bbdc67054e52a41346e68"
+}
