@@ -1,0 +1,373 @@
+{
+  "freeze_record_sha256": "86487724dca5a5a21587e628867dcda7c5fd1b2ea49c1610f35f2355f40639f9",
+  "frozen_at": "2026-08-17T20:11:27.631751Z",
+  "held_out_evaluation": {
+    "bundle": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-14d-s20260818.json",
+    "bundle_sha256": "c629a5429047738d31bb671e175ff39eb8f7ddf1d05ffd45d9e4261261b4dffa",
+    "by_horizon": [
+      {
+        "horizon_minutes": 10,
+        "macro_wape": 0.05148260020826454,
+        "mean_coverage_p90": 0.929739238410596,
+        "mean_coverage_p95": 0.9634381898454747
+      },
+      {
+        "horizon_minutes": 20,
+        "macro_wape": 0.06720013114930214,
+        "mean_coverage_p90": 0.9474682671081678,
+        "mean_coverage_p95": 0.9677152317880794
+      },
+      {
+        "horizon_minutes": 30,
+        "macro_wape": 0.080294308213951,
+        "mean_coverage_p90": 0.9468129139072848,
+        "mean_coverage_p95": 0.9634726821192052
+      },
+      {
+        "horizon_minutes": 40,
+        "macro_wape": 0.08650731412398306,
+        "mean_coverage_p90": 0.9343612030905076,
+        "mean_coverage_p95": 0.9522282008830021
+      },
+      {
+        "horizon_minutes": 50,
+        "macro_wape": 0.08271897310668963,
+        "mean_coverage_p90": 0.9263219822812846,
+        "mean_coverage_p95": 0.9462901439645626
+      },
+      {
+        "horizon_minutes": 60,
+        "macro_wape": 0.0875185938882215,
+        "mean_coverage_p90": 0.9186046511627907,
+        "mean_coverage_p95": 0.9426910299003323
+      },
+      {
+        "horizon_minutes": 70,
+        "macro_wape": 0.11241654090485333,
+        "mean_coverage_p90": 0.9145902547065339,
+        "mean_coverage_p95": 0.9462901439645626
+      },
+      {
+        "horizon_minutes": 80,
+        "macro_wape": 0.12817056484929368,
+        "mean_coverage_p90": 0.9288482834994463,
+        "mean_coverage_p95": 0.952796234772979
+      }
+    ],
+    "by_target": [
+      {
+        "macro_wape": 0.08703862830556948,
+        "mean_coverage_p90": 0.9308433492708265,
+        "mean_coverage_p95": 0.9543652321547748,
+        "mean_mae": 210.6014140437184,
+        "target": "new_session_count"
+      },
+      {
+        "macro_wape": 0.0870386283055702,
+        "mean_coverage_p90": 0.9308433492708265,
+        "mean_coverage_p95": 0.9543652321547748,
+        "mean_mae": 184.77395529757612,
+        "target": "new_ul_mbps"
+      },
+      {
+        "macro_wape": 0.08703862830556987,
+        "mean_coverage_p90": 0.9308433492708265,
+        "mean_coverage_p95": 0.9543652321547748,
+        "mean_mae": 325.15321639140853,
+        "target": "new_dl_mbps"
+      }
+    ],
+    "fitted_models": 2304,
+    "groups": 96,
+    "model_version": "extreme-calendar-ridge-conformal-stage1/1.0",
+    "overall": {
+      "macro_wape": 0.08703862830556987,
+      "mean_coverage_p90": 0.9308433492708263,
+      "mean_coverage_p95": 0.9543652321547746,
+      "median_model_wape": 0.08110949146355423,
+      "p90_model_wape": 0.15174754839352625,
+      "wape_based_score": 0.9129613716944301,
+      "worst_model_wape": 0.3332581298696844
+    },
+    "split": {
+      "calibration": 0.15,
+      "ordered": true,
+      "test": 0.15,
+      "train": 0.7
+    },
+    "synthetic": true,
+    "worst_session_models": [
+      {
+        "calibration_rows": 300.0,
+        "coverage_p90": 1.0,
+        "coverage_p95": 1.0,
+        "group_id": "north-urban|edge-inference|5-500001",
+        "horizon_minutes": 80,
+        "mae_p50": 222.1979205433454,
+        "rows": 2003.0,
+        "test_rows": 301.0,
+        "train_rows": 1402.0,
+        "wape_p50": 0.3332581298696844
+      },
+      {
+        "calibration_rows": 300.0,
+        "coverage_p90": 0.9966777408637874,
+        "coverage_p95": 1.0,
+        "group_id": "west-urban|edge-inference|5-500001",
+        "horizon_minutes": 80,
+        "mae_p50": 264.1722063380114,
+        "rows": 2003.0,
+        "test_rows": 301.0,
+        "train_rows": 1402.0,
+        "wape_p50": 0.32106594515000864
+      },
+      {
+        "calibration_rows": 300.0,
+        "coverage_p90": 0.9900332225913622,
+        "coverage_p95": 0.9900332225913622,
+        "group_id": "west-urban|factory-control|2-200001",
+        "horizon_minutes": 80,
+        "mae_p50": 495.74177992221627,
+        "rows": 2003.0,
+        "test_rows": 301.0,
+        "train_rows": 1402.0,
+        "wape_p50": 0.3149958851980349
+      },
+      {
+        "calibration_rows": 301.0,
+        "coverage_p90": 1.0,
+        "coverage_p95": 1.0,
+        "group_id": "north-urban|edge-inference|5-500001",
+        "horizon_minutes": 70,
+        "mae_p50": 189.36148249358843,
+        "rows": 2004.0,
+        "test_rows": 301.0,
+        "train_rows": 1402.0,
+        "wape_p50": 0.2840091994148693
+      },
+      {
+        "calibration_rows": 301.0,
+        "coverage_p90": 0.9933554817275747,
+        "coverage_p95": 1.0,
+        "group_id": "west-urban|edge-inference|5-500001",
+        "horizon_minutes": 70,
+        "mae_p50": 233.42867516131136,
+        "rows": 2004.0,
+        "test_rows": 301.0,
+        "train_rows": 1402.0,
+        "wape_p50": 0.2837012994466439
+      },
+      {
+        "calibration_rows": 301.0,
+        "coverage_p90": 0.9900332225913622,
+        "coverage_p95": 0.9933554817275747,
+        "group_id": "west-urban|factory-control|2-200001",
+        "horizon_minutes": 70,
+        "mae_p50": 446.3526616231045,
+        "rows": 2004.0,
+        "test_rows": 301.0,
+        "train_rows": 1402.0,
+        "wape_p50": 0.2836138841889205
+      },
+      {
+        "calibration_rows": 300.0,
+        "coverage_p90": 1.0,
+        "coverage_p95": 1.0,
+        "group_id": "east-urban|enterprise|1-100005",
+        "horizon_minutes": 80,
+        "mae_p50": 315.455913707791,
+        "rows": 2003.0,
+        "test_rows": 301.0,
+        "train_rows": 1402.0,
+        "wape_p50": 0.25937704540028383
+      },
+      {
+        "calibration_rows": 301.0,
+        "coverage_p90": 0.9933554817275747,
+        "coverage_p95": 0.9966777408637874,
+        "group_id": "west-urban|factory-control|2-200001",
+        "horizon_minutes": 60,
+        "mae_p50": 387.4348264682716,
+        "rows": 2005.0,
+        "test_rows": 301.0,
+        "train_rows": 1403.0,
+        "wape_p50": 0.24617730653863557
+      },
+      {
+        "calibration_rows": 301.0,
+        "coverage_p90": 1.0,
+        "coverage_p95": 1.0,
+        "group_id": "east-urban|enterprise|1-100005",
+        "horizon_minutes": 70,
+        "mae_p50": 296.84587476778336,
+        "rows": 2004.0,
+        "test_rows": 301.0,
+        "train_rows": 1402.0,
+        "wape_p50": 0.244075329042179
+      },
+      {
+        "calibration_rows": 301.0,
+        "coverage_p90": 1.0,
+        "coverage_p95": 1.0,
+        "group_id": "north-urban|edge-inference|5-500001",
+        "horizon_minutes": 60,
+        "mae_p50": 161.3009302242222,
+        "rows": 2005.0,
+        "test_rows": 301.0,
+        "train_rows": 1403.0,
+        "wape_p50": 0.2419232647241561
+      }
+    ]
+  },
+  "model": {
+    "algorithm": "calendar-ridge-direct-multihorizon",
+    "bundle_sha256": "c629a5429047738d31bb671e175ff39eb8f7ddf1d05ffd45d9e4261261b4dffa",
+    "file_sha256": "53ce0ccdb917e0533cda98af114c77b79a34df92d8b9749f86074352756db6de",
+    "fitted_models": 2304,
+    "groups": 96,
+    "horizon_minutes": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70,
+      80
+    ],
+    "model_version": "extreme-calendar-ridge-conformal-stage1/1.0",
+    "ordered_split": {
+      "calibration": 0.15,
+      "ordered": true,
+      "test": 0.15,
+      "train": 0.7
+    },
+    "path": "output/stage1/models/extreme-forecaster-14d-s20260818.json",
+    "schema_version": "trained-forecast-bundle/1.0",
+    "synthetic": true
+  },
+  "notes": [
+    "This record freezes a synthetic-data model candidate; it is not C-DOT production validation.",
+    "The source worktree was dirty if reproducibility.worktree_dirty is true; exact code hashes are recorded.",
+    "The model bundle is not modified by this operation."
+  ],
+  "pending_acceptance_gates": [
+    "compare the same held-out windows with seasonal-naive and moving-average baselines",
+    "report normal, surge, brownout, and outage windows separately",
+    "retrain/evaluate against the manifest's explicit 11/2/3 week split",
+    "show predictive-controller overload reduction on paired controller runs",
+    "revalidate and recalibrate on representative C-DOT telemetry"
+  ],
+  "release_accepted": false,
+  "reproducibility": {
+    "dependencies": {
+      "numpy": "2.4.6",
+      "pyarrow": "25.0.1"
+    },
+    "dirty_paths": [
+      "M docs/stage1-streaming-characterization.md",
+      " M experiments/build_stage1_worklist.py",
+      " M experiments/characterize_stage1_artifacts.py",
+      " M experiments/freeze_forecast_bundle.py",
+      " M experiments/freeze_oracle_benchmark.py",
+      " M experiments/memory_regression.py",
+      " M experiments/packed_runner.py",
+      " M experiments/profile_stage1.py",
+      " M pbs/characterize_stage1.pbs",
+      " M tests/test_pbs_scripts.py",
+      " M tests/test_stage1_streaming.py",
+      "?? cdot-extreme-oracle.o3434",
+      "?? cdot-stage1-2node.o3399",
+      "?? cdot-stage1-2node.o3400",
+      "?? cdot-stage1-artifacts.o3406",
+      "?? cdot-stage1-characterize.o3398",
+      "?? cdot-stage1-characterize.o3412",
+      "?? cdot-stage1-characterize.o3413",
+      "?? cdot-stage1-characterize.o3414",
+      "?? cdot-stage1-characterize.o3415",
+      "?? cdot-stage1-characterize.o3416",
+      "?? cdot-stage1-characterize.o3417",
+      "?? cdot-stage1-characterize.o3418",
+      "?? cdot-stage1-characterize.o3419",
+      "?? cdot-stage1-characterize.o3420",
+      "?? cdot-stage1-memory.o3403",
+      "?? cdot-stage1-memory.o3410",
+      "?? cdot-stage1-preflight.o3409",
+      "?? cdot-stage1-preflight.o3411",
+      "?? cdot-stage1-profile.o3405",
+      "?? cdot-stage1-single.o3401",
+      "?? cdot-stage1-single.o3402",
+      "?? cdot-stage1-single.o3428",
+      "?? cdot-stage1-single.o3432",
+      "?? cdot-stage1-single.o3433",
+      "?? cdot-stage1-train.o3404",
+      "?? cdot-stage2-aggregate.o3408",
+      "?? cdot-stage2-node.o3407.0",
+      "?? cdot-stage2-node.o3407.1",
+      "?? docs/cdot-showcase-talk-track.md",
+      "?? experiments/aggregate_packed_nodes.py",
+      "?? experiments/build_stage1_preflight.py",
+      "?? experiments/build_stage2_pilot_report.py",
+      "?? experiments/build_stage2_worklist.py",
+      "?? experiments/checkpoint_stage.py",
+      "?? experiments/freeze_stage1_inputs.py",
+      "?? experiments/promote_mpc_profile.py",
+      "?? pbs/build_cdot_showcase.pbs",
+      "?? pbs/build_stage1_preflight.pbs",
+      "?? pbs/build_stage1_report.pbs",
+      "?? pbs/characterize_stage1_2node.pbs",
+      "?? pbs/evaluate_forecaster_extreme.pbs",
+      "?? pbs/evaluate_mpc_candidate.pbs",
+      "?? pbs/evaluate_oracle_extreme.pbs",
+      "?? pbs/launch_extreme_stage2_phase.pbs",
+      "?? pbs/prepare_extreme_stage2.pbs",
+      "?? pbs/retry_stage2_partition.sh",
+      "?? pbs/run_stage1_single.pbs",
+      "?? pbs/run_stage2_node.pbs",
+      "?? pbs/stage1_artifacts.pbs",
+      "?? pbs/stage1_memory_regression.pbs",
+      "?? pbs/stage1_node_worker.sh",
+      "?? pbs/stage1_profile.pbs",
+      "?? pbs/stage2_aggregate.pbs",
+      "?? pbs/submit_stage1_ladder.sh",
+      "?? pbs/submit_stage2_campaign.sh",
+      "?? pbs/train_stage1_forecaster.pbs",
+      "?? scripts/build_cdot_showcase.py",
+      "?? scripts/run_mpc_candidate_parallel.py",
+      "?? tests/test_cdot_showcase.py",
+      "?? tests/test_mpc_parallel_script.py"
+    ],
+    "git_commit": "acd52e7b60729a423f99f00daec485c55a5639dd",
+    "python": "3.11.15",
+    "training_code_sha256": {
+      "experiments/train_forecaster.py": "e1357945e911aeb7913448d455bd088f85e4bb339f8a30911b77f0bec50d8f88",
+      "forecasting/bundle.py": "3a8df62202d62e283f21ebf9c2a850ec8abaab99255804750dacf03ed6db8ff0"
+    },
+    "worktree_dirty": true
+  },
+  "schema_version": "forecast-freeze/1.0",
+  "status": "frozen-provisional",
+  "training_corpus": {
+    "campaign_id": "extreme-forecast-training-14d-s20260818",
+    "campaign_metadata": "/home/abharadwaj/5g-stage1/overnight-20260817/forecaster-14d/shards/schema_major=2/campaign=extreme-forecast-training-14d-s20260818/scenario=extreme-national-training-16w-s20260818/controller=static-capacity-v1/seed=20260818/metadata.json",
+    "campaign_metadata_file_sha256": "9d58e899131549c5e2f6dcd92072efbdb8203e6bd43a84f6b0d14d542f00037c",
+    "canonical_file": null,
+    "controller": "static-capacity-v1",
+    "duration_days": 14,
+    "manifest": "output/manifests/extreme-training-14d-s20260818.json",
+    "manifest_embedded_sha256": "6adbebe7d75401c17e73b8ab7e43545480a64e1f931c64f7ce2d6a5e10f279a9",
+    "manifest_file_sha256": "af5e360746bb33e7798ad54bbbb422f83f6cd3b372abd79bcc4e418b44a2d9f5",
+    "nominal_ue_population": 16000000,
+    "parquet_file_sha256": null,
+    "run_file_sha256": null,
+    "scenario_id": "extreme-national-training-16w-s20260818",
+    "seed": 20260818,
+    "selection_audits_sha256": null,
+    "steps": 40320,
+    "topology": {
+      "groups": 96,
+      "upfs": 24,
+      "zones": 8
+    }
+  }
+}

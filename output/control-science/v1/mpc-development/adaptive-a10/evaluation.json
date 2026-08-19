@@ -1,0 +1,2678 @@
+{
+  "aggregate_guardrails": {
+    "no_dl_drop_regression": true,
+    "no_dl_overload_regression": true,
+    "no_session_failure_regression": true,
+    "no_ul_drop_regression": true
+  },
+  "aggregate_relative_reduction": {
+    "dropped_bytes": {
+      "dl": 0.4042942960944155,
+      "ul": 0.15142914773446042
+    },
+    "overload_area_seconds": {
+      "dl": 0.3166360928521737,
+      "ul": 0.010077657212465714
+    }
+  },
+  "by_scenario": {
+    "mixed_stress": {
+      "aggregate_ul_overload_area_relative_reduction": -0.004091034174203548,
+      "pairs": 3,
+      "worst_pair_ul_overload_area_relative_reduction": -0.17712757613947205
+    },
+    "scheduled_fault": {
+      "aggregate_ul_overload_area_relative_reduction": 0.5518648121041084,
+      "pairs": 3,
+      "worst_pair_ul_overload_area_relative_reduction": 0.0
+    },
+    "surge": {
+      "aggregate_ul_overload_area_relative_reduction": 0.0,
+      "pairs": 3,
+      "worst_pair_ul_overload_area_relative_reduction": 0.0
+    },
+    "unannounced_outage": {
+      "aggregate_ul_overload_area_relative_reduction": -0.006733912485268938,
+      "pairs": 3,
+      "worst_pair_ul_overload_area_relative_reduction": -0.23817893350972927
+    }
+  },
+  "created_at": "2026-08-19T07:06:39.372378Z",
+  "decision": "stop_or_retune_without_release_seeds",
+  "development_only": true,
+  "evaluation_stage": "development",
+  "evaluator": {
+    "parallel_workers_are_evaluation_only": true,
+    "path": "/home/abharadwaj/Projects/5g-simulation/scripts/run_mpc_candidate_parallel.py",
+    "sha256": "0a81c2ff7546cfbc0db4e8a35ddab5d9a6b90f54775b50c19877f43d69010442",
+    "simulation_source_fingerprint": "493c4a3ec4a0eb3138268fdca121aed527c8b9aa9376e7c5f81246100a74cbb1"
+  },
+  "forecaster": {
+    "bundle_sha256": "c629a5429047738d31bb671e175ff39eb8f7ddf1d05ffd45d9e4261261b4dffa",
+    "path": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-14d-s20260818.json",
+    "sha256": "53ce0ccdb917e0533cda98af114c77b79a34df92d8b9749f86074352756db6de",
+    "type": "trained_bundle"
+  },
+  "manifest": {
+    "path": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+    "sha256": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+  },
+  "mean_pair_ul_overload_area_relative_reduction": 0.07199056937924057,
+  "mean_pair_ul_reduction_bootstrap_95_interval": [
+    -0.06499794604149918,
+    0.2334645483413067
+  ],
+  "mpc_establishment_failures": 0,
+  "mpc_profile": {
+    "path": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_cs_adaptive_a10_v1.json",
+    "profile_id": "cohort-mpc-cs-adaptive-a10-v1",
+    "settings": {
+      "action_blend_fraction": 0.5,
+      "adaptive_forecast_risk_enabled": true,
+      "drop_cost": 10.0,
+      "failure_domain_protection_enabled": false,
+      "fallback_on_stale_survival": true,
+      "fallback_on_unplanned_capacity_state": false,
+      "forecast_risk_alpha": 1.0,
+      "guardrail_margin_fraction": 0.0,
+      "guardrail_tolerance": 1e-07,
+      "horizon_windows": 12,
+      "low_confidence_survival_safety_factor": 1.1,
+      "max_failure_domain_share": 1.0,
+      "max_group_upf_weight": 0.75,
+      "max_policy_l1_change_per_group": 2.0,
+      "max_ul_exposure_increase_fraction": 1.0,
+      "min_relative_improvement": 0.0001,
+      "min_ul_overload_relative_improvement": 0.0,
+      "minimum_hold_epochs": 0,
+      "minimum_survival_samples": 0,
+      "n_minus_one_exposure_cost": 0.0,
+      "overload_cost": 1.0,
+      "require_known_future_capacity_event": false,
+      "retain_last_safe_on_failure": false,
+      "solve_trigger_safe_utilization": 0.0,
+      "static_deviation_cost": 0.0001,
+      "terminal_exposure_cost": 1.0,
+      "terminal_failure_exposure_cost": 0.0,
+      "timeout_seconds": 2.0
+    },
+    "sha256": "d8f1f40385f400ecef47d3c47d600f83c544c88c2a3066ba72cfdcbcd3038b8c"
+  },
+  "paired_runs": 12,
+  "pairs": [
+    {
+      "certified_decisions": 28,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 4.487626234951851,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "east-urban|mission-critical|6-600001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 680,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 4.449046002494705,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "north-urban|ims-voice|1-100004",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1380,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "east-urban|mission-critical|6-600001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1400,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 3.077973570608941,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "east-urban|enterprise-rtc|1-100006",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1900,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "north-urban|ims-voice|1-100004",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2000,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "east-urban|enterprise-rtc|1-100006",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2540,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.052770328634094e+17,
+          "ul": 4.289185264339567e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024765735606528998,
+          "ul": 0.03267084310423922
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "new_session_offered_bytes": {
+          "dl": 2607263161335062.0,
+          "ul": 1401312988162528.2
+        },
+        "offered_bytes": {
+          "dl": 1.052770328634094e+17,
+          "ul": 4.289185264339567e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46101",
+        "seed": 46101,
+        "selection_audit_count": 43806632,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43806632,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46101",
+      "scenario_kind": "surge",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46101,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.052770328634375e+17,
+          "ul": 4.2891852643414984e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02476573560652239,
+          "ul": 0.03267084310422452
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "new_session_offered_bytes": {
+          "dl": 2607263161335062.0,
+          "ul": 1401312988162528.8
+        },
+        "offered_bytes": {
+          "dl": 1.052770328634375e+17,
+          "ul": 4.2891852643414984e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46101",
+        "seed": 46101,
+        "selection_audit_count": 43806632,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43806632,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 2951.1980995666236,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 45,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 5.077915341726503,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "west-urban|edge-inference|5-500001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 600,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "west-urban|edge-inference|5-500001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1260,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 3.494785621848615,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "north-urban|v2x|4-400001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1340,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "north-urban|v2x|4-400001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1900,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 5.158721072623288,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "west-urban|v2x|4-400001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1980,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "west-urban|v2x|4-400001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2540,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.055432154608041e+17,
+          "ul": 4.275864043937595e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.025207845265649564,
+          "ul": 0.0331717430243375
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "new_session_offered_bytes": {
+          "dl": 2660517044175062.5,
+          "ul": 1418378632725024.8
+        },
+        "offered_bytes": {
+          "dl": 1.055432154608041e+17,
+          "ul": 4.275864043937595e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46102",
+        "seed": 46102,
+        "selection_audit_count": 44100085,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 44100085,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46102",
+      "scenario_kind": "surge",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46102,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0554321546083848e+17,
+          "ul": 4.275864043932968e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.025207845265641352,
+          "ul": 0.03317174302437341
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "new_session_offered_bytes": {
+          "dl": 2660517044175062.5,
+          "ul": 1418378632725025.0
+        },
+        "offered_bytes": {
+          "dl": 1.0554321546083848e+17,
+          "ul": 4.275864043932968e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46102",
+        "seed": 46102,
+        "selection_audit_count": 44100085,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 44100085,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 3145.5631954567507,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 76,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 3.7968577668167747,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "rural|enterprise|1-100005",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 560,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "rural|enterprise|1-100005",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1000,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 3.0041696465455634,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "airport|internet-video|1-100001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1260,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 4.5193310930228,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "south-urban|enterprise-backup|1-100007",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1820,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "airport|internet-video|1-100001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1920,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "south-urban|enterprise-backup|1-100007",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2480,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.1131410664828835e+17,
+          "ul": 4.4116672614154504e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024151399886892955,
+          "ul": 0.03207024625670856
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "new_session_offered_bytes": {
+          "dl": 2688391502715061.5,
+          "ul": 1414832554762525.5
+        },
+        "offered_bytes": {
+          "dl": 1.1131410664828835e+17,
+          "ul": 4.4116672614154504e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46103",
+        "seed": 46103,
+        "selection_audit_count": 44148419,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 44148419,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46103",
+      "scenario_kind": "surge",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46103,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.1131410664819878e+17,
+          "ul": 4.4116672614084824e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.0241513998869124,
+          "ul": 0.03207024625675924
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "new_session_offered_bytes": {
+          "dl": 2688391502715063.0,
+          "ul": 1414832554762526.8
+        },
+        "offered_bytes": {
+          "dl": 1.1131410664819878e+17,
+          "ul": 4.4116672614084824e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46103",
+        "seed": 46103,
+        "selection_audit_count": 44148419,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 44148419,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 2958.6662095147185,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 73,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.28326101115731056,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 720,
+          "latency_ms": null,
+          "step": 960,
+          "ul_factor": 0.13326101115731057,
+          "upf_id": "upf-regional-3",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 720,
+          "latency_ms": null,
+          "step": 1520,
+          "ul_factor": 1.0,
+          "upf_id": "upf-regional-3",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.26666522773242207,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 1380,
+          "latency_ms": null,
+          "step": 1620,
+          "ul_factor": 0.1166652277324221,
+          "upf_id": "upf-edge-airport-a",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 1380,
+          "latency_ms": null,
+          "step": 2420,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-airport-a",
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.0477550318649563e+17,
+          "ul": 4.2276563455366136e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024717529862203068,
+          "ul": 0.03262901418101951
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 17742118162659.34,
+          "ul": 94553637845292.66
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 43.41140689681594,
+          "ul": 248.21738636013848
+        },
+        "new_session_offered_bytes": {
+          "dl": 2590230170175064.0,
+          "ul": 1382527780500031.0
+        },
+        "offered_bytes": {
+          "dl": 1.0479324530465834e+17,
+          "ul": 4.237111709321134e+16
+        },
+        "overload_area_seconds": {
+          "dl": 1564.3362479607881,
+          "ul": 10138.421720568764
+        },
+        "overload_duration_seconds": {
+          "dl": 7710.0,
+          "ul": 18780.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 1520.9248410639727,
+          "ul": 9890.20433420862
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46104",
+        "seed": 46104,
+        "selection_audit_count": 43359438,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43359438,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.9066995279922198,
+          "ul": 0.6216944456104174
+        },
+        "overload_area_seconds": {
+          "dl": 0.7450020737606703,
+          "ul": 0.5334860187305286
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46104",
+      "scenario_kind": "scheduled_fault",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46104,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0460308422849437e+17,
+          "ul": 4.2121177231819816e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02471752986220546,
+          "ul": 0.03262901418098408
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 190161076153825.3,
+          "ul": 249939861437827.16
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 186.82114178014166,
+          "ul": 508.8257311411892
+        },
+        "new_session_offered_bytes": {
+          "dl": 2590230170175063.5,
+          "ul": 1382527780500030.2
+        },
+        "offered_bytes": {
+          "dl": 1.047932453046482e+17,
+          "ul": 4.237111709325733e+16
+        },
+        "overload_area_seconds": {
+          "dl": 6134.7018426046825,
+          "ul": 21732.299840146763
+        },
+        "overload_duration_seconds": {
+          "dl": 16320.0,
+          "ul": 21480.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 5947.880700824537,
+          "ul": 21223.474109005634
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46104",
+        "seed": 46104,
+        "selection_audit_count": 43359438,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43359438,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 2923.1409555682912,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 40,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.30160702428431685,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 720,
+          "latency_ms": null,
+          "step": 960,
+          "ul_factor": 0.15160702428431688,
+          "upf_id": "upf-edge-north-urban-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 720,
+          "latency_ms": null,
+          "step": 1560,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-north-urban-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.4641462301702308,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 1440,
+          "latency_ms": null,
+          "step": 1680,
+          "ul_factor": 0.31414623017023086,
+          "upf_id": "upf-edge-rural-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 1440,
+          "latency_ms": null,
+          "step": 2300,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-rural-b",
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.0483371254936365e+17,
+          "ul": 4.235926627867466e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02470896403139723,
+          "ul": 0.03263551842099519
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "new_session_offered_bytes": {
+          "dl": 2590332432660062.5,
+          "ul": 1382416614937527.2
+        },
+        "offered_bytes": {
+          "dl": 1.0483371254936365e+17,
+          "ul": 4.235926627867466e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+        "seed": 46105,
+        "selection_audit_count": 43344306,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43344306,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+      "scenario_kind": "scheduled_fault",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46105,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0483371254940363e+17,
+          "ul": 4.235926627868354e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024708964031387802,
+          "ul": 0.03263551842098839
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "new_session_offered_bytes": {
+          "dl": 2590332432660062.5,
+          "ul": 1382416614937529.0
+        },
+        "offered_bytes": {
+          "dl": 1.0483371254940363e+17,
+          "ul": 4.235926627868354e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+        "seed": 46105,
+        "selection_audit_count": 43344306,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43344306,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 3179.9984340709634,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 53,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.23290402604283536,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 780,
+          "latency_ms": null,
+          "step": 1020,
+          "ul_factor": 0.08290402604283537,
+          "upf_id": "upf-edge-rural-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 780,
+          "latency_ms": null,
+          "step": 1720,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-rural-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.3178748225047957,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 1500,
+          "latency_ms": null,
+          "step": 1740,
+          "ul_factor": 0.16787482250479568,
+          "upf_id": "upf-edge-south-urban-a",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 1500,
+          "latency_ms": null,
+          "step": 2520,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-south-urban-a",
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.0485250943273731e+17,
+          "ul": 4.2412269582912344e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02470590336139593,
+          "ul": 0.03261489989028961
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 4292006642.571972
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 18.162743026869244
+        },
+        "new_session_offered_bytes": {
+          "dl": 2590475965245063.0,
+          "ul": 1383272066550028.0
+        },
+        "offered_bytes": {
+          "dl": 1.0485250943273731e+17,
+          "ul": 4.2412273874918984e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 547.4637423751333
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 3750.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 529.3009993482639
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46106",
+        "seed": 46106,
+        "selection_audit_count": 43364318,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43364318,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 0.998372832452551
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 0.7408980071830612
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46106",
+      "scenario_kind": "scheduled_fault",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46106,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0485250943278262e+17,
+          "ul": 4.2409636158458616e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024705903361385253,
+          "ul": 0.032614899890280685
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 2637716471976.5254
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 75.93973858097765
+        },
+        "new_session_offered_bytes": {
+          "dl": 2590475965245063.0,
+          "ul": 1383272066550029.0
+        },
+        "offered_bytes": {
+          "dl": 1.0485250943278262e+17,
+          "ul": 4.2412273874930616e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 2112.927563478558
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 7950.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 2036.9878248975824
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46106",
+        "seed": 46106,
+        "selection_audit_count": 43364318,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43364318,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 3007.4722727080807,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 57,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 2.1349375301708555,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "airport|mission-critical|6-600001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1000,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.16,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1240,
+          "ul_factor": 0.01,
+          "upf_id": "upf-edge-east-urban-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "airport|mission-critical|6-600001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1680,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1680,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-east-urban-b",
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.0485602059589622e+17,
+          "ul": 4.2453965172240424e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024725236963231936,
+          "ul": 0.03263294969662887
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 35703566799996.414
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 217.08763736263754
+        },
+        "new_session_offered_bytes": {
+          "dl": 2592589956255062.5,
+          "ul": 1386563222587527.2
+        },
+        "offered_bytes": {
+          "dl": 1.0485602059589622e+17,
+          "ul": 4.248966873904033e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 69116.78901098222
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 13200.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 68899.70137361964
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46107",
+        "seed": 46107,
+        "selection_audit_count": 43395162,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43395162,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": -0.11260047766764038
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": -0.10588821541164214
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46107",
+      "scenario_kind": "unannounced_outage",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46107,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.048560205959439e+17,
+          "ul": 4.2457578543577384e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024725236963220692,
+          "ul": 0.032632949696629325
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 32090195462473.906
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 435.23056318681336
+        },
+        "new_session_offered_bytes": {
+          "dl": 2592589956255062.5,
+          "ul": 1386563222587529.2
+        },
+        "offered_bytes": {
+          "dl": 1.048560205959439e+17,
+          "ul": 4.24896687390398e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 62498.892788413556
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 13200.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 62063.66222522678
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46107",
+        "seed": 46107,
+        "selection_audit_count": 43395162,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43395162,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 2967.4849145319313,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 74,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 2.2142124469519606,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "rural|internet-video|1-100001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1100,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.16,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1340,
+          "ul_factor": 0.01,
+          "upf_id": "upf-edge-airport-a",
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "rural|internet-video|1-100001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1760,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1760,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-airport-a",
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.0853742774482064e+17,
+          "ul": 4.2451243318319256e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024331955813066197,
+          "ul": 0.032575130435563586
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 572066804932.5431,
+          "ul": 61551754424863.07
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 5.547813835365066,
+          "ul": 361.74623397435937
+        },
+        "new_session_offered_bytes": {
+          "dl": 2640941815455063.0,
+          "ul": 1384859844675026.0
+        },
+        "offered_bytes": {
+          "dl": 1.0853799981162566e+17,
+          "ul": 4.251279507274416e+16
+        },
+        "overload_area_seconds": {
+          "dl": 847.4571507567564,
+          "ul": 135077.2530445792
+        },
+        "overload_duration_seconds": {
+          "dl": 5130.0,
+          "ul": 12600.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 841.9093369213904,
+          "ul": 134715.5068106049
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46108",
+        "seed": 46108,
+        "selection_audit_count": 43668443,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43668443,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": -0.24620513677664593
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": -0.23817893350972927
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46108",
+      "scenario_kind": "unannounced_outage",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46108,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0853799981162048e+17,
+          "ul": 4.2463403722424664e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024331955813067355,
+          "ul": 0.03257513043559776
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 49391350274858.34
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 715.6370192307686
+        },
+        "new_session_offered_bytes": {
+          "dl": 2640941815455062.5,
+          "ul": 1384859844675028.2
+        },
+        "offered_bytes": {
+          "dl": 1.0853799981162048e+17,
+          "ul": 4.251279507269963e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 109093.48349328688
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 12600.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 108377.84647405615
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46108",
+        "seed": 46108,
+        "selection_audit_count": 43668443,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43668443,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 3524.0644709831104,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 54,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 2.975244174960733,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "airport|mission-critical|6-600001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1080,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.16,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1320,
+          "ul_factor": 0.01,
+          "upf_id": "upf-central-1",
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "airport|mission-critical|6-600001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1840,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1840,
+          "ul_factor": 1.0,
+          "upf_id": "upf-central-1",
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.045756817668029e+17,
+          "ul": 4.19825064349043e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02474281744999853,
+          "ul": 0.03268860504484827
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 329898889301583.5,
+          "ul": 504599639049232.25
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 64.28906666292106,
+          "ul": 1173.2111250000023
+        },
+        "new_session_offered_bytes": {
+          "dl": 2595659631660062.5,
+          "ul": 1388844229950026.5
+        },
+        "offered_bytes": {
+          "dl": 1.0490558065610338e+17,
+          "ul": 4.248710607395309e+16
+        },
+        "overload_area_seconds": {
+          "dl": 9940.173781569061,
+          "ul": 285538.46613846254
+        },
+        "overload_duration_seconds": {
+          "dl": 15000.0,
+          "ul": 15600.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 9875.884714906124,
+          "ul": 284365.2550134626
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46109",
+        "seed": 46109,
+        "selection_audit_count": 43429594,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43429594,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.31354059863446315,
+          "ul": 0.09470386672096243
+        },
+        "overload_area_seconds": {
+          "dl": 0.2569411642239008,
+          "ul": 0.09313822375271116
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46109",
+      "scenario_kind": "unannounced_outage",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46109,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0442500032080347e+17,
+          "ul": 4.192971979945008e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024742817449990195,
+          "ul": 0.03268860504485001
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 480580335334228.56,
+          "ul": 557386274501738.7
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 133.78175989583127,
+          "ul": 2335.2245416666547
+        },
+        "new_session_offered_bytes": {
+          "dl": 2595659631660062.5,
+          "ul": 1388844229950028.5
+        },
+        "offered_bytes": {
+          "dl": 1.049055806561387e+17,
+          "ul": 4.248710607395089e+16
+        },
+        "overload_area_seconds": {
+          "dl": 13377.371081506479,
+          "ul": 314864.37472318835
+        },
+        "overload_duration_seconds": {
+          "dl": 15600.0,
+          "ul": 15600.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 13243.58932161064,
+          "ul": 312529.15018152155
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46109",
+        "seed": 46109,
+        "selection_audit_count": 43429594,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43429594,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 3441.0564274829812,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 53,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 2.5588652586725957,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "stadium|factory-control|2-200001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 620,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.39677060623803145,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 440,
+          "latency_ms": null,
+          "step": 680,
+          "ul_factor": 0.24677060623803146,
+          "upf_id": "upf-edge-stadium-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "stadium|factory-control|2-200001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 980,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": null,
+          "event_type": "path_latency",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": 109.36912137616562,
+          "step": 1040,
+          "ul_factor": null,
+          "upf_id": "upf-central-1",
+          "zone": "south-urban"
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 440,
+          "latency_ms": null,
+          "step": 1200,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-stadium-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": 2.3807277737909107,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "north-urban|edge-inference|5-500001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1580,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": null,
+          "event_type": "path_latency",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": 13.5,
+          "step": 1640,
+          "ul_factor": null,
+          "upf_id": "upf-central-1",
+          "zone": "south-urban"
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.16,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1660,
+          "ul_factor": 0.01,
+          "upf_id": "upf-edge-east-urban-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2000,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-east-urban-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "north-urban|edge-inference|5-500001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2140,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.0495566881472686e+17,
+          "ul": 4.245956316067449e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02477476020275915,
+          "ul": 0.03265987811207448
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 32538446387465.055
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.4818299277834037,
+          "ul": 162.08894230769292
+        },
+        "new_session_offered_bytes": {
+          "dl": 2600251526805064.5,
+          "ul": 1387786859212526.0
+        },
+        "offered_bytes": {
+          "dl": 1.0495566881472686e+17,
+          "ul": 4.249210160706191e+16
+        },
+        "overload_area_seconds": {
+          "dl": 17.101067455505213,
+          "ul": 62473.71133235345
+        },
+        "overload_duration_seconds": {
+          "dl": 720.0,
+          "ul": 10200.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 16.619237527721808,
+          "ul": 62311.622390045755
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46110",
+        "seed": 46110,
+        "selection_audit_count": 43463668,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43463668,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": -0.18728897724042715
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": -0.17712757613947205
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46110",
+      "scenario_kind": "mixed_stress",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46110,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0495566881476843e+17,
+          "ul": 4.2464695940027016e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024774760202749345,
+          "ul": 0.03265987811207255
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 27405667037432.613
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 321.5600274725272
+        },
+        "new_session_offered_bytes": {
+          "dl": 2600251526805065.5,
+          "ul": 1387786859212527.8
+        },
+        "offered_bytes": {
+          "dl": 1.0495566881476843e+17,
+          "ul": 4.249210160706447e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 53073.01655207443
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 10200.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 52751.456524601905
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46110",
+        "seed": 46110,
+        "selection_audit_count": 43463668,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43463668,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 3268.988328078296,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 56,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 2.1220729012009505,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "south-urban|mission-critical|6-600001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 500,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.4604759372540371,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 540,
+          "latency_ms": null,
+          "step": 780,
+          "ul_factor": 0.3104759372540371,
+          "upf_id": "upf-edge-rural-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "south-urban|mission-critical|6-600001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1160,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": null,
+          "event_type": "path_latency",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": 99.99982567777336,
+          "step": 1260,
+          "ul_factor": null,
+          "upf_id": "upf-edge-south-urban-a",
+          "zone": "industrial"
+        },
+        {
+          "arrival_factor": 2.0972658594399474,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "rural|social-live|1-100002",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1480,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 540,
+          "latency_ms": null,
+          "step": 1500,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-rural-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.16,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1820,
+          "ul_factor": 0.01,
+          "upf_id": "upf-central-2",
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": null,
+          "event_type": "path_latency",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": 19.0,
+          "step": 1860,
+          "ul_factor": null,
+          "upf_id": "upf-edge-south-urban-a",
+          "zone": "industrial"
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "rural|social-live|1-100002",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1960,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2100,
+          "ul_factor": 1.0,
+          "upf_id": "upf-central-2",
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.0451319166737824e+17,
+          "ul": 4.20979182640346e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024755517900843103,
+          "ul": 0.032789859878752194
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 370376016198276.56,
+          "ul": 398664913361628.8
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 39.21548802083304,
+          "ul": 674.5440208333347
+        },
+        "new_session_offered_bytes": {
+          "dl": 2596447037295063.0,
+          "ul": 1393457007712527.0
+        },
+        "offered_bytes": {
+          "dl": 1.0488356768357634e+17,
+          "ul": 4.2496583177395224e+16
+        },
+        "overload_area_seconds": {
+          "dl": 9235.472503442295,
+          "ul": 224285.84075646062
+        },
+        "overload_duration_seconds": {
+          "dl": 8400.0,
+          "ul": 8400.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 9196.257015421475,
+          "ul": 223611.29673562717
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46111",
+        "seed": 46111,
+        "selection_audit_count": 43494840,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43494840,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.3084072468735839,
+          "ul": 0.03928184947712376
+        },
+        "overload_area_seconds": {
+          "dl": 0.23692155716597627,
+          "ul": 0.03880958642157854
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46111",
+      "scenario_kind": "mixed_stress",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46111,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0434802705725909e+17,
+          "ul": 4.208161765064899e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02475551790083214,
+          "ul": 0.03278985987877272
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 535540626364220.44,
+          "ul": 414965526720457.2
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 79.14234765624846,
+          "ul": 1341.469479166662
+        },
+        "new_session_offered_bytes": {
+          "dl": 2596447037295063.0,
+          "ul": 1393457007712529.8
+        },
+        "offered_bytes": {
+          "dl": 1.0488356768362278e+17,
+          "ul": 4.24965831773687e+16
+        },
+        "overload_area_seconds": {
+          "dl": 12102.913652156587,
+          "ul": 233341.73706692053
+        },
+        "overload_duration_seconds": {
+          "dl": 8400.0,
+          "ul": 8400.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 12023.771304500357,
+          "ul": 232000.2675877541
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46111",
+        "seed": 46111,
+        "selection_audit_count": 43494840,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43494840,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 3605.0946945273317,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    },
+    {
+      "certified_decisions": 49,
+      "controller_decisions": 144,
+      "events": [
+        {
+          "arrival_factor": 3.0274014576474846,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "industrial|enterprise-rtc|1-100006",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 460,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.5271972097403363,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 440,
+          "latency_ms": null,
+          "step": 680,
+          "ul_factor": 0.3771972097403364,
+          "upf_id": "upf-edge-airport-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "industrial|enterprise-rtc|1-100006",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 880,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": null,
+          "event_type": "path_latency",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": 81.41661906614561,
+          "step": 1060,
+          "ul_factor": null,
+          "upf_id": "upf-edge-north-urban-b",
+          "zone": "stadium"
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": 440,
+          "latency_ms": null,
+          "step": 1260,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-airport-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": 3.3991916025765287,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "east-urban|edge-inference|5-500001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1580,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": null,
+          "event_type": "path_latency",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": 28.0,
+          "step": 1660,
+          "ul_factor": null,
+          "upf_id": "upf-edge-north-urban-b",
+          "zone": "stadium"
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 0.16,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 1840,
+          "ul_factor": 0.01,
+          "upf_id": "upf-edge-north-urban-b",
+          "zone": null
+        },
+        {
+          "arrival_factor": 1.0,
+          "dl_factor": null,
+          "event_type": "arrival_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": "east-urban|edge-inference|5-500001",
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2100,
+          "ul_factor": null,
+          "upf_id": null,
+          "zone": null
+        },
+        {
+          "arrival_factor": null,
+          "dl_factor": 1.0,
+          "event_type": "capacity_factor",
+          "forecast_hint_multiplier": null,
+          "group_id": null,
+          "health": null,
+          "known_at_step": null,
+          "latency_ms": null,
+          "step": 2300,
+          "ul_factor": 1.0,
+          "upf_id": "upf-edge-north-urban-b",
+          "zone": null
+        }
+      ],
+      "mpc": {
+        "carried_bytes": {
+          "dl": 1.0531684021310493e+17,
+          "ul": 4.277088123220132e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.02486223880157055,
+          "ul": 0.03271719098546167
+        },
+        "controller": "cohort-mpc-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 24745249674992.93
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 165.61421703296668
+        },
+        "new_session_offered_bytes": {
+          "dl": 2618412431205063.0,
+          "ul": 1400152684950028.2
+        },
+        "offered_bytes": {
+          "dl": 1.0531684021310493e+17,
+          "ul": 4.27956264818763e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 49215.841895592006
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 13800.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 49050.22767855906
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46112",
+        "seed": 46112,
+        "selection_audit_count": 43567926,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43567926,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "relative_reduction": {
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": -0.02311874204950045
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": -0.021250278476149333
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46112",
+      "scenario_kind": "mixed_stress",
+      "schema_version": "cohort-mpc-candidate-pair/1.0",
+      "seed": 46112,
+      "static": {
+        "carried_bytes": {
+          "dl": 1.0531684021314443e+17,
+          "ul": 4.277144038435354e+16
+        },
+        "control_scope": "new_session_placement_only",
+        "controllable_load_fraction": {
+          "dl": 0.024862238801561225,
+          "ul": 0.03271719098546005
+        },
+        "controller": "static-capacity-v1",
+        "dropped_bytes": {
+          "dl": 0.0,
+          "ul": 24186097525125.492
+        },
+        "establishment_failures": 0,
+        "incremental_new_session_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 350.9680631868137
+        },
+        "new_session_offered_bytes": {
+          "dl": 2618412431205063.0,
+          "ul": 1400152684950030.0
+        },
+        "offered_bytes": {
+          "dl": 1.0531684021314443e+17,
+          "ul": 4.279562648187849e+16
+        },
+        "overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 48191.7537090213
+        },
+        "overload_duration_seconds": {
+          "dl": 0.0,
+          "ul": 13800.0
+        },
+        "primary_overload_metric": "overload_area_seconds.ul",
+        "rejected_bytes": {
+          "dl": 0.0,
+          "ul": 0.0
+        },
+        "residual_overload_area_seconds": {
+          "dl": 0.0,
+          "ul": 47840.7856458345
+        },
+        "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-mixed_stress-s46112",
+        "seed": 46112,
+        "selection_audit_count": 43567926,
+        "selection_audit_stride": 1,
+        "selection_audits_retained": 43567926,
+        "session_migration_supported": false,
+        "steps": 2880
+      },
+      "wall_seconds": 3577.6481253420934,
+      "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0"
+    }
+  ],
+  "reaches_10_percent_gate": false,
+  "reserved_seeds_consumed": false,
+  "schema_version": "cohort-mpc-10pct-candidate-evaluation/1.0",
+  "simulated_days_per_pair": 1.0,
+  "static_establishment_failures": 0,
+  "totals": {
+    "mpc": {
+      "dropped_bytes": {
+        "dl": 718589090467452.0,
+        "ul": 1152361499550113.8
+      },
+      "overload_area_seconds": {
+        "dl": 21604.54075118441,
+        "ul": 836393.787641374
+      }
+    },
+    "static": {
+      "dropped_bytes": {
+        "dl": 1206282037852274.2,
+        "ul": 1358002689431890.0
+      },
+      "overload_area_seconds": {
+        "dl": 31614.98657626775,
+        "ul": 844908.4857365303
+      }
+    }
+  },
+  "validation_only": false,
+  "weighted_total_ul_overload_area_relative_reduction": 0.010077657212465714,
+  "worst_pair_ul_overload_area_relative_reduction": -0.23817893350972927
+}

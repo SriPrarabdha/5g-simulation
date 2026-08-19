@@ -1,0 +1,212 @@
+{
+  "certified_decisions": 56,
+  "controller_decisions": 144,
+  "events": [
+    {
+      "arrival_factor": 5.077915341726503,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "west-urban|edge-inference|5-500001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 600,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "west-urban|edge-inference|5-500001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1260,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 3.494785621848615,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "north-urban|v2x|4-400001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1340,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "north-urban|v2x|4-400001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1900,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 5.158721072623288,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "west-urban|v2x|4-400001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1980,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "west-urban|v2x|4-400001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 2540,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    }
+  ],
+  "mpc": {
+    "carried_bytes": {
+      "dl": 1.0554321546083926e+17,
+      "ul": 4.275864043941439e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.025207845265641165,
+      "ul": 0.03317174302430769
+    },
+    "controller": "cohort-mpc-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "new_session_offered_bytes": {
+      "dl": 2660517044175062.5,
+      "ul": 1418378632725025.0
+    },
+    "offered_bytes": {
+      "dl": 1.0554321546083926e+17,
+      "ul": 4.275864043941439e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46102",
+    "seed": 46102,
+    "selection_audit_count": 44100085,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 44100085,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "relative_reduction": {
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    }
+  },
+  "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46102",
+  "scenario_kind": "surge",
+  "schema_version": "cohort-mpc-candidate-pair/1.0",
+  "seed": 46102,
+  "static": {
+    "carried_bytes": {
+      "dl": 1.0554321546083848e+17,
+      "ul": 4.275864043932968e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.025207845265641352,
+      "ul": 0.03317174302437341
+    },
+    "controller": "static-capacity-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "new_session_offered_bytes": {
+      "dl": 2660517044175062.5,
+      "ul": 1418378632725025.0
+    },
+    "offered_bytes": {
+      "dl": 1.0554321546083848e+17,
+      "ul": 4.275864043932968e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-surge-s46102",
+    "seed": 46102,
+    "selection_audit_count": 44100085,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 44100085,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "wall_seconds": 3278.95643600123,
+  "work_fingerprint": "5ba8e5b779b2449e819142bd8ea1b4082c7433e4fe34b36fb8b57377426e2cf7"
+}

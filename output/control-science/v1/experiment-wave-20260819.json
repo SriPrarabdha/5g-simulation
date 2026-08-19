@@ -1,0 +1,87 @@
+{
+  "schema_version": "control-science-experiment-wave/1.0",
+  "submitted_at": "2026-08-19T05:54:50.656787Z",
+  "repacked_at": "2026-08-19T06:06:17Z",
+  "pbs_queue": "workq",
+  "release_seeds_consumed": false,
+  "frozen_production_package_modified": false,
+  "forecast_corpora": [
+    {
+      "job_id": "3450.wlm",
+      "status": "complete",
+      "wall_seconds": 696,
+      "role": "train",
+      "seed": 46001,
+      "manifest": "manifests/delhi-v2-28d-s46001-train.json",
+      "manifest_sha256": "fe211e2ec7ffaf8860c1f144adb201f2c381eabf5ef047341fc23300c57d7b66"
+    },
+    {
+      "job_id": "3451.wlm",
+      "status": "complete",
+      "wall_seconds": 680,
+      "role": "selection_calibration",
+      "seed": 46002,
+      "manifest": "manifests/delhi-v2-28d-s46002-selection.json",
+      "manifest_sha256": "6838c71dd1195eb7ffd366ba454013df081d6069d9e232ed5067039947399309"
+    },
+    {
+      "job_id": "3452.wlm",
+      "status": "complete",
+      "wall_seconds": 696,
+      "role": "untouched_test",
+      "seed": 46003,
+      "manifest": "manifests/delhi-v2-28d-s46003-test.json",
+      "manifest_sha256": "909ef073d2231945ee16a6246b4094083c914f2fb837bae3971fc4c711367aee"
+    }
+  ],
+  "mpc_development": {
+    "seeds": [46101, 46102, 46103, 46104, 46105, 46106, 46107, 46108, 46109, 46110, 46111, 46112],
+    "pairs_per_job": 12,
+    "initial_workers_per_job": 8,
+    "manifest_sha256": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+    "forecast_bundle_sha256": "53ce0ccdb917e0533cda98af114c77b79a34df92d8b9749f86074352756db6de",
+    "initial_jobs": [
+      {"job_id": "3453.wlm", "status": "superseded_before_pair_checkpoint", "ablation": "baseline", "profile_sha256": "43c5f47e8264de0046a6a0aedac53dafaf903c00a5d99491283b90b807639a08"},
+      {"job_id": "3454.wlm", "status": "superseded_before_pair_checkpoint", "ablation": "adaptive-risk-alpha-0.0", "profile_sha256": "82f876821424fe843f2bfdb7348474a0a8504a0f0a5faf5ae64b3bf7f291f0dc"},
+      {"job_id": "3455.wlm", "status": "superseded_before_pair_checkpoint", "ablation": "adaptive-risk-alpha-0.5", "profile_sha256": "715b4dcfef594dfcb31b71354059d42f09ae6d85c886c66e2153cee58be67b03"},
+      {"job_id": "3456.wlm", "status": "superseded_before_pair_checkpoint", "ablation": "adaptive-risk-alpha-1.0", "profile_sha256": "d8f1f40385f400ecef47d3c47d600f83c544c88c2a3066ba72cfdcbcd3038b8c"},
+      {"job_id": "3457.wlm", "status": "superseded_before_pair_checkpoint", "ablation": "failure-domain-protection", "profile_sha256": "cbc4f18f9398ff1ffbeb722a5e69c4dd973d45c0c350d936b99ee64e108bc87b"},
+      {"job_id": "3458.wlm", "status": "superseded_before_pair_checkpoint", "ablation": "churn-and-solve-trigger", "profile_sha256": "5511448847bb89d2c3f20f977da3dff8c9a6638646c4554e088e32fe281f799b"}
+    ],
+    "packed_replacement": {
+      "job_id": "3459.wlm",
+      "status": "complete_with_failed_ablation",
+      "node_count": 1,
+      "allocated_cpus": 72,
+      "workers_per_ablation": 12,
+      "concurrent_ablation_workers": 72,
+      "wall_seconds": 3662,
+      "exit_status": 1,
+      "valid_pairs": 60,
+      "completed_ablations": [
+        "baseline",
+        "adaptive-risk-alpha-0.0",
+        "adaptive-risk-alpha-0.5",
+        "adaptive-risk-alpha-1.0",
+        "failure-domain-protection"
+      ],
+      "failed_ablation": "churn-and-solve-trigger",
+      "failure": "SolverReport rejected the intentional skipped solve status",
+      "pbs_script_sha256": "fcbd76229931b2ba0e2850800060a519c04754a78c0fee3da2447ed52b00eddc"
+    },
+    "churn_trigger_rerun": {
+      "job_id": "3460.wlm",
+      "status": "running",
+      "node_count": 1,
+      "allocated_cpus": 12,
+      "parallel_pairs": 12,
+      "seeds": "46101-46112",
+      "contract_regression_tests_passed": 22
+    }
+  },
+  "launch_artifacts": {
+    "corpus_pbs_sha256": "607dbf1735949186fc69671452862934674c833fabd980e79fed5595f68b9539",
+    "mpc_pbs_sha256": "2116c270226146e4037ffcfab72f78edfbc8566b100486c157fc03748c477427",
+    "mpc_evaluator_sha256": "0a81c2ff7546cfbc0db4e8a35ddab5d9a6b90f54775b50c19877f43d69010442"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "created_at": "2026-08-18T01:05:47.090925Z",
+  "figures": [
+    "figures/01_streaming_memory_scaling.png",
+    "figures/01_streaming_memory_scaling.svg",
+    "figures/02_controller_profile.png",
+    "figures/02_controller_profile.svg",
+    "figures/03_controller_outcomes.png",
+    "figures/03_controller_outcomes.svg",
+    "figures/03_artifact_tiers.png",
+    "figures/03_artifact_tiers.svg",
+    "figures/04_multinode_validation.png",
+    "figures/04_multinode_validation.svg"
+  ],
+  "headline_metrics": {
+    "Gold evidence": "8.83 GiB",
+    "MPC extreme day": "30.5 min",
+    "Multinode failures": "0",
+    "RSS growth": "4.1%"
+  },
+  "inputs": [
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/reports/memory-regression-steady-state.json",
+      "sha256": "7fd136e830e8fd64a2eb9263322d8f1d7457c8af103b521bf3a0349ad91c7015"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/reports/sequential-profile.json",
+      "sha256": "0e377f1dc461768b91e428ca98ce3a553f33025b3b6e88a34baa2daa498b15bd"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/reports/artifact-characterization.json",
+      "sha256": "dd8e5f2f49a64e98d60f5b78afd89367100fc31ebc58afa8a965164bb75ec07f"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/campaign/multinode/stage1-demo-2node-w8-r1/combined.json",
+      "sha256": "cc038fda52b475d056aa1cbd48d7cad0ce2572b226316b12b585a4366ca1241e"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/stage2-smoke/multinode/stage2-array-demo-2node-v1/combined.json",
+      "sha256": "32df820f645b28d527d1921486f13d3abbe2e603ea27328c44119252f7d82d6b"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/artifact-shards/schema_major=2/campaign=stage1-artifacts-bronze/scenario=extreme-optimizer-pilot-1d-s20260817/controller=cohort-mpc-v1/seed=093001/metadata.json",
+      "sha256": "2e6e7dccbf03c27e6402b5899e0d9f04272d3f7165cc59cf15e268b2beff05dc"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/artifact-shards/schema_major=2/campaign=stage1-artifacts-bronze/scenario=extreme-optimizer-pilot-1d-s20260817/controller=reactive-threshold-v1/seed=093001/metadata.json",
+      "sha256": "ce13bbde9213ef85570b9e613ba0b96459e86d9c329e7304b84b5518b30a66c6"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/artifact-shards/schema_major=2/campaign=stage1-artifacts-bronze/scenario=extreme-optimizer-pilot-1d-s20260817/controller=static-capacity-v1/seed=093001/metadata.json",
+      "sha256": "5b2af07a13dcffa69c26d7aaeda930ef5469555755e2f94a15f3e8ce4503918c"
+    }
+  ],
+  "ladder_included": false,
+  "schema_version": "cdot-showcase/1.0"
+}

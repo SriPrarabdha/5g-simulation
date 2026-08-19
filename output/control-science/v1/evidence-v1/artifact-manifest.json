@@ -1,0 +1,118 @@
+{
+  "artifacts": [
+    {
+      "bytes": 7931,
+      "path": "REPORT.md",
+      "sha256": "8a3bbbded7c2a0ae50ba67f38a9ff6940d8b3b03ab59a8bedb1770349e244e89"
+    },
+    {
+      "bytes": 2813,
+      "path": "TALK_TRACK.md",
+      "sha256": "a721c7b469c1ed192b1b55e9f770c3cd325e3bf5f6e8862c30c480f7c26619ce"
+    },
+    {
+      "bytes": 926373,
+      "path": "cdot_control_science_report.pdf",
+      "sha256": "2f6088f19a7c874ad22320a259c1a5f1aa56c8362f53504dfb19e24938a7e6e1"
+    },
+    {
+      "bytes": 423356,
+      "path": "data/traffic-v2-summary.json",
+      "sha256": "bf1c38fd29b8f462b866a0fc041561242b5366b6d8d45e57225db713ac358a62"
+    },
+    {
+      "bytes": 12738,
+      "path": "experiment-ledger.json",
+      "sha256": "580ea2f4d844cf199bc1fb011d4dc246b0ba7063a1f238d416327fa066214a01"
+    },
+    {
+      "bytes": 479026,
+      "path": "figures/01_traffic_v2_realism_fingerprint.png",
+      "sha256": "b041a008309213b06237d8f8fafeafaf60821bed2b9377f6a3a086a903ff7b0c"
+    },
+    {
+      "bytes": 176570,
+      "path": "figures/01_traffic_v2_realism_fingerprint.svg",
+      "sha256": "ad4657cf046b1aa1dfc15df0630c644201b690b863fe7ca81020244289a3b66d"
+    },
+    {
+      "bytes": 229662,
+      "path": "figures/02_corpus_execution_integrity.png",
+      "sha256": "57e3fb0558eb11a2edb3449908bc45139055bf5179786488189d176b823e4081"
+    },
+    {
+      "bytes": 99630,
+      "path": "figures/02_corpus_execution_integrity.svg",
+      "sha256": "79ce5c8d007e1a5adc9225f1ff3af527b929e83bcf6e0110b2d83d99d9a2b602"
+    },
+    {
+      "bytes": 277927,
+      "path": "figures/03_mpc_30_vs_128_reconciliation.png",
+      "sha256": "c24a166a59e0f64c36cc759ec29723f30cd0b2b38e862f55eb6d4d76257c4d1a"
+    },
+    {
+      "bytes": 138972,
+      "path": "figures/03_mpc_30_vs_128_reconciliation.svg",
+      "sha256": "0021a76547a15b48bfe328f9fd48e2d7ce9b2b959d82386fb4006c2569967dfa"
+    },
+    {
+      "bytes": 178974,
+      "path": "figures/04_mpc_ablation_waterfall.png",
+      "sha256": "15312856e4848fd58c70742ce2f12d9f9b1926c2ba0daa38d6a2b10d8fd97a1a"
+    },
+    {
+      "bytes": 81520,
+      "path": "figures/04_mpc_ablation_waterfall.svg",
+      "sha256": "d932e90e2f8dc77a329af391686065b18679a6d20ebc59ccf5a9e8da13c880f3"
+    },
+    {
+      "bytes": 184335,
+      "path": "figures/05_mpc_scenario_controllability.png",
+      "sha256": "30b1bb0428bc8c6bbe8acd2fafa7de76d944ef02be200b8bd1dd33864fe8445c"
+    },
+    {
+      "bytes": 79483,
+      "path": "figures/05_mpc_scenario_controllability.svg",
+      "sha256": "e5589a0cfb89310231308df2a4d224972d4e12a807ef81db66247074419f1c86"
+    },
+    {
+      "bytes": 196180,
+      "path": "figures/06_mpc_mean_vs_tail_risk.png",
+      "sha256": "6c3a8919bdbe39a744ddbc41fd65fd96ea223ff8563f08fc03f47176944a6d52"
+    },
+    {
+      "bytes": 90433,
+      "path": "figures/06_mpc_mean_vs_tail_risk.svg",
+      "sha256": "1159d70ae92d562b7ed6662807675f7c4d922ae0cae7e3a2b12cce5490eb1981"
+    },
+    {
+      "bytes": 245926,
+      "path": "figures/07_plan_coverage_and_release_discipline.png",
+      "sha256": "cc1197f8c9bcac2944f4b8fcb07485a500a9fcd3d04f8fc31f2f2f585bdc27b4"
+    },
+    {
+      "bytes": 113903,
+      "path": "figures/07_plan_coverage_and_release_discipline.svg",
+      "sha256": "e6fbe8d32387a785b4ee12322598974535830f00ee21e675f3ea3fd0266ac227"
+    },
+    {
+      "bytes": 233722,
+      "path": "figures/08_mpc_solve_activity_tradeoff.png",
+      "sha256": "7cdd792d7eb013ba8cd624d1ce1d3b3a7c566fd22c688ad691fac33222eab115"
+    },
+    {
+      "bytes": 105645,
+      "path": "figures/08_mpc_solve_activity_tradeoff.svg",
+      "sha256": "d5e0d21b084d3d4cd6f092809538aa2654ffe78d57936b072ebe7c9f28837ca6"
+    },
+    {
+      "bytes": 3839,
+      "path": "index.html",
+      "sha256": "49c233d01f44a6e8c6cf317175ff716acd3248f012add4ab4e1749cb5e53cb8b"
+    }
+  ],
+  "created_at": "2026-08-19T07:47:19.074583Z",
+  "production_package_modified": false,
+  "release_seeds_consumed": false,
+  "schema_version": "control-science-evidence-manifest/1.0"
+}

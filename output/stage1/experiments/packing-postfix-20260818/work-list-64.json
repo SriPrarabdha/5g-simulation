@@ -1,0 +1,3044 @@
+{
+  "interleave": [
+    "static",
+    "reactive",
+    "mpc"
+  ],
+  "node_count": 1,
+  "schema_version": "stage1-work-list/1.0",
+  "seed_base": 38000,
+  "source_fingerprint": "86067cc123947c45f0a35c8a63101257c17320d2d2c975d73e7b1b1caa3367a5",
+  "waves": 2,
+  "waves_per_node": 2,
+  "work_items": [
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38000,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38001,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38002,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38003,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38004,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38005,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38006,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38007,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38008,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38009,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38010,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38011,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38012,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38013,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38014,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38015,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38016,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38017,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38018,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38019,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38020,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38021,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38022,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38023,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38024,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38025,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38026,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38027,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38028,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38029,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38030,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38031,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38032,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38033,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38034,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38035,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38036,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38037,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38038,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38039,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38040,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38041,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38042,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38043,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38044,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38045,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38046,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38047,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38048,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38049,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38050,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38051,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38052,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38053,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38054,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38055,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38056,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38057,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38058,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38059,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38060,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38061,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38062,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38063,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38064,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38065,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38066,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38067,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38068,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38069,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38070,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38071,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38072,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38073,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38074,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38075,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38076,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38077,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38078,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38079,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38080,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38081,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38082,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38083,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38084,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38085,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38086,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38087,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38088,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38089,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38090,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38091,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38092,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38093,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38094,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38095,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38096,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38097,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38098,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38099,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38100,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38101,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38102,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38103,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38104,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38105,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38106,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38107,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38108,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38109,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38110,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38111,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38112,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38113,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38114,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38115,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38116,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38117,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38118,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38119,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38120,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38121,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38122,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38123,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38124,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11",
+        "model": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49",
+        "optimizer_profile": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+      },
+      "model": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38125,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38126,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "input_sha256": {
+        "manifest": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+      },
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 38127,
+      "topology_id": "topology-4b9eda70bb7a3724"
+    }
+  ],
+  "worker_count": 64
+}

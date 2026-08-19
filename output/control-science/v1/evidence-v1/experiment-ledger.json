@@ -1,0 +1,310 @@
+{
+  "created_at": "2026-08-19T07:47:16.122489Z",
+  "experiments": [
+    {
+      "assessment": "matched",
+      "expectation": "Freeze and do not regenerate the accepted 12-node production package.",
+      "experiment_id": "production-evidence-freeze",
+      "result": {
+        "all_reference_hashes_match": true,
+        "cpu_efficiency": 0.9091327634327467,
+        "establishment_failures": 0,
+        "nodes": 12,
+        "peak_swap_bytes": 0,
+        "reference_hashes_verified": 4,
+        "shards": 384,
+        "wall_seconds": 5122.4982805280015,
+        "worker_failures": 0
+      },
+      "status": "complete"
+    },
+    {
+      "assessment": "matched",
+      "expectation": "Resolve the conflicting claims and make the 128-seed production result authoritative.",
+      "experiment_id": "mpc-30-vs-128-reconciliation",
+      "result": {
+        "conclusion": "Static remains the production winner. MPC is not promoted for the production contract.",
+        "development_mean": 0.18756771293289787,
+        "directly_comparable": false,
+        "production_mean": -0.13300498047735484
+      },
+      "status": "complete"
+    },
+    {
+      "assessment": "matched",
+      "expectation": "Generate train, selection/calibration and untouched-test corpora with actual rate-bin labels.",
+      "experiment_id": "traffic-v2-28-day-corpora",
+      "jobs": [
+        "3450.wlm",
+        "3451.wlm",
+        "3452.wlm"
+      ],
+      "result": [
+        {
+          "artifact_bytes": 210582589,
+          "campaign_id": "control-science-v1-corpus-selection",
+          "cpu_seconds": 656.2437591529999,
+          "label": "Select \u00b7 46002",
+          "metadata_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/corpora/schema_major=2/campaign=control-science-v1-corpus-selection/scenario=cdot-delhi-national-v2-28d-s46002/controller=static-capacity-v1/seed=046002/metadata.json",
+          "metadata_sha256": "2c721fbdc16cb246998631192bb48daa9a4fa6e1730fa0be8768d566a72f6d39",
+          "peak_rss_bytes": 797327360,
+          "seed": 46002,
+          "steps": 80640,
+          "wall_seconds": 657.3991084690206
+        },
+        {
+          "artifact_bytes": 210665002,
+          "campaign_id": "control-science-v1-corpus-test-untouched",
+          "cpu_seconds": 671.130379791,
+          "label": "Test \u00b7 46003",
+          "metadata_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/corpora/schema_major=2/campaign=control-science-v1-corpus-test-untouched/scenario=cdot-delhi-national-v2-28d-s46003/controller=static-capacity-v1/seed=046003/metadata.json",
+          "metadata_sha256": "c48fb43e8463261f74f2df3568c42297893ef3e38a99c18179b80590802e9035",
+          "peak_rss_bytes": 815247360,
+          "seed": 46003,
+          "steps": 80640,
+          "wall_seconds": 672.9645308451727
+        },
+        {
+          "artifact_bytes": 210700557,
+          "campaign_id": "control-science-v1-corpus-train",
+          "cpu_seconds": 670.00736057,
+          "label": "Train \u00b7 46001",
+          "metadata_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/corpora/schema_major=2/campaign=control-science-v1-corpus-train/scenario=cdot-delhi-national-v2-28d-s46001/controller=static-capacity-v1/seed=046001/metadata.json",
+          "metadata_sha256": "6bcc0ba297de65ce8c7a56548f64e9d1152a5036003775f316c7d40105cc16d5",
+          "peak_rss_bytes": 807288832,
+          "seed": 46001,
+          "steps": 80640,
+          "wall_seconds": 671.7001251750626
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "assessment": "partial",
+      "expectation": "Run independent development ablations on seeds 46101\u201346112 without touching release seeds.",
+      "experiment_id": "mpc-packed-development-wave",
+      "job": "3459.wlm",
+      "result": {
+        "allocated_cpus": 72,
+        "exit_status": 1,
+        "failed_ablation": "churn-trigger",
+        "failure": "SolverReport contract rejected the intentional skipped solve status.",
+        "superseded_jobs": [
+          "3453.wlm",
+          "3454.wlm",
+          "3455.wlm",
+          "3456.wlm",
+          "3457.wlm",
+          "3458.wlm"
+        ],
+        "valid_pairs": 60,
+        "wall_seconds": 3662
+      },
+      "status": "complete_with_failed_ablation"
+    },
+    {
+      "assessment": "matched",
+      "expectation": "Retained safe policies must be auditable as skipped solves without failing schema validation.",
+      "experiment_id": "churn-trigger-skip-contract-regression",
+      "result": {
+        "change": "SolverReport now accepts the intentional skipped solve status.",
+        "full_test_discovery": {
+          "assertion_failures": 0,
+          "environment_errors": [
+            "missing output/models/extreme-oracle-bound-evaluation-v1.json",
+            "optional qrcode package unavailable in penv"
+          ],
+          "tests_passed": 143,
+          "tests_run": 145
+        },
+        "relevant_tests_passed": 22,
+        "rerun_job": "3460.wlm"
+      },
+      "status": "complete"
+    },
+    {
+      "artifact": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/mpc-development/baseline/evaluation.json",
+      "artifact_sha256": "ac7f49251247d01a515d6337ae3a8bd8f86e5412b5f6a0803c3d7ac3ad9e0ba7",
+      "assessment": "did_not_match",
+      "expectation": "Clear every MPC development promotion gate.",
+      "experiment_id": "mpc-development-baseline",
+      "job": "3459.wlm",
+      "label": "Current MPC",
+      "result": {
+        "bootstrap_ci95": [
+          -0.004015108652974889,
+          0.27199366812571596
+        ],
+        "gate_checks": {
+          "aggregate_guardrails": true,
+          "bootstrap_lower_above_zero": false,
+          "empirical_survival_robustness": null,
+          "mean_at_least_10_percent": true,
+          "routing_churn_not_increased": null,
+          "severity_weighted_positive": true,
+          "unknown_and_mixed_regression_within_2_percent": true,
+          "worst_pair_better_than_minus_10_percent": false
+        },
+        "mean_accepted_new_policies": 37.083333333333336,
+        "mean_controller_epochs": 144.0,
+        "mean_pair_ul_improvement": 0.11557959904796611,
+        "severity_weighted_ul_improvement": 0.03964724941425541,
+        "worst_pair": -0.1140534497815352
+      },
+      "status": "complete"
+    },
+    {
+      "artifact": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/mpc-development/adaptive-a0/evaluation.json",
+      "artifact_sha256": "3ad3f1a625d3709e2e63d3884a7792dfc59a786cd5448037076572be855ab902",
+      "assessment": "did_not_match",
+      "expectation": "Clear every MPC development promotion gate.",
+      "experiment_id": "mpc-development-adaptive-a0",
+      "job": "3459.wlm",
+      "label": "Adaptive \u03b1=0.0",
+      "result": {
+        "bootstrap_ci95": [
+          -0.1496036552324639,
+          0.19168858398688993
+        ],
+        "gate_checks": {
+          "aggregate_guardrails": true,
+          "bootstrap_lower_above_zero": false,
+          "empirical_survival_robustness": null,
+          "mean_at_least_10_percent": false,
+          "routing_churn_not_increased": null,
+          "severity_weighted_positive": false,
+          "unknown_and_mixed_regression_within_2_percent": false,
+          "worst_pair_better_than_minus_10_percent": false
+        },
+        "mean_accepted_new_policies": 69.66666666666667,
+        "mean_controller_epochs": 144.0,
+        "mean_pair_ul_improvement": 0.01830222126238938,
+        "severity_weighted_ul_improvement": -0.031532484621194214,
+        "worst_pair": -0.43450193715960156
+      },
+      "status": "complete"
+    },
+    {
+      "artifact": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/mpc-development/adaptive-a05/evaluation.json",
+      "artifact_sha256": "94dd62ebd2dd40ecb83305756c00c20fac598648c46a57cbaf177f7b779f7173",
+      "assessment": "did_not_match",
+      "expectation": "Clear every MPC development promotion gate.",
+      "experiment_id": "mpc-development-adaptive-a05",
+      "job": "3459.wlm",
+      "label": "Adaptive \u03b1=0.5",
+      "result": {
+        "bootstrap_ci95": [
+          -0.12363963576611037,
+          0.20848567394806436
+        ],
+        "gate_checks": {
+          "aggregate_guardrails": true,
+          "bootstrap_lower_above_zero": false,
+          "empirical_survival_robustness": null,
+          "mean_at_least_10_percent": false,
+          "routing_churn_not_increased": null,
+          "severity_weighted_positive": false,
+          "unknown_and_mixed_regression_within_2_percent": false,
+          "worst_pair_better_than_minus_10_percent": false
+        },
+        "mean_accepted_new_policies": 61.833333333333336,
+        "mean_controller_epochs": 144.0,
+        "mean_pair_ul_improvement": 0.035064122721478304,
+        "severity_weighted_ul_improvement": -0.024778712443628767,
+        "worst_pair": -0.35306170522577746
+      },
+      "status": "complete"
+    },
+    {
+      "artifact": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/mpc-development/adaptive-a10/evaluation.json",
+      "artifact_sha256": "268c5d266f77f01d3737c592e5d88dadd485a5908ab8fcf00a25e8fa4576b51a",
+      "assessment": "did_not_match",
+      "expectation": "Clear every MPC development promotion gate.",
+      "experiment_id": "mpc-development-adaptive-a10",
+      "job": "3459.wlm",
+      "label": "Adaptive \u03b1=1.0",
+      "result": {
+        "bootstrap_ci95": [
+          -0.06499794604149918,
+          0.2334645483413067
+        ],
+        "gate_checks": {
+          "aggregate_guardrails": true,
+          "bootstrap_lower_above_zero": false,
+          "empirical_survival_robustness": null,
+          "mean_at_least_10_percent": false,
+          "routing_churn_not_increased": null,
+          "severity_weighted_positive": true,
+          "unknown_and_mixed_regression_within_2_percent": true,
+          "worst_pair_better_than_minus_10_percent": false
+        },
+        "mean_accepted_new_policies": 54.833333333333336,
+        "mean_controller_epochs": 144.0,
+        "mean_pair_ul_improvement": 0.07199056937924057,
+        "severity_weighted_ul_improvement": 0.010077657212465714,
+        "worst_pair": -0.23817893350972927
+      },
+      "status": "complete"
+    },
+    {
+      "artifact": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/mpc-development/failure-domain/evaluation.json",
+      "artifact_sha256": "e92889b9c1fdb00a48c753feffd468a42a16b149203e9ba036b48efc4aaf7416",
+      "assessment": "did_not_match",
+      "expectation": "Clear every MPC development promotion gate.",
+      "experiment_id": "mpc-development-failure-domain",
+      "job": "3459.wlm",
+      "label": "Failure domain",
+      "result": {
+        "bootstrap_ci95": [
+          -0.03937042065255916,
+          0.058215576789709234
+        ],
+        "gate_checks": {
+          "aggregate_guardrails": true,
+          "bootstrap_lower_above_zero": false,
+          "empirical_survival_robustness": null,
+          "mean_at_least_10_percent": false,
+          "routing_churn_not_increased": null,
+          "severity_weighted_positive": true,
+          "unknown_and_mixed_regression_within_2_percent": true,
+          "worst_pair_better_than_minus_10_percent": false
+        },
+        "mean_accepted_new_policies": 20.166666666666668,
+        "mean_controller_epochs": 144.0,
+        "mean_pair_ul_improvement": 0.012770176760084753,
+        "severity_weighted_ul_improvement": 0.002635088405183864,
+        "worst_pair": -0.20120653564401744
+      },
+      "status": "complete"
+    },
+    {
+      "assessment": "pending",
+      "expectation": "Clear every MPC development promotion gate.",
+      "experiment_id": "mpc-development-churn-trigger",
+      "job": "3460.wlm",
+      "label": "Churn + trigger",
+      "status": "running"
+    },
+    {
+      "assessment": "pending",
+      "expectation": "Compare ridge-v2, histogram-gradient quantile, regime ensemble and LightGBM.",
+      "experiment_id": "forecast-challenger-comparison",
+      "status": "not_run"
+    },
+    {
+      "assessment": "pending",
+      "expectation": "Compare oracle, empirical, uniform and stale curves at 100/1,000/10,000 samples.",
+      "experiment_id": "survival-provider-sample-size-and-drift",
+      "status": "not_run"
+    },
+    {
+      "assessment": "correctly_deferred",
+      "expectation": "Use validation then untouched release seeds only after development promotion.",
+      "experiment_id": "mpc-validation-and-release",
+      "status": "not_run"
+    }
+  ],
+  "production_package_modified": false,
+  "release_seeds_consumed": false,
+  "schema_version": "control-science-experiment-ledger/1.0"
+}

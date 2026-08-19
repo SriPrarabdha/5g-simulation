@@ -1,0 +1,11 @@
+{
+  "schema_version": "artifact-policy/1.0",
+  "policy_id": "stage1-tiered-retention/1.0",
+  "salt": "cdot-stage1-20260817",
+  "silver_percentage": 100.0,
+  "gold_pair_keys": [],
+  "row_group_size": 4096,
+  "audit_mode": "tiered",
+  "jsonl_enabled": false,
+  "checkpoint_interval_seconds": 21600
+}

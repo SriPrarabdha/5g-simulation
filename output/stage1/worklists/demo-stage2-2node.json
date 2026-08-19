@@ -1,0 +1,655 @@
+{
+  "interleave": [
+    "static",
+    "reactive",
+    "mpc"
+  ],
+  "node_count": 2,
+  "schema_version": "stage1-work-list/1.0",
+  "seed_base": 96000,
+  "waves": 4,
+  "waves_per_node": 2,
+  "work_items": [
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96000,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96001,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96002,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96003,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96004,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96005,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96006,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96007,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96008,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96009,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96010,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96011,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96012,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96013,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96014,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96015,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96016,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96017,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96018,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96019,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96020,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96021,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96022,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96023,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96024,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96025,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96026,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96027,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96028,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "mpc",
+      "model": "/home/abharadwaj/Projects/5g-simulation/configs/demo_forecast_bundle.json",
+      "optimizer_profile": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96029,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "static",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96030,
+      "topology_id": "topology-9775ff819183b0d3"
+    },
+    {
+      "artifact_policy": {
+        "audit_mode": "tiered",
+        "checkpoint_interval_seconds": 21600,
+        "gold_pair_keys": [],
+        "jsonl_enabled": false,
+        "policy_id": "stage1-tiered-retention/1.0",
+        "row_group_size": 4096,
+        "salt": "cdot-stage1",
+        "schema_version": "artifact-policy/1.0",
+        "silver_percentage": 1.0
+      },
+      "controller": "reactive",
+      "model": null,
+      "optimizer_profile": null,
+      "scenario_manifest": "/home/abharadwaj/Projects/5g-simulation/configs/demo_scenario.json",
+      "schema_version": "stage1-work-item/1.0",
+      "seed": 96031,
+      "topology_id": "topology-9775ff819183b0d3"
+    }
+  ],
+  "worker_count": 8
+}

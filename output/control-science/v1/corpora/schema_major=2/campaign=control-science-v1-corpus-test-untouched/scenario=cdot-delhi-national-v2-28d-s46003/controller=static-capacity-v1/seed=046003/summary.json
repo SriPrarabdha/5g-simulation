@@ -1,0 +1,53 @@
+{
+  "carried_bytes": {
+    "dl": 1.111735137564204e+16,
+    "ul": 3379317534164167.5
+  },
+  "control_scope": "new_session_placement_only",
+  "controllable_load_fraction": {
+    "dl": 0.07653191084197085,
+    "ul": 0.060678507491311776
+  },
+  "controller": "static-capacity-v1",
+  "dropped_bytes": {
+    "dl": 6515892608909.441,
+    "ul": 2193430478735.7915
+  },
+  "establishment_failures": 0,
+  "incremental_new_session_overload_area_seconds": {
+    "dl": 0.0,
+    "ul": 0.0
+  },
+  "new_session_offered_bytes": {
+    "dl": 851330817991694.9,
+    "ul": 205185038400037.8
+  },
+  "offered_bytes": {
+    "dl": 1.112386726825089e+16,
+    "ul": 3381510964642911.5
+  },
+  "overload_area_seconds": {
+    "dl": Infinity,
+    "ul": Infinity
+  },
+  "overload_duration_seconds": {
+    "dl": 100800.0,
+    "ul": 100800.0
+  },
+  "primary_overload_metric": "overload_area_seconds.ul",
+  "rejected_bytes": {
+    "dl": 0.0,
+    "ul": 0.0
+  },
+  "residual_overload_area_seconds": {
+    "dl": Infinity,
+    "ul": Infinity
+  },
+  "scenario_id": "cdot-delhi-national-v2-28d-s46003",
+  "seed": 46003,
+  "selection_audit_count": 21489638,
+  "selection_audit_stride": 1,
+  "selection_audits_retained": 21489638,
+  "session_migration_supported": false,
+  "steps": 80640
+}

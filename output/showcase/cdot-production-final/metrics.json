@@ -1,0 +1,167 @@
+{
+  "all_supplied_gates_passed": true,
+  "created_at": "2026-08-18T16:04:51.442757Z",
+  "figures": [
+    "figures/01_streaming_memory_scaling.png",
+    "figures/01_streaming_memory_scaling.svg",
+    "figures/02_controller_profile.png",
+    "figures/02_controller_profile.svg",
+    "figures/03_controller_outcomes.png",
+    "figures/03_controller_outcomes.svg",
+    "figures/04_artifact_tiers.png",
+    "figures/04_artifact_tiers.svg",
+    "figures/05_packing_ladder.png",
+    "figures/05_packing_ladder.svg",
+    "figures/06_production_scaling.png",
+    "figures/06_production_scaling.svg",
+    "figures/07_production_resource_headroom.png",
+    "figures/07_production_resource_headroom.svg"
+  ],
+  "headline_metrics": {
+    "12-node wall time": "85.4 min",
+    "CPU efficiency": "90.9%",
+    "Final shards": "384",
+    "Worker failures": "0"
+  },
+  "inputs": [
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/reports/memory-regression-steady-state.json",
+      "sha256": "7fd136e830e8fd64a2eb9263322d8f1d7457c8af103b521bf3a0349ad91c7015"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/reports/sequential-profile.json",
+      "sha256": "0e377f1dc461768b91e428ca98ce3a553f33025b3b6e88a34baa2daa498b15bd"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/reports/artifact-characterization.json",
+      "sha256": "dd8e5f2f49a64e98d60f5b78afd89367100fc31ebc58afa8a965164bb75ec07f"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-2node-pilot-s20260818/combined.json",
+      "sha256": "10b785d8793561829baf2c9eba090357f461ff1e7435584d9603fb072aee7553"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-4node-pilot-s20260818/combined.json",
+      "sha256": "b4a330685477c6c87f61387b31c4e18fd74696da1d87a09b55b035afef06cc37"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-12node-campaign-s20260818/combined.json",
+      "sha256": "1a52be767bb5c0bcd8f6a1d4660e1e347e3aa6db62ced5a0064e8090a92779d3"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-2node-pilot-s20260818/pilot-report.json",
+      "sha256": "cbd1c8a83f7c948706d341d03dddfc519a5386ddb0aec5199f1811565d078341"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-4node-pilot-s20260818/pilot-report.json",
+      "sha256": "5d70a33d084ea9ff04ab59d86e0769eba9d5a7e1298cfa4b5db974e766c3a266"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-12node-campaign-s20260818/pilot-report.json",
+      "sha256": "fb148ee346184894a0bfdb16e875a1968a2178d4d83a00b319e35b421e9985dd"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-2node-pilot-s20260818/campaign-summary.json",
+      "sha256": "fec62b75e7af025651444b85f91d94c50e1ad7fae23b3b7d191089e39fab1600"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-4node-pilot-s20260818/campaign-summary.json",
+      "sha256": "6dbb2601c8d8890989650615db6a3ddc15f7c197cd7f594011c8663cd3ed1e4d"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/overnight-20260818/production-scheduling-v2/campaigns/multinode/extreme-12node-campaign-s20260818/campaign-summary.json",
+      "sha256": "4a5e997dbb90a19d46619a699a617cb41bb477bc1da3f0bb87a02ff6cd8a5a95"
+    },
+    {
+      "path": "/home/abharadwaj/5g-stage1/extreme/packing/characterization/stage1-report.json",
+      "sha256": "3732b7dab778b94cf642bb72bf843bc7cca9aefb397c458bb71a659df00fdb29"
+    }
+  ],
+  "ladder_included": true,
+  "production_controller_outcomes": {
+    "campaign_id": "extreme-12node-campaign-s20260818",
+    "metrics": {
+      "DL dropped": {
+        "cohort-mpc-v1": {
+          "median": 116.64502638300337,
+          "p05": 105.86150853338873,
+          "p95": 131.74527493512892
+        },
+        "reactive-threshold-v1": {
+          "median": 207.38322000571395,
+          "p05": 205.8844101214529,
+          "p95": 208.83433166589134
+        },
+        "static-capacity-v1": {
+          "median": 100.0,
+          "p05": 100.0,
+          "p95": 100.0
+        }
+      },
+      "DL overload": {
+        "cohort-mpc-v1": {
+          "median": 116.01294411436523,
+          "p05": 105.63897146828832,
+          "p95": 130.54595008912304
+        },
+        "reactive-threshold-v1": {
+          "median": 203.31862459725397,
+          "p05": 201.91547125681365,
+          "p95": 204.70726932860083
+        },
+        "static-capacity-v1": {
+          "median": 100.0,
+          "p05": 99.99999999999999,
+          "p95": 100.00000000000001
+        }
+      },
+      "UL dropped": {
+        "cohort-mpc-v1": {
+          "median": 105.43506876238547,
+          "p05": 97.57587493174223,
+          "p95": 116.86362684506175
+        },
+        "reactive-threshold-v1": {
+          "median": 221.01816621235128,
+          "p05": 218.58518960325026,
+          "p95": 223.4861350263217
+        },
+        "static-capacity-v1": {
+          "median": 100.0,
+          "p05": 99.99999999999999,
+          "p95": 100.00000000000001
+        }
+      },
+      "UL overload": {
+        "cohort-mpc-v1": {
+          "median": 113.05246139485769,
+          "p05": 104.08724854149824,
+          "p95": 124.38664503774221
+        },
+        "reactive-threshold-v1": {
+          "median": 197.58055564210437,
+          "p05": 196.09903818005373,
+          "p95": 199.20208101566803
+        },
+        "static-capacity-v1": {
+          "median": 100.0,
+          "p05": 99.99999999999999,
+          "p95": 100.00000000000001
+        }
+      }
+    },
+    "normalization": "per-seed static-capacity-v1 = 100; lower is better",
+    "paired_seed_count": 128
+  },
+  "production_resource_included": true,
+  "production_summary": {
+    "establishment_failures": 0,
+    "failures": 0,
+    "final_cpu_efficiency": 0.9091327634327467,
+    "final_node_count": 12,
+    "final_shards": 384,
+    "final_wall_seconds": 5122.4982805280015,
+    "peak_swap_bytes": 0
+  },
+  "schema_version": "cdot-showcase/1.1"
+}

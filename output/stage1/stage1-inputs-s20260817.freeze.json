@@ -1,0 +1,46 @@
+{
+  "artifact_policy": {
+    "bytes": 287,
+    "contract": {
+      "audit_mode": "tiered",
+      "checkpoint_interval_seconds": 21600,
+      "gold_pair_keys": [],
+      "jsonl_enabled": false,
+      "policy_id": "stage1-tiered-retention/1.0",
+      "row_group_size": 4096,
+      "salt": "cdot-stage1",
+      "schema_version": "artifact-policy/1.0",
+      "silver_percentage": 1.0
+    },
+    "path": "/home/abharadwaj/Projects/5g-simulation/output/stage1/policies/ladder-1pct-silver.json",
+    "sha256": "304cb4f3036b673db81470720579ff07dab0d79c6cfc57f65b8cf9f078a458dd"
+  },
+  "created_at": "2026-08-17T17:00:11.399455Z",
+  "forecast_bundle": {
+    "bundle_sha256": "9cba2b6b2a6ce5f2d8de02c806b1b8805a19f1417e1661338fff5d755640ab40",
+    "bytes": 3415537,
+    "groups": 96,
+    "model_version": "extreme-calendar-ridge-conformal-stage1/1.0",
+    "path": "/home/abharadwaj/Projects/5g-simulation/output/stage1/models/extreme-forecaster-7d-s20260817.json",
+    "sha256": "3d46b6f07eaf3a6dabfb1fc95a79dfcae6c53e4b79df76d23d9a00d44b4bdf49"
+  },
+  "manifest": {
+    "bytes": 426936,
+    "path": "/home/abharadwaj/Projects/5g-simulation/output/manifests/stage1-extreme-packing-1d-s20260817.json",
+    "sha256": "bff7beae603dcd6a1d82d1ba101dc5aee51bee78cef38e835887e4800bfd1f11"
+  },
+  "manifest_embedded_sha256": "6200d9c5c8148d9a0a9c2bc083faba6751eab699ef0a7b0aad4a3a87b341d36c",
+  "mpc_profile": {
+    "bytes": 821,
+    "development_only": true,
+    "path": "/home/abharadwaj/Projects/5g-simulation/configs/cohort_mpc_pilot_10pct_v2.json",
+    "profile_id": "cohort-state-mpc-ma6-anchor50-10pct-v2",
+    "sha256": "044634c6a9265533c4b7deb3174fe53fcd071a004e83fe7f2f9fe542e629916a"
+  },
+  "record_sha256": "1d2c980f86b5e23263c5775c9eb9c12568f19f2f3d10d18dad578662c819f62e",
+  "scenario_id": "extreme-optimizer-pilot-1d-s20260817",
+  "schema_version": "stage1-frozen-inputs/1.0",
+  "source_fingerprint": "ffb946ad5ec15cb999e5fdc2d7fb0121226db07d7b47d9a451faf6d28b46d833",
+  "status": "frozen-provisional",
+  "topology_id": "topology-4b9eda70bb7a3724"
+}

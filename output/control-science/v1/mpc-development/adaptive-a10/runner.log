@@ -1,0 +1,14 @@
+{"pairs": 12, "pending": 12, "resumed": 0, "work_fingerprint": "3f7520b1ad6e655e7ef486dbd27ab7f205421df7e997bd260c012ecaa9699ce0", "workers": 12}
+pair=1/12 kind=scheduled_fault seed=46104 ul_reduction=0.5335 wall=2923.1s
+pair=2/12 kind=surge seed=46101 ul_reduction=0.0000 wall=2951.2s
+pair=3/12 kind=surge seed=46103 ul_reduction=0.0000 wall=2958.7s
+pair=4/12 kind=unannounced_outage seed=46107 ul_reduction=-0.1059 wall=2967.5s
+pair=5/12 kind=scheduled_fault seed=46106 ul_reduction=0.7409 wall=3007.5s
+pair=6/12 kind=surge seed=46102 ul_reduction=0.0000 wall=3145.6s
+pair=7/12 kind=scheduled_fault seed=46105 ul_reduction=0.0000 wall=3180.0s
+pair=8/12 kind=mixed_stress seed=46110 ul_reduction=-0.1771 wall=3269.0s
+pair=9/12 kind=unannounced_outage seed=46109 ul_reduction=0.0931 wall=3441.1s
+pair=10/12 kind=unannounced_outage seed=46108 ul_reduction=-0.2382 wall=3524.1s
+pair=11/12 kind=mixed_stress seed=46112 ul_reduction=-0.0213 wall=3577.6s
+pair=12/12 kind=mixed_stress seed=46111 ul_reduction=0.0388 wall=3605.1s
+{"confidence": [-0.06499794604149918, 0.2334645483413067], "decision": "stop_or_retune_without_release_seeds", "guardrails": {"no_dl_drop_regression": true, "no_dl_overload_regression": true, "no_session_failure_regression": true, "no_ul_drop_regression": true}, "mean_pair_ul_reduction": 0.07199056937924057, "output": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/mpc-development/adaptive-a10/evaluation.json"}

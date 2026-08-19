@@ -1,0 +1,32 @@
+{
+  "schema_version": "frozen-production-reference/1.0",
+  "source_package": "output/showcase/cdot-production-final",
+  "immutable": true,
+  "artifacts": [
+    {
+      "path": "metrics.json",
+      "sha256": "3223cbad08fe856a4a20b6114c4208c94b3473f4ef8d9511a1d78b96ce13d887"
+    },
+    {
+      "path": "cdot_final_report.pdf",
+      "sha256": "5859ed4f39b0c38185d4415b60550a15de9650712ef98846785ed0a362fa4962"
+    },
+    {
+      "path": "index.html",
+      "sha256": "a5e651efc6f4e32d13ffb9c101d9bf109fa89d570df3ac0a75f1d4e6a1d9d5b3"
+    },
+    {
+      "path": "TALK_TRACK.md",
+      "sha256": "9705dbc4b6c3ce3319a975800b23414438ae92312b8bb423d696947b1a1476c4"
+    }
+  ],
+  "scale_evidence": {
+    "shards": 384,
+    "nodes": 12,
+    "cpu_efficiency": 0.9091327634327467,
+    "wall_seconds": 5122.4982805280015,
+    "worker_failures": 0,
+    "establishment_failures": 0,
+    "peak_swap_bytes": 0
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "fingerprint_sha256": "d26b3d5e8ddb18431b56a7c209c3e29082d63d43ce43c79e944cadde0e742619",
+  "fingerprints": {
+    "artifact_policy": {
+      "audit_mode": "tiered",
+      "checkpoint_interval_seconds": 21600,
+      "gold_pair_keys": [],
+      "jsonl_enabled": false,
+      "policy_id": "stage1-tiered-retention/1.0",
+      "row_group_size": 4096,
+      "salt": "cdot-stage1-20260817",
+      "schema_version": "artifact-policy/1.0",
+      "silver_percentage": 100.0
+    },
+    "controller": "static-capacity-v1",
+    "manifest_sha256": "fe211e2ec7ffaf8860c1f144adb201f2c381eabf5ef047341fc23300c57d7b66",
+    "model": null,
+    "mpc_profile": null,
+    "predictive_profile": null,
+    "scenario_id": "cdot-delhi-national-v2-28d-s46001",
+    "seed": 46001,
+    "source_fingerprint": "493c4a3ec4a0eb3138268fdca121aed527c8b9aa9376e7c5f81246100a74cbb1",
+    "topology_id": "topology-02afddd812f062ea"
+  },
+  "schema_version": "simulation-provenance/1.0"
+}

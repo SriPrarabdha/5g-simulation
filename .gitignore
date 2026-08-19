@@ -2,7 +2,6 @@ env/
 .conda/
 __pycache__/
 *.py[cod]
-output/
 .coverage
 .pytest_cache/
 *.egg-info/

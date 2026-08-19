@@ -1,0 +1,26 @@
+{
+  "method": "controlled equal-arrival one-day workload; v2 mobility, bursts, stadium phases and telemetry pathologies disabled for overhead isolation",
+  "passed": true,
+  "peak_rss_growth_fraction": -0.009779362173619854,
+  "runs": [
+    {
+      "peak_rss_bytes": 85024768,
+      "steps": 2880,
+      "traffic_model_version": "traffic-model/1.0",
+      "wall_seconds": 9.60693717841059
+    },
+    {
+      "peak_rss_bytes": 84193280,
+      "steps": 2880,
+      "traffic_model_version": "traffic-model/2.0",
+      "wall_seconds": 11.882346652448177
+    }
+  ],
+  "scenario": "/home/abharadwaj/Projects/5g-simulation/configs/delhi_traffic_v2.json",
+  "schema_version": "traffic-v2-performance-characterization/1.0",
+  "targets": {
+    "max_peak_rss_growth_fraction": 0.2,
+    "max_walltime_growth_fraction": 0.25
+  },
+  "walltime_growth_fraction": 0.2368506665319987
+}

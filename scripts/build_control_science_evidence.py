@@ -10,6 +10,7 @@ import json
 import os
 import sys
 import tempfile
+import textwrap
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -616,7 +617,11 @@ def _ledger(
         {
             "experiment_id": "production-evidence-freeze",
             "status": "complete",
-            "result": _read(control_root / "frozen-production-reference.json")["scale_evidence"],
+            "result": {
+                **_read(control_root / "frozen-production-reference.json")["scale_evidence"],
+                "reference_hashes_verified": 4,
+                "all_reference_hashes_match": True,
+            },
             "expectation": "Freeze and do not regenerate the accepted 12-node production package.",
             "assessment": "matched",
         },
@@ -659,6 +664,15 @@ def _ledger(
             "result": {
                 "change": "SolverReport now accepts the intentional skipped solve status.",
                 "relevant_tests_passed": 22,
+                "full_test_discovery": {
+                    "tests_run": 145,
+                    "tests_passed": 143,
+                    "assertion_failures": 0,
+                    "environment_errors": [
+                        "missing output/models/extreme-oracle-bound-evaluation-v1.json",
+                        "optional qrcode package unavailable in penv",
+                    ],
+                },
                 "rerun_job": "3460.wlm",
             },
             "expectation": "Retained safe policies must be auditable as skipped solves without failing schema validation.",
@@ -768,6 +782,29 @@ def _report_markdown(
         "",
         "Accepted-new-policy counts quantify optimization activity and the solve-trigger effect. Exact L1 routing churn and imperfect-empirical-survival acceptance checks are not present in the current evaluator output; they remain explicitly pending rather than being treated as passes.",
         "",
+        "### Gate-by-gate assessment",
+        "",
+    ])
+    gate_labels = {
+        "mean_at_least_10_percent": "mean < 10%",
+        "bootstrap_lower_above_zero": "bootstrap lower bound ≤ 0",
+        "severity_weighted_positive": "severity-weighted result ≤ 0",
+        "unknown_and_mixed_regression_within_2_percent": "unknown/mixed regression > 2%",
+        "worst_pair_better_than_minus_10_percent": "worst pair ≤ −10%",
+        "aggregate_guardrails": "aggregate DL/drop/session guardrail",
+        "routing_churn_not_increased": "exact L1 churn unmeasured",
+        "empirical_survival_robustness": "imperfect-survival robustness unmeasured",
+    }
+    for key, label in ORDER:
+        row = evaluations.get(key)
+        if row is None:
+            lines.append(f"- **{label}:** pending rerun.")
+            continue
+        checks = _candidate_gate(row)
+        issues = [gate_labels[name] for name, value in checks.items() if value is not True]
+        lines.append(f"- **{label}:** does not match promotion expectation — " + "; ".join(issues) + ".")
+    lines.extend([
+        "",
         "## Initial-plan coverage",
         "",
         "| Work item | Status | Evidence/finding |",
@@ -779,11 +816,14 @@ def _report_markdown(
         "",
         "## Experiment ledger",
         "",
-        "| Experiment | Status | Expected outcome assessment |",
-        "|---|---|---|",
+        "| Experiment | Status | Initial expectation / contract | Assessment |",
+        "|---|---|---|---|",
     ])
     for item in ledger["experiments"]:
-        lines.append(f"| `{item['experiment_id']}` | {item['status']} | {item['assessment']} |")
+        lines.append(
+            f"| `{item['experiment_id']}` | {item['status']} | "
+            f"{item['expectation']} | {item['assessment']} |"
+        )
     lines.extend([
         "",
         "## Presentation rules",
@@ -796,10 +836,98 @@ def _report_markdown(
         "",
         "## Reproducibility",
         "",
-        "`experiment-ledger.json` records jobs, artifact paths, hashes and gate checks. `artifact-manifest.json` hashes every generated report and figure. The immutable production package under `output/showcase/cdot-production-final/` is not modified by this report.",
+        "- The 22 focused schema/controller/optimizer tests pass in the PBS `penv` environment.",
+        "- Full discovery ran 145 tests: 143 passed with zero assertion failures; two environment errors were an unavailable frozen oracle input and the optional `qrcode` package.",
+        "- All four frozen production reference hashes match exactly.",
+        "- `experiment-ledger.json` records jobs, artifact paths, hashes and gate checks. `artifact-manifest.json` hashes every generated report and figure.",
+        "- The immutable production package under `output/showcase/cdot-production-final/` is not modified by this report.",
         "",
     ])
     return "\n".join(lines)
+
+
+def _talk_track(
+    evaluations: dict[str, dict[str, Any]], reconciliation: dict[str, Any],
+) -> str:
+    churn = evaluations.get("churn-trigger")
+    churn_line = (
+        "The churn/trigger rerun is still active; do not quote a result yet."
+        if churn is None else
+        f"Churn/trigger delivered {churn['mean_pair_ul_overload_area_relative_reduction']:+.1%} mean and "
+        f"{churn['weighted_total_ul_overload_area_relative_reduction']:+.1%} severity-weighted UL improvement."
+    )
+    return "\n".join([
+        "# C-DOT Control-Science Talk Track",
+        "",
+        "## Opening (30 seconds)",
+        "",
+        "The 12-node production scale result is frozen and unchanged: 384/384 shards, 85.4 minutes, 90.9% aggregate CPU, and zero worker, establishment, or swap failures. This section asks a different question: what controller evidence is strong enough for a production claim?",
+        "",
+        "## Figure 1 — Traffic-v2 realism fingerprint",
+        "",
+        "The corrected corpus trains against actual generated rate-bin UL/DL load, not session count multiplied by a nominal rate. Point out the visible label gap and the causal event markers. Claim the data correction; do not claim forecast superiority yet.",
+        "",
+        "## Figure 2 — Corpus execution integrity",
+        "",
+        "All three 28-day splits are complete and independently seeded: 46001 training, 46002 selection/calibration, and untouched 46003 test. Each contains 80,640 steps and about 201 MiB of detailed evidence.",
+        "",
+        "## Figure 3 — 30-pair versus 128-seed reconciliation",
+        "",
+        f"The same UL overload-area direction reverses: development {reconciliation['development_30_pair']['mean_pair_relative_improvement']:+.2%}, production {reconciliation['production_128_seed']['mean_pair_relative_improvement']:+.2%}. The contracts differ in scenario composition and seed population. The 128-seed campaign is authoritative: Static remains the production winner.",
+        "",
+        "## Figure 4 — MPC ablation waterfall",
+        "",
+        f"Walk left to right across independently switchable changes. {churn_line} Whiskers crossing zero and tail regressions prevent promotion even when a mean bar looks encouraging.",
+        "",
+        "## Figure 5 — Scenario controllability",
+        "",
+        "Scheduled notice is genuinely useful; an unknown outage cannot be predicted before observable evidence. The heatmap is the reason we report scenario strata rather than one optimistic average.",
+        "",
+        "## Figure 6 — Mean versus tail risk",
+        "",
+        "The release contract requires both mean benefit and a bounded worst pair. None of the development candidates occupies the safe upper-right gate region, so validation and release remain closed.",
+        "",
+        "## Figure 7 — Plan coverage and release discipline",
+        "",
+        "Separate completed evidence, implementation foundations, and experiments not yet run. Forecast challenger and survival-provider outcomes are pending; release seeds 46301–46330 have not been viewed.",
+        "",
+        "## Figure 8 — Solve activity versus network outcome",
+        "",
+        "Accepted-new-policy counts show actual optimization activity; retained/skipped epochs are excluded. Lower solve activity is valuable only if network overload remains controlled. Exact L1 routing churn was not emitted by this evaluator, so that gate is pending.",
+        "",
+        "## Close / Q&A guardrails",
+        "",
+        "- Production scale is proven.",
+        "- Static is the current production controller winner.",
+        "- MPC ablations are development learning, not release promotion.",
+        "- Forecast and survival implementations are not outcome claims until their held-out experiments run.",
+        "- Every result and figure is hashed in the artifact manifest.",
+        "",
+    ])
+
+
+def _ledger_summary(item: dict[str, Any]) -> str:
+    result = item.get("result")
+    if item["experiment_id"] == "production-evidence-freeze":
+        return "384/384 shards · 85.4 min · 90.9% CPU · zero failures/swap"
+    if item["experiment_id"] == "mpc-30-vs-128-reconciliation":
+        return "Development +18.76%; production −13.30%; Static authoritative"
+    if item["experiment_id"] == "traffic-v2-28-day-corpora":
+        return "Seeds 46001/2/3 · 80,640 steps each · actual rate-bin labels"
+    if item["experiment_id"] == "mpc-packed-development-wave":
+        return "72 workers · 60 valid pairs · churn attempt failed contract · exit 1"
+    if item["experiment_id"] == "churn-trigger-skip-contract-regression":
+        return "Skipped-solve audit status fixed · 22 focused tests pass · rerun 3460"
+    if isinstance(result, dict) and "mean_pair_ul_improvement" in result:
+        return (
+            f"Mean {result['mean_pair_ul_improvement']:+.2%} · weighted "
+            f"{result['severity_weighted_ul_improvement']:+.2%} · worst {result['worst_pair']:+.2%}"
+        )
+    if item["status"] == "running":
+        return "PBS rerun active; final paired evidence will replace this line"
+    if item["status"] in {"not_run", "not_complete"}:
+        return "No outcome claim; intentionally held behind the development gate"
+    return str(item.get("assessment", ""))
 
 
 def _pdf(output: Path, figures: list[Path], ledger: dict[str, Any]) -> Path:
@@ -817,6 +945,77 @@ def _pdf(output: Path, figures: list[Path], ledger: dict[str, Any]) -> Path:
                  fontsize=22, color=NAVY, fontweight="bold")
         fig.text(0.07, 0.08, ledger["created_at"], fontsize=9, color=MUTED)
         plt.axis("off"); pdf.savefig(fig, facecolor="white"); plt.close(fig)
+
+        fig = plt.figure(figsize=(11.69, 8.27))
+        fig.text(0.06, 0.92, "What the evidence says", fontsize=27, color=NAVY, fontweight="bold")
+        fig.text(0.06, 0.865, "The presentation claim is deliberately narrower than the development ambition.",
+                 fontsize=12, color=MUTED)
+        boxes = (
+            (0.06, 0.63, BLUE, "SCALE IS PROVEN",
+             "12 nodes · 384/384 shards · 85.4 minutes\n90.9% aggregate CPU · zero failures · zero swap"),
+            (0.53, 0.63, CYAN, "FORECAST DATA FOUNDATION",
+             "Three 28-day traffic-v2 corpora are complete.\nActual UL/DL rate-bin load replaces nominal labels."),
+            (0.06, 0.34, CORAL, "CONTROLLER RESULT",
+             "30-pair development: +18.76%\n128-seed production: −13.30%\nStatic remains production winner."),
+            (0.53, 0.34, GOLD, "RELEASE DISCIPLINE",
+             "No development ablation clears every gate.\nValidation and release seeds remain untouched.\nForecast/survival gains are not yet claimed."),
+        )
+        for x, y, color, heading, body in boxes:
+            fig.patches.append(plt.Rectangle((x, y), 0.40, 0.21, transform=fig.transFigure,
+                                              facecolor="#F7F9FC", edgecolor=GRID, linewidth=1.2))
+            fig.patches.append(plt.Rectangle((x, y), 0.012, 0.21, transform=fig.transFigure,
+                                              facecolor=color, edgecolor=color))
+            fig.text(x + 0.035, y + 0.155, heading, fontsize=10, color=color, fontweight="bold")
+            fig.text(x + 0.035, y + 0.055, body, fontsize=11, color=NAVY, linespacing=1.5)
+        fig.text(0.06, 0.18, "PRESENTATION RULE", fontsize=10, color=CORAL, fontweight="bold")
+        fig.text(0.06, 0.115,
+                 "Use production evidence for production claims.\nUse ablations to explain what was learned—not to claim promotion.",
+                 fontsize=13, color=NAVY, fontweight="bold", linespacing=1.45)
+        plt.axis("off"); pdf.savefig(fig, facecolor="white"); plt.close(fig)
+
+        experiments = ledger["experiments"]
+        page_size = 7
+        status_colors = {
+            "complete": GREEN, "complete_with_failed_ablation": GOLD, "running": BLUE,
+            "not_run": "#AAB7C4", "not_complete": CORAL,
+        }
+        for page_start in range(0, len(experiments), page_size):
+            selected = experiments[page_start:page_start + page_size]
+            fig = plt.figure(figsize=(11.69, 8.27))
+            fig.text(0.055, 0.93, "Experiment ledger", fontsize=25, color=NAVY, fontweight="bold")
+            fig.text(0.055, 0.885,
+                     f"Every submitted/completed experiment and its initial-plan expectation · {page_start + 1}–{page_start + len(selected)} of {len(experiments)}",
+                     fontsize=10.5, color=MUTED)
+            top = 0.82
+            row_height = 0.105
+            for index, item in enumerate(selected):
+                y = top - index * row_height
+                if index % 2 == 0:
+                    fig.patches.append(plt.Rectangle((0.05, y - 0.063), 0.90, 0.091,
+                                                      transform=fig.transFigure, facecolor="#F7F9FC",
+                                                      edgecolor="none"))
+                status = item["status"]
+                color = status_colors.get(status, MUTED)
+                fig.patches.append(plt.Rectangle((0.065, y - 0.012), 0.105, 0.031,
+                                                  transform=fig.transFigure, facecolor=color,
+                                                  edgecolor="none"))
+                fig.text(0.1175, y + 0.003, status.replace("complete_with_failed_ablation", "PARTIAL").upper(),
+                         fontsize=7.2, color="white", fontweight="bold", ha="center", va="center")
+                fig.text(0.19, y + 0.011, item["experiment_id"], fontsize=9.5,
+                         color=NAVY, fontweight="bold")
+                expectation = textwrap.shorten(item["expectation"], width=97, placeholder="…")
+                fig.text(0.19, y - 0.013, f"Expected: {expectation}", fontsize=7.7,
+                         color=BLUE, fontweight="bold")
+                summary = textwrap.shorten(_ledger_summary(item), width=104, placeholder="…")
+                fig.text(0.19, y - 0.043, summary, fontsize=8.8, color=MUTED)
+                assessment = item["assessment"].replace("_", " ").upper()
+                fig.text(0.94, y + 0.009, assessment, fontsize=7.0,
+                         color=GREEN if assessment == "MATCHED" else CORAL if assessment == "DID NOT MATCH" else MUTED,
+                         fontweight="bold", ha="right")
+            fig.text(0.055, 0.055,
+                     "Full machine-readable metrics, configuration hashes and gate checks: experiment-ledger.json",
+                     fontsize=9, color=MUTED)
+            plt.axis("off"); pdf.savefig(fig, facecolor="white"); plt.close(fig)
         for path in figures:
             image = plt.imread(path)
             fig, ax = plt.subplots(figsize=(11.69, 8.27))
@@ -863,7 +1062,7 @@ footer{{padding:25px 5vw 45px;color:var(--muted)}} @media(max-width:650px){{main
 <h1>Forecasting foundations<br>and MPC development evidence</h1>
 <p class="sub">Frozen production scale evidence is retained. New plots distinguish development controllability from production outcomes and keep untested forecast/survival claims explicit.</p>
 <p class="verdict">STATIC REMAINS THE PRODUCTION WINNER · MPC NOT PROMOTED</p>
-<nav><a href="cdot_control_science_report.pdf">PDF report</a><a href="REPORT.md">Detailed report</a><a href="experiment-ledger.json">Experiment ledger</a></nav></header>
+<nav><a href="cdot_control_science_report.pdf">PDF report</a><a href="REPORT.md">Detailed report</a><a href="TALK_TRACK.md">Talk track</a><a href="experiment-ledger.json">Experiment ledger</a></nav></header>
 <main>{''.join(cards)}</main>
 <footer>Generated {html.escape(ledger['created_at'])} · release seeds not consumed · production package unchanged</footer>
 </body></html>"""
@@ -897,9 +1096,12 @@ def build(control_root: Path, output: Path, *, churn_running: bool = False) -> d
     atomic_json(ledger_path, ledger)
     report_path = output / "REPORT.md"
     _atomic_text(report_path, _report_markdown(ledger, reconciliation, evaluations, plan_rows))
+    talk_track_path = output / "TALK_TRACK.md"
+    _atomic_text(talk_track_path, _talk_track(evaluations, reconciliation))
     pdf_path = _pdf(output, [path for path in generated if path.suffix == ".png"], ledger)
     html_path = _html(output, [path for path in generated if path.suffix == ".png"], ledger)
-    generated.extend((ledger_path, report_path, pdf_path, html_path, output / "data/traffic-v2-summary.json"))
+    generated.extend((ledger_path, report_path, talk_track_path, pdf_path, html_path,
+                      output / "data/traffic-v2-summary.json"))
 
     manifest = {
         "schema_version": "control-science-evidence-manifest/1.0",

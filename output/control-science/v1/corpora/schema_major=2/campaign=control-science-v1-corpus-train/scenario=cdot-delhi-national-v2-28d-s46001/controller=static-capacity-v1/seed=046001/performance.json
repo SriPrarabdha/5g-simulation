@@ -1,0 +1,17 @@
+{
+  "cpu_seconds": 670.00736057,
+  "peak_rss_bytes": 807288832,
+  "phase_timings": {
+    "arrival_generation_seconds": 32.02444048039615,
+    "checkpointing_seconds": 77.21326798386872,
+    "controller_work_seconds": 1.8847317700274289,
+    "lifetime_generation_seconds": 21.15362107940018,
+    "rendezvous_selection_seconds": 88.60066945571452,
+    "result_construction_seconds": 6.451582973822951,
+    "sink_writes_seconds": 121.30443103378639,
+    "stage_out_seconds": 0.0
+  },
+  "schema_version": "simulation-performance/1.0",
+  "scratch_bytes": 223693548,
+  "wall_seconds": 671.7001251750626
+}
