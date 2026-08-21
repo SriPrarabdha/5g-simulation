@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -N cdot-fc-calendar
+#PBS -q workq
+#PBS -l select=1:ncpus=125:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=08:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+: "${TRAIN_CAMPAIGN_ROOT:?set seed-46001 corpus root}"
+: "${TRAIN_MANIFEST:?set seed-46001 manifest}"
+: "${OUTPUT_BUNDLE:?set calendar bundle output}"
+"$PYTHON_BIN" -m experiments.check_forecast_environment
+"$PYTHON_BIN" -m experiments.train_forecaster \
+  --campaign-root "$TRAIN_CAMPAIGN_ROOT" --manifest "$TRAIN_MANIFEST" \
+  --family calendar-ridge --model-version calendar-ridge/control-science-v1 \
+  --output "$OUTPUT_BUNDLE"

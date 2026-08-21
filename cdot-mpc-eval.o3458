@@ -1,6 +1,0 @@
-[env] root=/home/abharadwaj/Projects/5g-simulation
-[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
-[env] host=x8000c0s2b0n1 job=3458.wlm array_index=none
-{"pairs": 12, "pending": 12, "resumed": 0, "work_fingerprint": "6ec4d509914b21e8027e9e73cb0e7cfd97a83d1f2a513380334185c05c8e959a", "workers": 8}
-/home/abharadwaj/.conda/envs/penv/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 5 leaked semaphore objects to clean up at shutdown
-  warnings.warn('resource_tracker: There appear to be %d '

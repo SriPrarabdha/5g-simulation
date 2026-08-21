@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "56a7434a846507a763a22d780122a5b6159c8f9b6e54ac955c9e36dc7c6af805",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "abe0d0e177dd7c6ecefa008c83d50e31890a7eb2ba32a5def24fb5a660ad99d6",
+      "metric_file_sha256": "01d33ba8381f5831d940df662b6aceb96ac66bcf0918312ee7115ad0619a1145",
+      "trained_bundle_sha256": "e332e77c87a49666e2a44349f58ee01e13830591f0aa8a4ca438b18721bb0e7d"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "21e392b462143334b723557acf93d829dce21ce4d5b653ca8055cef18e50958c",
+      "metric_file_sha256": "83dee080691e436890a911d414c90e380ab39eac74a82656b5027d52f2e0002e",
+      "trained_bundle_sha256": "9e88b6b3165e2b117cc23a6a53587e47e1b59922cfee57e0a5857b2fbcaca3be"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "7a01f339add9f75b716063bbf117f01c0307a247b745bacb6fbce7438a907476",
+      "metric_file_sha256": "7ed53639802905b6e2feecfa5058e0181af903f0e00727351dcc0763938f786d",
+      "trained_bundle_sha256": "ad463bdbbce22eb0f3c7d94fc95e668672738f551556489938419fbf279a1747"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "e062c0b044d4c9d96a3de169d9f03f435acc06f659502eca1733c248a7bea917",
+      "metric_file_sha256": "6f6bf1ead0228cd528aabd51dab6dc706aafe6666a7fa6533b04afffa0d60b0d",
+      "trained_bundle_sha256": "0a154e4589c8ba538af4039f201ad90975d1ea981a043b16b4dc3c66c3e80271"
+    }
+  },
+  "group_id": "south|iot-massive|1-667788",
+  "group_index": 79,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

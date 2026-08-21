@@ -1,0 +1,156 @@
+{
+  "02_executive_result": {
+    "candidate_promoted": false,
+    "production_controller": "static-capacity-v1",
+    "twin_ready": true
+  },
+  "03_scientific_journey": {
+    "stages": [
+      "1 \u00b7 SIMULATE",
+      "2 \u00b7 FORECAST",
+      "3 \u00b7 BOUND",
+      "4 \u00b7 CONTROL",
+      "5 \u00b7 DECIDE"
+    ],
+    "terminal_decision": "retain_static"
+  },
+  "04_digital_twin_architecture": {
+    "actuation_scope": "future_sessions_only",
+    "causal_step_seconds": 30,
+    "production_fallback": "static-capacity-v1"
+  },
+  "05_traffic_fingerprint": {
+    "sha256": "87e977f6427960388097cae4ec6ce6088dde6f68f5a87314595e770d2c20bbe2",
+    "source": "presentation/delhi/charts/02_traffic_fingerprint.png"
+  },
+  "06_representative_upf_day": {
+    "sha256": "bb95609d8f4feb727c9f044418ce00494f4b376ef7d5c3c922d41d09c5d0ce68",
+    "source": "presentation/delhi/charts/03_representative_upf_day.png"
+  },
+  "07_telemetry_pathology": {
+    "sha256": "831f8384ddb36a8e6d20003d10e6e578a412a25d3945884a6fbf06080f12c92d",
+    "source": "presentation/delhi/charts/05_telemetry_pathology.png"
+  },
+  "08_streaming_memory_scaling": {
+    "sha256": "56e93a1127f268594bc0ca55056d423e067785950393a627b651dfd2f0fdab26",
+    "source": "output/showcase/cdot-production-final/figures/01_streaming_memory_scaling.png"
+  },
+  "09_cluster_scale": {
+    "sha256": "56d43138df5a1c38b5a082c35188010a061600281e61255a3219d652e34e4afc",
+    "source": "output/showcase/cdot-production-final/figures/06_production_scaling.png"
+  },
+  "10_forecast_horizon": {
+    "sha256": "feb12a2a8a3694ca623ba16536c9c5dd9b6ae395b809e20a1494078d1446075e",
+    "source": "presentation/delhi/charts/06_forecast_horizon.png"
+  },
+  "11_forecast_targets": {
+    "sha256": "504e209154a21247cb2c2c53aeda7d36a9331762515bbe21ec37a1287b401b4f",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/01_forecast_target_separated_wape.png"
+  },
+  "12_survival_calibration": {
+    "sha256": "2955959c10d602147e6744c5e3ef4682e5e4d8b8be7f882a9d52b63b49273a02",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/03_survival_calibration_convergence.png"
+  },
+  "13_forecast_vs_control": {
+    "sha256": "521caaccb15f1806bd3d9febfa25a391abd93046084108b4eecf3b97b42d01f8",
+    "source": "presentation/delhi/charts/07_forecast_vs_control.png"
+  },
+  "14_controllability_surface": {
+    "sha256": "6fb993539d2ca3366e183bee231251a66ab6b9469770ac3fdf11de10a31f5bca",
+    "source": "presentation/delhi/charts/11_controllability_surface.png"
+  },
+  "15_oracle_ladder": {
+    "sha256": "4e1cd769b4badefb24b4b97e23c08458505b49a9ed52b530304b1e58add33c75",
+    "source": "presentation/delhi/charts/09_oracle_ladder.png"
+  },
+  "16_guarded_mpc_architecture": {
+    "sha256": "523f8a842b7542e4f168813ade8e5b78f53521b4088f69836db2e847de8dd3e6",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/11_guarded_mpc_production_architecture.png"
+  },
+  "17_solver_and_fallback": {
+    "sha256": "2cef6745c9c4347e5864e4fefe5ae931829aaac799e2a80287ba5c3ae5a3f5e5",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/09_solver_status_and_static_fallback.png"
+  },
+  "18_all_mpc_candidates": {
+    "sha256": "4567c4619cc0d1eedc848d5aba6b70937b67a8ad710fc1eb48605a0bb388fb8e",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/07_all_mpc_candidates_forest.png"
+  },
+  "19_distribution_blind_survival": {
+    "sha256": "ff75411b13748608c22ac6f100d46a4ebcab2db6e503ee1d41e717dc40ccd968",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/13_distribution_blind_survival_matrix.png"
+  },
+  "20_scenario_transfer": {
+    "sha256": "24959834478d32dd26a2a160a4a1c43303a27354d20b1df5a6abb539c58fe34e",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/15_new_scenario_improvement_heatmap.png"
+  },
+  "21_predrain_frontier": {
+    "sha256": "a7a796f7382521d63b5baad36e9a6b89f37af8e9af067c6416f246c3df4e8714",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/17_predrain_benefit_tail_frontier.png"
+  },
+  "22_mpc_action_funnel": {
+    "sha256": "9966ae1e68bb0277a5ca593a4cf6f5b748070afaad50509ee4a60c15e777a4d7",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/18_mpc_action_funnel.png"
+  },
+  "23_adaptive_causal_lag": {
+    "sha256": "d19cee4b8350b007ba7ee6f8e386a18ee17d234ea5d525c0ee785eb9110e4f62",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/20_adaptive_blend_causal_lag.png"
+  },
+  "24_overflow_fail_closed": {
+    "affected": [
+      {
+        "actions": 12,
+        "label": "pre-drain 25%",
+        "max_raw_mixed_unit_slack": 65391.85206624973
+      },
+      {
+        "actions": 7,
+        "label": "pre-drain 50%",
+        "max_raw_mixed_unit_slack": 38845.062065385486
+      },
+      {
+        "actions": 12,
+        "label": "adaptive 50\u201375",
+        "max_raw_mixed_unit_slack": 85635.83403979382
+      },
+      {
+        "actions": 12,
+        "label": "adaptive 60\u201385",
+        "max_raw_mixed_unit_slack": 85635.83403979382
+      },
+      {
+        "actions": 12,
+        "label": "fixed 35%",
+        "max_raw_mixed_unit_slack": 98823.29404049288
+      },
+      {
+        "actions": 12,
+        "label": "fixed 40%",
+        "max_raw_mixed_unit_slack": 94425.25404026298
+      },
+      {
+        "actions": 12,
+        "label": "fixed 45%",
+        "max_raw_mixed_unit_slack": 89880.74404002252
+      }
+    ],
+    "certified_with_overflow": false,
+    "tolerance": 1e-07
+  },
+  "25_campaign_saturation_latency": {
+    "sha256": "dbe644123a290547cb3c802a6eeab6446e9e731fa628b82e45f69899459cb3dd",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/19_end_to_end_latency_audit.png"
+  },
+  "26_experiment_inventory": {
+    "sha256": "5b8f3295e08c0862b61b49a0f5aa1c5d01768512a51e8d774c3d0487e3ec77de",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/21_campaign_scale_seed_firewall.png"
+  },
+  "27_worked_vs_did_not": {
+    "sha256": "f2bb5222104ca21d5923deca1426d634280ed317808ff4c984285790f12b9358",
+    "source": "output/control-science/v1/phase3-cdot-showcase-v6/figures/22_worked_vs_did_not_work.png"
+  },
+  "28_final_decision": {
+    "decision": "retain_static",
+    "protected_release_consumed": false,
+    "protected_validation_consumed": false
+  }
+}

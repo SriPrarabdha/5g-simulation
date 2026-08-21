@@ -1,0 +1,428 @@
+{
+  "candidates": [
+    {
+      "bootstrap_95_interval": [
+        -0.023449451824797896,
+        0.2661605892071431
+      ],
+      "candidate": "existing-baseline",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-guarded-development-v1/existing-baseline/evaluation.json",
+      "evaluation_sha256": "9128a0d7f6ce791afce14e78a65ef061e6f68dafd4c18a45687d984c1eb79175",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": true,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": false,
+        "normalized_churn_within_0_05_l1_per_group_decision": false,
+        "positive_severity_weighted_improvement": true,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": false
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+      "interface_freeze_sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9",
+      "mean_pair_ul_improvement": 0.1026056877872299,
+      "normalized_churn": 0.05470914266953727,
+      "passes": false,
+      "profile": "configs/cohort_mpc_control_science_baseline_v1.json",
+      "severity_weighted_ul_improvement": 0.031505379851731706,
+      "unknown_mixed_ul_improvement": 0.016669052162731245,
+      "worst_pair_ul_improvement": -0.1228697162363038
+    },
+    {
+      "bootstrap_95_interval": [
+        -0.018945678343969565,
+        0.2679169282827245
+      ],
+      "candidate": "empirical-survival",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-guarded-development-v1/empirical-survival/evaluation.json",
+      "evaluation_sha256": "e198bb7047b9933d24242292e442208e3495d8328e138d0eb114c8b2462ab0ae",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": true,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": false,
+        "normalized_churn_within_0_05_l1_per_group_decision": false,
+        "positive_severity_weighted_improvement": true,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": false
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+      "interface_freeze_sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9",
+      "mean_pair_ul_improvement": 0.10631539727870254,
+      "normalized_churn": 0.053444385941014826,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_empirical_survival_v1.json",
+      "severity_weighted_ul_improvement": 0.03359349956864176,
+      "unknown_mixed_ul_improvement": 0.01881781481913515,
+      "worst_pair_ul_improvement": -0.10207412430481319
+    },
+    {
+      "bootstrap_95_interval": [
+        0.0,
+        0.0
+      ],
+      "candidate": "scheduled-only",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-guarded-development-v1/scheduled-only/evaluation.json",
+      "evaluation_sha256": "d82ef430422bdc08626ade171a40fbe44c7456223d4effe9103edfe811791765",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": false,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": false,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+      "interface_freeze_sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9",
+      "mean_pair_ul_improvement": 0.0,
+      "normalized_churn": 0.0008504434022772728,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_scheduled_only_v1.json",
+      "severity_weighted_ul_improvement": 0.0,
+      "unknown_mixed_ul_improvement": 0.0,
+      "worst_pair_ul_improvement": 0.0
+    },
+    {
+      "bootstrap_95_interval": [
+        -0.03585780305992229,
+        0.134694294594271
+      ],
+      "candidate": "failure-domain",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-guarded-development-v1/failure-domain/evaluation.json",
+      "evaluation_sha256": "5f914aa212da289fd44e1993175b877a25ba4ab8985679e48962649c67fd6d9f",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": false,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": true,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": false
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+      "interface_freeze_sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9",
+      "mean_pair_ul_improvement": 0.0379089037904476,
+      "normalized_churn": 0.023077897727842817,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_failure_domain_v1.json",
+      "severity_weighted_ul_improvement": 0.008375745787145361,
+      "unknown_mixed_ul_improvement": 0.005789379309672602,
+      "worst_pair_ul_improvement": -0.19281211855687025
+    },
+    {
+      "bootstrap_95_interval": [
+        0.0,
+        0.0
+      ],
+      "candidate": "conservative-combined",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-guarded-development-v1/conservative-combined/evaluation.json",
+      "evaluation_sha256": "44b8d28515a6dbda26524d9defbc4ce101e7b5518b0a2d1d33cc82a53b645a9c",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": false,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": false,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+      "interface_freeze_sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9",
+      "mean_pair_ul_improvement": 0.0,
+      "normalized_churn": 0.0008504434022772728,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_combined_v1.json",
+      "severity_weighted_ul_improvement": 0.0,
+      "unknown_mixed_ul_improvement": 0.0,
+      "worst_pair_ul_improvement": 0.0
+    },
+    {
+      "bootstrap_95_interval": [
+        0.0,
+        0.0
+      ],
+      "candidate": "calendar-optimistic-stale",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-guarded-development-v1/calendar-optimistic-stale/evaluation.json",
+      "evaluation_sha256": "1fd1606b4f92c609bd6239d136fd14b0781f195cb788799b5418f5abe588d051",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": false,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": false,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+      "interface_freeze_sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9",
+      "mean_pair_ul_improvement": 0.0,
+      "normalized_churn": 0.0008504434022772728,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_calendar_optimistic_v1.json",
+      "severity_weighted_ul_improvement": 0.0,
+      "unknown_mixed_ul_improvement": 0.0,
+      "worst_pair_ul_improvement": 0.0
+    },
+    {
+      "bootstrap_95_interval": [
+        0.0,
+        0.0
+      ],
+      "candidate": "calendar-conservative",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-guarded-development-v1/calendar-conservative/evaluation.json",
+      "evaluation_sha256": "0dd2c33c43daeb95f0407b31f77c2567f1f78f8dc52e43fcb0d024a871bbc7ad",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": false,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": false,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+      "interface_freeze_sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9",
+      "mean_pair_ul_improvement": 0.0,
+      "normalized_churn": 0.0008504434022772728,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_calendar_conservative_v1.json",
+      "severity_weighted_ul_improvement": 0.0,
+      "unknown_mixed_ul_improvement": 0.0,
+      "worst_pair_ul_improvement": 0.0
+    },
+    {
+      "bootstrap_95_interval": [
+        -0.010102715834317091,
+        0.003018190096498984
+      ],
+      "candidate": "scheduled-h2-t10",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-scheduled-tuning-v1/scheduled-h2-t10/evaluation.json",
+      "evaluation_sha256": "93db05164059c35489752e57905d69b3878b3630556272dbff25de3ac9986252",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": false,
+        "no_solver_timeout_or_error": true,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": false,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v3.json",
+      "interface_freeze_sha256": "c47fc5cb3b144decd1381c9af1d4c7feeccb7dcc2029b4545f92480484876800",
+      "mean_pair_ul_improvement": -0.0022283234406269277,
+      "normalized_churn": 0.002780326193879275,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_scheduled_h2_t10_v1.json",
+      "severity_weighted_ul_improvement": -0.00036770954872710024,
+      "unknown_mixed_ul_improvement": 0.0006813089286100133,
+      "worst_pair_ul_improvement": -0.041209974169143015
+    },
+    {
+      "bootstrap_95_interval": [
+        -0.005496991634627292,
+        0.0002185527683462147
+      ],
+      "candidate": "scheduled-h3-t10",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-scheduled-tuning-v1/scheduled-h3-t10/evaluation.json",
+      "evaluation_sha256": "d14bb93fb1796aef2abf763ae0a1236c1b3c796111997be4716b2924bd8fd50e",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": false,
+        "no_solver_timeout_or_error": true,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": false,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v3.json",
+      "interface_freeze_sha256": "c47fc5cb3b144decd1381c9af1d4c7feeccb7dcc2029b4545f92480484876800",
+      "mean_pair_ul_improvement": -0.0018556523915780165,
+      "normalized_churn": 0.0024411846735058968,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_scheduled_h3_t10_v1.json",
+      "severity_weighted_ul_improvement": -0.00018891663404805326,
+      "unknown_mixed_ul_improvement": 0.0003726690879597317,
+      "worst_pair_ul_improvement": -0.021192377153257013
+    },
+    {
+      "bootstrap_95_interval": [
+        -0.0008764839155517854,
+        0.0005372480118392762
+      ],
+      "candidate": "scheduled-h6-t10",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-scheduled-tuning-v1/scheduled-h6-t10/evaluation.json",
+      "evaluation_sha256": "a3c71af5ba46b029a8035267f3eb498d1dc3f7c714e4b9c152498f167345334b",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": true,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": true,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v3.json",
+      "interface_freeze_sha256": "c47fc5cb3b144decd1381c9af1d4c7feeccb7dcc2029b4545f92480484876800",
+      "mean_pair_ul_improvement": -7.408265576123173e-05,
+      "normalized_churn": 0.0018529726412003498,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_scheduled_h6_t10_v1.json",
+      "severity_weighted_ul_improvement": 0.00024601653445382137,
+      "unknown_mixed_ul_improvement": 0.0002706652138566891,
+      "worst_pair_ul_improvement": -0.003951984473780647
+    },
+    {
+      "bootstrap_95_interval": [
+        -0.005496991634627292,
+        0.0002185527683462147
+      ],
+      "candidate": "scheduled-h3-t30",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-scheduled-tuning-v1/scheduled-h3-t30/evaluation.json",
+      "evaluation_sha256": "806f749aeca25d12dd1b39fe35dd470102f853d054629aa094f1e0703502604b",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": false,
+        "no_solver_timeout_or_error": true,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": false,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v3.json",
+      "interface_freeze_sha256": "c47fc5cb3b144decd1381c9af1d4c7feeccb7dcc2029b4545f92480484876800",
+      "mean_pair_ul_improvement": -0.0018556523915780165,
+      "normalized_churn": 0.0024411846735058968,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_scheduled_h3_t30_v1.json",
+      "severity_weighted_ul_improvement": -0.00018891663404805326,
+      "unknown_mixed_ul_improvement": 0.0003726690879597317,
+      "worst_pair_ul_improvement": -0.021192377153257013
+    },
+    {
+      "bootstrap_95_interval": [
+        -0.0008764839155517854,
+        0.0005372480118392762
+      ],
+      "candidate": "scheduled-h6-t30",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-scheduled-tuning-v1/scheduled-h6-t30/evaluation.json",
+      "evaluation_sha256": "413f75f118c254b7597b08e1d9b51ce937f39f0e6ebee37724c6e38144e12f9b",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": true,
+        "no_solver_timeout_or_error": true,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": true,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v3.json",
+      "interface_freeze_sha256": "c47fc5cb3b144decd1381c9af1d4c7feeccb7dcc2029b4545f92480484876800",
+      "mean_pair_ul_improvement": -7.408265576123173e-05,
+      "normalized_churn": 0.0018529726412003498,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_scheduled_h6_t30_v1.json",
+      "severity_weighted_ul_improvement": 0.00024601653445382137,
+      "unknown_mixed_ul_improvement": 0.0002706652138566891,
+      "worst_pair_ul_improvement": -0.003951984473780647
+    },
+    {
+      "bootstrap_95_interval": [
+        -0.005375615395677889,
+        0.00046026121310929237
+      ],
+      "candidate": "calendar-conservative-h3-t30",
+      "evaluation_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-scheduled-tuning-v1/calendar-conservative-h3-t30/evaluation.json",
+      "evaluation_sha256": "f786e0f69f206e4f4320b1dd9d484e4e414ce15256c5459db9ad40689a1fb888",
+      "gates": {
+        "bootstrap_lower_bound_above_zero": false,
+        "mean_pair_ul_improvement_at_least_10_percent": false,
+        "measured_empirical_survival_robustness": true,
+        "no_dl_overload_drop_or_establishment_regression": false,
+        "no_solver_timeout_or_error": false,
+        "normalized_churn_within_0_05_l1_per_group_decision": true,
+        "positive_severity_weighted_improvement": false,
+        "skipped_decision_fraction_within_95_percent": true,
+        "unexpected_fallback_fraction_within_1_percent": false,
+        "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+        "worst_pair_better_than_minus_10_percent": true
+      },
+      "interface_freeze_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v3.json",
+      "interface_freeze_sha256": "c47fc5cb3b144decd1381c9af1d4c7feeccb7dcc2029b4545f92480484876800",
+      "mean_pair_ul_improvement": -0.0016384513941895323,
+      "normalized_churn": 0.002012145806709224,
+      "passes": false,
+      "profile": "configs/cohort_mpc_phase3_calendar_conservative_h3_t30_v1.json",
+      "severity_weighted_ul_improvement": -4.462653549759551e-05,
+      "unknown_mixed_ul_improvement": 0.000523214989254361,
+      "worst_pair_ul_improvement": -0.021502461582711557
+    }
+  ],
+  "created_at": "2026-08-19T19:29:35.878533Z",
+  "decision": "stop_and_retain_static",
+  "development_seeds": [
+    46101,
+    46112
+  ],
+  "phase3_interface_freezes": [
+    {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+      "sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9"
+    },
+    {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v3.json",
+      "sha256": "c47fc5cb3b144decd1381c9af1d4c7feeccb7dcc2029b4545f92480484876800"
+    }
+  ],
+  "release_seeds_consumed": false,
+  "schema_version": "phase3-development-decision/1.0",
+  "selected_candidate": null,
+  "static_remains_default": true,
+  "validation_seeds_consumed": false
+}

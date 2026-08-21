@@ -61,6 +61,10 @@ class CohortMPCConfig:
     min_ul_overload_relative_improvement: float = 0.0
     require_known_future_capacity_event: bool = False
     fallback_on_unplanned_capacity_state: bool = False
+    fallback_on_telemetry_uncertainty: bool = False
+    scheduled_capacity_factor_bias: float = 0.0
+    scheduled_event_start_offset_windows: int = 0
+    scheduled_event_end_offset_windows: int = 0
     guardrail_margin_fraction: float = 0.01
     guardrail_tolerance: float = 1e-7
     adaptive_forecast_risk_enabled: bool = False
@@ -115,6 +119,12 @@ class CohortMPCConfig:
             raise ValueError("solve_trigger_safe_utilization must be in [0, 1)")
         if self.low_confidence_survival_safety_factor < 1:
             raise ValueError("low-confidence survival safety factor must be at least one")
+        if not -1 < self.scheduled_capacity_factor_bias < 1:
+            raise ValueError("scheduled capacity factor bias must lie in (-1, 1)")
+        if abs(self.scheduled_event_start_offset_windows) > self.horizon_windows:
+            raise ValueError("scheduled event start offset exceeds the planning horizon")
+        if abs(self.scheduled_event_end_offset_windows) > self.horizon_windows:
+            raise ValueError("scheduled event end offset exceeds the planning horizon")
 
 
 @dataclass(frozen=True, slots=True)
@@ -149,6 +159,10 @@ class CohortMPCResult:
     certificate: MPCCertificate | None
     known_future_events: int
     survival_audit: dict[str, dict[str, object]] | None = None
+    model_variables: int = 0
+    equality_constraints: int = 0
+    inequality_constraints: int = 0
+    matrix_nonzeros: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -215,7 +229,7 @@ def solve_cohort_mpc(
     )
 
     path, known_count = _known_capacity_path(
-        scenario, states, current_step, config.horizon_windows
+        scenario, states, current_step, config.horizon_windows, config
     )
     model = _PlanningModel(
         scenario, groups, active_cohorts, demand_by_group, config.horizon_windows,
@@ -227,7 +241,7 @@ def solve_cohort_mpc(
         return CohortMPCResult(
             "infeasible", "no static allocation exists across the planning horizon",
             round((time.perf_counter() - started) * 1000), {}, {}, {}, None, known_count,
-            survival_audit,
+            survival_audit, len(model.x_keys), len(model.columns_by_group_window), 0, 0,
         )
 
     nx = len(model.x_keys)
@@ -441,11 +455,14 @@ def solve_cohort_mpc(
             if path.admission_healthy[upf_index, window]
             else 0.0
         )
+    inequality_matrix = vstack(inequalities, format="csr")
+    inequality_rhs = np.concatenate(rhs)
+    model_nonzeros = equality.nnz + inequality_matrix.nnz
     try:
         solution = linprog(
             objective,
-            A_ub=vstack(inequalities, format="csr"),
-            b_ub=np.concatenate(rhs),
+            A_ub=inequality_matrix,
+            b_ub=inequality_rhs,
             A_eq=equality,
             b_eq=equality_rhs,
             bounds=np.column_stack((lower, upper)),
@@ -456,14 +473,16 @@ def solve_cohort_mpc(
         return CohortMPCResult(
             "error", f"HiGHS error: {error}",
             round((time.perf_counter() - started) * 1000), {}, {}, {}, None, known_count,
-            survival_audit,
+            survival_audit, variable_count, equality.shape[0],
+            inequality_matrix.shape[0], model_nonzeros,
         )
     runtime_ms = round((time.perf_counter() - started) * 1000)
     if not solution.success or solution.x is None:
         status = "timeout" if solution.status == 1 else "infeasible" if solution.status == 2 else "error"
         return CohortMPCResult(
             status, solution.message, runtime_ms, {}, {}, {}, None, known_count,
-            survival_audit,
+            survival_audit, variable_count, equality.shape[0],
+            inequality_matrix.shape[0], model_nonzeros,
         )
 
     candidate = np.asarray(solution.x[:nx])
@@ -486,7 +505,8 @@ def solve_cohort_mpc(
     }
     return CohortMPCResult(
         "optimal", solution.message, runtime_ms, first, static_first, planned,
-        certificate, known_count, survival_audit,
+        certificate, known_count, survival_audit, variable_count,
+        equality.shape[0], inequality_matrix.shape[0], model_nonzeros,
     )
 
 
@@ -609,6 +629,7 @@ def _known_capacity_path(
     states: Sequence[UPFState],
     current_step: int,
     horizon: int,
+    settings: CohortMPCConfig,
 ) -> tuple[_CapacityPath, int]:
     index = {upf.upf_id: position for position, upf in enumerate(scenario.upfs)}
     state_by_id = {state.upf_id: state for state in states}
@@ -633,7 +654,16 @@ def _known_capacity_path(
     ]
     by_step: dict[int, list[ScenarioEvent]] = {}
     for event in known:
-        by_step.setdefault(event.step, []).append(event)
+        shifted_step = event.step
+        if event.event_type == "capacity_factor":
+            factors = [value for value in (event.ul_factor, event.dl_factor) if value is not None]
+            is_recovery = bool(factors) and all(value >= 0.999999 for value in factors)
+            offset = (
+                settings.scheduled_event_end_offset_windows
+                if is_recovery else settings.scheduled_event_start_offset_windows
+            )
+            shifted_step += offset * scenario.decision_interval_steps
+        by_step.setdefault(max(current_step + 1, shifted_step), []).append(event)
     shape = (len(scenario.upfs), horizon)
     safe_ul = np.full(shape, np.inf)
     safe_dl = np.full(shape, np.inf)
@@ -649,9 +679,15 @@ def _known_capacity_path(
                 upf = index[event.upf_id or ""]
                 if event.event_type == "capacity_factor":
                     if event.ul_factor is not None:
-                        ul_factor[upf] = event.ul_factor
+                        ul_factor[upf] = (
+                            event.ul_factor if event.ul_factor >= 0.999999
+                            else min(1.0, max(0.0, event.ul_factor + settings.scheduled_capacity_factor_bias))
+                        )
                     if event.dl_factor is not None:
-                        dl_factor[upf] = event.dl_factor
+                        dl_factor[upf] = (
+                            event.dl_factor if event.dl_factor >= 0.999999
+                            else min(1.0, max(0.0, event.dl_factor + settings.scheduled_capacity_factor_bias))
+                        )
                 else:
                     healthy[upf] = event.health in {"healthy", "degraded"}
             for upf_index, profile in enumerate(scenario.upfs):

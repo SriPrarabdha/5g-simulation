@@ -1,0 +1,44 @@
+{
+  "criteria": {
+    "empirical_load_exposure_relative_absolute_error_at_most_5_percent": true,
+    "empirical_mean_pair_gap_vs_oracle_no_worse_than_5_points": true,
+    "empirical_no_dl_drop_or_establishment_regression": true,
+    "empirical_solver_errors_zero_and_timeouts_within_5_percent_of_oracle": true,
+    "n100_and_n1000_no_dl_drop_or_establishment_regression": true,
+    "same_12_development_pairs": true,
+    "stale_empirical_returns_exactly_to_static": true
+  },
+  "development_seeds": [
+    46101,
+    46102,
+    46103,
+    46104,
+    46105,
+    46106,
+    46107,
+    46108,
+    46109,
+    46110,
+    46111,
+    46112
+  ],
+  "empirical_solver_errors": 0,
+  "empirical_solver_timeouts": 1201,
+  "inputs": {
+    "calibration_sha256": "fab918016d123f1569028bbfa5470dffe6dacffb4bc05dff9e865aefbc49bb54",
+    "empirical_bundle_sha256": "2fe277aa31b59a545a8b0ce5849a2a1626161acc2574813b09a542d5e81d1725",
+    "empirical_evaluation_sha256": "0159e4b6bac5d03f827492dbae32dbf3b0f2a74bdd82573b53d093f86334c681",
+    "oracle_evaluation_sha256": "11e059947dc9f50fc64587d8eb6a621470adc30ca7ed812c8ec235c5f93df5bf",
+    "small_evaluation_sha256": [
+      "78058beef4d37d69c477bed0e0f3fc4e62e86bc438063de13119b68434ceee38",
+      "540d303ee7aa4b6c849144f34ab79d78ca9ffac1ebb7cabdbf57e85fa9fa3970"
+    ],
+    "stale_evaluation_sha256": "c1a6f6640b0e4334492886ee7dc33f36073eac6d6e2dc47b9badebadeee414e8"
+  },
+  "load_exposure_relative_absolute_error": 0.004199455483308974,
+  "mean_pair_ul_improvement_gap_empirical_minus_oracle": -0.013142561675078338,
+  "oracle_solver_timeouts": 1188,
+  "passed": true,
+  "schema_version": "empirical-survival-guardrail/1.0",
+  "worst_pair_gap_empirical_minus_oracle": -0.05817577102523896
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": "phase3.1-candidate-matrix/1.0",
+  "development_only": true,
+  "candidate_count": 5,
+  "candidates": [
+    {
+      "candidate_id": "predrain-balanced",
+      "controller": "predrain",
+      "hypothesis": "A bounded event-triggered flow will create scheduled-fault benefit without MPC timeout risk.",
+      "flow": {
+        "lead_windows": 12,
+        "timeout_seconds": 0.25,
+        "max_group_upf_weight": 0.75,
+        "event_risk_cost": 100.0,
+        "latency_cost": 0.01,
+        "utilization_cost": 0.1,
+        "overflow_cost": 10000.0
+      }
+    },
+    {
+      "candidate_id": "predrain-early-diverse",
+      "controller": "predrain",
+      "hypothesis": "Earlier and more diverse pre-drain reduces persistent cohort exposure before scheduled faults.",
+      "flow": {
+        "lead_windows": 18,
+        "timeout_seconds": 0.25,
+        "max_group_upf_weight": 0.65,
+        "event_risk_cost": 150.0,
+        "latency_cost": 0.01,
+        "utilization_cost": 0.1,
+        "overflow_cost": 10000.0
+      }
+    },
+    {
+      "candidate_id": "mpc-h3-configured-survival-diagnostic",
+      "controller": "mpc",
+      "hypothesis": "A compact three-window model avoids timeout while testing whether the configured-survival upper bound has actionable headroom.",
+      "profile": "configs/cohort_mpc_phase31_operational_h3_v1.json",
+      "forecast_bundle": "output/control-science/v1/forecast-phase2/trained-v3/calendar-ridge.json",
+      "survival_bundle": null,
+      "non_deployable_survival_diagnostic": true
+    },
+    {
+      "candidate_id": "mpc-h3-lifecycle-lognormal",
+      "controller": "mpc",
+      "hypothesis": "Distribution-blind lifecycle survival changes closed-loop decisions without operational timeout.",
+      "profile": "configs/cohort_mpc_phase31_operational_h3_v1.json",
+      "forecast_bundle": "output/control-science/v1/forecast-phase2/trained-v3/calendar-ridge.json",
+      "survival_bundle": "output/control-science/v1/phase3.1-survival-v1/lognormal/seed-46501/survival.json"
+    },
+    {
+      "candidate_id": "mpc-h6-lifecycle-heavy-tail",
+      "controller": "mpc",
+      "hypothesis": "A six-window model paired with heavy-tail lifecycle telemetry captures longer persistence while retaining the two-second solve bound.",
+      "profile": "configs/cohort_mpc_phase31_operational_h6_v1.json",
+      "forecast_bundle": "output/control-science/v1/forecast-phase2/trained-v3/calendar-ridge.json",
+      "survival_bundle": "output/control-science/v1/phase3.1-survival-v1/heavy-tail-mixture/seed-46501/survival.json"
+    }
+  ]
+}

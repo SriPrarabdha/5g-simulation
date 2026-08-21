@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -N cdot-fc-aggregate
+#PBS -q workq
+#PBS -l select=1:ncpus=2:mem=16gb
+#PBS -l walltime=01:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+: "${SELECTION_ROOT:?set root containing every family metric shard}"
+: "${OUTPUT:?set frozen selection report}"
+"$PYTHON_BIN" -m experiments.aggregate_forecast_selection \
+  --root "$SELECTION_ROOT" --output "$OUTPUT"

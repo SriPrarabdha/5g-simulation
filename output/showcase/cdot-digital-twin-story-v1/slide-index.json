@@ -1,0 +1,140 @@
+{
+  "cover": 1,
+  "slides": [
+    {
+      "chapter": "Result",
+      "figure": "figures/02_executive_result.png",
+      "number": 2
+    },
+    {
+      "chapter": "Journey",
+      "figure": "figures/03_scientific_journey.png",
+      "number": 3
+    },
+    {
+      "chapter": "System",
+      "figure": "figures/04_digital_twin_architecture.png",
+      "number": 4
+    },
+    {
+      "chapter": "Build the twin",
+      "figure": "figures/05_traffic_fingerprint.png",
+      "number": 5
+    },
+    {
+      "chapter": "Build the twin",
+      "figure": "figures/06_representative_upf_day.png",
+      "number": 6
+    },
+    {
+      "chapter": "Build the twin",
+      "figure": "figures/07_telemetry_pathology.png",
+      "number": 7
+    },
+    {
+      "chapter": "Build the twin",
+      "figure": "figures/08_streaming_memory_scaling.png",
+      "number": 8
+    },
+    {
+      "chapter": "Build the twin",
+      "figure": "figures/09_cluster_scale.png",
+      "number": 9
+    },
+    {
+      "chapter": "Teach it to predict",
+      "figure": "figures/10_forecast_horizon.png",
+      "number": 10
+    },
+    {
+      "chapter": "Teach it to predict",
+      "figure": "figures/11_forecast_targets.png",
+      "number": 11
+    },
+    {
+      "chapter": "Teach it to predict",
+      "figure": "figures/12_survival_calibration.png",
+      "number": 12
+    },
+    {
+      "chapter": "Prediction is not control",
+      "figure": "figures/13_forecast_vs_control.png",
+      "number": 13
+    },
+    {
+      "chapter": "Map the ceiling",
+      "figure": "figures/14_controllability_surface.png",
+      "number": 14
+    },
+    {
+      "chapter": "Map the ceiling",
+      "figure": "figures/15_oracle_ladder.png",
+      "number": 15
+    },
+    {
+      "chapter": "Build the controller",
+      "figure": "figures/16_guarded_mpc_architecture.png",
+      "number": 16
+    },
+    {
+      "chapter": "Build the controller",
+      "figure": "figures/17_solver_and_fallback.png",
+      "number": 17
+    },
+    {
+      "chapter": "Test the hypothesis",
+      "figure": "figures/18_all_mpc_candidates.png",
+      "number": 18
+    },
+    {
+      "chapter": "Test the hypothesis",
+      "figure": "figures/19_distribution_blind_survival.png",
+      "number": 19
+    },
+    {
+      "chapter": "Test the hypothesis",
+      "figure": "figures/20_scenario_transfer.png",
+      "number": 20
+    },
+    {
+      "chapter": "Test the hypothesis",
+      "figure": "figures/21_predrain_frontier.png",
+      "number": 21
+    },
+    {
+      "chapter": "Mechanism audit",
+      "figure": "figures/22_mpc_action_funnel.png",
+      "number": 22
+    },
+    {
+      "chapter": "Mechanism audit",
+      "figure": "figures/23_adaptive_causal_lag.png",
+      "number": 23
+    },
+    {
+      "chapter": "Safety audit",
+      "figure": "figures/24_overflow_fail_closed.png",
+      "number": 24
+    },
+    {
+      "chapter": "Operational audit",
+      "figure": "figures/25_campaign_saturation_latency.png",
+      "number": 25
+    },
+    {
+      "chapter": "Evidence discipline",
+      "figure": "figures/26_experiment_inventory.png",
+      "number": 26
+    },
+    {
+      "chapter": "Conclusion",
+      "figure": "figures/27_worked_vs_did_not.png",
+      "number": 27
+    },
+    {
+      "chapter": "Decision",
+      "figure": "figures/28_final_decision.png",
+      "number": 28
+    }
+  ]
+}

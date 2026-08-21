@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "abaec904fb0d695e6c7a10b257609ca7cbb37f218cd99180c45bef63a9d1d66f",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "3e21464f2202a99d091afc195902edc654e8e60f502b1f593e93697169389579",
+      "metric_file_sha256": "9ccb0fdff8e33e1a2895eb11da154406c6a6b16de9b7d2ee1c22259307a680ac",
+      "trained_bundle_sha256": "4415b3930c7129f0b41ea7f14aef1b7874b21e714ea63fc24f17af7d8e4cad42"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "bfe80819a283674979a39e599fb7711b56b9cc15fe33ff34f671fb95230bf143",
+      "metric_file_sha256": "f70c9bb98319955c76f6c0515ac43bf00db2f8fc8c11e8410f2490681e9679a1",
+      "trained_bundle_sha256": "06be52b8d90c13f931feb248211986a8f493a38d5cd7832579f904f06b279cb2"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "aa9da7fe4e940b632b26c5caed8bb7b2939926d141e23567b5b330c3ee4215fa",
+      "metric_file_sha256": "e5c019bb993e6672b1a3ca5d0c59e7b19192513073d76d5b6930718120fdde8b",
+      "trained_bundle_sha256": "d1f89e973fe43db92014d4ed426ea3cdb4afa63021b2faa5726771b481b0adb9"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "a9ea33b1006cbbc7c6ec63ea0d8c567cee2369030a860dfcefd07d54678018b3",
+      "metric_file_sha256": "6701add891bc1205ae18f08f7a59d8a2c534657a6c4f6355c9cc8318a5acebc8",
+      "trained_bundle_sha256": "cb76bfc66a10f3b2aee4ae2c765e09c42d3dd00bec4ad3b96e65f09f3cb52eb7"
+    }
+  },
+  "group_id": "delhi-ncr|mobility-vehicle|1-334455",
+  "group_index": 20,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

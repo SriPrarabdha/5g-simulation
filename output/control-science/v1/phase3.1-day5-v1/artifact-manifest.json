@@ -1,0 +1,23 @@
+{
+  "artifacts": [
+    {
+      "bytes": 1195,
+      "path": "DECISION.json",
+      "sha256": "eed55cf1f601884669a6e157de9f601da0b37bb530700a7ffc142b362aca7fdf"
+    },
+    {
+      "bytes": 1443,
+      "path": "REFERENCED_EVIDENCE.json",
+      "sha256": "3a8ff387edccdd21261c4ca486ff907f56bc10a495548e62f2e4195c27d537cc"
+    },
+    {
+      "bytes": 3933,
+      "path": "REPORT.md",
+      "sha256": "0d81bc9d5863e6de0a7585b6b2e1b277cf34fa796be5839b3da3ebd2cf4d82cc"
+    }
+  ],
+  "file_count": 3,
+  "hash_algorithm": "sha256",
+  "schema_version": "artifact-tree-manifest/1.0",
+  "total_bytes": 6571
+}

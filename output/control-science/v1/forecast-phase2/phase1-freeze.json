@@ -1,0 +1,143 @@
+{
+  "caches": {
+    "selection": {
+      "groups": 96,
+      "observations": 387072,
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/forecast-phase2/selection-cache-v3/index.json",
+      "seed": 46002,
+      "sha256": "d4f5a90db68883cfc50f093c345d5b01475e4ac221b89ac246dc063d41507d2f"
+    },
+    "train": {
+      "groups": 96,
+      "observations": 387072,
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/forecast-phase2/train-cache-v3/index.json",
+      "seed": 46001,
+      "sha256": "a2bd520786d6f429aea07778201c3ba07f9cc251a3945f0c3347d5e816333e97"
+    }
+  },
+  "created_at": "2026-08-19T10:08:23.965028Z",
+  "environment": {
+    "lightgbm": "4.7.0",
+    "numpy": "2.4.6",
+    "pyarrow": "25.0.1",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.17.1"
+  },
+  "forecast_seed_policy": {
+    "selection": [
+      46002
+    ],
+    "test": [
+      46003
+    ],
+    "train": [
+      46001
+    ]
+  },
+  "interfaces": {
+    "configs/control_science_v1.json": "19bf33d14dbea06a5f28f3be16a3a95bdae36ad9b8dee9dd424c101f808ae55b",
+    "experiments/aggregate_forecast_selection.py": "c844e16b7599e3d40f0e970ad159ec474eba03227034f32f99c50a9abe19513f",
+    "experiments/calibrate_evaluate_forecast_candidate.py": "52fedfc0248f5302089e24145ebca6a0bd6a6a0cc5ea41acedab6fdf8149242e",
+    "experiments/evaluate_control_science_release.py": "ad78baa486ccd6749b409d26213e3d5432ca7b1711077ac0040803f7d6ddc900",
+    "experiments/prepare_forecast_series.py": "564fd20ee0d2f9f01cdd8da2ef208ad13c5a7e13b152782df683122e9eb12895",
+    "experiments/seed_policy.py": "b90df92e78789da69736ea6b0be9c536a94086c3c37bff7029aaae5f23ff8718",
+    "experiments/train_forecaster.py": "b01112f2560bd56521baf1982a920f615ecb0bc8ecf53db797a5119f5526786f",
+    "forecasting/baselines.py": "274115a9d0dacf487d91ddab7d7c1c645a37e5af5a0deca7e99aea63a70ad85a",
+    "forecasting/candidate_bundle.py": "8df1342a7d697192eaeabd96a319079144f60740fa118cbd892a21175f3882be",
+    "forecasting/candidates.py": "01c154dabbab0cad6da40ee9023ec801cd6e81837c4fc0b910e590d64e43376f",
+    "forecasting/evaluation.py": "06dd076d81f5b20c5bc69ff97b1399f2308bc4d70ea8168fc8b1e76f0a9a43b0",
+    "forecasting/metadata.py": "c6a4ce7f66af2149bf990b472fe5de8d54b187c85b7c2aeeb403d22fef7dce8a",
+    "optimization/cohort_mpc.py": "e18573e0ac0afd6d629cc8b09c1a56bfd140b44e61384fcf5f42ab0bb7acd33c",
+    "optimization/survival.py": "815c415e6ab317aaa7ce3b5e29e7b509f80898f3e30a4802e4c44eb2e8c6f36c",
+    "requirements-pbs-forecast.lock": "7c9225c4c081adf0458bb67559d7dd43252598417b0423c4fce485644f402634",
+    "simulator/macro/controllers.py": "9282311350ad8aaac32bbbdab206d94013de6bc49b5fe28f2fe6a37501232b72",
+    "simulator/macro/engine.py": "52bfb4462e59c272001cdfc412f73956f3abd53c30c69194d850fa1226e95ca3"
+  },
+  "mpc_seed_policy": {
+    "development": [
+      46101,
+      46102,
+      46103,
+      46104,
+      46105,
+      46106,
+      46107,
+      46108,
+      46109,
+      46110,
+      46111,
+      46112
+    ],
+    "release": [
+      46301,
+      46302,
+      46303,
+      46304,
+      46305,
+      46306,
+      46307,
+      46308,
+      46309,
+      46310,
+      46311,
+      46312,
+      46313,
+      46314,
+      46315,
+      46316,
+      46317,
+      46318,
+      46319,
+      46320,
+      46321,
+      46322,
+      46323,
+      46324,
+      46325,
+      46326,
+      46327,
+      46328,
+      46329,
+      46330
+    ],
+    "validation": [
+      46201,
+      46202,
+      46203,
+      46204,
+      46205,
+      46206,
+      46207,
+      46208,
+      46209,
+      46210,
+      46211,
+      46212,
+      46213,
+      46214,
+      46215,
+      46216
+    ]
+  },
+  "release_mandatory_pair_fields": [
+    "seed",
+    "scenario_kind",
+    "static",
+    "mpc",
+    "solver_timeout_count",
+    "mpc_routing_churn_l1",
+    "baseline_routing_churn_l1",
+    "decision_reasons",
+    "solver_statuses",
+    "survival",
+    "imperfect_survival_guardrail_passed"
+  ],
+  "schema_version": "control-science-phase1-freeze/1.0",
+  "source_fingerprint": "3e394c10f4f89d33630abe29dde389e9f8322570777b6178e158d4f643a34913",
+  "status": "phase1_interfaces_frozen",
+  "tests": {
+    "focused": "73 passed, 47 subtests passed",
+    "full": "157 passed; 1 unrelated missing frozen oracle artifact",
+    "protected_forecast_test_seed_consumed": false
+  }
+}

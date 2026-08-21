@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import math
+import time
+from collections import Counter
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from typing import Any, Protocol
@@ -11,8 +13,11 @@ from optimization import (
     CohortMPCConfig,
     CohortMPCResult,
     OptimizationConfig,
+    PreDrainFlowConfig,
+    PreDrainFlowResult,
     solve_allocation,
     solve_cohort_mpc,
+    solve_predrain_flow,
     SurvivalTable,
 )
 
@@ -679,11 +684,19 @@ class CohortMPCController:
         mpc_config: CohortMPCConfig | None = None,
         forecast_adjustment: ForecastAdjustmentConfig | None = None,
         survival_by_group: dict[str, SurvivalTable] | None = None,
+        survival_guardrail_evidence: dict[str, Any] | None = None,
     ) -> None:
         self.forecaster = forecaster or MovingAverageForecaster(6)
         self.mpc_config = mpc_config or CohortMPCConfig()
         self.forecast_adjustment = forecast_adjustment or ForecastAdjustmentConfig()
         self.survival_by_group = dict(survival_by_group) if survival_by_group is not None else None
+        self.survival_guardrail_evidence = dict(survival_guardrail_evidence or {
+            "measured": False,
+            "passed": False,
+            "comparison_sha256": None,
+            "criteria": {},
+            "reason": "not_supplied",
+        })
         self._fallback = StaticCapacityController()
         self._previous_policy: Policy | None = None
         self._last_applied_epoch: int | None = None
@@ -691,6 +704,13 @@ class CohortMPCController:
         self.last_forecasts: list[Forecast] = []
         self.decision_count = 0
         self.certified_decision_count = 0
+        self.decision_funnel: Counter[str] = Counter()
+        self.decision_diagnostics: list[dict[str, Any]] = []
+        self._executed_versions: set[int] = set()
+        self.survival_guardrail_passed = bool(
+            self.survival_guardrail_evidence.get("measured")
+            and self.survival_guardrail_evidence.get("passed")
+        )
 
     @property
     def required_history_windows(self) -> int:
@@ -705,14 +725,43 @@ class CohortMPCController:
         version: int,
         context: ControlContext | None = None,
     ) -> Policy:
+        diagnostic_count = len(self.decision_diagnostics)
+        started = time.perf_counter()
+        policy = self._build_policy(
+            config, groups, upf_states, created_at, version, context
+        )
+        if len(self.decision_diagnostics) > diagnostic_count:
+            self.decision_diagnostics[-1]["decision_runtime_ms"] = round(
+                (time.perf_counter() - started) * 1000
+            )
+        return policy
+
+    def _build_policy(
+        self,
+        config: ScenarioConfig,
+        groups: tuple[GroupProfile, ...],
+        upf_states: list[UPFState],
+        created_at: datetime,
+        version: int,
+        context: ControlContext | None = None,
+    ) -> Policy:
         self.decision_count += 1
+        self.decision_funnel["requested"] += 1
+        self.last_result = None
         context = context or ControlContext()
         duration = timedelta(seconds=config.step_seconds * config.decision_interval_steps)
+        current_step = round(
+            (created_at - config.start_time).total_seconds() / config.step_seconds
+        )
+        hold_bypass = _hold_bypass_required(
+            config, current_step, upf_states, context
+        )
         if (
             self._previous_policy is not None
             and self._last_applied_epoch is not None
             and version - self._last_applied_epoch <= self.mpc_config.minimum_hold_epochs
             and _policy_routes_safely(self._previous_policy, upf_states)
+            and not hold_bypass
         ):
             return self._retain_previous(
                 config, created_at, version, "minimum_hold_period"
@@ -722,13 +771,40 @@ class CohortMPCController:
                 group_id for group_id, table in self.survival_by_group.items()
                 if (
                     self.mpc_config.fallback_on_stale_survival and table.stale
-                ) or table.sample_count < self.mpc_config.minimum_survival_samples
+                ) or (
+                    table.confidence != "oracle"
+                    and table.sample_count < self.mpc_config.minimum_survival_samples
+                )
             ]
             if unusable:
                 return self._static_fallback(
                     config, groups, upf_states, created_at, version,
                     "stale_or_insufficient_survival:" + ",".join(sorted(unusable)),
                 )
+        if (
+            self.mpc_config.fallback_on_unplanned_capacity_state
+            and _observed_unplanned_capacity_event(config, current_step)
+        ):
+            return self._static_fallback(
+                config, groups, upf_states, created_at, version,
+                "observed_unplanned_capacity_state",
+            )
+        if (
+            self.mpc_config.fallback_on_telemetry_uncertainty
+            and _telemetry_is_uncertain(context)
+        ):
+            return self._static_fallback(
+                config, groups, upf_states, created_at, version,
+                "telemetry_uncertainty",
+            )
+        if (
+            self.mpc_config.require_known_future_capacity_event
+            and not _known_future_capacity_event(config, current_step)
+        ):
+            return self._static_fallback(
+                config, groups, upf_states, created_at, version,
+                "no_known_future_capacity_event",
+            )
         demand_by_group: dict[str, list[ResidualObservation]] = {}
         forecasts: list[Forecast] = []
         try:
@@ -805,9 +881,6 @@ class CohortMPCController:
             )
 
         self.last_forecasts = forecasts
-        current_step = round(
-            (created_at - config.start_time).total_seconds() / config.step_seconds
-        )
         if (
             self.mpc_config.solve_trigger_safe_utilization > 0
             and not _known_future_capacity_event(config, current_step)
@@ -844,18 +917,15 @@ class CohortMPCController:
             ),
         )
         self.last_result = result
-        profile_by_id = {profile.upf_id: profile for profile in config.upfs}
-        unplanned_capacity_state = (
-            result.known_future_events == 0
-            and any(
-                state.health not in {"healthy", "degraded"}
-                or state.capacity_mbps.ul
-                < profile_by_id[state.upf_id].capacity_ul_mbps - 1e-9
-                or state.capacity_mbps.dl
-                < profile_by_id[state.upf_id].capacity_dl_mbps - 1e-9
-                for state in upf_states
-            )
-        )
+        self.decision_funnel[f"solver:{result.status}"] += 1
+        if result.status == "optimal" and result.first_allocation:
+            self.decision_funnel["proposed"] += 1
+        if result.certificate is not None and result.certificate.accepted:
+            self.decision_funnel["certified"] += 1
+        elif result.certificate is not None:
+            self.decision_funnel[
+                f"certificate_rejected:{result.certificate.reason}"
+            ] += 1
         if (
             result.status != "optimal"
             or result.certificate is None
@@ -864,21 +934,12 @@ class CohortMPCController:
                 self.mpc_config.require_known_future_capacity_event
                 and result.known_future_events == 0
             )
-            or (
-                self.mpc_config.fallback_on_unplanned_capacity_state
-                and unplanned_capacity_state
-            )
         ):
             reason = (
                 "no_known_future_capacity_event"
                 if (
                     self.mpc_config.require_known_future_capacity_event
                     and result.known_future_events == 0
-                )
-                else "observed_unplanned_capacity_state"
-                if (
-                    self.mpc_config.fallback_on_unplanned_capacity_state
-                    and unplanned_capacity_state
                 )
                 else result.certificate.reason
                 if result.certificate is not None
@@ -911,9 +972,59 @@ class CohortMPCController:
         )
         policy.validate()
         self.certified_decision_count += 1
+        self.decision_funnel["accepted"] += 1
         self._previous_policy = policy
         self._last_applied_epoch = version
+        self._record_diagnostic(version, created_at, "accepted", result)
         return policy
+
+    def _record_diagnostic(
+        self,
+        version: int,
+        created_at: datetime,
+        disposition: str,
+        result: CohortMPCResult | None,
+    ) -> None:
+        action_l1 = None
+        if result is not None and result.first_allocation and result.static_first_allocation:
+            action_l1 = sum(
+                abs(float(weights.get(upf_id, 0.0)) - float(
+                    result.static_first_allocation.get(group_id, {}).get(upf_id, 0.0)
+                ))
+                for group_id, weights in result.first_allocation.items()
+                for upf_id in set(weights) | set(result.static_first_allocation.get(group_id, {}))
+            )
+        self.decision_diagnostics.append({
+            "version": version,
+            "created_at": created_at.isoformat(),
+            "disposition": disposition,
+            "solver_status": result.status if result is not None else "skipped",
+            "solver_runtime_ms": result.runtime_ms if result is not None else 0,
+            "model_variables": result.model_variables if result is not None else 0,
+            "equality_constraints": result.equality_constraints if result is not None else 0,
+            "inequality_constraints": result.inequality_constraints if result is not None else 0,
+            "matrix_nonzeros": result.matrix_nonzeros if result is not None else 0,
+            "known_future_events": result.known_future_events if result is not None else 0,
+            "certificate_reason": (
+                result.certificate.reason
+                if result is not None and result.certificate is not None else None
+            ),
+            "proposed_static_l1": action_l1,
+            "executed": False,
+            "executed_admissions_first_tick": 0,
+        })
+
+    def mark_policy_executed(self, version: int, admitted_sessions: int) -> None:
+        if version in self._executed_versions:
+            return
+        self._executed_versions.add(version)
+        self.decision_funnel["executed"] += 1
+        self.decision_funnel["executed_admissions_first_tick"] += admitted_sessions
+        for item in reversed(self.decision_diagnostics):
+            if item["version"] == version:
+                item["executed"] = True
+                item["executed_admissions_first_tick"] = admitted_sessions
+                break
 
     def _observed_anomaly_multiplier(
         self, history: tuple[DemandObservation, ...]
@@ -951,6 +1062,8 @@ class CohortMPCController:
             and _policy_routes_safely(self._previous_policy, upf_states)
         ):
             return self._retain_previous(config, created_at, version, reason)
+        self.decision_funnel[f"rejected:{reason}"] += 1
+        self._record_diagnostic(version, created_at, f"static_fallback:{reason}", self.last_result)
         policy = self._fallback.build_policy(
             config, groups, upf_states, created_at, version
         )
@@ -959,7 +1072,7 @@ class CohortMPCController:
         # reshuffle sessions and make an MPC fallback differ from paired static.
         policy.solver = SolverReport(
             self.name,
-            self.last_result.status if self.last_result is not None else "error",
+            self.last_result.status if self.last_result is not None else "skipped",
             self.last_result.runtime_ms if self.last_result is not None else 0,
         )
         policy.fallback = Fallback(True, reason)
@@ -975,6 +1088,8 @@ class CohortMPCController:
         reason: str,
     ) -> Policy:
         assert self._previous_policy is not None
+        self.decision_funnel[f"retained:{reason}"] += 1
+        self._record_diagnostic(version, created_at, f"retained:{reason}", self.last_result)
         duration = timedelta(seconds=config.step_seconds * config.decision_interval_steps)
         retained = Policy(
             policy_id=f"{config.scenario_id}:cohort-mpc-retained:{version}",
@@ -992,6 +1107,213 @@ class CohortMPCController:
         retained.validate()
         self._previous_policy = retained
         return retained
+
+
+class PreDrainFlowController:
+    """Scheduled-event controller using a bounded, single-period min-cost flow."""
+
+    name = "event-predrain-flow-v1"
+    required_history_windows = 1
+
+    def __init__(self, *, flow_config: PreDrainFlowConfig | None = None) -> None:
+        self.flow_config = flow_config or PreDrainFlowConfig()
+        self._fallback = StaticCapacityController()
+        self.last_flow_result: PreDrainFlowResult | None = None
+        self.last_forecasts: list[Forecast] = []
+        self.decision_count = 0
+        self.certified_decision_count = 0
+        self.decision_funnel: Counter[str] = Counter()
+        self.decision_diagnostics: list[dict[str, Any]] = []
+        self._executed_versions: set[int] = set()
+
+    def build_policy(
+        self,
+        config: ScenarioConfig,
+        groups: tuple[GroupProfile, ...],
+        upf_states: list[UPFState],
+        created_at: datetime,
+        version: int,
+        context: ControlContext | None = None,
+    ) -> Policy:
+        diagnostic_count = len(self.decision_diagnostics)
+        started = time.perf_counter()
+        policy = self._build_policy(
+            config, groups, upf_states, created_at, version, context
+        )
+        if len(self.decision_diagnostics) > diagnostic_count:
+            self.decision_diagnostics[-1]["decision_runtime_ms"] = round(
+                (time.perf_counter() - started) * 1000
+            )
+        return policy
+
+    def _build_policy(
+        self,
+        config: ScenarioConfig,
+        groups: tuple[GroupProfile, ...],
+        upf_states: list[UPFState],
+        created_at: datetime,
+        version: int,
+        context: ControlContext | None = None,
+    ) -> Policy:
+        self.decision_count += 1
+        self.decision_funnel["requested"] += 1
+        context = context or ControlContext()
+        demand: dict[str, ResidualObservation] = {}
+        for group in groups:
+            group_id = group.key.selection_id
+            history = context.history_by_group.get(group_id, ())
+            if history:
+                latest = history[-1]
+                demand[group_id] = ResidualObservation(
+                    latest.new_session_count, latest.new_ul_mbps, latest.new_dl_mbps
+                )
+            else:
+                sessions = group.arrivals_per_step * config.decision_interval_steps
+                demand[group_id] = ResidualObservation(
+                    sessions,
+                    sessions * group.offered_ul_mbps_per_session,
+                    sessions * group.offered_dl_mbps_per_session,
+                )
+        current_step = round(
+            (created_at - config.start_time).total_seconds() / config.step_seconds
+        )
+        result = solve_predrain_flow(
+            config, groups, upf_states, context.residual_by_upf, demand,
+            current_step=current_step, settings=self.flow_config,
+        )
+        self.last_flow_result = result
+        self.decision_funnel[f"solver:{result.status}"] += 1
+        diagnostic = {
+            "version": version,
+            "created_at": created_at.isoformat(),
+            "disposition": "accepted" if result.status == "optimal" else f"static_fallback:{result.message}",
+            "solver_status": result.status,
+            "solver_runtime_ms": result.runtime_ms,
+            "model_variables": result.variable_count,
+            "equality_constraints": result.equality_constraints,
+            "inequality_constraints": result.inequality_constraints,
+            "matrix_nonzeros": result.matrix_nonzeros,
+            "targeted_upfs": list(result.targeted_upfs),
+            "overflow": result.overflow,
+            "constraint_slack": {
+                "ul_mbps_by_upf": dict(result.constraint_slack.ul_mbps_by_upf),
+                "dl_mbps_by_upf": dict(result.constraint_slack.dl_mbps_by_upf),
+                "sessions_by_upf": dict(result.constraint_slack.sessions_by_upf),
+            },
+            "executed": False,
+            "executed_admissions_first_tick": 0,
+        }
+        self.decision_diagnostics.append(diagnostic)
+        if result.status != "optimal":
+            self.decision_funnel[f"rejected:{result.message}"] += 1
+            policy = self._fallback.build_policy(
+                config, groups, upf_states, created_at, version
+            )
+            policy.solver = SolverReport(self.name, result.status, result.runtime_ms)
+            policy.fallback = Fallback(True, result.message)
+            policy.validator_version = "scheduled-predrain-min-cost-flow/1.0"
+            policy.validate()
+            return policy
+        self.decision_funnel["proposed"] += 1
+        if result.overflow > self.flow_config.overflow_tolerance:
+            reason = "predicted_overflow_exceeds_tolerance"
+            diagnostic["disposition"] = f"static_fallback:{reason}"
+            self.decision_funnel[f"rejected:{reason}"] += 1
+            policy = self._fallback.build_policy(
+                config, groups, upf_states, created_at, version
+            )
+            policy.solver = SolverReport(
+                self.name, "feasible_with_slack", result.runtime_ms
+            )
+            policy.constraint_slack = result.constraint_slack
+            policy.fallback = Fallback(True, reason)
+            policy.validator_version = "scheduled-predrain-min-cost-flow/1.1"
+            policy.validate()
+            return policy
+        self.decision_funnel["certified"] += 1
+        self.decision_funnel["accepted"] += 1
+        self.certified_decision_count += 1
+        static_policy = self._fallback.build_policy(
+            config, groups, upf_states, created_at, version
+        )
+        static_by_group = {
+            item.key.selection_id: item.weights for item in static_policy.groups
+        }
+        residual_utilization = 0.0
+        for state in upf_states:
+            residual = context.residual_by_upf.get(
+                state.upf_id, ResidualObservation(0, 0, 0)
+            )
+            residual_utilization = max(
+                residual_utilization,
+                residual.ul_mbps / max(state.safe_capacity_mbps.ul, 1e-9),
+                residual.dl_mbps / max(state.safe_capacity_mbps.dl, 1e-9),
+                residual.surviving_sessions / max(state.safe_session_capacity, 1),
+            )
+        maximum_blend = self.flow_config.action_blend_fraction
+        minimum_blend = self.flow_config.minimum_action_blend_fraction
+        blend = maximum_blend
+        if minimum_blend is not None:
+            low = self.flow_config.full_action_below_residual_utilization
+            high = self.flow_config.minimum_action_above_residual_utilization
+            pressure = min(
+                1.0, max(0.0, (residual_utilization - low) / (high - low))
+            )
+            blend = maximum_blend - pressure * (maximum_blend - minimum_blend)
+        blended_allocation: dict[str, dict[str, float]] = {}
+        for group in groups:
+            group_id = group.key.selection_id
+            flow_weights = result.allocation[group_id]
+            static_weights = static_by_group[group_id]
+            upf_ids = set(flow_weights) | set(static_weights)
+            weights = {
+                upf_id: blend * flow_weights.get(upf_id, 0.0)
+                + (1.0 - blend) * static_weights.get(upf_id, 0.0)
+                for upf_id in upf_ids
+            }
+            total = sum(weights.values())
+            blended_allocation[group_id] = {
+                upf_id: weight / total for upf_id, weight in weights.items()
+                if weight > 1e-12
+            }
+        diagnostic["action_blend_fraction"] = blend
+        diagnostic["maximum_action_blend_fraction"] = maximum_blend
+        diagnostic["minimum_action_blend_fraction"] = minimum_blend
+        diagnostic["max_residual_utilization"] = residual_utilization
+        duration = timedelta(seconds=config.step_seconds * config.decision_interval_steps)
+        policy = Policy(
+            policy_id=f"{config.scenario_id}:predrain-flow:{version}",
+            policy_version=version,
+            created_at=created_at,
+            validity=TimeWindow(created_at, created_at + duration),
+            forecast_id=f"causal-last-window:{version}",
+            upf_state_time=max(state.measurement_time for state in upf_states),
+            solver=SolverReport(self.name, "optimal", result.runtime_ms),
+            constraint_slack=ConstraintSlack(),
+            groups=[
+                PolicyGroup(
+                    GroupKey(group.key.zone, group.key.dnn, group.key.snssai),
+                    blended_allocation[group.key.selection_id],
+                )
+                for group in groups
+            ],
+            fallback=Fallback(),
+            validator_version="scheduled-predrain-min-cost-flow/1.1",
+        )
+        policy.validate()
+        return policy
+
+    def mark_policy_executed(self, version: int, admitted_sessions: int) -> None:
+        if version in self._executed_versions:
+            return
+        self._executed_versions.add(version)
+        self.decision_funnel["executed"] += 1
+        self.decision_funnel["executed_admissions_first_tick"] += admitted_sessions
+        for item in reversed(self.decision_diagnostics):
+            if item["version"] == version:
+                item["executed"] = True
+                item["executed_admissions_first_tick"] = admitted_sessions
+                break
 
 
 def _residual_contract(context: ControlContext) -> list[ExistingLoad]:
@@ -1121,6 +1443,76 @@ def _known_future_capacity_event(config: ScenarioConfig, current_step: int) -> b
     )
 
 
+def _observed_unplanned_capacity_event(
+    config: ScenarioConfig, current_step: int,
+) -> bool:
+    latest: dict[tuple[str, str], Any] = {}
+    for event in config.events:
+        if (
+            event.step <= current_step
+            and event.known_at_step is None
+            and event.event_type in {"capacity_factor", "health"}
+        ):
+            latest[(event.upf_id or "", event.event_type)] = event
+    return any(
+        (
+            event.event_type == "health"
+            and event.health not in {"healthy", "degraded"}
+        ) or (
+            event.event_type == "capacity_factor"
+            and (
+                (event.ul_factor is not None and event.ul_factor < 0.999999)
+                or (event.dl_factor is not None and event.dl_factor < 0.999999)
+            )
+        )
+        for event in latest.values()
+    )
+
+
+def _telemetry_is_uncertain(context: ControlContext) -> bool:
+    return any(
+        history and (
+            history[-1].telemetry_missing
+            or history[-1].counter_reset
+            or history[-1].telemetry_age_seconds > 0
+        )
+        for history in context.history_by_group.values()
+    )
+
+
+def _hold_bypass_required(
+    config: ScenarioConfig,
+    current_step: int,
+    states: list[UPFState],
+    context: ControlContext,
+) -> bool:
+    """Capacity/anomaly transitions always take precedence over policy hold."""
+
+    if _known_future_capacity_event(config, current_step):
+        return True
+    profiles = {profile.upf_id: profile for profile in config.upfs}
+    if any(
+        state.health not in {"healthy", "degraded"}
+        or state.capacity_mbps.ul < profiles[state.upf_id].capacity_ul_mbps - 1e-9
+        or state.capacity_mbps.dl < profiles[state.upf_id].capacity_dl_mbps - 1e-9
+        for state in states
+    ):
+        return True
+    for history in context.history_by_group.values():
+        if not history:
+            continue
+        latest = history[-1]
+        if (
+            latest.regime != "normal"
+            or latest.telemetry_missing
+            or latest.counter_reset
+            or latest.telemetry_age_seconds > 0
+            or latest.event_features.get("time_since_observable_anomaly_minutes", 0.0) > 0
+        ):
+            return True
+    return False
+
+
 def _projected_demand_is_safe(
     demand_by_group: dict[str, list[ResidualObservation]],
     states: list[UPFState],
@@ -1159,6 +1551,9 @@ def controller_by_name(
     optimizer_weight: float = 1.0,
     forecast_adjustment_config: ForecastAdjustmentConfig | None = None,
     mpc_config: CohortMPCConfig | None = None,
+    predrain_config: PreDrainFlowConfig | None = None,
+    survival_by_group: dict[str, SurvivalTable] | None = None,
+    survival_guardrail_evidence: dict[str, Any] | None = None,
 ) -> Controller:
     if forecaster is not None and name not in {"forecast-capacity", "predictive", "mpc"}:
         raise ValueError("a forecast bundle can only be attached to a forecast controller")
@@ -1170,6 +1565,10 @@ def controller_by_name(
         raise ValueError("forecast settings can only be attached to a forecast controller")
     if mpc_config is not None and name != "mpc":
         raise ValueError("MPC settings can only be attached to the MPC controller")
+    if predrain_config is not None and name != "predrain":
+        raise ValueError("pre-drain settings can only be attached to the pre-drain controller")
+    if survival_by_group is not None and name != "mpc":
+        raise ValueError("survival tables can only be attached to the MPC controller")
     controllers: dict[str, Controller] = {
         "static": StaticCapacityController(),
         "reactive": ReactiveThresholdController(),
@@ -1188,9 +1587,12 @@ def controller_by_name(
             forecast_adjustment_config=forecast_adjustment_config,
         ),
         "oracle": OracleHiGHSController(),
+        "predrain": PreDrainFlowController(flow_config=predrain_config),
         "mpc": CohortMPCController(
             forecaster=forecaster,
             mpc_config=mpc_config,
+            survival_by_group=survival_by_group,
+            survival_guardrail_evidence=survival_guardrail_evidence,
         ),
     }
     try:
@@ -1220,11 +1622,24 @@ def snapshot_controller(controller: Controller) -> dict[str, Any]:
         state.update({
             "decision_count": controller.decision_count,
             "certified_decision_count": controller.certified_decision_count,
+            "decision_funnel": dict(controller.decision_funnel),
+            "decision_diagnostics": list(controller.decision_diagnostics),
+            "executed_versions": sorted(controller._executed_versions),
             "previous_policy": (
                 controller._previous_policy.to_dict()
                 if controller._previous_policy is not None else None
             ),
             "last_applied_epoch": controller._last_applied_epoch,
+            "survival_guardrail_passed": controller.survival_guardrail_passed,
+            "survival_guardrail_evidence": controller.survival_guardrail_evidence,
+        })
+    if isinstance(controller, PreDrainFlowController):
+        state.update({
+            "decision_count": controller.decision_count,
+            "certified_decision_count": controller.certified_decision_count,
+            "decision_funnel": dict(controller.decision_funnel),
+            "decision_diagnostics": list(controller.decision_diagnostics),
+            "executed_versions": sorted(controller._executed_versions),
         })
     forecaster = getattr(controller, "forecaster", None)
     alpha = getattr(forecaster, "_alpha_by_group", None)
@@ -1250,9 +1665,38 @@ def restore_controller(controller: Controller, state: dict[str, Any]) -> None:
     if isinstance(controller, CohortMPCController):
         controller.decision_count = int(state.get("decision_count", 0))
         controller.certified_decision_count = int(state.get("certified_decision_count", 0))
+        controller.decision_funnel = Counter({
+            str(key): int(value) for key, value in state.get("decision_funnel", {}).items()
+        })
+        controller.decision_diagnostics = list(state.get("decision_diagnostics", []))
+        controller._executed_versions = {
+            int(value) for value in state.get("executed_versions", [])
+        }
         previous = state.get("previous_policy")
         controller._previous_policy = Policy.from_dict(previous) if previous is not None else None
         controller._last_applied_epoch = state.get("last_applied_epoch")
+        controller.survival_guardrail_evidence = dict(state.get(
+            "survival_guardrail_evidence", {
+                "measured": False, "passed": False,
+                "comparison_sha256": None, "criteria": {},
+                "reason": "legacy_checkpoint",
+            }
+        ))
+        controller.survival_guardrail_passed = bool(
+            state.get("survival_guardrail_passed", False)
+            and controller.survival_guardrail_evidence.get("measured")
+            and controller.survival_guardrail_evidence.get("passed")
+        )
+    if isinstance(controller, PreDrainFlowController):
+        controller.decision_count = int(state.get("decision_count", 0))
+        controller.certified_decision_count = int(state.get("certified_decision_count", 0))
+        controller.decision_funnel = Counter({
+            str(key): int(value) for key, value in state.get("decision_funnel", {}).items()
+        })
+        controller.decision_diagnostics = list(state.get("decision_diagnostics", []))
+        controller._executed_versions = {
+            int(value) for value in state.get("executed_versions", [])
+        }
     alpha = state.get("adaptive_conformal")
     forecaster = getattr(controller, "forecaster", None)
     if alpha is not None:

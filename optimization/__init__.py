@@ -13,10 +13,14 @@ from .cohort_mpc import (
 from .survival import (
     EmpiricalSurvivalProvider,
     SessionLifecycle,
+    SessionTelemetry,
     SurvivalTable,
+    extract_session_lifecycles,
     kaplan_meier_table,
-    static_survival_table,
+    static_survival_table, load_survival_guardrail_evidence,
+    load_survival_tables, write_survival_tables,
 )
+from .predrain_flow import PreDrainFlowConfig, PreDrainFlowResult, solve_predrain_flow
 from .oracle_bounds import (
     OracleBoundResult,
     OracleMetrics,
@@ -49,7 +53,15 @@ __all__ = [
     "bucket_survival",
     "EmpiricalSurvivalProvider",
     "SessionLifecycle",
+    "SessionTelemetry",
     "SurvivalTable",
+    "extract_session_lifecycles",
     "kaplan_meier_table",
     "static_survival_table",
+    "load_survival_tables",
+    "load_survival_guardrail_evidence",
+    "write_survival_tables",
+    "PreDrainFlowConfig",
+    "PreDrainFlowResult",
+    "solve_predrain_flow",
 ]

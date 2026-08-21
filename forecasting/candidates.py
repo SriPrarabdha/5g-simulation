@@ -120,6 +120,9 @@ class _CandidateBase:
     horizons: tuple[int, ...] = SUPPORTED_HORIZONS
     models: dict[tuple[str, str, int], Any] = field(default_factory=dict, init=False, repr=False)
     group_keys: dict[str, GroupKey] = field(default_factory=dict, init=False, repr=False)
+    calibration_widths: dict[tuple[str, str, int], tuple[float, float]] = field(
+        default_factory=dict, init=False, repr=False
+    )
 
     @property
     def required_history_windows(self) -> int:
@@ -207,6 +210,10 @@ class CalendarRidgeV2Forecaster(_CandidateBase):
                 raise ForecastingError("ridge-v2 model is not fitted for this group/horizon") from error
             row = causal_features(ordered, field_name, len(ordered) - 1, target_window.start)
             p50 = max(0.0, float(row @ coefficients))
+            if (group_id, field_name, horizon_steps) in self.calibration_widths:
+                p90_width, p95_width = self.calibration_widths[
+                    (group_id, field_name, horizon_steps)
+                ]
             predictions[field_name] = Quantiles(p50, p50 + p95_width, p50 + p90_width)
         return self._forecast(ordered, parse_utc(issued_at), target_window, horizon_steps,
                               predictions, ["causal_features", "split_conformal"])
@@ -255,9 +262,67 @@ class HistGradientBoostingQuantileForecaster(_CandidateBase):
                 raise ForecastingError("hist-gradient model is not fitted for this group/horizon") from error
             row = causal_features(ordered, field_name, len(ordered) - 1, target_window.start)[None, :]
             p50, p90, p95 = sorted(max(0.0, float(model.predict(row)[0])) for model in models)
+            if (group_id, field_name, horizon_steps) in self.calibration_widths:
+                p90_width, p95_width = self.calibration_widths[
+                    (group_id, field_name, horizon_steps)
+                ]
+                p90, p95 = p50 + p90_width, p50 + p95_width
             predictions[field_name] = Quantiles(p50, p95, p90)
         return self._forecast(ordered, parse_utc(issued_at), target_window, horizon_steps,
                               predictions, ["causal_features", "quantile_order_corrected"])
+
+
+@dataclass(slots=True)
+class LightGBMQuantileCandidate(_CandidateBase):
+    n_estimators: int = 150
+    max_depth: int = -1
+    random_state: int = 0
+    model_family: str = field(default="lightgbm-quantile", init=False)
+
+    def fit(self, series_by_group: Mapping[str, Sequence[Sequence[DemandObservation]]]) -> "LightGBMQuantileCandidate":
+        try:
+            from lightgbm import LGBMRegressor
+        except ImportError as error:
+            raise ForecastingError("LightGBM is required for the LightGBM candidate") from error
+        for group_id, sequences in sorted(series_by_group.items()):
+            nonempty = [list(items) for items in sequences if items]
+            if not nonempty:
+                raise ForecastingError(f"group {group_id} has no observations")
+            self.group_keys[group_id] = nonempty[0][0].group
+            for field_name in TARGET_FIELDS:
+                for horizon in self.horizons:
+                    x, y = _training_rows(nonempty, field_name, horizon)
+                    fitted = []
+                    for quantile in (0.50, 0.90, 0.95):
+                        fitted.append(LGBMRegressor(
+                            objective="quantile", alpha=quantile,
+                            n_estimators=self.n_estimators, max_depth=self.max_depth,
+                            random_state=self.random_state, n_jobs=1,
+                            deterministic=True, force_col_wise=True, verbosity=-1,
+                        ).fit(x, y))
+                    self.models[(group_id, field_name, horizon)] = tuple(fitted)
+        return self
+
+    def predict(self, history: Iterable[DemandObservation], *, issued_at: datetime,
+                target_window: TimeWindow, horizon_steps: int = 1) -> Forecast:
+        ordered = self._validate_predict(history, issued_at, horizon_steps)
+        group_id = ordered[0].group.selection_id
+        predictions: dict[str, Quantiles] = {}
+        for field_name in TARGET_FIELDS:
+            try:
+                models = self.models[(group_id, field_name, horizon_steps)]
+            except KeyError as error:
+                raise ForecastingError("LightGBM candidate is not fitted for this group/horizon") from error
+            row = causal_features(ordered, field_name, len(ordered) - 1, target_window.start)[None, :]
+            p50, p90, p95 = sorted(max(0.0, float(model.predict(row)[0])) for model in models)
+            if (group_id, field_name, horizon_steps) in self.calibration_widths:
+                p90_width, p95_width = self.calibration_widths[
+                    (group_id, field_name, horizon_steps)
+                ]
+                p90, p95 = p50 + p90_width, p50 + p95_width
+            predictions[field_name] = Quantiles(p50, p95, p90)
+        return self._forecast(ordered, parse_utc(issued_at), target_window, horizon_steps,
+                              predictions, ["causal_features", "lightgbm_quantile"])
 
 
 @dataclass(slots=True)
@@ -286,9 +351,11 @@ class CausalRegimeEnsemble:
             horizon_steps=horizon_steps,
         )
         latest = ordered[-1]
-        known_event = latest.regime == "scheduled_event" or any(
-            name.startswith("known_event") and value != 0
-            for name, value in latest.event_features.items()
+        lead = float(latest.event_features.get("known_event_lead_minutes", 0.0))
+        known_event = (
+            latest.regime == "scheduled_event"
+            or float(latest.event_features.get("known_event_phase", 0.0)) != 0.0
+            or 0.0 < lead <= horizon_steps * 10.0
         )
         prior = [item.new_session_count for item in ordered[-7:-1]]
         detected = bool(prior) and latest.new_session_count > self.surge_threshold * max(1.0, float(np.median(prior)))

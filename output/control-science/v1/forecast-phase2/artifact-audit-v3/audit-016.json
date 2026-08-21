@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "fb6a6efa26ea8052af5aa04f1a7b7283cd021333a4ccd06cd87a5c5219dba975",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "0da64126276ef8fb9969adf81555f9773900e30c76e9bb9db9b91b886e64ea35",
+      "metric_file_sha256": "c458d50156da1321ed81f27a051c1e23ccbfbc60f24214315b3a47bd5ba2b9f3",
+      "trained_bundle_sha256": "cbb21b0ccc335dba1f0b3cdf21b7c7b4968e099c0d6dad683caa2fa91ecb559e"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "f5a1dce278f5c6182e82186ba986a24adbd3a2b98f878e4b74cbde62a97c730f",
+      "metric_file_sha256": "ef5f3e07395c11993c4338e5b9bb504fbcc49d82a657ced3c7cad6613042d698",
+      "trained_bundle_sha256": "e997357070780ceffbbf2b8ee5f6341ad74dc1ebcd9344a4f1f2d7904f22d348"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "d3b69a0dd63235b24beb8ed489fa423bbe60a66e04b0e035fafeaa6d5d3b16a3",
+      "metric_file_sha256": "11af1e901f3d66926be2d0dca5225dfc2d7207d1b09644b8f4e6c55f873eb629",
+      "trained_bundle_sha256": "e6808f5c075f9c9da57f501f8ae573bcd34f22d9ed10c3d1c41a5fd7571d0a15"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "cd6678207e6cbbf738fef815f2ef2e4e1ca56f67824f66ceb7778f2c82b98a04",
+      "metric_file_sha256": "0217e0e66745f1a6bddb4c60ce28f6638777e2aecdd12cf6c834da2fc45bad44",
+      "trained_bundle_sha256": "a18280d4b36f35bafb74c0f103ae21b19443e3affeffe70c17aacb1275fc8530"
+    }
+  },
+  "group_id": "delhi-ncr|enterprise-vpn|1-112234",
+  "group_index": 16,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

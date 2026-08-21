@@ -10,3 +10,29 @@ frontend/node_modules/
 frontend/*.tsbuildinfo
 frontend/test-results/
 frontend/playwright-report/
+
+# Local experiment products. Keep compact aggregate reports and presentation
+# packages in Git; regenerate these high-volume intermediates when needed.
+*.pkl
+*.pickle
+*.pkl.gz
+*.jsonl.gz
+output/**/train-cache*/
+output/**/selection-cache*/
+output/**/trained*/
+output/**/smoke*/
+output/**/work/
+output/control-science/v1/corpora/
+output/manifests/
+output/control-science/v1/forecast-phase2/selection-v3/
+output/control-science/v1/phase3.1-survival-v1/*/seed-*/
+output/control-science/v1/phase3-cdot-showcase-v[1-4]/
+
+# Batch-scheduler and runtime logs are local diagnostics, not source evidence.
+logs/
+*.log
+*.out
+*.err
+nohup.out
+*.o[0-9]*
+*.e[0-9]*

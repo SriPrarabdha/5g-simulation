@@ -1,0 +1,82 @@
+{
+  "created_at": "2026-08-21T10:25:04.671226Z",
+  "decision": "retain_static",
+  "eligible_candidates": [],
+  "evaluations": {
+    "mpc-h3-ma6-configured-diagnostic": {
+      "confidence": [
+        -0.008648322290302294,
+        0.0013874313440536638
+      ],
+      "mean_ul_reduction": -0.002802879544846561,
+      "passes": false,
+      "timeouts": 0
+    },
+    "mpc-h3-ma6-lifecycle-heavy-tail": {
+      "confidence": [
+        -0.008923206334213635,
+        0.0005624530154873956
+      ],
+      "mean_ul_reduction": -0.002934483262347603,
+      "passes": false,
+      "timeouts": 0
+    },
+    "mpc-h3-ma6-lifecycle-lognormal": {
+      "confidence": [
+        -0.004970664976589263,
+        0.0006905869887397537
+      ],
+      "mean_ul_reduction": -0.001615338977599721,
+      "passes": false,
+      "timeouts": 0
+    },
+    "predrain-balanced-blend-025": {
+      "confidence": [
+        0.006609833175378349,
+        0.1419263961673812
+      ],
+      "mean_ul_reduction": 0.06346123690008408,
+      "passes": false,
+      "timeouts": 0
+    },
+    "predrain-balanced-blend-050": {
+      "confidence": [
+        0.009880416458571078,
+        0.2191704845002794
+      ],
+      "mean_ul_reduction": 0.10157327539261113,
+      "passes": false,
+      "timeouts": 0
+    }
+  },
+  "fresh_development_seeds": [
+    46425,
+    46426,
+    46427,
+    46428,
+    46429,
+    46430,
+    46431,
+    46432,
+    46433,
+    46434,
+    46435,
+    46436,
+    46437,
+    46438,
+    46439,
+    46440,
+    46441,
+    46442,
+    46443,
+    46444,
+    46445,
+    46446,
+    46447,
+    46448
+  ],
+  "paired_runs": 120,
+  "protected_release_seeds_consumed": false,
+  "protected_validation_seeds_consumed": false,
+  "schema_version": "phase3.1-development-decision/1.0"
+}

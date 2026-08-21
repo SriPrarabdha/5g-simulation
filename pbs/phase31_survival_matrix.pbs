@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#PBS -N phase31-survival
+#PBS -q workq
+#PBS -l select=1:ncpus=125
+#PBS -l place=excl
+#PBS -l walltime=04:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 BLIS_NUM_THREADS=1
+
+"$PYTHON_BIN" scripts/run_distribution_blind_survival_parallel.py \
+  --manifest output/manifests/stage1-extreme-packing-1d-s20260817.json \
+  --output-root output/control-science/v1/phase3.1-survival-v1 \
+  --workers 125 \
+  --seed-start 46501 \
+  --seeds-per-distribution 25

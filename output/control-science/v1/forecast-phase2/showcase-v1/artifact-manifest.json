@@ -1,0 +1,157 @@
+{
+  "artifacts": [
+    {
+      "bytes": 4652,
+      "path": "REPORT.md",
+      "sha256": "1abce3ef952385e66ca9b2ce12b4572e95e54a25105605486d1759593e54a10e"
+    },
+    {
+      "bytes": 3092,
+      "path": "TALK_TRACK.md",
+      "sha256": "9cb363d71e0faae10e933ab170e77974b7cd8fcecc144ba604173e86cd4169a9"
+    },
+    {
+      "bytes": 1051939,
+      "path": "cdot_forecast_phase2_showcase.pdf",
+      "sha256": "b21b7a353c4c0b3d484d84216de1fa8177b796dd8896f95d9018cd251d866cbe"
+    },
+    {
+      "bytes": 68527,
+      "path": "figure-data.json",
+      "sha256": "0d89cf104c5c52e94b09344d19e34c6a3070cd753e8827d93adc26451ecce6e3"
+    },
+    {
+      "bytes": 286098,
+      "path": "figures/01_forecast_wape_vs_simple_baseline.png",
+      "sha256": "030ccebf73516b8fde0583024be9bc1ecee470dc1498730a52ff55865ca49197"
+    },
+    {
+      "bytes": 109231,
+      "path": "figures/01_forecast_wape_vs_simple_baseline.svg",
+      "sha256": "01e1aa837ec05dbda17c2cf19b736301356c0106db4ddd301ede4e7b2b9cb544"
+    },
+    {
+      "bytes": 171119,
+      "path": "figures/02_event_peak_underprediction.png",
+      "sha256": "3f37f41d3a68434c93b7dc423a2ac2f3cdde8586e47efe97dbe7644f37df9bc0"
+    },
+    {
+      "bytes": 75651,
+      "path": "figures/02_event_peak_underprediction.svg",
+      "sha256": "3d710f20b94d14317b9e5952285da43356e8fc60281e22e1a3159c06083d411d"
+    },
+    {
+      "bytes": 178163,
+      "path": "figures/03_p90_coverage_calibration.png",
+      "sha256": "fe9d17cb2c879cd13d0750bcd114953a89c42f43d1e44bb79cb647ac12ace47a"
+    },
+    {
+      "bytes": 73419,
+      "path": "figures/03_p90_coverage_calibration.svg",
+      "sha256": "cac142e279d90ab33fad94e57afcf68f668c2bd8a27712563c72880eb53135b5"
+    },
+    {
+      "bytes": 203988,
+      "path": "figures/04_worst_slice_guardrail.png",
+      "sha256": "c8c14a526358ea2878aa36ab307ef9b7947441b8174a29898e9d45f0e71f86d3"
+    },
+    {
+      "bytes": 81738,
+      "path": "figures/04_worst_slice_guardrail.svg",
+      "sha256": "8d0b171af3223e881979b33d6bce4c470bc525cea969812f8af3cd74d29c7a8f"
+    },
+    {
+      "bytes": 175756,
+      "path": "figures/05_fail_closed_gate_scorecard.png",
+      "sha256": "97ca669eea888d7afdf924b90f35167a5d13b0f1a49b82caf6e294df907b015d"
+    },
+    {
+      "bytes": 76881,
+      "path": "figures/05_fail_closed_gate_scorecard.svg",
+      "sha256": "68447fc409b06265ba8139b434a5723d31c54fd2bed59d72be23a0d7aae3fa1c"
+    },
+    {
+      "bytes": 241807,
+      "path": "figures/06_wape_improvement_by_regime.png",
+      "sha256": "a41e7e55487c6c35d332bf582aa16075b2528935fec8c05f602efcc5ad7f76b4"
+    },
+    {
+      "bytes": 93264,
+      "path": "figures/06_wape_improvement_by_regime.svg",
+      "sha256": "dc4e8117b8014cc8a5111d14481ef7a6108901ffae305a52896d99dd16cd467d"
+    },
+    {
+      "bytes": 208659,
+      "path": "figures/07_wape_improvement_by_horizon.png",
+      "sha256": "78eb672e6cb9351b02055146ba0392e6ab1ed503ef8a4ae1151e3549671f0a14"
+    },
+    {
+      "bytes": 84015,
+      "path": "figures/07_wape_improvement_by_horizon.svg",
+      "sha256": "540903125863cf854c55fe36d794c5f397d5b3655951afb6a08f94e35b947396"
+    },
+    {
+      "bytes": 199893,
+      "path": "figures/08_causal_unknown_surge_observability.png",
+      "sha256": "acc80b7295ea90d9b13b8dd3e65d6a5b4d9fb4dc58ed711db134986355a7d10e"
+    },
+    {
+      "bytes": 83422,
+      "path": "figures/08_causal_unknown_surge_observability.svg",
+      "sha256": "b905aab80c346f2310bf53a3f6d4d1233eba084b72249d3c8d365fa61d58183b"
+    },
+    {
+      "bytes": 212325,
+      "path": "figures/09_phase1_plumbing_and_reproducibility.png",
+      "sha256": "398efb12b813352e4030f48f59d402c1a2a62fe60de90c222d7b2f43fec0c311"
+    },
+    {
+      "bytes": 96022,
+      "path": "figures/09_phase1_plumbing_and_reproducibility.svg",
+      "sha256": "bda1c292428b29ab657ba450a7cb6814c552b2c1dd8bafc2e919687ac00d8808"
+    },
+    {
+      "bytes": 248526,
+      "path": "figures/10_cluster_campaign_and_artifact_scale.png",
+      "sha256": "328300b32d0f1b34c6e7ccb5c0d7403e72ea508a34471862b969cf6726f56db6"
+    },
+    {
+      "bytes": 99391,
+      "path": "figures/10_cluster_campaign_and_artifact_scale.svg",
+      "sha256": "37d40e58daed701a9efa36f121f7d716f010ab569d53fb20373f01777cab7a17"
+    },
+    {
+      "bytes": 220251,
+      "path": "figures/11_guarded_hybrid_architecture.png",
+      "sha256": "31248a9daa7c4d053e6208af0cd8d98270c6931036168f52b7093217f70fcda8"
+    },
+    {
+      "bytes": 90700,
+      "path": "figures/11_guarded_hybrid_architecture.svg",
+      "sha256": "ce03ac6a244911d7f4974eb66c95a0d732b586b29f80987b2b97165ed5f4f585"
+    },
+    {
+      "bytes": 3248,
+      "path": "index.html",
+      "sha256": "2a399cd4a21a463ecd115b6366c5502e1c6593e4a40b1e94546af807b8dd320a"
+    }
+  ],
+  "claim_boundary": "deterministic synthetic evidence; no C-DOT calibration or live-network validation",
+  "created_at": "2026-08-19T10:36:19.517481Z",
+  "decision": "no candidate promoted; seed 46003 not consumed",
+  "schema_version": "forecast-phase2-showcase-manifest/1.0",
+  "sources": [
+    {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/forecast-phase2/forecast-selection-v3.json",
+      "sha256": "1e0536398e0bb1ab062edd2a9e248de9f6b346e85f9161f5e1011aeec84fe6ec"
+    },
+    {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/forecast-phase2/phase2-completion-v3.json",
+      "sha256": "48845cd4a5583cadea60101db9dad081c4c28ce27b9bf8ed1875b4cf5e848d4d"
+    },
+    {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/forecast-phase2/phase1-freeze.json",
+      "sha256": "939dc51e04a9de0e52c2e060575566dd18169494090a528ccc4fa5e93e68b895"
+    }
+  ]
+}

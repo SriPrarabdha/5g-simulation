@@ -1,0 +1,4576 @@
+{
+  "candidates": [
+    {
+      "headline_metric_name": "pooled_cross_target_wape",
+      "macro_average_target_baseline_wape": 0.14821520960035264,
+      "macro_average_target_relative_improvement": 0.10037008244413327,
+      "macro_average_target_wape": 0.13333883679329075,
+      "model_family": "calendar-ridge",
+      "pooled_cross_target_relative_improvement": 0.10109119926065985,
+      "pooled_cross_target_wape": 0.12728801004111495,
+      "slices": [
+        {
+          "baseline_wape": 0.6205255527404535,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.14720398347791663,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.19311896275947812,
+            -0.10827188534568953
+          ],
+          "scored_observations": 256,
+          "target": "new_dl_mbps",
+          "wape": 0.5291817195272227
+        },
+        {
+          "baseline_wape": 0.136160482564244,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.08035566148629858,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0880616664587589,
+            -0.07288354240761398
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12521921691950055
+        },
+        {
+          "baseline_wape": 0.1843057742043076,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.16888490568823988,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2418750705742825,
+            -0.05328495542787391
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15317931091001508
+        },
+        {
+          "baseline_wape": 0.18499665403797047,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.07357969330777092,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.16600709049132606,
+            0.011384154068213536
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.1713846569708928
+        },
+        {
+          "baseline_wape": 0.24240286213080248,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.4378946955276648,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.4703554350875002,
+            -0.21528050598917858
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.13625593462300023
+        },
+        {
+          "baseline_wape": 0.6390996451469326,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.014686434886524546,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.03963915603539696,
+            0.06604710053514952
+          ],
+          "scored_observations": 30,
+          "target": "new_dl_mbps",
+          "wape": 0.648485740471384
+        },
+        {
+          "baseline_wape": 0.1373126073930648,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.0912383677242512,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09867502781684379,
+            -0.08203323314353068
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12478442922656062
+        },
+        {
+          "baseline_wape": 0.18256948850529414,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.14792118907148655,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.19954259188313506,
+            -0.036012830316798444
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15556359267741793
+        },
+        {
+          "baseline_wape": 0.18817060347917267,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.1142412417749521,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.16498968488733973,
+            -0.050890656727224384
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16667376007216986
+        },
+        {
+          "baseline_wape": 0.2740939570115807,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.36240369239835324,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3879238998841815,
+            -0.18344104532392724
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.17476129492650835
+        },
+        {
+          "baseline_wape": 0.5304422137795675,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.11388303969254676,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08362085156052418,
+            0.36981708739248365
+          ],
+          "scored_observations": 9,
+          "target": "new_dl_mbps",
+          "wape": 0.5908505854660283
+        },
+        {
+          "baseline_wape": 0.13763372594237452,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.08905314601107339,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0995462297264499,
+            -0.07614414607329155
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.1253770096499802
+        },
+        {
+          "baseline_wape": 0.17818380700300157,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.13469302772595015,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.18240051632425638,
+            -0.026900429401159547
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15418369054603093
+        },
+        {
+          "baseline_wape": 0.20567945208006894,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.18253640125921333,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.26169962387634127,
+            -0.07066669891370125
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16813546508440633
+        },
+        {
+          "baseline_wape": 0.30176853474091514,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.34719169727436494,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.36975336854703067,
+            -0.19813569256215136
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.19699700498021866
+        },
+        {
+          "baseline_wape": 0.5697492758980454,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.028434889836158606,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1522918868952161,
+            0.0871209045277399
+          ],
+          "scored_observations": 5,
+          "target": "new_dl_mbps",
+          "wape": 0.5859500337924374
+        },
+        {
+          "baseline_wape": 0.14006291680700206,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.08435971070926429,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09902233651391523,
+            -0.06635852438019867
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12824724966406761
+        },
+        {
+          "baseline_wape": 0.16120222884187382,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.04397559319395983,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08001972707592564,
+            -0.032884915952586385
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15411326520436397
+        },
+        {
+          "baseline_wape": 0.1723230563941314,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": 0.00456789001987179,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1461260976273207,
+            0.13356350003619297
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.17311020916362796
+        },
+        {
+          "baseline_wape": 0.34237414500405583,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.28804713386257885,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.30246886053633026,
+            -0.19508668447588373
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.2437542538269866
+        },
+        {
+          "baseline_wape": 0.6271388499298738,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.15385417130130263,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.18123135172403382,
+            -0.12792249541911446
+          ],
+          "scored_observations": 256,
+          "target": "new_session_count",
+          "wape": 0.5306509218830611
+        },
+        {
+          "baseline_wape": 0.12816352710412213,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.0778794707185565,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08264633241488582,
+            -0.07330392634582103
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11818221944782972
+        },
+        {
+          "baseline_wape": 0.16404302888139569,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.14027840857292273,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2229089483898133,
+            -0.059659613815601364
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.1410313338524315
+        },
+        {
+          "baseline_wape": 0.15340847512734365,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.0498548237495412,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1507962310584129,
+            0.027691979380428066
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14576032263818406
+        },
+        {
+          "baseline_wape": 0.23708962771143896,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.45951691925051674,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5096477260906767,
+            -0.3046320936789785
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.12814293239922658
+        },
+        {
+          "baseline_wape": 0.6340503168811216,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.01980184540365193,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.02025884029793124,
+            0.056560868386389004
+          ],
+          "scored_observations": 30,
+          "target": "new_session_count",
+          "wape": 0.646605683234138
+        },
+        {
+          "baseline_wape": 0.12899167467577943,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.09017048614039336,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09528991625488355,
+            -0.08479403953511641
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11736043266220093
+        },
+        {
+          "baseline_wape": 0.16630626007916727,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.14249291128457375,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.21912603178096007,
+            -0.06415730112825035
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14260879691563724
+        },
+        {
+          "baseline_wape": 0.15552183808388426,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.09023920197957902,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.19737453081276082,
+            -0.02557557333230469
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14148767152479724
+        },
+        {
+          "baseline_wape": 0.2690078503045338,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.3811654058539954,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.4139984643148341,
+            -0.275281826419758
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.16647136386529532
+        },
+        {
+          "baseline_wape": 0.5664095972579263,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.06612624326388938,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.048263987100451614,
+            0.1946654060717253
+          ],
+          "scored_observations": 9,
+          "target": "new_session_count",
+          "wape": 0.6038641360732055
+        },
+        {
+          "baseline_wape": 0.12923815349120532,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.0892337686740311,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09557327599149182,
+            -0.0809454333496021
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11770574599871218
+        },
+        {
+          "baseline_wape": 0.16280604017006303,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.12653191207200742,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1877927097967306,
+            -0.059690936761901923
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.1422058806104729
+        },
+        {
+          "baseline_wape": 0.1724829305299664,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.17443760782412265,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.32026514686650465,
+            -0.05422338733131114
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14239542073782474
+        },
+        {
+          "baseline_wape": 0.2964294946508179,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.35066408188767817,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3787613404314685,
+            -0.2666573044550925
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.19248231806466043
+        },
+        {
+          "baseline_wape": 0.6071942446043166,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": -0.0060160534361194395,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08141393990396352,
+            0.028766500901812986
+          ],
+          "scored_observations": 5,
+          "target": "new_session_count",
+          "wape": 0.6035413315826729
+        },
+        {
+          "baseline_wape": 0.13103188568559793,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.08668313261459049,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0965463280619111,
+            -0.07403190891838696
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11967363136197338
+        },
+        {
+          "baseline_wape": 0.1518747251136197,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.06571063682520872,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08891856907572532,
+            -0.042548008336077206
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14189494020875024
+        },
+        {
+          "baseline_wape": 0.15210794407716485,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.049834078870444,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.12200507310778824,
+            0.050820219661526805
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14452778479520234
+        },
+        {
+          "baseline_wape": 0.33894857619693336,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.29324797579688644,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3151495613190536,
+            -0.2345830254861403
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.23955259232794593
+        },
+        {
+          "baseline_wape": 0.6203835418783141,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.10935003628953821,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.14238221835410517,
+            -0.07797428789882467
+          ],
+          "scored_observations": 256,
+          "target": "new_ul_mbps",
+          "wape": 0.5525445790604883
+        },
+        {
+          "baseline_wape": 0.16317863624352874,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.08474261533373628,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08882902090750408,
+            -0.08003215553038623
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.1493504518416597
+        },
+        {
+          "baseline_wape": 0.19458777900725763,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.10426978327211922,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.16464941306777997,
+            -0.05958780152679403
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17429815346276784
+        },
+        {
+          "baseline_wape": 0.20703061298550296,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.06535989866675074,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.16127844175588332,
+            0.023847628421670302
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1934991130998552
+        },
+        {
+          "baseline_wape": 0.248896732543395,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.37039883696597786,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.46779773329826757,
+            -0.20923855504416666
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.15670567228468943
+        },
+        {
+          "baseline_wape": 0.6313115098320271,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.043543821753691425,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.005481520754749125,
+            0.07724016815199834
+          ],
+          "scored_observations": 30,
+          "target": "new_ul_mbps",
+          "wape": 0.6588012256872067
+        },
+        {
+          "baseline_wape": 0.16405313984984035,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.09327909354255359,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09723396804563011,
+            -0.08839858550949668
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.14875041167183747
+        },
+        {
+          "baseline_wape": 0.19285557484499208,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.09737571900217712,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.16421928508874895,
+            -0.052433425821320816
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17407612458088279
+        },
+        {
+          "baseline_wape": 0.20788235303982766,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.09025403140724442,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.17694167142824635,
+            -0.03898800406944365
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.18912013261955918
+        },
+        {
+          "baseline_wape": 0.27864401330452576,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.32051282663275393,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3853096944971607,
+            -0.20560970497090436
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.18933503297599752
+        },
+        {
+          "baseline_wape": 0.5410617527308199,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.0859583371730972,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.06635060528452376,
+            0.2963605016715763
+          ],
+          "scored_observations": 9,
+          "target": "new_ul_mbps",
+          "wape": 0.5875705213035227
+        },
+        {
+          "baseline_wape": 0.16445909854278268,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.09346038334638318,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09838955458751689,
+            -0.08681452737704774
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.1490886881481736
+        },
+        {
+          "baseline_wape": 0.18967250496679566,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.08193166803330176,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.15738797429718304,
+            -0.03351116855448187
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17413232025481137
+        },
+        {
+          "baseline_wape": 0.2148494297578707,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.12131204875689594,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.25860962916256647,
+            -0.03947596597674679
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1887856052596926
+        },
+        {
+          "baseline_wape": 0.30402377306522516,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.304088696429466,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3539899659766892,
+            -0.21508760336185928
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.21157358023025302
+        },
+        {
+          "baseline_wape": 0.6079219321349264,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.004533402932456854,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.14644015595043136,
+            0.027327001536402218
+          ],
+          "scored_observations": 5,
+          "target": "new_ul_mbps",
+          "wape": 0.6106778872047717
+        },
+        {
+          "baseline_wape": 0.16591337720095414,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.09163610528583488,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09874656858284565,
+            -0.08275218147301384
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15070972149943906
+        },
+        {
+          "baseline_wape": 0.18177460989887448,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.045639016002820276,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.05736624353967463,
+            -0.033914796225179455
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17347859556879333
+        },
+        {
+          "baseline_wape": 0.20581208404165613,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.0699097864903504,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1585638478252838,
+            0.034830752163486696
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1914238051891699
+        },
+        {
+          "baseline_wape": 0.34745382130290164,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.26783147805642626,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3016738304861776,
+            -0.2141781382908048
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.2543947507869921
+        }
+      ],
+      "target_separated": {
+        "new_dl_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.14348226421863852,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.09197016022031239,
+            0.1183025954146092
+          ],
+          "relative_wape_improvement": 0.10396079458491933,
+          "scored_observations": 769260,
+          "wape": 0.12856573402162552,
+          "wape_cluster_bootstrap_95_interval": [
+            0.11949903521511214,
+            0.1412396230487897
+          ]
+        },
+        "new_session_count": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.13335616618582863,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.09120740577037938,
+            0.10751473553198555
+          ],
+          "relative_wape_improvement": 0.09875133841280428,
+          "scored_observations": 769260,
+          "wape": 0.1201870662893777,
+          "wape_cluster_bootstrap_95_interval": [
+            0.1128374411078217,
+            0.12883461706794075
+          ]
+        },
+        "new_ul_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.16780719839659078,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.09386503562846643,
+            0.10421044051023756
+          ],
+          "relative_wape_improvement": 0.09858628524756903,
+          "scored_observations": 769260,
+          "wape": 0.15126371006886907,
+          "wape_cluster_bootstrap_95_interval": [
+            0.13955646098141883,
+            0.16496042799020663
+          ]
+        }
+      },
+      "worst_aggregate_slice": {
+        "baseline_wape": 0.5304422137795675,
+        "contributing_groups": 8,
+        "horizon_minutes": 30,
+        "regime": "detected_surge",
+        "relative_regression": 0.11388303969254676,
+        "relative_regression_cluster_bootstrap_95_interval": [
+          -0.08362085156052418,
+          0.36981708739248365
+        ],
+        "scored_observations": 9,
+        "target": "new_dl_mbps",
+        "wape": 0.5908505854660283
+      }
+    },
+    {
+      "headline_metric_name": "pooled_cross_target_wape",
+      "macro_average_target_baseline_wape": 0.14821520960035264,
+      "macro_average_target_relative_improvement": 0.11168256402663755,
+      "macro_average_target_wape": 0.13166215496443975,
+      "model_family": "hist-gradient-quantile",
+      "pooled_cross_target_relative_improvement": 0.1163060515488437,
+      "pooled_cross_target_wape": 0.12513354423853348,
+      "slices": [
+        {
+          "baseline_wape": 0.6205255527404535,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.03430786371926231,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.06696507064635514,
+            -0.005499859251611187
+          ],
+          "scored_observations": 256,
+          "target": "new_dl_mbps",
+          "wape": 0.5992366466427141
+        },
+        {
+          "baseline_wape": 0.136160482564244,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.08271230109686023,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09386005215220825,
+            -0.07442771720091937
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12489833573289648
+        },
+        {
+          "baseline_wape": 0.1843057742043076,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.16657529671229765,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.23882157119269526,
+            -0.03841234363046221
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15360498518043533
+        },
+        {
+          "baseline_wape": 0.18499665403797047,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.09946452154101937,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.18173138589614407,
+            -0.00873817104964943
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16659605035739425
+        },
+        {
+          "baseline_wape": 0.24240286213080248,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5363453334930514,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5724631780460903,
+            -0.2810008929970875
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.11239121820158707
+        },
+        {
+          "baseline_wape": 0.6390996451469326,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.05456876335931127,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.02209352918743262,
+            0.10860014249205352
+          ],
+          "scored_observations": 30,
+          "target": "new_dl_mbps",
+          "wape": 0.6739745224459754
+        },
+        {
+          "baseline_wape": 0.1373126073930648,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.0885845395707705,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.10286764876609789,
+            -0.0780943050499614
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12514883328988818
+        },
+        {
+          "baseline_wape": 0.18256948850529414,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.13990357806685405,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.19896512379776013,
+            -0.012061761832268607
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.1570273638175681
+        },
+        {
+          "baseline_wape": 0.18817060347917267,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.09985804721469937,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.15036413737423776,
+            -0.032949121933302475
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16938025447253097
+        },
+        {
+          "baseline_wape": 0.2740939570115807,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5650863823519784,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5939544531921161,
+            -0.3247087589018226
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.11920719441936788
+        },
+        {
+          "baseline_wape": 0.5304422137795675,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.14344412972287368,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.05212756461116517,
+            0.4784464971910303
+          ],
+          "scored_observations": 9,
+          "target": "new_dl_mbps",
+          "wape": 0.606531035503452
+        },
+        {
+          "baseline_wape": 0.13763372594237452,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.0903824593149185,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.10693414409144798,
+            -0.07744119791439381
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.1251940513070272
+        },
+        {
+          "baseline_wape": 0.17818380700300157,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.11444712250836497,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1540536239782848,
+            -0.018445387892091356
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.1577911830139222
+        },
+        {
+          "baseline_wape": 0.20567945208006894,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.1815763009815461,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2771874279940204,
+            -0.04832262035945308
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16833293798345886
+        },
+        {
+          "baseline_wape": 0.30176853474091514,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6358390550116111,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6699571259798075,
+            -0.4089836960694748
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.10989231477901312
+        },
+        {
+          "baseline_wape": 0.5697492758980454,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.0722320856391312,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.016346992008446692,
+            0.08837478364809637
+          ],
+          "scored_observations": 5,
+          "target": "new_dl_mbps",
+          "wape": 0.610903454387546
+        },
+        {
+          "baseline_wape": 0.14006291680700206,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.10802613078123091,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.14634616666915212,
+            -0.07866866760354457
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12493246183840818
+        },
+        {
+          "baseline_wape": 0.16120222884187382,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.02966121449516579,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08159015803933917,
+            -0.007934353954742361
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.1564207749550962
+        },
+        {
+          "baseline_wape": 0.1723230563941314,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.025849795290191935,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.16471124240501459,
+            0.08521458076094318
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.1678685406625629
+        },
+        {
+          "baseline_wape": 0.34237414500405583,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6698677749669545,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.7019119720483347,
+            -0.4502198264038323
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.11302873828397551
+        },
+        {
+          "baseline_wape": 0.6271388499298738,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.03312473480078015,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.05287187834903184,
+            -0.015403691142146122
+          ],
+          "scored_observations": 256,
+          "target": "new_session_count",
+          "wape": 0.6063650418426805
+        },
+        {
+          "baseline_wape": 0.12816352710412213,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.07893682445700112,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08536631201416903,
+            -0.07351677320519598
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11804670526331393
+        },
+        {
+          "baseline_wape": 0.16404302888139569,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.1061195743874751,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.18078374167423378,
+            -0.03254890924852418
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.1466348524752697
+        },
+        {
+          "baseline_wape": 0.15340847512734365,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.08541072808485628,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.16371557286688573,
+            -0.011119874267788812
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14030574557232967
+        },
+        {
+          "baseline_wape": 0.23708962771143896,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5623866099204169,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6150225619645483,
+            -0.3945356303134754
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.10375359573550906
+        },
+        {
+          "baseline_wape": 0.6340503168811216,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.05832389400386617,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.027122730897610924,
+            0.11151222752511479
+          ],
+          "scored_observations": 30,
+          "target": "new_session_count",
+          "wape": 0.6710306003560138
+        },
+        {
+          "baseline_wape": 0.12899167467577943,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.08403766470645901,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0924376207795159,
+            -0.07726028709315774
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11815151556945164
+        },
+        {
+          "baseline_wape": 0.16630626007916727,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.12535318631437165,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2009494866497996,
+            -0.04504798047267599
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14545924047421707
+        },
+        {
+          "baseline_wape": 0.15552183808388426,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.07732727948857443,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.17919566818099242,
+            0.0065556598957371955
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14349575744379492
+        },
+        {
+          "baseline_wape": 0.2690078503045338,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5800620793358052,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6264229854868911,
+            -0.4320491768576392
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.11296659729923089
+        },
+        {
+          "baseline_wape": 0.5664095972579263,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.08789833612341114,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.03715528239834737,
+            0.2734044452384698
+          ],
+          "scored_observations": 9,
+          "target": "new_session_count",
+          "wape": 0.6161960584212294
+        },
+        {
+          "baseline_wape": 0.12923815349120532,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.08611197906688683,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09682870612604105,
+            -0.07776055764496755
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11810920032312754
+        },
+        {
+          "baseline_wape": 0.16280604017006303,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.11024086160020974,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.17198586407359834,
+            -0.04175523184791238
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14485816202799692
+        },
+        {
+          "baseline_wape": 0.1724829305299664,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.18123297673637273,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3503740312349314,
+            -0.04197147275530973
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14122333559380762
+        },
+        {
+          "baseline_wape": 0.2964294946508179,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6541328880352293,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6993408781804754,
+            -0.506365821755182
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.10252521321605484
+        },
+        {
+          "baseline_wape": 0.6071942446043166,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.013299630722755529,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.05402248073425875,
+            0.06688466328232148
+          ],
+          "scored_observations": 5,
+          "target": "new_session_count",
+          "wape": 0.6152697038345365
+        },
+        {
+          "baseline_wape": 0.13103188568559793,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.0998187681250432,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.12359308426689154,
+            -0.08079557153016662
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11795244427136006
+        },
+        {
+          "baseline_wape": 0.1518747251136197,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.04491109094669932,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.07741472769754304,
+            -0.01520051128640896
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14505386552153698
+        },
+        {
+          "baseline_wape": 0.15210794407716485,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.04559255108772098,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09727277762302357,
+            0.0034801893458444064
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.1451729548659785
+        },
+        {
+          "baseline_wape": 0.33894857619693336,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6906104231133796,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.7318508674994657,
+            -0.5528751282227478
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.1048671565758916
+        },
+        {
+          "baseline_wape": 0.6203835418783141,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.014462518127931978,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.03934829721901542,
+            0.008589529394558532
+          ],
+          "scored_observations": 256,
+          "target": "new_ul_mbps",
+          "wape": 0.6114112336576284
+        },
+        {
+          "baseline_wape": 0.16317863624352874,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.07682074217281765,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08243055190280367,
+            -0.07222534399895932
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15064313230055262
+        },
+        {
+          "baseline_wape": 0.19458777900725763,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.08751202829222682,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1450808031789396,
+            -0.04228704330836878
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17755900778545292
+        },
+        {
+          "baseline_wape": 0.20703061298550296,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.06969684447584501,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.13915364880268086,
+            -0.015420890814176197
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1926012325505135
+        },
+        {
+          "baseline_wape": 0.248896732543395,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.4680353952130223,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5603469135144488,
+            -0.3078475834951212
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.1324042519602172
+        },
+        {
+          "baseline_wape": 0.6313115098320271,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.068120175582147,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.02398028073352133,
+            0.12177924830828482
+          ],
+          "scored_observations": 30,
+          "target": "new_ul_mbps",
+          "wape": 0.6743165607288152
+        },
+        {
+          "baseline_wape": 0.16405313984984035,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.08246255830499016,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08825184507919523,
+            -0.07762742425014621
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15052489823985618
+        },
+        {
+          "baseline_wape": 0.19285557484499208,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.08449834040737025,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.15332744185422542,
+            -0.0307758137252541
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17655959883228087
+        },
+        {
+          "baseline_wape": 0.20788235303982766,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.06477158881113299,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1446578933971864,
+            -0.008783791013020903
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.19441748274764117
+        },
+        {
+          "baseline_wape": 0.27864401330452576,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.4955362163709828,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5801606847574292,
+            -0.34308301186246454
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.1405658132371753
+        },
+        {
+          "baseline_wape": 0.5410617527308199,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.11800556859537004,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.05214488698360507,
+            0.3886522741878425
+          ],
+          "scored_observations": 9,
+          "target": "new_ul_mbps",
+          "wape": 0.6049100525070278
+        },
+        {
+          "baseline_wape": 0.16445909854278268,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.08439349345095537,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09233827083338535,
+            -0.07821486582428563
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15057982068696232
+        },
+        {
+          "baseline_wape": 0.18967250496679566,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.08098748902334074,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.14009348010104233,
+            -0.03343578804670177
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17431140505276776
+        },
+        {
+          "baseline_wape": 0.2148494297578707,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.08487059554777687,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.24875834883820375,
+            0.010763421495956018
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.19661503070121994
+        },
+        {
+          "baseline_wape": 0.30402377306522516,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5770881142919619,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6613290996594204,
+            -0.43521201307072965
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.128575267167087
+        },
+        {
+          "baseline_wape": 0.6079219321349264,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.04130053216700924,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.04921360424297951,
+            0.05016692756833896
+          ],
+          "scored_observations": 5,
+          "target": "new_ul_mbps",
+          "wape": 0.6330294314480953
+        },
+        {
+          "baseline_wape": 0.16591337720095414,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.09272967520401842,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.11022092838874596,
+            -0.07920353946681506
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15052828362110787
+        },
+        {
+          "baseline_wape": 0.18177460989887448,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.02816543727921561,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.053202914312802226,
+            -0.002783152700341233
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17665484852481383
+        },
+        {
+          "baseline_wape": 0.20581208404165613,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.07373761557111291,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.17945278264573394,
+            0.026969982603938188
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1906359917087029
+        },
+        {
+          "baseline_wape": 0.34745382130290164,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6178508236524433,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6966441940831335,
+            -0.485905140613462
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.13277919162971502
+        }
+      ],
+      "target_separated": {
+        "new_dl_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.14348226421863852,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.07907689595771655,
+            0.18643073876855443
+          ],
+          "relative_wape_improvement": 0.1257827668102417,
+          "scored_observations": 769260,
+          "wape": 0.12543466803702003,
+          "wape_cluster_bootstrap_95_interval": [
+            0.11874372104201994,
+            0.1353501262233428
+          ]
+        },
+        "new_session_count": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.13335616618582863,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.08168098745597462,
+            0.1487627018084611
+          ],
+          "relative_wape_improvement": 0.11097304712355,
+          "scored_observations": 769260,
+          "wape": 0.1185572260714727,
+          "wape_cluster_bootstrap_95_interval": [
+            0.11201508707572387,
+            0.12625080255553203
+          ]
+        },
+        "new_ul_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.16780719839659078,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.07951670197617154,
+            0.12828271303566194
+          ],
+          "relative_wape_improvement": 0.10019014543124503,
+          "scored_observations": 769260,
+          "wape": 0.15099457078482656,
+          "wape_cluster_bootstrap_95_interval": [
+            0.13977405045490254,
+            0.16454543051376402
+          ]
+        }
+      },
+      "worst_aggregate_slice": {
+        "baseline_wape": 0.5304422137795675,
+        "contributing_groups": 8,
+        "horizon_minutes": 30,
+        "regime": "detected_surge",
+        "relative_regression": 0.14344412972287368,
+        "relative_regression_cluster_bootstrap_95_interval": [
+          -0.05212756461116517,
+          0.4784464971910303
+        ],
+        "scored_observations": 9,
+        "target": "new_dl_mbps",
+        "wape": 0.606531035503452
+      }
+    },
+    {
+      "headline_metric_name": "pooled_cross_target_wape",
+      "macro_average_target_baseline_wape": 0.14821520960035264,
+      "macro_average_target_relative_improvement": 0.11167722723968947,
+      "macro_average_target_wape": 0.13166294595743586,
+      "model_family": "lightgbm-quantile",
+      "pooled_cross_target_relative_improvement": 0.11642726394970176,
+      "pooled_cross_target_wape": 0.12511638022224525,
+      "slices": [
+        {
+          "baseline_wape": 0.6205255527404535,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.03033859912994208,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.05600211930862865,
+            -0.005647824176489126
+          ],
+          "scored_observations": 256,
+          "target": "new_dl_mbps",
+          "wape": 0.6016996767459751
+        },
+        {
+          "baseline_wape": 0.136160482564244,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.08247511571764132,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0929080552471933,
+            -0.0744636768619764
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.1249306310085881
+        },
+        {
+          "baseline_wape": 0.1843057742043076,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.1582757912134357,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.22455364100214326,
+            -0.043921735156502426
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.155134631966916
+        },
+        {
+          "baseline_wape": 0.18499665403797047,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.10709576262539666,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1682566989022848,
+            0.019378946071370362
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16518429629062736
+        },
+        {
+          "baseline_wape": 0.24240286213080248,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5361124641333284,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5696165877946842,
+            -0.29670300748023104
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.11244766640088649
+        },
+        {
+          "baseline_wape": 0.6390996451469326,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.0419767261469699,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.0067479396154159045,
+            0.10530924990191895
+          ],
+          "scored_observations": 30,
+          "target": "new_dl_mbps",
+          "wape": 0.665926955931891
+        },
+        {
+          "baseline_wape": 0.1373126073930648,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.09056406625556235,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.10564950933657058,
+            -0.0802654144167568
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12487701931939527
+        },
+        {
+          "baseline_wape": 0.18256948850529414,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.13327995058943465,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1818897096184676,
+            -0.007832045018239654
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15823663609817018
+        },
+        {
+          "baseline_wape": 0.18817060347917267,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.10816665434730388,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1665139625235812,
+            -0.0383452801644137
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16781681885431743
+        },
+        {
+          "baseline_wape": 0.2740939570115807,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5717082582356994,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6035100758639235,
+            -0.32075626735697793
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.11739217825555923
+        },
+        {
+          "baseline_wape": 0.5304422137795675,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.147015864964275,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.06530184743386701,
+            0.5093094534787986
+          ],
+          "scored_observations": 9,
+          "target": "new_dl_mbps",
+          "wape": 0.6084256346519354
+        },
+        {
+          "baseline_wape": 0.13763372594237452,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.08918918564723344,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.10580378671148563,
+            -0.07637026815958757
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12535828600797963
+        },
+        {
+          "baseline_wape": 0.17818380700300157,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.11387171111367389,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.15417724627098475,
+            -0.02107740068046614
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15789371200682115
+        },
+        {
+          "baseline_wape": 0.20567945208006894,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.15455323143119049,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2338834088366837,
+            -0.037562566938659794
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.17389102812209759
+        },
+        {
+          "baseline_wape": 0.30176853474091514,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6346330615578881,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6687595623216528,
+            -0.3775398958304742
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.11025624565645024
+        },
+        {
+          "baseline_wape": 0.5697492758980454,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.07404529445250119,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.042730034162606234,
+            0.26291316752561955
+          ],
+          "scored_observations": 5,
+          "target": "new_dl_mbps",
+          "wape": 0.6119365287960155
+        },
+        {
+          "baseline_wape": 0.14006291680700206,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.10920098425380265,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1509001980148584,
+            -0.08022627096704264
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12476790843421896
+        },
+        {
+          "baseline_wape": 0.16120222884187382,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.03538368195439856,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09390935191374761,
+            -0.018565505804951143
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15549830044619278
+        },
+        {
+          "baseline_wape": 0.1723230563941314,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.015259790365470205,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.15655973505291396,
+            0.10559731550995306
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16969344267841985
+        },
+        {
+          "baseline_wape": 0.34237414500405583,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6693467625601934,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.7051299446726719,
+            -0.4491592139020272
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.11320711946127686
+        },
+        {
+          "baseline_wape": 0.6271388499298738,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.03375261659927342,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.051944001694729194,
+            -0.01717139742323813
+          ],
+          "scored_observations": 256,
+          "target": "new_session_count",
+          "wape": 0.6059712727736815
+        },
+        {
+          "baseline_wape": 0.12816352710412213,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.07916756839588046,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0861874475319869,
+            -0.0733363289013888
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11801713230624926
+        },
+        {
+          "baseline_wape": 0.16404302888139569,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.09860003803804507,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.17821427473899712,
+            -0.016596429088106483
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14786837999381394
+        },
+        {
+          "baseline_wape": 0.15340847512734365,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.08600836252444277,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.15774701531766003,
+            -0.006529129865442933
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14021406338426912
+        },
+        {
+          "baseline_wape": 0.23708962771143896,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5583568713673784,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6052548293256441,
+            -0.4084440202795778
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.10470900494882339
+        },
+        {
+          "baseline_wape": 0.6340503168811216,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.05235355364170746,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.02292105570561554,
+            0.09758931025725975
+          ],
+          "scored_observations": 30,
+          "target": "new_session_count",
+          "wape": 0.667245104157499
+        },
+        {
+          "baseline_wape": 0.12899167467577943,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.08462388694667344,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09331027593176867,
+            -0.07769725186158624
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11807589778095419
+        },
+        {
+          "baseline_wape": 0.16630626007916727,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.12284884887375747,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.20293132619460694,
+            -0.04303841242852151
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14587572746794183
+        },
+        {
+          "baseline_wape": 0.15552183808388426,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.05894152365644756,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.18019161934100827,
+            0.023719030846365865
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14635514398536878
+        },
+        {
+          "baseline_wape": 0.2690078503045338,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5888730383682996,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6342663599325574,
+            -0.44291950418234477
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.11059638015077827
+        },
+        {
+          "baseline_wape": 0.5664095972579263,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.08260794714700781,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.04497489042225343,
+            0.26890911519572785
+          ],
+          "scored_observations": 9,
+          "target": "new_session_count",
+          "wape": 0.6131995313317671
+        },
+        {
+          "baseline_wape": 0.12923815349120532,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.08561975775424313,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0965286321773206,
+            -0.07722191140382909
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11817281409668264
+        },
+        {
+          "baseline_wape": 0.16280604017006303,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.1039580475945523,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1675168351766934,
+            -0.03483134604405297
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14588104209738303
+        },
+        {
+          "baseline_wape": 0.1724829305299664,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.1777201790586045,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3353090867929296,
+            -0.045023857994730285
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14182923323162794
+        },
+        {
+          "baseline_wape": 0.2964294946508179,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.648155338046929,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6913378225637606,
+            -0.516106121622383
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.10429713533833668
+        },
+        {
+          "baseline_wape": 0.6071942446043166,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.013643055362159595,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.04849436102714377,
+            0.060453480760758405
+          ],
+          "scored_observations": 5,
+          "target": "new_session_count",
+          "wape": 0.615478229299038
+        },
+        {
+          "baseline_wape": 0.13103188568559793,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.09923640425643476,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.12211050755350125,
+            -0.08111864986912697
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11802875250721898
+        },
+        {
+          "baseline_wape": 0.1518747251136197,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.04872562907025968,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.07927576508206431,
+            -0.018110478671282685
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14447453359258583
+        },
+        {
+          "baseline_wape": 0.15210794407716485,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.03926311968586649,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08524921390492607,
+            0.01617967319030431
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14613571166369205
+        },
+        {
+          "baseline_wape": 0.33894857619693336,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6916109052084729,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.7296549590509671,
+            -0.5584701022886835
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.10452804459424925
+        },
+        {
+          "baseline_wape": 0.6203835418783141,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.017816026696340526,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.044213248860822785,
+            0.008582625475996475
+          ],
+          "scored_observations": 256,
+          "target": "new_ul_mbps",
+          "wape": 0.6093307721342398
+        },
+        {
+          "baseline_wape": 0.16317863624352874,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.07603823046950076,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08127100158582216,
+            -0.07162273198728485
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15077082149314447
+        },
+        {
+          "baseline_wape": 0.19458777900725763,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.09429801678614447,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.15364140865934206,
+            -0.04541799284590852
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.1762385373560527
+        },
+        {
+          "baseline_wape": 0.20703061298550296,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.0711424651834488,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.12996725674493384,
+            -0.0220632499227746
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.19230194480927376
+        },
+        {
+          "baseline_wape": 0.248896732543395,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.4696755121553997,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5577450995011332,
+            -0.3107249813767555
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.1319960322122704
+        },
+        {
+          "baseline_wape": 0.6313115098320271,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.06465183576094446,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.020808893585077454,
+            0.1159889893013078
+          ],
+          "scored_observations": 30,
+          "target": "new_ul_mbps",
+          "wape": 0.6721269578796812
+        },
+        {
+          "baseline_wape": 0.16405313984984035,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.08254651921233347,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0887601673312357,
+            -0.07739211480229337
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15051112418938187
+        },
+        {
+          "baseline_wape": 0.19285557484499208,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.07641785731564665,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1508839036049859,
+            -0.01767063934089814
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17811796504396046
+        },
+        {
+          "baseline_wape": 0.20788235303982766,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.06504822132214538,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.14599863965773788,
+            -0.015479490666942146
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1943599757303246
+        },
+        {
+          "baseline_wape": 0.27864401330452576,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.49839558392639804,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5789702327762848,
+            -0.35821803853119366
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.13976906758602162
+        },
+        {
+          "baseline_wape": 0.5410617527308199,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.1233809215604762,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.05385523072024968,
+            0.41481401738875295
+          ],
+          "scored_observations": 9,
+          "target": "new_ul_mbps",
+          "wape": 0.6078184504038749
+        },
+        {
+          "baseline_wape": 0.16445909854278268,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.08421699387805548,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09191066725909149,
+            -0.07810211495845722
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15060884764761462
+        },
+        {
+          "baseline_wape": 0.18967250496679566,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.0765310728996006,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.13837295386004442,
+            -0.030155933174879683
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17515666466213198
+        },
+        {
+          "baseline_wape": 0.2148494297578707,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.10498381055972872,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2623127273666499,
+            -0.005138352916375142
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.19229371792530464
+        },
+        {
+          "baseline_wape": 0.30402377306522516,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5762376346842695,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.6608145947540769,
+            -0.42533234643424733
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.12883383318633268
+        },
+        {
+          "baseline_wape": 0.6079219321349264,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.0227329538735368,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.062443184565358245,
+            0.03395482144375084
+          ],
+          "scored_observations": 5,
+          "target": "new_ul_mbps",
+          "wape": 0.6217417933768611
+        },
+        {
+          "baseline_wape": 0.16591337720095414,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.09220625254608072,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.11075499748314664,
+            -0.07942810045953765
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15061512644198982
+        },
+        {
+          "baseline_wape": 0.18177460989887448,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.026386444395151698,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.04632218023455062,
+            -0.005510026102058483
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17697822426232743
+        },
+        {
+          "baseline_wape": 0.20581208404165613,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.03954164810553218,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.11153436599982718,
+            0.04863228415034189
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.19767393503861475
+        },
+        {
+          "baseline_wape": 0.34745382130290164,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.6161366497467815,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.696395971985702,
+            -0.4778101851317491
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.13337478790361493
+        }
+      ],
+      "target_separated": {
+        "new_dl_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.14348226421863852,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.08004116545856178,
+            0.18799187395517758
+          ],
+          "relative_wape_improvement": 0.12621814192335795,
+          "scored_observations": 769260,
+          "wape": 0.12537219943000566,
+          "wape_cluster_bootstrap_95_interval": [
+            0.11853662996777094,
+            0.135860656894904
+          ]
+        },
+        "new_session_count": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.13335616618582863,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.08080801212398822,
+            0.1497600719388364
+          ],
+          "relative_wape_improvement": 0.1108889260945224,
+          "scored_observations": 769260,
+          "wape": 0.11856844412939943,
+          "wape_cluster_bootstrap_95_interval": [
+            0.11262984020633618,
+            0.12619531652822144
+          ]
+        },
+        "new_ul_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.16780719839659078,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.07887645775068781,
+            0.12900003482176786
+          ],
+          "relative_wape_improvement": 0.099870591034364,
+          "scored_observations": 769260,
+          "wape": 0.15104819431290248,
+          "wape_cluster_bootstrap_95_interval": [
+            0.13967386225197356,
+            0.16459910552971488
+          ]
+        }
+      },
+      "worst_aggregate_slice": {
+        "baseline_wape": 0.5304422137795675,
+        "contributing_groups": 8,
+        "horizon_minutes": 30,
+        "regime": "detected_surge",
+        "relative_regression": 0.147015864964275,
+        "relative_regression_cluster_bootstrap_95_interval": [
+          -0.06530184743386701,
+          0.5093094534787986
+        ],
+        "scored_observations": 9,
+        "target": "new_dl_mbps",
+        "wape": 0.6084256346519354
+      }
+    },
+    {
+      "headline_metric_name": "pooled_cross_target_wape",
+      "macro_average_target_baseline_wape": 0.14821520960035264,
+      "macro_average_target_relative_improvement": -0.18819182374024063,
+      "macro_average_target_wape": 0.17610810020108503,
+      "model_family": "regime-ensemble",
+      "pooled_cross_target_relative_improvement": -0.2017621204376794,
+      "pooled_cross_target_wape": 0.17017289042835856,
+      "slices": [
+        {
+          "baseline_wape": 0.6205255527404535,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.05035171391953697,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.24600575096542335,
+            0.1924488244762244
+          ],
+          "scored_observations": 256,
+          "target": "new_dl_mbps",
+          "wape": 0.5892810276291036
+        },
+        {
+          "baseline_wape": 0.136160482564244,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.002191198055374377,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.016015790740459286,
+            0.009613286291796221
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.1358621279796304
+        },
+        {
+          "baseline_wape": 0.1843057742043076,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.06417653829437242,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.09814978256713826,
+            0.012724211806321184
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.1724776676282109
+        },
+        {
+          "baseline_wape": 0.18499665403797047,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": 0.6679343581758965,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.13449586784674078,
+            1.2737004902676539
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.30856227541751063
+        },
+        {
+          "baseline_wape": 0.24240286213080248,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.09516102133501303,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1391482595136907,
+            0.2595446759097635
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.21933555819590497
+        },
+        {
+          "baseline_wape": 0.6390996451469326,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.20407121600953904,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.19659027356873487,
+            0.7701418569517031
+          ],
+          "scored_observations": 30,
+          "target": "new_dl_mbps",
+          "wape": 0.7695214868833321
+        },
+        {
+          "baseline_wape": 0.1373126073930648,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": 0.08885360768783812,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.06564038456626295,
+            0.10985283062870878
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.14951332794096234
+        },
+        {
+          "baseline_wape": 0.18256948850529414,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": 0.11946998565894207,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.06045696664505394,
+            0.22971703363521076
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.20438106267878203
+        },
+        {
+          "baseline_wape": 0.18817060347917267,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.04145613021438821,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.18923207407635123,
+            0.4418539517920118
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.18036977843882007
+        },
+        {
+          "baseline_wape": 0.2740939570115807,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": 0.2558694929408525,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.20527604528958232,
+            0.60328529640913
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.34422623881028563
+        },
+        {
+          "baseline_wape": 0.5304422137795675,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 1.5489298719157478,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.13473762688249388,
+            5.3098423561666905
+          ],
+          "scored_observations": 9,
+          "target": "new_dl_mbps",
+          "wape": 1.3520600040278585
+        },
+        {
+          "baseline_wape": 0.13763372594237452,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": 0.16253642807136703,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.1273139129706374,
+            0.19394632205147108
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.16000422013920151
+        },
+        {
+          "baseline_wape": 0.17818380700300157,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": 0.3793551495052887,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.052371571356538124,
+            0.6528697577595044
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.24577875174804673
+        },
+        {
+          "baseline_wape": 0.20567945208006894,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.15720868879972028,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.23291291839748907,
+            -0.04339863462927356
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.1733448551055164
+        },
+        {
+          "baseline_wape": 0.30176853474091514,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": 0.49521899529790936,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.42971340293805316,
+            0.9114363597843413
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.4512100453278334
+        },
+        {
+          "baseline_wape": 0.5697492758980454,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 6.016720078091391,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.059615945727871766,
+            14.075194566650495
+          ],
+          "scored_observations": 5,
+          "target": "new_dl_mbps",
+          "wape": 3.9977711836718464
+        },
+        {
+          "baseline_wape": 0.14006291680700206,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": 0.4435011368266517,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.3750886947336945,
+            0.5022944409551665
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.2021809796381642
+        },
+        {
+          "baseline_wape": 0.16120222884187382,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": 1.4789611185667981,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.403507653276306,
+            2.0528272757061403
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.3996140575253125
+        },
+        {
+          "baseline_wape": 0.1723230563941314,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": 2.581300931102005,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.13096850098065907,
+            5.700137040025417
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.6171407223146461
+        },
+        {
+          "baseline_wape": 0.34237414500405583,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": 1.6624727246619782,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            1.5055756990478335,
+            2.518434457407448
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.9115618227027636
+        },
+        {
+          "baseline_wape": 0.6271388499298738,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.13074777682123118,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2592654132592378,
+            0.01742612713387165
+          ],
+          "scored_observations": 256,
+          "target": "new_session_count",
+          "wape": 0.5451418395433191
+        },
+        {
+          "baseline_wape": 0.12816352710412213,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": 0.010330436610417992,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0002671441583308398,
+            0.021406547387263896
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.12948751229663885
+        },
+        {
+          "baseline_wape": 0.16404302888139569,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.04327204287547193,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.12697734743270292,
+            0.028346828155864902
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.15694455190221765
+        },
+        {
+          "baseline_wape": 0.15340847512734365,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": 0.6194674154073398,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.11709065469071722,
+            1.2432798559861147
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.2484400267160604
+        },
+        {
+          "baseline_wape": 0.23708962771143896,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.10858844470351348,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.17793735314274567,
+            0.09766720694401165
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.21134443378291878
+        },
+        {
+          "baseline_wape": 0.6340503168811216,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.2262418628052465,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.22731758227220464,
+            0.8845418187909225
+          ],
+          "scored_observations": 30,
+          "target": "new_session_count",
+          "wape": 0.7774990416845633
+        },
+        {
+          "baseline_wape": 0.12899167467577943,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": 0.10324414475469168,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.08182803409224507,
+            0.12457521509319935
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.1423093098081557
+        },
+        {
+          "baseline_wape": 0.16630626007916727,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": 0.02614083857609173,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.07455233331732965,
+            0.13027923199304078
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.1706536451780903
+        },
+        {
+          "baseline_wape": 0.15552183808388426,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": 0.09734026658913808,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.14646252096068224,
+            0.534110282185758
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.1706603752634023
+        },
+        {
+          "baseline_wape": 0.2690078503045338,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": 0.24862056295513146,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.17040268302216227,
+            0.4662877515541024
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.3358887334865967
+        },
+        {
+          "baseline_wape": 0.5664095972579263,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 1.2209957727227287,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.21038783022954052,
+            3.058804481998034
+          ],
+          "scored_observations": 9,
+          "target": "new_session_count",
+          "wape": 1.2579933211394376
+        },
+        {
+          "baseline_wape": 0.12923815349120532,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": 0.17556920358300276,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.1449160604065381,
+            0.2058820972891824
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.15192839317219411
+        },
+        {
+          "baseline_wape": 0.16280604017006303,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": 0.18681819800460375,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.03219155379990657,
+            0.42581491851533776
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.19322117121889934
+        },
+        {
+          "baseline_wape": 0.1724829305299664,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.1395073578601238,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2962027896991052,
+            -0.02210998406393694
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.1484202926157595
+        },
+        {
+          "baseline_wape": 0.2964294946508179,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": 0.4901257798221079,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.40168688030444133,
+            0.740360862205284
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.4417172318788234
+        },
+        {
+          "baseline_wape": 0.6071942446043166,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 5.577594601845887,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.005033256614625836,
+            10.417525773195877
+          ],
+          "scored_observations": 5,
+          "target": "new_session_count",
+          "wape": 3.993877585581244
+        },
+        {
+          "baseline_wape": 0.13103188568559793,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": 0.4647841013629459,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.40456848510013355,
+            0.5231354854617933
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.1919334229238708
+        },
+        {
+          "baseline_wape": 0.1518747251136197,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": 1.0938290212308561,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.2989652537625393,
+            1.8066823454379692
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.3179997070343557
+        },
+        {
+          "baseline_wape": 0.15210794407716485,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": 1.6175440610514187,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.10051284739817334,
+            4.719826159266429
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.39814924565792414
+        },
+        {
+          "baseline_wape": 0.33894857619693336,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": 1.5683798712442423,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            1.3889196217704445,
+            2.043335483203175
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.8705487004910989
+        },
+        {
+          "baseline_wape": 0.6203835418783141,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.07241173747957763,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.21862203898190213,
+            0.07766521790013234
+          ],
+          "scored_observations": 256,
+          "target": "new_ul_mbps",
+          "wape": 0.5754604917071711
+        },
+        {
+          "baseline_wape": 0.16317863624352874,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.013958606883582747,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.023775897211916856,
+            -0.004081091473760254
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.16090088980840617
+        },
+        {
+          "baseline_wape": 0.19458777900725763,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.04042491121113112,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.12718896506702673,
+            0.02567361833381291
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.18672158531811803
+        },
+        {
+          "baseline_wape": 0.20703061298550296,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": 0.4073441746216848,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.11001512648481526,
+            1.1764387023841365
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.2913633271535041
+        },
+        {
+          "baseline_wape": 0.248896732543395,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": 0.015399460237957019,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.13257568082049997,
+            0.2657049396850617
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.25272960787955445
+        },
+        {
+          "baseline_wape": 0.6313115098320271,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.2854377660863694,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.18048755611627434,
+            0.8181817792442927
+          ],
+          "scored_observations": 30,
+          "target": "new_ul_mbps",
+          "wape": 0.8115116569030939
+        },
+        {
+          "baseline_wape": 0.16405313984984035,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": 0.059331236882917526,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.04099024462635713,
+            0.07865790405737416
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.1737866155516576
+        },
+        {
+          "baseline_wape": 0.19285557484499208,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.001322397766672645,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08679384800500649,
+            0.08945961643365076
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.1926005430635267
+        },
+        {
+          "baseline_wape": 0.20788235303982766,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": 0.2036919354370379,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.17206312286481834,
+            0.9837870989005107
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.25022631187371575
+        },
+        {
+          "baseline_wape": 0.27864401330452576,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": 0.3615287741339115,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.2254964094073586,
+            0.5873860633885362
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.37938184185426427
+        },
+        {
+          "baseline_wape": 0.5410617527308199,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 1.6396951475036556,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.12692523839020714,
+            4.524033793525407
+          ],
+          "scored_observations": 9,
+          "target": "new_ul_mbps",
+          "wape": 1.428238083183368
+        },
+        {
+          "baseline_wape": 0.16445909854278268,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": 0.11573345653614142,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.08903042350274355,
+            0.14235329351862447
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.18349251847595682
+        },
+        {
+          "baseline_wape": 0.18967250496679566,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": 0.11050708979366441,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.046210456115246115,
+            0.3090075602299376
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.21063266150455062
+        },
+        {
+          "baseline_wape": 0.2148494297578707,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.10602762939606725,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.25707304995644475,
+            -0.020464827737187843
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1920694540435468
+        },
+        {
+          "baseline_wape": 0.30402377306522516,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": 0.6152202595781813,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.4546253899407664,
+            0.8935971161267189
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.491065357648351
+        },
+        {
+          "baseline_wape": 0.6079219321349264,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 3.5251820755716228,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.005221878464021001,
+            13.637171418049741
+          ],
+          "scored_observations": 5,
+          "target": "new_ul_mbps",
+          "wape": 2.7509574306438376
+        },
+        {
+          "baseline_wape": 0.16591337720095414,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": 0.3553704078986901,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.30118374308930335,
+            0.40811371059476437
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.22487408173270645
+        },
+        {
+          "baseline_wape": 0.18177460989887448,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": 0.9313291414689056,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.3275258077215642,
+            1.6939180720415374
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.3510666012768385
+        },
+        {
+          "baseline_wape": 0.20581208404165613,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": 0.6548414813933268,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.11753730070534725,
+            2.5233474308997534
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.3405863740441421
+        },
+        {
+          "baseline_wape": 0.34745382130290164,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": 1.8570085248441655,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            1.5257570126252615,
+            2.4178631130697066
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.9926785294520712
+        }
+      ],
+      "target_separated": {
+        "new_dl_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.14348226421863852,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            -0.25599422078336537,
+            -0.1614515216337448
+          ],
+          "relative_wape_improvement": -0.20811971481902125,
+          "scored_observations": 769260,
+          "wape": 0.17334375212940903,
+          "wape_cluster_bootstrap_95_interval": [
+            0.15682884297420868,
+            0.19718425538149914
+          ]
+        },
+        "new_session_count": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.13335616618582863,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            -0.2435887465643079,
+            -0.17296497746757372
+          ],
+          "relative_wape_improvement": -0.20936387282783275,
+          "scored_observations": 769260,
+          "wape": 0.16127612960396578,
+          "wape_cluster_bootstrap_95_interval": [
+            0.15097792838613597,
+            0.17444381785800261
+          ]
+        },
+        "new_ul_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.16780719839659078,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            -0.19269091926471107,
+            -0.11748954542785135
+          ],
+          "relative_wape_improvement": -0.1543272322089825,
+          "scored_observations": 769260,
+          "wape": 0.19370441886988024,
+          "wape_cluster_bootstrap_95_interval": [
+            0.17891611438200603,
+            0.21145403083199824
+          ]
+        }
+      },
+      "worst_aggregate_slice": {
+        "baseline_wape": 0.5697492758980454,
+        "contributing_groups": 4,
+        "horizon_minutes": 80,
+        "regime": "detected_surge",
+        "relative_regression": 6.016720078091391,
+        "relative_regression_cluster_bootstrap_95_interval": [
+          0.059615945727871766,
+          14.075194566650495
+        ],
+        "scored_observations": 5,
+        "target": "new_dl_mbps",
+        "wape": 3.9977711836718464
+      }
+    },
+    {
+      "headline_metric_name": "pooled_cross_target_wape",
+      "macro_average_target_baseline_wape": 0.14821520960035264,
+      "macro_average_target_relative_improvement": 0.09201899342648627,
+      "macro_average_target_wape": 0.1345765952024325,
+      "model_family": "ridge-v2",
+      "pooled_cross_target_relative_improvement": 0.09278108737449008,
+      "pooled_cross_target_wape": 0.128464745216407,
+      "slices": [
+        {
+          "baseline_wape": 0.6205255527404535,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.1892372710310396,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.23049616584690855,
+            -0.14990615011445793
+          ],
+          "scored_observations": 256,
+          "target": "new_dl_mbps",
+          "wape": 0.5030989905348227
+        },
+        {
+          "baseline_wape": 0.136160482564244,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.0775748665399858,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08216056786898746,
+            -0.07299302150781388
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12559785130130272
+        },
+        {
+          "baseline_wape": 0.1843057742043076,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.15731312077231185,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.22856124069489236,
+            -0.034732792773076795
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15531205768787093
+        },
+        {
+          "baseline_wape": 0.18499665403797047,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.120524612962297,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.19014293441048621,
+            -0.024440847096141003
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16270000391072412
+        },
+        {
+          "baseline_wape": 0.24240286213080248,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.4849794094791329,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5143221072261795,
+            -0.259690967012429
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.12484246519855424
+        },
+        {
+          "baseline_wape": 0.6390996451469326,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.02766689417824475,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.002660478799797847,
+            0.07784939490868527
+          ],
+          "scored_observations": 30,
+          "target": "new_dl_mbps",
+          "wape": 0.6567815473985665
+        },
+        {
+          "baseline_wape": 0.1373126073930648,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.07849818554204291,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08632817180677123,
+            -0.06792365098065536
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.1265338168606623
+        },
+        {
+          "baseline_wape": 0.18256948850529414,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.13699748788354116,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.19527888733110269,
+            -0.02447640647375628
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.1575579272158858
+        },
+        {
+          "baseline_wape": 0.18817060347917267,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.13620026905634675,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2003950581788691,
+            -0.04995815552449845
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.16254171665681422
+        },
+        {
+          "baseline_wape": 0.2740939570115807,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.4002186620357424,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.4220163574793555,
+            -0.24054546421547274
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.16439644026432357
+        },
+        {
+          "baseline_wape": 0.5304422137795675,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.12415508012217757,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0945118594152694,
+            0.3938833574031275
+          ],
+          "scored_observations": 9,
+          "target": "new_dl_mbps",
+          "wape": 0.596299309331555
+        },
+        {
+          "baseline_wape": 0.13763372594237452,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.06911029273259728,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08445082535171908,
+            -0.04805667386290845
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.12812181885261895
+        },
+        {
+          "baseline_wape": 0.17818380700300157,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.12112579573200344,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1691440847242659,
+            -0.022185508038826712
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.15660115159320528
+        },
+        {
+          "baseline_wape": 0.20567945208006894,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.15720868879972028,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2325533713458734,
+            -0.0501539051273717
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.1733448551055164
+        },
+        {
+          "baseline_wape": 0.30176853474091514,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.37839233309199805,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.4079500918238897,
+            -0.25137055293589416
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.18758163482654658
+        },
+        {
+          "baseline_wape": 0.5697492758980454,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.034881600620163544,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            0.014286486731130088,
+            0.11974109275571077
+          ],
+          "scored_observations": 5,
+          "target": "new_dl_mbps",
+          "wape": 0.5896230425935484
+        },
+        {
+          "baseline_wape": 0.14006291680700206,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.07693187005260171,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08684826957943154,
+            -0.06587592018054056
+          ],
+          "scored_observations": 188964,
+          "target": "new_dl_mbps",
+          "wape": 0.1292876146920174
+        },
+        {
+          "baseline_wape": 0.16120222884187382,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.04364126454405437,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.07579095558780126,
+            -0.033033071614492204
+          ],
+          "scored_observations": 1008,
+          "target": "new_dl_mbps",
+          "wape": 0.1541671597278944
+        },
+        {
+          "baseline_wape": 0.1723230563941314,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": 0.01239366966939115,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.14781756900738227,
+            0.16565537358134014
+          ],
+          "scored_observations": 168,
+          "target": "new_dl_mbps",
+          "wape": 0.17445877143150013
+        },
+        {
+          "baseline_wape": 0.34237414500405583,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.3754705686391123,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3950226596109486,
+            -0.29905427171895116
+          ],
+          "scored_observations": 2100,
+          "target": "new_dl_mbps",
+          "wape": 0.2138227300920531
+        },
+        {
+          "baseline_wape": 0.6271388499298738,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.20563105220391675,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.23489088437992423,
+            -0.17872075623895015
+          ],
+          "scored_observations": 256,
+          "target": "new_session_count",
+          "wape": 0.4981796283408396
+        },
+        {
+          "baseline_wape": 0.12816352710412213,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.07067876623841662,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0750073898898451,
+            -0.06583115576881923
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.1191050871316389
+        },
+        {
+          "baseline_wape": 0.16404302888139569,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.11786557973813627,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.20293320024738645,
+            -0.029192240336822235
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14470800218029015
+        },
+        {
+          "baseline_wape": 0.15340847512734365,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.06666429323512357,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1372708863330242,
+            -0.012297032709639262
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14318160755670126
+        },
+        {
+          "baseline_wape": 0.23708962771143896,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.5021895154071434,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5453459830705725,
+            -0.35260384251970667
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.1180257024629714
+        },
+        {
+          "baseline_wape": 0.6340503168811216,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.028702000897364854,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0015805765611611592,
+            0.07166573304865297
+          ],
+          "scored_observations": 30,
+          "target": "new_session_count",
+          "wape": 0.652248829645218
+        },
+        {
+          "baseline_wape": 0.12899167467577943,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.0754108300450167,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08087269251723922,
+            -0.0695359656766947
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.11926430541958215
+        },
+        {
+          "baseline_wape": 0.16630626007916727,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.1267923458662985,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.20013402114536222,
+            -0.045103078445438996
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.1452198992314789
+        },
+        {
+          "baseline_wape": 0.15552183808388426,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.09021769332695062,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.18505460381161032,
+            -0.02554240533141922
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14149101658998872
+        },
+        {
+          "baseline_wape": 0.2690078503045338,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.39433582936861333,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.4226123407949325,
+            -0.2936665218904557
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.16292841654802767
+        },
+        {
+          "baseline_wape": 0.5664095972579263,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.06019456040484794,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.06089954895661187,
+            0.21281245499110413
+          ],
+          "scored_observations": 9,
+          "target": "new_session_count",
+          "wape": 0.6005043739739542
+        },
+        {
+          "baseline_wape": 0.12923815349120532,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.06915575886475256,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.07883574521406925,
+            -0.05635566347197299
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.12030059091224164
+        },
+        {
+          "baseline_wape": 0.16280604017006303,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.10431984675479022,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1638728770277944,
+            -0.0413599549129684
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14582213900876784
+        },
+        {
+          "baseline_wape": 0.1724829305299664,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.1395073578601238,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.29475872254842395,
+            -0.022164486509869227
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.1484202926157595
+        },
+        {
+          "baseline_wape": 0.2964294946508179,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.36135475917928106,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.39053902557937026,
+            -0.29359115709094163
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.18931328599763564
+        },
+        {
+          "baseline_wape": 0.6071942446043166,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": -0.019088942802193865,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.04537661485746014,
+            0.12617328221532964
+          ],
+          "scored_observations": 5,
+          "target": "new_session_count",
+          "wape": 0.5956035483992435
+        },
+        {
+          "baseline_wape": 0.13103188568559793,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.07721039521122408,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08318019831689621,
+            -0.07072793900575071
+          ],
+          "scored_observations": 188964,
+          "target": "new_session_count",
+          "wape": 0.12091486200654097
+        },
+        {
+          "baseline_wape": 0.1518747251136197,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.05281774326565414,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0858294169726618,
+            -0.02405426373944526
+          ],
+          "scored_observations": 1008,
+          "target": "new_session_count",
+          "wape": 0.14385304487402675
+        },
+        {
+          "baseline_wape": 0.15210794407716485,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.05354805322676082,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.12733855389920465,
+            0.05656797256571841
+          ],
+          "scored_observations": 168,
+          "target": "new_session_count",
+          "wape": 0.14396285979150766
+        },
+        {
+          "baseline_wape": 0.33894857619693336,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.36814349074073627,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.38419313821062295,
+            -0.32270716095955443
+          ],
+          "scored_observations": 2100,
+          "target": "new_session_count",
+          "wape": 0.2141668641741919
+        },
+        {
+          "baseline_wape": 0.6203835418783141,
+          "contributing_groups": 88,
+          "horizon_minutes": 10,
+          "regime": "detected_surge",
+          "relative_regression": -0.17113991985900245,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2075872671411162,
+            -0.13565987053366454
+          ],
+          "scored_observations": 256,
+          "target": "new_ul_mbps",
+          "wape": 0.5142111522394154
+        },
+        {
+          "baseline_wape": 0.16317863624352874,
+          "contributing_groups": 96,
+          "horizon_minutes": 10,
+          "regime": "normal",
+          "relative_regression": -0.0773318994603911,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08110088940901192,
+            -0.0731394655409372
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15055972235146045
+        },
+        {
+          "baseline_wape": 0.19458777900725763,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "outage",
+          "relative_regression": -0.09827697157979931,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.17302618026707853,
+            -0.035871318693554165
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.1754642813799851
+        },
+        {
+          "baseline_wape": 0.20703061298550296,
+          "contributing_groups": 12,
+          "horizon_minutes": 10,
+          "regime": "recovery",
+          "relative_regression": -0.06692216553178543,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1717893799863204,
+            0.01746602015793837
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.19317567603314012
+        },
+        {
+          "baseline_wape": 0.248896732543395,
+          "contributing_groups": 5,
+          "horizon_minutes": 10,
+          "regime": "scheduled_event",
+          "relative_regression": -0.41892256096119196,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.5073688277457186,
+            -0.2665736067462787
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.14462827593144312
+        },
+        {
+          "baseline_wape": 0.6313115098320271,
+          "contributing_groups": 25,
+          "horizon_minutes": 20,
+          "regime": "detected_surge",
+          "relative_regression": 0.042504268728858374,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            4.0256506625533004e-05,
+            0.0873429265115214
+          ],
+          "scored_observations": 30,
+          "target": "new_ul_mbps",
+          "wape": 0.658144943897549
+        },
+        {
+          "baseline_wape": 0.16405313984984035,
+          "contributing_groups": 96,
+          "horizon_minutes": 20,
+          "regime": "normal",
+          "relative_regression": -0.08120624001782639,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08544767982184327,
+            -0.07644124874626117
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15073100119951618
+        },
+        {
+          "baseline_wape": 0.19285557484499208,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "outage",
+          "relative_regression": -0.08647612512521607,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1596401730817774,
+            -0.03601517239753086
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17617817202360106
+        },
+        {
+          "baseline_wape": 0.20788235303982766,
+          "contributing_groups": 12,
+          "horizon_minutes": 20,
+          "regime": "recovery",
+          "relative_regression": -0.09196943649882328,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.19358434314373849,
+            -0.017455606254147975
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.18876353017270528
+        },
+        {
+          "baseline_wape": 0.27864401330452576,
+          "contributing_groups": 5,
+          "horizon_minutes": 20,
+          "regime": "scheduled_event",
+          "relative_regression": -0.34748277146488504,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.4070388220191561,
+            -0.24775830396991438
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.18182001930937086
+        },
+        {
+          "baseline_wape": 0.5410617527308199,
+          "contributing_groups": 8,
+          "horizon_minutes": 30,
+          "regime": "detected_surge",
+          "relative_regression": 0.0751809767865248,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.0856477032962122,
+            0.2754878998271777
+          ],
+          "scored_observations": 9,
+          "target": "new_ul_mbps",
+          "wape": 0.5817393038029521
+        },
+        {
+          "baseline_wape": 0.16445909854278268,
+          "contributing_groups": 96,
+          "horizon_minutes": 30,
+          "regime": "normal",
+          "relative_regression": -0.07885927722027086,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08554646520834083,
+            -0.0701935945317392
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15148997289940153
+        },
+        {
+          "baseline_wape": 0.18967250496679566,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "outage",
+          "relative_regression": -0.07700448997008136,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.14112254151265755,
+            -0.02665788353421565
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17506687046047983
+        },
+        {
+          "baseline_wape": 0.2148494297578707,
+          "contributing_groups": 12,
+          "horizon_minutes": 30,
+          "regime": "recovery",
+          "relative_regression": -0.10602762939606725,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.2519399371193562,
+            -0.015597365256779998
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1920694540435468
+        },
+        {
+          "baseline_wape": 0.30402377306522516,
+          "contributing_groups": 5,
+          "horizon_minutes": 30,
+          "regime": "scheduled_event",
+          "relative_regression": -0.32849904041165645,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.3744248436755545,
+            -0.2621191876463268
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.20415225535096748
+        },
+        {
+          "baseline_wape": 0.6079219321349264,
+          "contributing_groups": 4,
+          "horizon_minutes": 80,
+          "regime": "detected_surge",
+          "relative_regression": 0.006510710350298599,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.005684100747548548,
+            0.07719824307885603
+          ],
+          "scored_observations": 5,
+          "target": "new_ul_mbps",
+          "wape": 0.6118799357506508
+        },
+        {
+          "baseline_wape": 0.16591337720095414,
+          "contributing_groups": 96,
+          "horizon_minutes": 80,
+          "regime": "normal",
+          "relative_regression": -0.08259765389285167,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.08741549091228787,
+            -0.07752700312522212
+          ],
+          "scored_observations": 188964,
+          "target": "new_ul_mbps",
+          "wape": 0.15220932149471558
+        },
+        {
+          "baseline_wape": 0.18177460989887448,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "outage",
+          "relative_regression": -0.03986410705138865,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.05195645192992299,
+            -0.025486817116709182
+          ],
+          "scored_observations": 1008,
+          "target": "new_ul_mbps",
+          "wape": 0.17452832739064134
+        },
+        {
+          "baseline_wape": 0.20581208404165613,
+          "contributing_groups": 12,
+          "horizon_minutes": 80,
+          "regime": "recovery",
+          "relative_regression": -0.07597367527221066,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.1479084073164191,
+            0.015900997141667036
+          ],
+          "scored_observations": 168,
+          "target": "new_ul_mbps",
+          "wape": 0.1901757836015784
+        },
+        {
+          "baseline_wape": 0.34745382130290164,
+          "contributing_groups": 5,
+          "horizon_minutes": 80,
+          "regime": "scheduled_event",
+          "relative_regression": -0.3447012450890189,
+          "relative_regression_cluster_bootstrap_95_interval": [
+            -0.37586634962186016,
+            -0.3122153682336435
+          ],
+          "scored_observations": 2100,
+          "target": "new_ul_mbps",
+          "wape": 0.22768605648885396
+        }
+      ],
+      "target_separated": {
+        "new_dl_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.14348226421863852,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.08213816732459583,
+            0.11663091893521081
+          ],
+          "relative_wape_improvement": 0.09760263500987622,
+          "scored_observations": 769260,
+          "wape": 0.12947801715371612,
+          "wape_cluster_bootstrap_95_interval": [
+            0.12060885131737296,
+            0.14303891058666976
+          ]
+        },
+        "new_session_count": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.13335616618582863,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.07814439467650539,
+            0.10022826403764773
+          ],
+          "relative_wape_improvement": 0.08836954144682665,
+          "scored_observations": 769260,
+          "wape": 0.12157154293088014,
+          "wape_cluster_bootstrap_95_interval": [
+            0.11470457411290616,
+            0.12977720074692034
+          ]
+        },
+        "new_ul_mbps": {
+          "best_simple_baseline": "moving_average",
+          "best_simple_baseline_wape": 0.16780719839659078,
+          "relative_improvement_cluster_bootstrap_95_interval": [
+            0.08309973752769413,
+            0.09833586866350333
+          ],
+          "relative_wape_improvement": 0.0901449581330763,
+          "scored_observations": 769260,
+          "wape": 0.15268022552270127,
+          "wape_cluster_bootstrap_95_interval": [
+            0.1409872543159151,
+            0.16572724695022126
+          ]
+        }
+      },
+      "worst_aggregate_slice": {
+        "baseline_wape": 0.5304422137795675,
+        "contributing_groups": 8,
+        "horizon_minutes": 30,
+        "regime": "detected_surge",
+        "relative_regression": 0.12415508012217757,
+        "relative_regression_cluster_bootstrap_95_interval": [
+          -0.0945118594152694,
+          0.3938833574031275
+        ],
+        "scored_observations": 9,
+        "target": "new_dl_mbps",
+        "wape": 0.596299309331555
+      }
+    }
+  ],
+  "confidence_interval_method": "fixed-seed 2,000-replicate group-cluster bootstrap",
+  "protected_test_seed_consumed": false,
+  "schema_version": "forecast-phase2-audit-addendum/1.0",
+  "sealed_phase2_modified": false,
+  "selection_calibration_seed": 46002,
+  "source": {
+    "metric_shard_set_sha256": "6fecd0d787d3a09c80fab6700e94fe323e8ac835d2b8d494d4a834b106d6d2de",
+    "metric_shards": 480,
+    "sealed_selection_path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/forecast-phase2/forecast-selection-v3.json",
+    "sealed_selection_sha256": "1e0536398e0bb1ab062edd2a9e248de9f6b346e85f9161f5e1011aeec84fe6ec"
+  },
+  "train_seed": 46001
+}

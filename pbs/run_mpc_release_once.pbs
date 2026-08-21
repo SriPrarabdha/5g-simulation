@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -N cdot-mpc-release
+#PBS -q workq
+#PBS -l select=1:ncpus=30:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=08:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST:?set frozen release manifest}"
+: "${FORECAST_BUNDLE:?set frozen release forecast bundle}"
+: "${MPC_PROFILE:?set frozen release MPC profile}"
+: "${SURVIVAL_BUNDLE:?set measured empirical survival bundle}"
+: "${RELEASE_FREEZE:?set final release freeze}"
+: "${VALIDATION_EVALUATION:?set passing validation evidence}"
+: "${RELEASE_ROOT:?set new durable release root}"
+
+"$PYTHON_BIN" scripts/run_mpc_release_once.py \
+  --manifest "$MANIFEST" \
+  --forecast-bundle "$FORECAST_BUNDLE" \
+  --mpc-profile "$MPC_PROFILE" \
+  --survival-bundle "$SURVIVAL_BUNDLE" \
+  --release-freeze "$RELEASE_FREEZE" \
+  --validation-evaluation "$VALIDATION_EVALUATION" \
+  --steps "${STEPS:-2880}" \
+  --workers "${WORKERS:-30}" \
+  --output-root "$RELEASE_ROOT"

@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "242f65a15fbe39371a139fe04eec11165fc83dde70215021ecbfde45b7af2983",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "c59755e760afb8a601c174c27ec79e7201f54e35080a1645b7e7ba4dfefab898",
+      "metric_file_sha256": "2f34b0e4c063f4c65b68e6461f139d09cca331248a93ff0b6b51277294ba84d2",
+      "trained_bundle_sha256": "0fd22b3cd37cc5ae988598e9920dffe9a0ca320ec49577555229b6870cd31839"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "1a71364e311232089948d83561922f17d84ae657ee01ec1604cf747a11304dbb",
+      "metric_file_sha256": "0fa0b5e026388b7bc2f6fe64ecd880691d4973a5fb62e1c68e2d4a7866a2cad3",
+      "trained_bundle_sha256": "5ead85faa1cc1734f50446ddf81f32bdea6513cf49f9d4a74a2ab89679356109"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "5dc531781586114478df0b4f020f5f2aa52e77a9f92d55b966e3724323733560",
+      "metric_file_sha256": "c99bac47bf0600ee0974f29524fde27fe8179cee90e3af8549f3f179cb903be5",
+      "trained_bundle_sha256": "f6b93cecbefe0e5fd9524d79c44c5d52cb75293a89e7c9a2fb1cbca2403ae331"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "a5f3e28d16df87ccb6f3375f1190370db48eac3eda0e59d6ba51c85dbf1a7765",
+      "metric_file_sha256": "d8868ee3bccc220dc0428fcdd40adbb5b3a885ef769a50899db94a557383c8e2",
+      "trained_bundle_sha256": "1ee206d7058acf026551ab6c098b99b00a57039e8d9b33be67b534ea7485da00"
+    }
+  },
+  "group_id": "delhi-ncr|consumer-voice|1-010103",
+  "group_index": 14,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

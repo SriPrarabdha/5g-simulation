@@ -1,0 +1,73 @@
+{
+  "created_at": "2026-08-19T18:53:08.152030Z",
+  "evidence": {
+    "guarded_survival_bundle": {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/survival-phase3-v1/empirical-n10000-guarded-v2.json",
+      "sha256": "ea222dc15055cf74e024a6749f14243cc76901e42b6b60604458755d2f1735ed"
+    },
+    "phase21_addendum": {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase2.1-addendum-v1/phase2-audit-addendum-v1.json",
+      "sha256": "6d9c8fd236a6953dcd87745cafcfc23ddd73fd767285b2a14ac54736bb841937"
+    },
+    "survival_calibration": {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/survival-phase3-v1/calibration-v1.json",
+      "sha256": "fab918016d123f1569028bbfa5470dffe6dacffb4bc05dff9e865aefbc49bb54"
+    },
+    "survival_guardrail": {
+      "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/survival-phase3-v1/survival-guardrail-v2.json",
+      "sha256": "333a1dd4d09301ff585a59eae3bcca3a6cbe4e1c8a6ef6d21577f45aba20a121"
+    }
+  },
+  "frozen": true,
+  "interfaces": {
+    "configs/cohort_mpc_control_science_baseline_v1.json": "43c5f47e8264de0046a6a0aedac53dafaf903c00a5d99491283b90b807639a08",
+    "configs/cohort_mpc_phase3_calendar_conservative_h3_t30_v1.json": "8453770464e1b001e3da0f8a0055d9b4825572766fb0e4741653bc788a377f4b",
+    "configs/cohort_mpc_phase3_calendar_conservative_v1.json": "3adc20b64e5789665dbecb57d238333e2e95987724426293e6a2e5c687bb416b",
+    "configs/cohort_mpc_phase3_calendar_optimistic_v1.json": "6e9bed860c74679aa784a1a0cc7f426b511cfe3870ba0a593143684654a07fa1",
+    "configs/cohort_mpc_phase3_combined_v1.json": "59c663587ed8b07b5c7e1fa841d92b739df1a2f124dab838b71ea3292b4db4c2",
+    "configs/cohort_mpc_phase3_empirical_survival_v1.json": "0ffb5d30c24345cab7d135f140f0bc4491536891ee7f8f94dcd539f4a678f31a",
+    "configs/cohort_mpc_phase3_failure_domain_v1.json": "7fada2f2e69e1048cc1bb676c4413de4cb3ee016f007a321aaeca349ab927a3d",
+    "configs/cohort_mpc_phase3_scheduled_h2_t10_v1.json": "9ead5b9b5939419f0f7526cecf0bba69d9e60dcc8b63757cbb4f761a4c55315a",
+    "configs/cohort_mpc_phase3_scheduled_h3_t10_v1.json": "cdda29d7e8893662facf956d3aab2a151bb5c4bace5e9d27ed52a7a9fb183497",
+    "configs/cohort_mpc_phase3_scheduled_h3_t30_v1.json": "c6281f51eaf1ed24a37079cfca7cab967872786b6fe8fcfb043abd90bbfae25b",
+    "configs/cohort_mpc_phase3_scheduled_h6_t10_v1.json": "94a15c94117b1ffc9930f2a278fee8b23cbfec24427112b6d7af3faed7a90b3c",
+    "configs/cohort_mpc_phase3_scheduled_h6_t30_v1.json": "b77a2e15b81f0bc9ac2152122b84c15c931f536426c90c321a660412dc4cfa8d",
+    "configs/cohort_mpc_phase3_scheduled_only_v1.json": "3e2dd8239578e5b370faa3537f8e26d63e7b00205d461d856208634daef9fe3e",
+    "experiments/build_empirical_survival_phase3.py": "6a4a7f7a674d76674019a6dc217898eac1cf19db329865b72c6f70c95e05b648",
+    "experiments/evaluate_control_science_release.py": "edc8c6283cd10557a04bb0119ba4422e28dc9d928fb198bb61d1924886e75443",
+    "experiments/evaluate_survival_guardrail.py": "25e57174829d2a86a4daf211cf534c7b6c394401c67dff71141ce2778cbf08bc",
+    "forecasting/metadata.py": "0d6c5cf303c6836c617adf142e9f7349e1fd6bfc530ffa36d96ea29c91fee021",
+    "optimization/cohort_mpc.py": "c7aee0cdd9d2846387084dece847b91b5a67b5b8c1415aba1dc3f160b785b973",
+    "optimization/survival.py": "6451a40c6291f02435f17e9f2790eb68206495ee8ae65eb7e0874e39ac8ce155",
+    "pbs/evaluate_mpc_candidate.pbs": "7fb693dc5b7d6763adc8211206ae4e63a1718a189c312d0f2901b7a7c3ca63f3",
+    "pbs/phase3_guarded_development_array.pbs": "840227acb5cd93f4e5416d1799ac457107fc0067da4a97dae30fe51b45386446",
+    "pbs/phase3_scheduled_solver_tuning_array.pbs": "eaf57cdf27f6a3ac9bfa541a5a69e88132487a237b4933a26c5cf4fd7a5d5883",
+    "pbs/phase3_survival_comparison_array.pbs": "44ddff6a468e56f2bea18a0491791fb843fc8e4ef16884821ce3665fb594d29e",
+    "pbs/run_mpc_release_once.pbs": "0ff27f54be481e5d2e9eaa1dc80d8c0ae315888a78e6dfdbb24a6df3d277412f",
+    "scripts/run_mpc_candidate_parallel.py": "9728475d1be48b4f811fd500a6e275aa82621a5cead3a8281b98d3f744a41133",
+    "scripts/run_mpc_release_once.py": "e9556f69138cd39eb7770b4267ddf08f45aea454f0d844572516752610a0cc3d",
+    "simulator/macro/config.py": "9489a77541da0d1efdd431d729928b79981ad552edc1230d05a925ec76240490",
+    "simulator/macro/controllers.py": "35cfeff6ae5f2887153946bfcc057fab135d433d420ea1671245215606782e78",
+    "simulator/macro/engine.py": "1c6f2eb93c75fba31ada0a44986028bdbd616ce73fd50f6c8cb7e587095a9781"
+  },
+  "protected_seed_policy": {
+    "development": [
+      46101,
+      46112
+    ],
+    "forecast_test_46003_untouched": true,
+    "release_untouched": [
+      46301,
+      46330
+    ],
+    "validation_untouched": [
+      46201,
+      46216
+    ]
+  },
+  "schema_version": "phase3-interface-freeze/1.0",
+  "supersedes": {
+    "path": "/home/abharadwaj/Projects/5g-simulation/output/control-science/v1/phase3-interface-freeze-v2.json",
+    "sha256": "9a73ce944d32c2262eeafbe2fd4c0f0722efcd1bd81383bdbe86da2ba99d04e9"
+  }
+}

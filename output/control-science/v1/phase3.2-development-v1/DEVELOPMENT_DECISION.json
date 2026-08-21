@@ -1,0 +1,82 @@
+{
+  "created_at": "2026-08-21T11:49:06.319487Z",
+  "decision": "retain_static",
+  "eligible_candidates": [],
+  "evaluations": {
+    "predrain-adaptive-050-075": {
+      "confidence": [
+        -0.011520302175257095,
+        0.17186567910303183
+      ],
+      "mean_ul_reduction": 0.06610500888799367,
+      "passes": false,
+      "timeouts": 0
+    },
+    "predrain-adaptive-060-085": {
+      "confidence": [
+        -0.011520302175257095,
+        0.17216506438169574
+      ],
+      "mean_ul_reduction": 0.06625470152732564,
+      "passes": false,
+      "timeouts": 0
+    },
+    "predrain-fixed-035": {
+      "confidence": [
+        -0.008391754789291968,
+        0.16366494335598689
+      ],
+      "mean_ul_reduction": 0.06151815345355613,
+      "passes": false,
+      "timeouts": 0
+    },
+    "predrain-fixed-040": {
+      "confidence": [
+        -0.009889196677222425,
+        0.1674048562321435
+      ],
+      "mean_ul_reduction": 0.06392496396274136,
+      "passes": false,
+      "timeouts": 0
+    },
+    "predrain-fixed-045": {
+      "confidence": [
+        -0.011157968838187302,
+        0.17184564573258465
+      ],
+      "mean_ul_reduction": 0.0665168212990662,
+      "passes": false,
+      "timeouts": 0
+    }
+  },
+  "fresh_development_seeds": [
+    46449,
+    46450,
+    46451,
+    46452,
+    46453,
+    46454,
+    46455,
+    46456,
+    46457,
+    46458,
+    46459,
+    46460,
+    46461,
+    46462,
+    46463,
+    46464,
+    46465,
+    46466,
+    46467,
+    46468,
+    46469,
+    46470,
+    46471,
+    46472
+  ],
+  "paired_runs": 120,
+  "protected_release_seeds_consumed": false,
+  "protected_validation_seeds_consumed": false,
+  "schema_version": "phase3.2-development-decision/1.0"
+}

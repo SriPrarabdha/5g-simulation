@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "4996ed91b06affee747ea871424bb66c3ffdf8673f24682fed39f52ef97a945d",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "ba98ac861f2f0c8305f37223168ec9bd48bd3ee15be9716d8584aaf097acfb7d",
+      "metric_file_sha256": "3532c497e606bebd7c6b74f1332b5f9aac504341cb9be4c2db6f200ff304b215",
+      "trained_bundle_sha256": "a8a14451ef1ce7ab9ea5a1e72d72400299616aa7deb9fe0bb4127924e0d73c1a"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "708bc2adcb6e68ee411f2d7b106286b778903aea0b4cd6abdefa09b9ed872962",
+      "metric_file_sha256": "b901f7b0d87c6e627faca6ebc4ad9305ad6a9ae8d3b1923a59a69f9fb0f38d4e",
+      "trained_bundle_sha256": "4740864586d201b6a816d33239d16a1fbdd7446d4a9d5a69ad049e4b032987a4"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "369c2810e85b67e301fb151339870fcb4483894157b09a2140d1910ecb279eec",
+      "metric_file_sha256": "935474ed331c4c3d2c24acf2e758485758bb928be89e7a1d420269d272a293f7",
+      "trained_bundle_sha256": "d569da39155ae782a917e779466839659566beb8b3ca5aa1c5173c0793751021"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "4a7ec75db0e21acec69575c3395a2bb5e78d3d51fa416991c19c3be1dc4e6c07",
+      "metric_file_sha256": "69cebdfe8c8f9d85203ccfea58da58335e6bc4aedfb1258b64aaab294e74ecba",
+      "trained_bundle_sha256": "2b4789b6e021e7c560a94602ab3bf40205a118d6fe8bf0fef768f982d4b80a47"
+    }
+  },
+  "group_id": "south-west|mobility-vehicle|1-334455",
+  "group_index": 68,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

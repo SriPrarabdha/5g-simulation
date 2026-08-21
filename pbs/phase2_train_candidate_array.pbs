@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -N cdot-fc-train
+#PBS -q workq
+#PBS -l select=1:ncpus=4:mem=12gb
+#PBS -l walltime=04:00:00
+#PBS -J 0-95
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+export OMP_NUM_THREADS=4
+: "${FAMILY:?set causal forecast family}"
+: "${TRAIN_CACHE:?set seed-46001 series cache}"
+: "${TRAIN_MANIFEST:?set seed-46001 manifest}"
+: "${OUTPUT_ROOT:?set family training output root}"
+"$PYTHON_BIN" -m experiments.check_forecast_environment
+index="${PBS_ARRAY_INDEX}"
+output="$OUTPUT_ROOT/group-$(printf '%03d' "$index")"
+"$PYTHON_BIN" -m experiments.train_forecaster \
+  --series-cache "$TRAIN_CACHE" --manifest "$TRAIN_MANIFEST" \
+  --family "$FAMILY" --group-index "$index" --horizons 1,2,3,8 \
+  --model-version "$FAMILY/control-science-v1" --output "$output"

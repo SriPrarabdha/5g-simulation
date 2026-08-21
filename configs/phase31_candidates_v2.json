@@ -1,0 +1,62 @@
+{
+  "schema_version": "phase3.1-candidate-matrix/1.1",
+  "development_only": true,
+  "candidate_count": 5,
+  "candidates": [
+    {
+      "candidate_id": "predrain-balanced-blend-050",
+      "controller": "predrain",
+      "hypothesis": "Blending half of the event-triggered flow action with Static preserves scheduled-fault benefit while reducing churn and mixed-stress tail risk.",
+      "flow": {
+        "lead_windows": 12,
+        "timeout_seconds": 0.25,
+        "max_group_upf_weight": 0.75,
+        "event_risk_cost": 100.0,
+        "latency_cost": 0.01,
+        "utilization_cost": 0.1,
+        "overflow_cost": 10000.0,
+        "action_blend_fraction": 0.5
+      }
+    },
+    {
+      "candidate_id": "predrain-balanced-blend-025",
+      "controller": "predrain",
+      "hypothesis": "A quarter-strength pre-drain action trades peak scheduled-fault gain for lower churn and stronger worst-pair protection.",
+      "flow": {
+        "lead_windows": 12,
+        "timeout_seconds": 0.25,
+        "max_group_upf_weight": 0.75,
+        "event_risk_cost": 100.0,
+        "latency_cost": 0.01,
+        "utilization_cost": 0.1,
+        "overflow_cost": 10000.0,
+        "action_blend_fraction": 0.25
+      }
+    },
+    {
+      "candidate_id": "mpc-h3-ma6-configured-diagnostic",
+      "controller": "mpc",
+      "hypothesis": "A causal six-window moving average allows the compact MPC to solve and measures configured-survival diagnostic headroom.",
+      "profile": "configs/cohort_mpc_phase31_operational_h3_v1.json",
+      "moving_average_history_windows": 6,
+      "survival_bundle": null,
+      "non_deployable_survival_diagnostic": true
+    },
+    {
+      "candidate_id": "mpc-h3-ma6-lifecycle-lognormal",
+      "controller": "mpc",
+      "hypothesis": "With forecast history held fixed, distribution-blind lognormal lifecycle survival changes exercised closed-loop decisions without operational timeouts.",
+      "profile": "configs/cohort_mpc_phase31_operational_h3_v1.json",
+      "moving_average_history_windows": 6,
+      "survival_bundle": "output/control-science/v1/phase3.1-survival-v1/lognormal/seed-46501/survival.json"
+    },
+    {
+      "candidate_id": "mpc-h3-ma6-lifecycle-heavy-tail",
+      "controller": "mpc",
+      "hypothesis": "Holding forecast and MPC settings fixed isolates the closed-loop sensitivity to a heavy-tail lifecycle survival table.",
+      "profile": "configs/cohort_mpc_phase31_operational_h3_v1.json",
+      "moving_average_history_windows": 6,
+      "survival_bundle": "output/control-science/v1/phase3.1-survival-v1/heavy-tail-mixture/seed-46501/survival.json"
+    }
+  ]
+}

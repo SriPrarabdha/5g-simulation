@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N cdot-fc-select
+#PBS -q workq
+#PBS -l select=1:ncpus=4:mem=12gb
+#PBS -l walltime=04:00:00
+#PBS -J 0-95
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+export OMP_NUM_THREADS=4
+: "${FAMILY:?set forecast family}"
+: "${INPUT_ROOT:?set family training root or calendar bundle}"
+: "${SELECTION_CACHE:?set seed-46002 selection cache}"
+: "${OUTPUT_ROOT:?set calibrated/evaluation root}"
+"$PYTHON_BIN" -m experiments.check_forecast_environment
+index="${PBS_ARRAY_INDEX}"
+mkdir -p "$OUTPUT_ROOT"
+if [ "$FAMILY" = "calendar-ridge" ]; then
+  input="$INPUT_ROOT"
+  extra=()
+else
+  input="$INPUT_ROOT/group-$(printf '%03d' "$index")"
+  extra=(--output-bundle "$OUTPUT_ROOT/bundle-$(printf '%03d' "$index")")
+fi
+"$PYTHON_BIN" -m experiments.calibrate_evaluate_forecast_candidate \
+  --input-bundle "$input" --selection-cache "$SELECTION_CACHE" \
+  --group-index "$index" "${extra[@]}" \
+  --output-metrics "$OUTPUT_ROOT/metrics-$(printf '%03d' "$index").json"

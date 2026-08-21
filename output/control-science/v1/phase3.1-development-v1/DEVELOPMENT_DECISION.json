@@ -1,0 +1,82 @@
+{
+  "created_at": "2026-08-20T14:46:41.930245Z",
+  "decision": "retain_static",
+  "eligible_candidates": [],
+  "evaluations": {
+    "mpc-h3-configured-survival-diagnostic": {
+      "confidence": [
+        0.0,
+        0.0
+      ],
+      "mean_ul_reduction": 0.0,
+      "passes": false,
+      "timeouts": 0
+    },
+    "mpc-h3-lifecycle-lognormal": {
+      "confidence": [
+        0.0,
+        0.0
+      ],
+      "mean_ul_reduction": 0.0,
+      "passes": false,
+      "timeouts": 0
+    },
+    "mpc-h6-lifecycle-heavy-tail": {
+      "confidence": [
+        0.0,
+        0.0
+      ],
+      "mean_ul_reduction": 0.0,
+      "passes": false,
+      "timeouts": 0
+    },
+    "predrain-balanced": {
+      "confidence": [
+        0.0388566304248243,
+        0.3543030772022613
+      ],
+      "mean_ul_reduction": 0.18406261188431483,
+      "passes": false,
+      "timeouts": 0
+    },
+    "predrain-early-diverse": {
+      "confidence": [
+        0.03776954521923975,
+        0.36634212708425234
+      ],
+      "mean_ul_reduction": 0.18968112717476418,
+      "passes": false,
+      "timeouts": 0
+    }
+  },
+  "fresh_development_seeds": [
+    46401,
+    46402,
+    46403,
+    46404,
+    46405,
+    46406,
+    46407,
+    46408,
+    46409,
+    46410,
+    46411,
+    46412,
+    46413,
+    46414,
+    46415,
+    46416,
+    46417,
+    46418,
+    46419,
+    46420,
+    46421,
+    46422,
+    46423,
+    46424
+  ],
+  "paired_runs": 120,
+  "protected_release_seeds_consumed": false,
+  "protected_validation_seeds_consumed": false,
+  "schema_version": "phase3.1-development-decision/1.0"
+}

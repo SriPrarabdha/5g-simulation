@@ -1,0 +1,49 @@
+#!/bin/bash
+#PBS -N cdot-guarded-mpc
+#PBS -q workq
+#PBS -J 0-6
+#PBS -l select=1:ncpus=12:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=04:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST:?set development manifest}"
+: "${FORECAST_BUNDLE:?set frozen forecast bundle}"
+: "${GUARDED_SURVIVAL_BUNDLE:?set measured empirical survival bundle}"
+: "${EVALUATION_ROOT:?set guarded development root}"
+: "${INTERFACE_FREEZE:?set Phase-3 interface freeze}"
+
+specs=(
+  "existing-baseline:configs/cohort_mpc_control_science_baseline_v1.json"
+  "empirical-survival:configs/cohort_mpc_phase3_empirical_survival_v1.json"
+  "scheduled-only:configs/cohort_mpc_phase3_scheduled_only_v1.json"
+  "failure-domain:configs/cohort_mpc_phase3_failure_domain_v1.json"
+  "conservative-combined:configs/cohort_mpc_phase3_combined_v1.json"
+  "calendar-optimistic-stale:configs/cohort_mpc_phase3_calendar_optimistic_v1.json"
+  "calendar-conservative:configs/cohort_mpc_phase3_calendar_conservative_v1.json"
+)
+spec="${specs[$PBS_ARRAY_INDEX]}"
+name="${spec%%:*}"
+profile="${spec#*:}"
+root="$EVALUATION_ROOT/$name"
+mkdir -p "$root/pairs"
+
+"$PYTHON_BIN" scripts/run_mpc_candidate_parallel.py \
+  --manifest "$MANIFEST" \
+  --forecast-bundle "$FORECAST_BUNDLE" \
+  --mpc-profile "$profile" \
+  --survival-bundle "$GUARDED_SURVIVAL_BUNDLE" \
+  --interface-freeze "$INTERFACE_FREEZE" \
+  --seed-start 46101 \
+  --total-seeds 12 \
+  --steps "${STEPS:-2880}" \
+  --workers "${WORKERS:-12}" \
+  --work-dir "$root/pairs" \
+  --evaluation-stage development \
+  --output "$root/evaluation.json" \
+  >"$root/runner.log" 2>&1

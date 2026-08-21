@@ -1,0 +1,980 @@
+{
+  "baseline_routing_churn_l1": 5.154379374981284,
+  "certified_decisions": 18,
+  "controller_decisions": 144,
+  "controller_groups": 96,
+  "decision_reasons": {
+    "applied": 18,
+    "insufficient_multi_horizon_forecast_history": 1,
+    "same_state_static_certificate:timeout": 125
+  },
+  "events": [
+    {
+      "arrival_factor": null,
+      "dl_factor": 0.30160702428431685,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 720,
+      "latency_ms": null,
+      "step": 960,
+      "ul_factor": 0.15160702428431688,
+      "upf_id": "upf-edge-north-urban-b",
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 1.0,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 720,
+      "latency_ms": null,
+      "step": 1560,
+      "ul_factor": 1.0,
+      "upf_id": "upf-edge-north-urban-b",
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 0.4641462301702308,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 1440,
+      "latency_ms": null,
+      "step": 1680,
+      "ul_factor": 0.31414623017023086,
+      "upf_id": "upf-edge-rural-b",
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 1.0,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": 1440,
+      "latency_ms": null,
+      "step": 2300,
+      "ul_factor": 1.0,
+      "upf_id": "upf-edge-rural-b",
+      "zone": null
+    }
+  ],
+  "fallback_decision_count": 126,
+  "imperfect_survival_guardrail_passed": false,
+  "mpc": {
+    "carried_bytes": {
+      "dl": 1.0483371254939563e+17,
+      "ul": 4.23592662786727e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.02470896403138969,
+      "ul": 0.03263551842099673
+    },
+    "controller": "cohort-mpc-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "new_session_offered_bytes": {
+      "dl": 2590332432660062.5,
+      "ul": 1382416614937528.8
+    },
+    "offered_bytes": {
+      "dl": 1.0483371254939563e+17,
+      "ul": 4.23592662786727e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+    "seed": 46105,
+    "selection_audit_count": 43344306,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43344306,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "mpc_routing_churn_l1": 702.3088125520065,
+  "relative_reduction": {
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    }
+  },
+  "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+  "scenario_kind": "scheduled_fault",
+  "schema_version": "cohort-mpc-candidate-pair/1.0",
+  "seed": 46105,
+  "solver_error_count": 0,
+  "solver_skipped_count": 1,
+  "solver_statuses": {
+    "optimal": 18,
+    "skipped": 1,
+    "timeout": 125
+  },
+  "solver_timeout_count": 125,
+  "static": {
+    "carried_bytes": {
+      "dl": 1.0483371254940363e+17,
+      "ul": 4.235926627868354e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.024708964031387802,
+      "ul": 0.03263551842098839
+    },
+    "controller": "static-capacity-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "new_session_offered_bytes": {
+      "dl": 2590332432660062.5,
+      "ul": 1382416614937529.0
+    },
+    "offered_bytes": {
+      "dl": 1.0483371254940363e+17,
+      "ul": 4.235926627868354e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-scheduled_fault-s46105",
+    "seed": 46105,
+    "selection_audit_count": 43344306,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43344306,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "survival": {
+    "airport|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "airport|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "east-urban|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "industrial|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "north-urban|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "rural|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "south-urban|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "stadium|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    },
+    "west-urban|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "medium",
+      "sample_count": 1000,
+      "source": "empirical-kaplan-meier",
+      "stale": false,
+      "upper_confidence": true
+    }
+  },
+  "survival_guardrail_evidence": {
+    "comparison_sha256": null,
+    "criteria": {},
+    "measured": false,
+    "passed": false,
+    "reason": "pending_paired_mpc_comparison"
+  },
+  "unexpected_fallback_decision_count": 125,
+  "wall_seconds": 2601.936303902883,
+  "work_fingerprint": "522c104ade654f0b2aa17a239e7820a2e76dc5bcf4e1394d95009943cf5ef5d6"
+}

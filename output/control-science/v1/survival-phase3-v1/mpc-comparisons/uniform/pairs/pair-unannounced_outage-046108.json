@@ -1,0 +1,980 @@
+{
+  "baseline_routing_churn_l1": 3.6240277367722977,
+  "certified_decisions": 117,
+  "controller_decisions": 144,
+  "controller_groups": 96,
+  "decision_reasons": {
+    "applied": 117,
+    "insufficient_multi_horizon_forecast_history": 1,
+    "same_state_static_certificate:timeout": 26
+  },
+  "events": [
+    {
+      "arrival_factor": 2.2142124469519606,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "rural|internet-video|1-100001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1100,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 0.16,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1340,
+      "ul_factor": 0.01,
+      "upf_id": "upf-edge-airport-a",
+      "zone": null
+    },
+    {
+      "arrival_factor": 1.0,
+      "dl_factor": null,
+      "event_type": "arrival_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": "rural|internet-video|1-100001",
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1760,
+      "ul_factor": null,
+      "upf_id": null,
+      "zone": null
+    },
+    {
+      "arrival_factor": null,
+      "dl_factor": 1.0,
+      "event_type": "capacity_factor",
+      "forecast_hint_multiplier": null,
+      "group_id": null,
+      "health": null,
+      "known_at_step": null,
+      "latency_ms": null,
+      "step": 1760,
+      "ul_factor": 1.0,
+      "upf_id": "upf-edge-airport-a",
+      "zone": null
+    }
+  ],
+  "fallback_decision_count": 27,
+  "imperfect_survival_guardrail_passed": false,
+  "mpc": {
+    "carried_bytes": {
+      "dl": 1.0853799981162013e+17,
+      "ul": 4.246586343787509e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.024331955813067435,
+      "ul": 0.03257513043559744
+    },
+    "controller": "cohort-mpc-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 46931634824859.695
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 358.3553685897431
+    },
+    "new_session_offered_bytes": {
+      "dl": 2640941815455062.5,
+      "ul": 1384859844675028.2
+    },
+    "offered_bytes": {
+      "dl": 1.0853799981162013e+17,
+      "ul": 4.251279507270005e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 103837.68124970101
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 12600.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 103479.32588111133
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46108",
+    "seed": 46108,
+    "selection_audit_count": 43668443,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43668443,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "mpc_routing_churn_l1": 5.29993013962776,
+  "relative_reduction": {
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 0.04980053058502262
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 0.04817705031766899
+    }
+  },
+  "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46108",
+  "scenario_kind": "unannounced_outage",
+  "schema_version": "cohort-mpc-candidate-pair/1.0",
+  "seed": 46108,
+  "solver_error_count": 0,
+  "solver_skipped_count": 1,
+  "solver_statuses": {
+    "optimal": 117,
+    "skipped": 1,
+    "timeout": 26
+  },
+  "solver_timeout_count": 26,
+  "static": {
+    "carried_bytes": {
+      "dl": 1.0853799981162048e+17,
+      "ul": 4.2463403722424664e+16
+    },
+    "control_scope": "new_session_placement_only",
+    "controllable_load_fraction": {
+      "dl": 0.024331955813067355,
+      "ul": 0.03257513043559776
+    },
+    "controller": "static-capacity-v1",
+    "dropped_bytes": {
+      "dl": 0.0,
+      "ul": 49391350274858.34
+    },
+    "establishment_failures": 0,
+    "incremental_new_session_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 715.6370192307686
+    },
+    "new_session_offered_bytes": {
+      "dl": 2640941815455062.5,
+      "ul": 1384859844675028.2
+    },
+    "offered_bytes": {
+      "dl": 1.0853799981162048e+17,
+      "ul": 4.251279507269963e+16
+    },
+    "overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 109093.48349328688
+    },
+    "overload_duration_seconds": {
+      "dl": 0.0,
+      "ul": 12600.0
+    },
+    "primary_overload_metric": "overload_area_seconds.ul",
+    "rejected_bytes": {
+      "dl": 0.0,
+      "ul": 0.0
+    },
+    "residual_overload_area_seconds": {
+      "dl": 0.0,
+      "ul": 108377.84647405615
+    },
+    "scenario_id": "extreme-optimizer-pilot-1d-s20260817-mpc-pilot-unannounced_outage-s46108",
+    "seed": 46108,
+    "selection_audit_count": 43668443,
+    "selection_audit_stride": 1,
+    "selection_audits_retained": 43668443,
+    "session_migration_supported": false,
+    "steps": 2880
+  },
+  "survival": {
+    "airport|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "airport|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "east-urban|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "industrial|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "north-urban|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "rural|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "south-urban|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "stadium|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|edge-inference|5-500001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|enterprise-backup|1-100007": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|enterprise-rtc|1-100006": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|enterprise|1-100005": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|factory-control|2-200001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|gaming|1-100003": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|ims-voice|1-100004": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|internet-video|1-100001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|mission-critical|6-600001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|mmtc|3-300001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|social-live|1-100002": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    },
+    "west-urban|v2x|4-400001": {
+      "age_seconds": 0.0,
+      "confidence": "low",
+      "sample_count": 0,
+      "source": "uniform-naive-horizon",
+      "stale": false,
+      "upper_confidence": false
+    }
+  },
+  "survival_guardrail_evidence": {
+    "comparison_sha256": null,
+    "criteria": {},
+    "measured": false,
+    "passed": false,
+    "reason": "pending_paired_mpc_comparison"
+  },
+  "unexpected_fallback_decision_count": 26,
+  "wall_seconds": 2428.5807951013558,
+  "work_fingerprint": "1bdc8bc2866216afde8a098d4228f8f2ec416c963fca1e19e36c5099c055cf89"
+}

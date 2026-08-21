@@ -85,6 +85,14 @@ class PBSScriptTests(unittest.TestCase):
         self.assertIn("env/bin/python", content)
         self.assertIn("CONDA_ENV_NAME", content)
 
+    def test_mpc_pbs_forwards_survival_and_phase3_freeze(self) -> None:
+        content = (PBS_DIR / "evaluate_mpc_candidate.pbs").read_text(encoding="utf-8")
+        self.assertIn('--survival-bundle "$SURVIVAL_BUNDLE"', content)
+        self.assertIn('--interface-freeze "$INTERFACE_FREEZE"', content)
+        release = (PBS_DIR / "run_mpc_release_once.pbs").read_text(encoding="utf-8")
+        self.assertIn("scripts/run_mpc_release_once.py", release)
+        self.assertIn(': "${SURVIVAL_BUNDLE:', release)
+
     def test_campaign_scripts_use_canonical_schema_partition(self) -> None:
         for name in ("aggregate_campaign.pbs", "check_build.pbs", "smoke_test.sh"):
             with self.subTest(name=name):

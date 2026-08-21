@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "0ac0bfa78365c211b05f06aa989a7bf576a9a44612e90a051624205b846ff3c8",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "0c000455a5a900549562e2eeb3a25bf24f0b3d82df41c2e7a73191440f8a73bb",
+      "metric_file_sha256": "60518f7ca706a9fa6469ca9da9fbead66187b476a8868f8a8bcd42ca1fdc6bbf",
+      "trained_bundle_sha256": "0085cb0e18544ddfa8f6a047e961d81513e8fcd3ecd78406dd9b62e88153bda2"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "293817c8fbf38af964b1d422cbfbfeb3c634febbbbfd30ca86e28afd73a73464",
+      "metric_file_sha256": "dbd5c78496efe7491fcc1c142e74e7e588e5dd891a208c9c91a47611db3be019",
+      "trained_bundle_sha256": "17dc936e25b0d9cebcdaaab8c1f3dfe04bc584a8b43debe5d05f6d9973afabe9"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "b73911752cc336863057b46fbfb12dabfceb4a8ffb387b21c1a8e0f7dbca1f3e",
+      "metric_file_sha256": "6e2718b9dbb51ee82857e04a35e9594c3f76b26cf5d8bad65a3ce8fa02563d24",
+      "trained_bundle_sha256": "a48c182c63033bcd31bddefae186a6136e53dec4c72496f8e983f33c4d3e633b"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "b67691ab3a45bed993235e4bec7ddc30c6898ff5bf0362ecdf31c4a21258d24a",
+      "metric_file_sha256": "f16886939f4cbda3ae351f12c19abe4da0e15b5823280431117849b3f63e26e4",
+      "trained_bundle_sha256": "e83683b951ae9f10364edcd88c0e4ccb2e23b0fa8367acd811b744392aa47485"
+    }
+  },
+  "group_id": "north-east|consumer-internet|1-010101",
+  "group_index": 36,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

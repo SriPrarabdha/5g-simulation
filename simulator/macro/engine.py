@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import gzip
 import json
 import math
 import random
@@ -13,7 +14,7 @@ from typing import Any, Callable
 
 from schemas import Capacity, GroupKey, Policy, SelectionAudit, TimeWindow, UPFState
 from schemas.common import iso_utc, parse_utc
-from forecasting import DemandObservation, ResidualObservation
+from forecasting import DemandObservation, ResidualObservation, causal_observation_metadata
 from steering import rendezvous_select
 
 from .config import GroupProfile, ScenarioConfig, ScenarioEvent, UPFProfile
@@ -45,6 +46,17 @@ class _UPFRuntime:
     @property
     def dl_capacity_mbps(self) -> float:
         return self.profile.capacity_dl_mbps * self.dl_factor if self.health != "unavailable" else 0.0
+
+
+@dataclass(frozen=True, slots=True)
+class _SessionLifecycleRecord:
+    """Compact internal truth row; export deliberately removes hidden causes."""
+
+    session_id: str
+    group_id: str
+    service_class: str
+    started_step: int
+    ended_step: int
 
 
 @dataclass(slots=True)
@@ -158,7 +170,8 @@ class _DetachedArtifactWriter:
     def write_jsonl(self, path: str | Path) -> None:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
-        with destination.open("w", encoding="utf-8", newline="\n") as stream:
+        opener = gzip.open if destination.suffix == ".gz" else open
+        with opener(destination, "wt", encoding="utf-8", newline="\n") as stream:
             metadata = {
                 "record_type": "simulation_metadata",
                 "schema_version": "simulation-metadata/0.1",
@@ -334,9 +347,19 @@ class RunOutcome:
 
 
 class Simulator:
-    def __init__(self, config: ScenarioConfig, controller: Controller | None = None) -> None:
+    def __init__(
+        self,
+        config: ScenarioConfig,
+        controller: Controller | None = None,
+        *,
+        capture_session_lifecycle: bool = False,
+        lifetime_sampler: Callable[[GroupProfile, int, random.Random], int] | None = None,
+    ) -> None:
         self.config = config
         self.controller = controller or StaticCapacityController()
+        self._capture_session_lifecycle = capture_session_lifecycle
+        self._lifetime_sampler = lifetime_sampler
+        self._session_lifecycle_records: list[_SessionLifecycleRecord] = []
         self._upfs = {profile.upf_id: _UPFRuntime(profile) for profile in config.upfs}
         self._active_sessions: Counter[str] = Counter()
         self._active_ul_mbps: Counter[str] = Counter()
@@ -393,6 +416,7 @@ class Simulator:
         })
         self._realism_v2: TrafficRealismRuntimeV2 | None = None
         self._latest_telemetry_v2: tuple[TelemetryObservationV2, ...] = ()
+        self._last_fresh_telemetry_step_by_upf: dict[str, int] = {}
         if config.traffic_model is not None:
             for group in config.groups:
                 group_id = group.key.selection_id
@@ -411,6 +435,10 @@ class Simulator:
         self._history_closed_at_step: int | None = None
         self._events_applied_at_step: int | None = None
         self._planned_at_step: int | None = None
+        self._last_decision_policy = None
+        self._routing_churn_l1 = 0.0
+        self._decision_reasons: Counter[str] = Counter()
+        self._solver_statuses: Counter[str] = Counter()
         self._event_sink: CompositeSink | None = None
         self._advance_sink: BoundedMemorySink | None = None
         self._timings: defaultdict[str, float] = defaultdict(float)
@@ -437,6 +465,78 @@ class Simulator:
     @property
     def latest_telemetry_v2(self) -> tuple[TelemetryObservationV2, ...]:
         return self._latest_telemetry_v2
+
+    def session_lifecycle_telemetry(
+        self, *, observed_through_step: int | None = None,
+    ) -> tuple[dict[str, Any], ...]:
+        """Return deployment-shaped start/end telemetry at a causal cutoff.
+
+        The exported contract intentionally contains no configured lifetime
+        bounds, sampled duration, or generator/distribution identity.  Ends
+        beyond the cutoff are represented as ordinary right-censoring.
+        """
+
+        if not self._capture_session_lifecycle:
+            raise RuntimeError("session lifecycle capture was not enabled")
+        default_cutoff = max(0, min(self.config.steps - 1, self._step_index - 1))
+        cutoff = default_cutoff if observed_through_step is None else observed_through_step
+        if cutoff < 0 or cutoff >= self.config.steps:
+            raise ValueError("lifecycle cutoff lies outside the scenario")
+        rows: list[dict[str, Any]] = []
+        for record in self._session_lifecycle_records:
+            if record.started_step > cutoff:
+                continue
+            completed = record.ended_step <= cutoff
+            started_at = self.config.start_time + timedelta(
+                seconds=record.started_step * self.config.step_seconds
+            )
+            ended_at = (
+                self.config.start_time + timedelta(
+                    seconds=(record.ended_step + 1) * self.config.step_seconds
+                )
+                if completed else None
+            )
+            rows.append({
+                "record_type": "session_lifecycle",
+                "schema_version": "session-lifecycle/1.0",
+                "session_id": record.session_id,
+                "group_id": record.group_id,
+                "service_class": record.service_class,
+                "started_step": record.started_step,
+                "ended_step": record.ended_step if completed else None,
+                "started_at": iso_utc(started_at),
+                "ended_at": iso_utc(ended_at) if ended_at is not None else None,
+            })
+        return tuple(rows)
+
+    def write_session_lifecycle_jsonl(
+        self, path: str | Path, *, observed_through_step: int | None = None,
+    ) -> int:
+        """Write only causally observable lifecycle records for external fitting."""
+
+        rows = self.session_lifecycle_telemetry(
+            observed_through_step=observed_through_step
+        )
+        cutoff = (
+            max(0, min(self.config.steps - 1, self._step_index - 1))
+            if observed_through_step is None else observed_through_step
+        )
+        destination = Path(path)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        opener = gzip.open if destination.suffix == ".gz" else open
+        with opener(destination, "wt", encoding="utf-8", newline="\n") as stream:
+            stream.write(json.dumps({
+                "record_type": "lifecycle_export_metadata",
+                "schema_version": "lifecycle-export/1.0",
+                "scenario_id": self.config.scenario_id,
+                "seed": self.config.seed,
+                "step_seconds": self.config.step_seconds,
+                "observed_through_step": cutoff,
+                "records": len(rows),
+            }, sort_keys=True, separators=(",", ":")) + "\n")
+            for row in rows:
+                stream.write(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n")
+        return len(rows)
 
     @property
     def decision_due(self) -> bool:
@@ -583,6 +683,10 @@ class Simulator:
         duration = timedelta(seconds=self.config.step_seconds * self.config.decision_interval_steps)
         window = TimeWindow(window_end - duration, window_end)
         residual = self._residual_by_upf()
+        bucket_end_step = self._step_index
+        bucket_start_step = max(0, bucket_end_step - self.config.decision_interval_steps)
+        arrivals_by_group = dict(self._interval_arrivals)
+        telemetry_by_upf = {item.upf_id: item for item in self._latest_telemetry_v2}
         for group in self.config.groups:
             arrivals = self._interval_arrivals[group.key.selection_id]
             if self._realism_v2 is None:
@@ -591,13 +695,40 @@ class Simulator:
             else:
                 new_ul_mbps = self._interval_new_ul_by_group[group.key.selection_id]
                 new_dl_mbps = self._interval_new_dl_by_group[group.key.selection_id]
-            self._history_by_group[group.key.selection_id].append(DemandObservation(
+            group_id = group.key.selection_id
+            metadata = causal_observation_metadata(
+                self.config, group_id=group_id,
+                bucket_start_step=bucket_start_step, bucket_end_step=bucket_end_step,
+                arrivals_by_group=arrivals_by_group,
+                prior_arrivals=[item.new_session_count for item in self._history_by_group[group_id]],
+                telemetry_flags=tuple(sorted({
+                    flag for upf_id in group.eligible_upfs
+                    for flag in (
+                        telemetry_by_upf[upf_id].quality_flags
+                        if upf_id in telemetry_by_upf else ()
+                    )
+                })),
+                telemetry_age_seconds=(
+                    max((
+                        max(
+                            0,
+                            bucket_end_step - 1
+                            - self._last_fresh_telemetry_step_by_upf.get(
+                                upf_id, bucket_end_step - 1
+                            ),
+                        ) * self.config.step_seconds
+                        for upf_id in group.eligible_upfs
+                    ), default=0.0)
+                ),
+            )
+            self._history_by_group[group_id].append(DemandObservation(
                 window=window,
                 group=group.key,
                 new_session_count=float(arrivals),
                 new_ul_mbps=new_ul_mbps,
                 new_dl_mbps=new_dl_mbps,
                 existing_load_by_upf=residual,
+                **metadata,
             ))
         self._interval_arrivals.clear()
         self._interval_new_ul_by_group.clear()
@@ -648,12 +779,12 @@ class Simulator:
                 samples: list[float] = []
                 event_index = 0
                 while event_index < len(known_events) and known_events[event_index].step < start:
-                    factor = known_events[event_index].forecast_hint_multiplier or known_events[event_index].arrival_factor or 1.0
+                    factor = known_events[event_index].forecast_hint_multiplier or 1.0
                     event_index += 1
                 window_factor = factor
                 for step in range(start, end):
                     while event_index < len(known_events) and known_events[event_index].step == step:
-                        window_factor = known_events[event_index].forecast_hint_multiplier or known_events[event_index].arrival_factor or 1.0
+                        window_factor = known_events[event_index].forecast_hint_multiplier or 1.0
                         event_index += 1
                     samples.append(window_factor)
                 factor = window_factor
@@ -771,12 +902,60 @@ class Simulator:
             self._policy = None
         finally:
             self._timings["controller_work_seconds"] += time.perf_counter() - started
+        if self._policy is not None:
+            if self._last_decision_policy is not None:
+                previous = {
+                    item.key.selection_id: item.weights
+                    for item in self._last_decision_policy.groups
+                }
+                current = {item.key.selection_id: item.weights for item in self._policy.groups}
+                for group_id in set(previous) | set(current):
+                    old = previous.get(group_id, {})
+                    new = current.get(group_id, {})
+                    self._routing_churn_l1 += sum(
+                        abs(float(old.get(upf_id, 0.0)) - float(new.get(upf_id, 0.0)))
+                        for upf_id in set(old) | set(new)
+                    )
+            self._last_decision_policy = self._policy
+            reason = self._policy.fallback.reason if self._policy.fallback.used else "applied"
+            self._decision_reasons[reason] += 1
+            self._solver_statuses[self._policy.solver.status] += 1
         if self._event_sink is not None:
             self._event_sink.accept_policy(
                 self._policy, self._step_index, self._decision_trace_details()
             )
         self._planned_at_step = self._step_index
         return self._policy
+
+    def control_metrics(self) -> dict[str, Any]:
+        """Mandatory per-run controller observability used by release gates."""
+
+        survival = getattr(getattr(self.controller, "last_result", None), "survival_audit", None)
+        if survival is None:
+            configured = getattr(self.controller, "survival_by_group", None)
+            survival = (
+                {group_id: table.audit(now=self.config.start_time) for group_id, table in configured.items()}
+                if configured is not None else {}
+            )
+        return {
+            "routing_churn_l1": self._routing_churn_l1,
+            "decision_reasons": dict(sorted(self._decision_reasons.items())),
+            "solver_statuses": dict(sorted(self._solver_statuses.items())),
+            "solver_timeout_count": int(self._solver_statuses.get("timeout", 0)),
+            "decision_funnel": dict(sorted(getattr(
+                self.controller, "decision_funnel", {}
+            ).items())),
+            "decision_diagnostics": list(getattr(
+                self.controller, "decision_diagnostics", ()
+            )),
+            "survival": survival,
+            "survival_guardrail_evidence": dict(getattr(
+                self.controller, "survival_guardrail_evidence", {}
+            )),
+            "imperfect_survival_guardrail_passed": bool(
+                getattr(self.controller, "survival_guardrail_passed", False)
+            ),
+        }
 
     def _decision_trace_details(self) -> dict[str, Any]:
         details: dict[str, Any] = {
@@ -812,6 +991,12 @@ class Simulator:
                 "certificate": asdict(mpc.certificate) if mpc.certificate is not None else None,
                 "known_future_events": mpc.known_future_events,
                 "survival": mpc.survival_audit,
+                "model_size": {
+                    "variables": mpc.model_variables,
+                    "equality_constraints": mpc.equality_constraints,
+                    "inequality_constraints": mpc.inequality_constraints,
+                    "matrix_nonzeros": mpc.matrix_nonzeros,
+                },
             }
         return details
 
@@ -940,13 +1125,27 @@ class Simulator:
                     self._interval_rejected_by_group_upf[(group_id, selected)] += 1
                     continue
                 phase_started = time.perf_counter()
-                lifetime = (
-                    self._streams[f"lifetimes:{group_id}"].randint(
-                        group.lifetime_steps_min, group.lifetime_steps_max
-                    ) if self._realism_v2 is None else self._realism_v2.sample_lifetime(group)
-                )
+                lifetime_stream = self._streams[f"lifetimes:{group_id}"]
+                if self._lifetime_sampler is not None:
+                    lifetime = int(self._lifetime_sampler(group, step, lifetime_stream))
+                else:
+                    lifetime = (
+                        lifetime_stream.randint(
+                            group.lifetime_steps_min, group.lifetime_steps_max
+                        ) if self._realism_v2 is None else self._realism_v2.sample_lifetime(group)
+                    )
+                if lifetime < 1:
+                    raise ValueError("lifetime sampler returned a non-positive duration")
                 self._timings["lifetime_generation_seconds"] += time.perf_counter() - phase_started
                 admitted[selected] += 1
+                if self._capture_session_lifecycle:
+                    self._session_lifecycle_records.append(_SessionLifecycleRecord(
+                        session_id=session_key,
+                        group_id=group_id,
+                        service_class=f"{group.key.dnn}|{group.key.snssai}",
+                        started_step=step,
+                        ended_step=step + lifetime - 1,
+                    ))
                 new_cohorts[(
                     group_id, selected, lifetime,
                     session_ul_mbps, session_dl_mbps,
@@ -1076,9 +1275,20 @@ class Simulator:
             unplaced_rejected_ul_bytes=unplaced_ul_mbps * 1_000_000 / 8 * self.config.step_seconds,
             unplaced_rejected_dl_bytes=unplaced_dl_mbps * 1_000_000 / 8 * self.config.step_seconds,
         )
+        if (
+            policy is not None
+            and not policy.fallback.used
+            and hasattr(self.controller, "mark_policy_executed")
+        ):
+            self.controller.mark_policy_executed(
+                policy.policy_version, sum(admitted.values())
+            )
         self._timings["result_construction_seconds"] += time.perf_counter() - phase_started
         if self._realism_v2 is not None:
             self._latest_telemetry_v2 = self._realism_v2.observe(step_result)
+            for item in self._latest_telemetry_v2:
+                if not ({"missing_scrape", "stale_sample"} & set(item.quality_flags)):
+                    self._last_fresh_telemetry_step_by_upf[item.upf_id] = step
         for (group_id, upf_id, ul_mbps, dl_mbps), count in self._departures_by_step.pop(step, {}).items():
             self._active_sessions[upf_id] -= count
             self._active_ul_mbps[upf_id] -= count * ul_mbps
@@ -1216,6 +1426,20 @@ class Simulator:
             "events": [[step, [asdict(event) for event in events]] for step, events in sorted(self._events_by_step.items())],
             "rng_states": {key: stream.getstate() for key, stream in sorted(self._streams.items())},
             "controller": snapshot_controller(self.controller),
+            "control_observability": {
+                "last_decision_policy": (
+                    self._last_decision_policy.to_dict()
+                    if self._last_decision_policy is not None else None
+                ),
+                "routing_churn_l1": self._routing_churn_l1,
+                "decision_reasons": dict(self._decision_reasons),
+                "solver_statuses": dict(self._solver_statuses),
+            },
+            "telemetry_freshness": dict(self._last_fresh_telemetry_step_by_upf),
+            "session_lifecycle_capture": {
+                "enabled": self._capture_session_lifecycle,
+                "records": [asdict(item) for item in self._session_lifecycle_records],
+            },
         }
         if self._realism_v2 is not None:
             state["traffic_model_version"] = "traffic-model/2.0"
@@ -1244,6 +1468,27 @@ class Simulator:
             raise ValueError("checkpoint step lies outside the scenario")
         self._policy_version = int(state["policy_version"])
         self._policy = Policy.from_dict(state["policy"]) if state.get("policy") is not None else None
+        observability = state.get("control_observability", {})
+        self._last_decision_policy = (
+            Policy.from_dict(observability["last_decision_policy"])
+            if observability.get("last_decision_policy") is not None else self._policy
+        )
+        self._routing_churn_l1 = float(observability.get("routing_churn_l1", 0.0))
+        self._decision_reasons = Counter({
+            str(key): int(value) for key, value in observability.get("decision_reasons", {}).items()
+        })
+        self._solver_statuses = Counter({
+            str(key): int(value) for key, value in observability.get("solver_statuses", {}).items()
+        })
+        self._last_fresh_telemetry_step_by_upf = {
+            str(key): int(value) for key, value in state.get("telemetry_freshness", {}).items()
+        }
+        lifecycle = state.get("session_lifecycle_capture", {"enabled": False, "records": []})
+        if bool(lifecycle.get("enabled", False)) != self._capture_session_lifecycle:
+            raise ValueError("checkpoint lifecycle-capture mode does not match simulator")
+        self._session_lifecycle_records = [
+            _SessionLifecycleRecord(**item) for item in lifecycle.get("records", [])
+        ]
         markers = state["boundary_markers"]
         self._history_closed_at_step = markers["history_closed_at_step"]
         self._events_applied_at_step = markers["events_applied_at_step"]

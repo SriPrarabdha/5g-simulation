@@ -1,0 +1,50 @@
+#!/bin/bash
+#PBS -N cdot-survival-compare
+#PBS -q workq
+#PBS -J 0-5
+#PBS -l select=1:ncpus=12:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=04:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${MANIFEST:?set development manifest}"
+: "${FORECAST_BUNDLE:?set frozen forecast bundle}"
+: "${SURVIVAL_ROOT:?set Phase-3 survival bundle root}"
+: "${EVALUATION_ROOT:?set Phase-3 survival comparison root}"
+: "${INTERFACE_FREEZE:?set Phase-3 interface freeze}"
+
+specs=(
+  "oracle:configs/cohort_mpc_phase3_empirical_survival_v1.json:$SURVIVAL_ROOT/oracle.json"
+  "empirical-n100:configs/cohort_mpc_phase3_empirical_survival_v1.json:$SURVIVAL_ROOT/empirical-n100.json"
+  "empirical-n1000:configs/cohort_mpc_phase3_empirical_survival_v1.json:$SURVIVAL_ROOT/empirical-n1000.json"
+  "empirical-n10000:configs/cohort_mpc_phase3_empirical_survival_v1.json:$SURVIVAL_ROOT/empirical-n10000.json"
+  "uniform:configs/cohort_mpc_control_science_baseline_v1.json:$SURVIVAL_ROOT/uniform.json"
+  "stale-empirical:configs/cohort_mpc_phase3_empirical_survival_v1.json:$SURVIVAL_ROOT/stale-empirical.json"
+)
+spec="${specs[$PBS_ARRAY_INDEX]}"
+name="${spec%%:*}"
+rest="${spec#*:}"
+profile="${rest%%:*}"
+bundle="${rest#*:}"
+root="$EVALUATION_ROOT/$name"
+mkdir -p "$root/pairs"
+
+"$PYTHON_BIN" scripts/run_mpc_candidate_parallel.py \
+  --manifest "$MANIFEST" \
+  --forecast-bundle "$FORECAST_BUNDLE" \
+  --mpc-profile "$profile" \
+  --survival-bundle "$bundle" \
+  --interface-freeze "$INTERFACE_FREEZE" \
+  --seed-start 46101 \
+  --total-seeds 12 \
+  --steps "${STEPS:-2880}" \
+  --workers "${WORKERS:-12}" \
+  --work-dir "$root/pairs" \
+  --evaluation-stage development \
+  --output "$root/evaluation.json" \
+  >"$root/runner.log" 2>&1

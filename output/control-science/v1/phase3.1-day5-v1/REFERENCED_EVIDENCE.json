@@ -1,0 +1,34 @@
+{
+  "schema_version": "phase3.1-referenced-evidence/1.0",
+  "hash_algorithm": "sha256",
+  "artifacts": [
+    {
+      "path": "output/control-science/v1/phase3.1-interface-freeze-v1.json",
+      "sha256": "291c0b8685c6c3526e0b696c814774bc26152d8f1ad7d850c19ae751bcc20a0e"
+    },
+    {
+      "path": "output/control-science/v1/phase3.1-interface-freeze-v2.json",
+      "sha256": "43e47c4cad859fd5bb259b393c21ae99a997a9bfc277eb51f0ecde581f706422"
+    },
+    {
+      "path": "output/control-science/v1/source-archives/phase3.1-v2/source-c8b13b85649216e4910125e2cc35c42d94eab2bbd212bc3944681e5504be4a8a.tar.gz",
+      "sha256": "c8b13b85649216e4910125e2cc35c42d94eab2bbd212bc3944681e5504be4a8a"
+    },
+    {
+      "path": "output/control-science/v1/phase3.1-survival-v1/artifact-manifest.json",
+      "sha256": "1ce9aefec48a269fd486afa94168491ed6ed3a631f96df9daec0306f5c841b61"
+    },
+    {
+      "path": "output/control-science/v1/phase3.1-development-v1/artifact-manifest.json",
+      "sha256": "3bb42844363fcb2cb6366551f8e4fb6baf64f26888d4ffe3cf97c3663a265d7d"
+    },
+    {
+      "path": "output/control-science/v1/phase3.1-development-v2/artifact-manifest.json",
+      "sha256": "3224a74fc4e5cbe71a194b5de44c9f3352ea6b299856fa55a1bc1caea4bee6d8"
+    },
+    {
+      "path": "output/control-science/v1/phase3-cdot-showcase-v4/artifact-manifest.json",
+      "sha256": "d44b192a8b1db18826f61f557db7cb5163293fe7a07f9620025e62b9097654cd"
+    }
+  ]
+}

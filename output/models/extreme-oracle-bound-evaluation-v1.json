@@ -1,0 +1,294 @@
+{
+  "created_at": "2026-08-17T18:09:35.705865Z",
+  "decision": "new_session_gate_reachable_in_continuous_relaxation",
+  "fault_knowledge_overlay": {
+    "path": "/home/abharadwaj/Projects/5g-simulation/configs/extreme_validation_fault_knowledge_v1.json",
+    "sha256": "ae8df283d32cc0f188ed15c9d6065aec8dbf90f52f8362a6261e1ee7bb94f143"
+  },
+  "migration_fraction_per_decision_bucket": 0.1,
+  "non_deployable": true,
+  "scenarios": [
+    {
+      "actual_static_metrics": {
+        "dropped_bytes": {
+          "dl": 81301890239991.14,
+          "ul": 51234777938339.7
+        },
+        "overload_area_seconds": {
+          "dl": 59940.66256409628,
+          "ul": 111217.17408737823
+        }
+      },
+      "arrival_source": "exact paired static shard; aggregated to decision buckets",
+      "bounds": [
+        {
+          "allocation_bucket_count": 13824,
+          "continuous_relaxation": true,
+          "deployable": false,
+          "guardrails_satisfied": true,
+          "message": "receding-information continuous relaxation solved",
+          "metrics": {
+            "dropped_bytes": {
+              "dl": 445402051079.1696,
+              "ul": 26986007222250.426
+            },
+            "overload_area_seconds": {
+              "dl": 2053.7584706625667,
+              "ul": 42998.74816725224
+            },
+            "peak_safe_utilization": {
+              "dl": 1.4149492582024756,
+              "ul": 7.388044944583552
+            }
+          },
+          "reaches_20_percent_ul_gate": true,
+          "regime": "arrival_only",
+          "runtime_ms": 30300,
+          "status": "optimal",
+          "ul_overload_area_relative_reduction": 0.6115443857307241
+        },
+        {
+          "allocation_bucket_count": 13824,
+          "continuous_relaxation": true,
+          "deployable": false,
+          "guardrails_satisfied": true,
+          "message": "receding-information continuous relaxation solved",
+          "metrics": {
+            "dropped_bytes": {
+              "dl": 172766190932.26254,
+              "ul": 15299995013603.64
+            },
+            "overload_area_seconds": {
+              "dl": 1517.0078745398769,
+              "ul": 34723.066268383845
+            },
+            "peak_safe_utilization": {
+              "dl": 1.3661600086211456,
+              "ul": 6.686714261452896
+            }
+          },
+          "reaches_20_percent_ul_gate": true,
+          "regime": "scheduled_fault",
+          "runtime_ms": 37235,
+          "status": "optimal",
+          "ul_overload_area_relative_reduction": 0.6863078435648381
+        },
+        {
+          "allocation_bucket_count": 13824,
+          "continuous_relaxation": true,
+          "deployable": false,
+          "guardrails_satisfied": true,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "metrics": {
+            "dropped_bytes": {
+              "dl": 0.0,
+              "ul": 0.0
+            },
+            "overload_area_seconds": {
+              "dl": 0.0,
+              "ul": 0.0
+            },
+            "peak_safe_utilization": {
+              "dl": 0.9999999999999997,
+              "ul": 1.0
+            }
+          },
+          "reaches_20_percent_ul_gate": true,
+          "regime": "clairvoyant_fault",
+          "runtime_ms": 4636,
+          "status": "optimal",
+          "ul_overload_area_relative_reduction": 1.0
+        },
+        {
+          "allocation_bucket_count": 13824,
+          "continuous_relaxation": true,
+          "deployable": false,
+          "guardrails_satisfied": true,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "metrics": {
+            "dropped_bytes": {
+              "dl": 0.13969838619232178,
+              "ul": 0.0
+            },
+            "overload_area_seconds": {
+              "dl": 1937.0581434360831,
+              "ul": 1.8449749664536547e-12
+            },
+            "peak_safe_utilization": {
+              "dl": 1.2820512820512826,
+              "ul": 1.0000000000000007
+            }
+          },
+          "reaches_20_percent_ul_gate": true,
+          "regime": "bounded_migration_0.1_per_bucket",
+          "runtime_ms": 13363,
+          "status": "optimal",
+          "ul_overload_area_relative_reduction": 1.0
+        }
+      ],
+      "cohort_survival": "expected uniform-lifetime continuous relaxation",
+      "manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/extreme-oracle-1d-s036001.json",
+      "manifest_sha256": "1f4d83b60ebc9c4a6cb5986b26bf653d0cb1e247e899e16c42afc4a355ced047",
+      "modeled_static_metrics": {
+        "dropped_bytes": {
+          "dl": 80329474970568.27,
+          "ul": 51096008234816.66
+        },
+        "overload_area_seconds": {
+          "dl": 59245.494993282235,
+          "ul": 110691.53485691593
+        },
+        "peak_safe_utilization": {
+          "dl": 13.163126323490461,
+          "ul": 23.807217755783537
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s36001",
+      "scheduled_capacity_health_events_declared": 8,
+      "seed": 36001,
+      "static_metadata": "/home/abharadwaj/5g-stage1/overnight-20260817/oracle/shards/schema_major=2/campaign=extreme-oracle-static-s036001/scenario=extreme-optimizer-pilot-1d-s36001/controller=static-capacity-v1/seed=036001/metadata.json"
+    },
+    {
+      "actual_static_metrics": {
+        "dropped_bytes": {
+          "dl": 71388178590039.77,
+          "ul": 50716403137443.78
+        },
+        "overload_area_seconds": {
+          "dl": 52879.61438037024,
+          "ul": 110833.36503496875
+        }
+      },
+      "arrival_source": "exact paired static shard; aggregated to decision buckets",
+      "bounds": [
+        {
+          "allocation_bucket_count": 13824,
+          "continuous_relaxation": true,
+          "deployable": false,
+          "guardrails_satisfied": true,
+          "message": "receding-information continuous relaxation solved",
+          "metrics": {
+            "dropped_bytes": {
+              "dl": 37797987890118.38,
+              "ul": 37306093485160.01
+            },
+            "overload_area_seconds": {
+              "dl": 28952.413027149843,
+              "ul": 56192.156274398585
+            },
+            "peak_safe_utilization": {
+              "dl": 6.52811284665877,
+              "ul": 9.857990711526975
+            }
+          },
+          "reaches_20_percent_ul_gate": true,
+          "regime": "arrival_only",
+          "runtime_ms": 28614,
+          "status": "optimal",
+          "ul_overload_area_relative_reduction": 0.49095142389868296
+        },
+        {
+          "allocation_bucket_count": 13824,
+          "continuous_relaxation": true,
+          "deployable": false,
+          "guardrails_satisfied": true,
+          "message": "receding-information continuous relaxation solved",
+          "metrics": {
+            "dropped_bytes": {
+              "dl": 9274671589687.445,
+              "ul": 16210854599064.984
+            },
+            "overload_area_seconds": {
+              "dl": 8603.402048604114,
+              "ul": 36669.347433899544
+            },
+            "peak_safe_utilization": {
+              "dl": 3.3491709336046616,
+              "ul": 9.024449905827499
+            }
+          },
+          "reaches_20_percent_ul_gate": true,
+          "regime": "scheduled_fault",
+          "runtime_ms": 37757,
+          "status": "optimal",
+          "ul_overload_area_relative_reduction": 0.6678098806773218
+        },
+        {
+          "allocation_bucket_count": 13824,
+          "continuous_relaxation": true,
+          "deployable": false,
+          "guardrails_satisfied": true,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "metrics": {
+            "dropped_bytes": {
+              "dl": 0.0,
+              "ul": 0.0
+            },
+            "overload_area_seconds": {
+              "dl": 299.9041766744494,
+              "ul": 1.166018848426831e-13
+            },
+            "peak_safe_utilization": {
+              "dl": 1.0824849878779867,
+              "ul": 1.0000000000000002
+            }
+          },
+          "reaches_20_percent_ul_gate": true,
+          "regime": "clairvoyant_fault",
+          "runtime_ms": 4821,
+          "status": "optimal",
+          "ul_overload_area_relative_reduction": 1.0
+        },
+        {
+          "allocation_bucket_count": 13824,
+          "continuous_relaxation": true,
+          "deployable": false,
+          "guardrails_satisfied": true,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "metrics": {
+            "dropped_bytes": {
+              "dl": 0.08731149137020111,
+              "ul": 0.0
+            },
+            "overload_area_seconds": {
+              "dl": 3703.862855979541,
+              "ul": 2.134280900160472e-12
+            },
+            "peak_safe_utilization": {
+              "dl": 1.2820512820512826,
+              "ul": 1.0000000000000004
+            }
+          },
+          "reaches_20_percent_ul_gate": true,
+          "regime": "bounded_migration_0.1_per_bucket",
+          "runtime_ms": 19790,
+          "status": "optimal",
+          "ul_overload_area_relative_reduction": 1.0
+        }
+      ],
+      "cohort_survival": "expected uniform-lifetime continuous relaxation",
+      "manifest": "/home/abharadwaj/Projects/5g-simulation/output/manifests/extreme-oracle-1d-s036002.json",
+      "manifest_sha256": "7ef58f5c3c2fa50f51eb42c1dbad943dc8676aa48f369ea3173952187319967e",
+      "modeled_static_metrics": {
+        "dropped_bytes": {
+          "dl": 71469149750550.83,
+          "ul": 50506361451269.6
+        },
+        "overload_area_seconds": {
+          "dl": 52934.72204455188,
+          "ul": 110386.62892402343
+        },
+        "peak_safe_utilization": {
+          "dl": 12.306820390015671,
+          "ul": 24.08224442771959
+        }
+      },
+      "scenario_id": "extreme-optimizer-pilot-1d-s36002",
+      "scheduled_capacity_health_events_declared": 8,
+      "seed": 36002,
+      "static_metadata": "/home/abharadwaj/5g-stage1/overnight-20260817/oracle/shards/schema_major=2/campaign=extreme-oracle-static-s036002/scenario=extreme-optimizer-pilot-1d-s36002/controller=static-capacity-v1/seed=036002/metadata.json"
+    }
+  ],
+  "schema_version": "oracle-bound-evaluation/1.0",
+  "test_seeds_consumed": false
+}

@@ -9,8 +9,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from forecasting import MovingAverageForecaster, TrainedForecastBundle
-from optimization import CohortMPCConfig
+from forecasting import MovingAverageForecaster, load_forecaster_bundle
+from optimization import (
+    CohortMPCConfig, load_survival_guardrail_evidence, load_survival_tables,
+)
 from simulator.macro import Simulator, load_scenario
 from simulator.macro.controllers import CohortMPCController, StaticCapacityController
 
@@ -20,6 +22,7 @@ from .evaluate_cohort_mpc_pilot import (
     ScenarioKind,
     build_pilot_scenario,
 )
+from .seed_policy import reject_protected_mpc_seeds
 
 
 SCHEMA_VERSION = "cohort-mpc-10pct-candidate-evaluation/1.0"
@@ -30,6 +33,16 @@ def _sha256(path: Path) -> str:
     with path.open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _artifact_sha256(path: Path) -> str:
+    if path.is_file():
+        return _sha256(path)
+    digest = hashlib.sha256()
+    for item in sorted(candidate for candidate in path.rglob("*") if candidate.is_file()):
+        digest.update(str(item.relative_to(path)).encode())
+        digest.update(bytes.fromhex(_sha256(item)))
     return digest.hexdigest()
 
 
@@ -56,6 +69,7 @@ def evaluate_candidate(
     *,
     steps: int,
     forecast_bundle: Path | None = None,
+    survival_bundle: Path | None = None,
     progress: bool = False,
 ) -> dict[str, Any]:
     seeds = [seed for values in seeds_by_scenario.values() for seed in values]
@@ -65,6 +79,7 @@ def evaluate_candidate(
         raise ValueError("candidate seeds must be non-empty and unique")
     if RESERVED_SEEDS.intersection(seeds):
         raise ValueError("reserved validation seeds cannot be consumed")
+    reject_protected_mpc_seeds(seeds)
     base = load_scenario(manifest)
     if steps < 24 * 3600 // base.step_seconds:
         raise ValueError("candidate scenarios must cover a full simulated day")
@@ -74,12 +89,12 @@ def evaluate_candidate(
     settings = CohortMPCConfig(**profile.get("mpc", {}))
     forecaster_spec = profile.get("forecaster", {})
     if forecast_bundle is not None:
-        forecaster = TrainedForecastBundle.load(forecast_bundle)
+        forecaster = load_forecaster_bundle(forecast_bundle)
         forecaster.validate_groups(group.key for group in base.groups)
         forecaster_identity: dict[str, Any] = {
             "type": "trained_bundle",
             "path": str(forecast_bundle.resolve()),
-            "sha256": _sha256(forecast_bundle),
+            "sha256": _artifact_sha256(forecast_bundle),
             "bundle_sha256": forecaster.payload["bundle_sha256"],
         }
     else:
@@ -93,6 +108,15 @@ def evaluate_candidate(
             "model_version": forecaster.model_version,
         }
 
+    survival_tables = load_survival_tables(str(survival_bundle)) if survival_bundle else None
+    survival_evidence = (
+        load_survival_guardrail_evidence(str(survival_bundle))
+        if survival_bundle else None
+    )
+    if survival_tables is not None and set(survival_tables) != {
+        group.key.selection_id for group in base.groups
+    }:
+        raise ValueError("survival bundle groups must exactly match the scenario")
     records = []
     total_pairs = len(seeds)
     completed = 0
@@ -109,14 +133,18 @@ def evaluate_candidate(
                 print(f"candidate {completed + 1}/{total_pairs} {kind} seed={seed} static", flush=True)
             static_simulator = Simulator(scenario, StaticCapacityController())
             static = static_simulator.run(static_simulator.make_summary_sink()).summary
+            static_control = static_simulator.control_metrics()
             controller = CohortMPCController(
                 forecaster=forecaster,
                 mpc_config=settings,
+                survival_by_group=survival_tables,
+                survival_guardrail_evidence=survival_evidence,
             )
             if progress:
                 print(f"candidate {completed + 1}/{total_pairs} {kind} seed={seed} mpc", flush=True)
             mpc_simulator = Simulator(scenario, controller)
             mpc = mpc_simulator.run(mpc_simulator.make_summary_sink()).summary
+            mpc_control = mpc_simulator.control_metrics()
             reductions = {
                 metric: {
                     direction: _reduction(static[metric][direction], mpc[metric][direction])
@@ -134,6 +162,16 @@ def evaluate_candidate(
                 "relative_reduction": reductions,
                 "controller_decisions": controller.decision_count,
                 "certified_decisions": controller.certified_decision_count,
+                "baseline_routing_churn_l1": static_control["routing_churn_l1"],
+                "mpc_routing_churn_l1": mpc_control["routing_churn_l1"],
+                "decision_reasons": mpc_control["decision_reasons"],
+                "solver_statuses": mpc_control["solver_statuses"],
+                "solver_timeout_count": mpc_control["solver_timeout_count"],
+                "survival": mpc_control["survival"],
+                "survival_guardrail_evidence": mpc_control["survival_guardrail_evidence"],
+                "imperfect_survival_guardrail_passed": mpc_control[
+                    "imperfect_survival_guardrail_passed"
+                ],
             })
             completed += 1
             if progress:
@@ -212,6 +250,10 @@ def evaluate_candidate(
             "settings": asdict(settings),
         },
         "forecaster": forecaster_identity,
+        "survival_bundle": (
+            {"path": str(survival_bundle.resolve()), "sha256": _sha256(survival_bundle)}
+            if survival_bundle else None
+        ),
         "paired_runs": len(records),
         "simulated_days_per_pair": steps * base.step_seconds / 86_400,
         "totals": totals,
@@ -238,6 +280,7 @@ def main() -> int:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--mpc-profile", type=Path, required=True)
     parser.add_argument("--forecast-bundle", type=Path)
+    parser.add_argument("--survival-bundle", type=Path)
     parser.add_argument("--seed-start", type=int, default=33001)
     parser.add_argument("--total-seeds", type=int, default=30)
     parser.add_argument("--steps", type=int, default=2880)
@@ -260,6 +303,7 @@ def main() -> int:
         seeds_by_scenario,
         steps=args.steps,
         forecast_bundle=args.forecast_bundle,
+        survival_bundle=args.survival_bundle,
         progress=True,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)

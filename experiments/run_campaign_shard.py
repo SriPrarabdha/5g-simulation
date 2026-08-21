@@ -18,8 +18,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from forecasting import TrainedForecastBundle
-from optimization import CohortMPCConfig, OptimizationConfig
+from forecasting import load_forecaster_bundle
+from optimization import (
+    CohortMPCConfig, OptimizationConfig, load_survival_guardrail_evidence,
+    load_survival_tables,
+)
 from simulator.macro import (
     AuditSink, CompositeSink, DecisionTraceSink, JsonlSink, ParquetSink, Simulator,
     controller_by_name, load_scenario,
@@ -42,6 +45,16 @@ def file_sha256(path: Path) -> str:
     with path.open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
+    return digest.hexdigest()
+
+
+def artifact_sha256(path: Path) -> str:
+    if path.is_file():
+        return file_sha256(path)
+    digest = hashlib.sha256()
+    for item in sorted(candidate for candidate in path.rglob("*") if candidate.is_file()):
+        digest.update(str(item.relative_to(path)).encode())
+        digest.update(bytes.fromhex(file_sha256(item)))
     return digest.hexdigest()
 
 
@@ -140,6 +153,7 @@ def run_shard(
     forecast_bundle: Path | None = None,
     predictive_profile: Path | None = None,
     mpc_profile: Path | None = None,
+    survival_bundle: Path | None = None,
     *,
     artifact_policy: ArtifactPolicy | None = None,
     scratch_root: Path | None = None,
@@ -153,7 +167,7 @@ def run_shard(
     topology_id = topology_identity(manifest_payload)
     base_config = load_scenario(manifest)
     config = replace(base_config, seed=seed)
-    trained_forecaster = TrainedForecastBundle.load(forecast_bundle) if forecast_bundle else None
+    trained_forecaster = load_forecaster_bundle(forecast_bundle) if forecast_bundle else None
     if trained_forecaster is not None:
         trained_forecaster.validate_groups(group.key for group in config.groups)
     if predictive_profile is not None and controller not in {"predictive", "forecast-capacity"}:
@@ -170,11 +184,17 @@ def run_shard(
     optimization = OptimizationConfig(**profile_payload.get("optimization", {})) if profile_payload else None
     adjustment = ForecastAdjustmentConfig(**profile_payload.get("forecast_adjustment", {})) if profile_payload else None
     mpc_config = CohortMPCConfig(**mpc_payload.get("mpc", {})) if mpc_payload else None
+    survival_tables = load_survival_tables(str(survival_bundle)) if survival_bundle else None
     simulator = Simulator(config, controller_by_name(
         controller, forecaster=trained_forecaster, gate_config=gate,
         optimization_config=optimization,
         optimizer_weight=float(profile_payload.get("optimizer_weight", 1.0)) if profile_payload else 1.0,
         forecast_adjustment_config=adjustment, mpc_config=mpc_config,
+        survival_by_group=survival_tables,
+        survival_guardrail_evidence=(
+            load_survival_guardrail_evidence(str(survival_bundle))
+            if survival_bundle else None
+        ),
     ))
     decision = assign_retention(
         policy, topology_id=topology_id, scenario_id=config.scenario_id, seed=seed
@@ -185,13 +205,17 @@ def run_shard(
     manifest_digest = file_sha256(manifest)
     forecast_identity = (
         {
-            "path": str(forecast_bundle.resolve()), "file_sha256": file_sha256(forecast_bundle),
+            "path": str(forecast_bundle.resolve()), "file_sha256": artifact_sha256(forecast_bundle),
             "bundle_sha256": trained_forecaster.metadata["bundle_sha256"],
             "model_version": trained_forecaster.model_version,
         } if forecast_bundle and trained_forecaster else None
     )
     profile_identity = _identity(predictive_profile, profile_payload, "profile_id")
     mpc_identity = _identity(mpc_profile, mpc_payload, "profile_id")
+    survival_identity = (
+        {"path": str(survival_bundle.resolve()), "file_sha256": file_sha256(survival_bundle)}
+        if survival_bundle else None
+    )
     if destination.exists():
         if not skip_existing:
             raise FileExistsError(f"refusing to overwrite shard: {destination}")
@@ -199,7 +223,8 @@ def run_shard(
         expected = {
             "manifest_sha256": manifest_digest, "controller": simulator.controller.name,
             "forecast_bundle": forecast_identity, "predictive_profile": profile_identity,
-            "mpc_profile": mpc_identity, "artifact_policy": policy.to_dict(),
+            "mpc_profile": mpc_identity, "survival_bundle": survival_identity,
+            "artifact_policy": policy.to_dict(),
             "retention": decision.to_dict(),
         }
         if any(existing.get(key) != value for key, value in expected.items()):
@@ -212,6 +237,7 @@ def run_shard(
         "controller": simulator.controller.name, "policy": policy.to_dict(),
         "manifest": manifest_digest, "forecast": forecast_identity,
         "predictive_profile": profile_identity, "mpc_profile": mpc_identity,
+        "survival_bundle": survival_identity,
     })
     scratch = scratch_base / "cdot-stage1" / work_identity[:24]
     scratch.mkdir(parents=True, exist_ok=True)
@@ -219,7 +245,8 @@ def run_shard(
     fingerprints = {
         "manifest_sha256": manifest_digest, "artifact_policy": policy.to_dict(),
         "model": forecast_identity, "predictive_profile": profile_identity,
-        "mpc_profile": mpc_identity, "source_fingerprint": source_digest,
+        "mpc_profile": mpc_identity, "survival_bundle": survival_identity,
+        "source_fingerprint": source_digest,
         "topology_id": topology_id, "scenario_id": config.scenario_id,
         "seed": seed, "controller": simulator.controller.name,
     }
@@ -352,6 +379,7 @@ def run_shard(
         "topology_id": topology_id, "scenario_id": config.scenario_id, "seed": seed,
         "controller": simulator.controller.name, "forecast_bundle": forecast_identity,
         "predictive_profile": profile_identity, "mpc_profile": mpc_identity,
+        "survival_bundle": survival_identity,
         "manifest": str(manifest.resolve()), "manifest_sha256": manifest_digest,
         "artifact_policy": policy.to_dict(), "retention": decision.to_dict(),
         "checkpoint_lineage": checkpoints.lineage, "artifacts": artifacts,
@@ -386,6 +414,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--controller", choices=("static", "reactive", "forecast-capacity", "predictive", "mpc", "oracle"), default="static")
     parser.add_argument("--forecast-bundle", type=Path)
     parser.add_argument("--mpc-profile", type=Path)
+    parser.add_argument("--survival-bundle", type=Path)
     parser.add_argument("--predictive-profile", type=Path)
     parser.add_argument("--artifact-policy", type=Path)
     parser.add_argument("--scratch-root", type=Path)
@@ -402,6 +431,7 @@ def main() -> int:
         progress_every_simulated_hours=args.progress_every_simulated_hours,
         forecast_bundle=args.forecast_bundle, predictive_profile=args.predictive_profile,
         mpc_profile=args.mpc_profile, artifact_policy=policy,
+        survival_bundle=args.survival_bundle,
         scratch_root=args.scratch_root, resume=not args.no_resume,
     )
     print(destination)

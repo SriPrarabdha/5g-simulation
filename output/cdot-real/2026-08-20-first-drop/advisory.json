@@ -1,0 +1,393 @@
+{
+  "application_gate": {
+    "automatic_application_allowed": false,
+    "controlled_second_run_allowed_after": [
+      "C-DOT confirms the metric-label to UPF-ID mapping",
+      "C-DOT confirms SMF weight semantics and whether weights are global or per TAC/DNN",
+      "the pre-run baseline is captured and a rollback-to-equal policy is ready"
+    ]
+  },
+  "basic_smf_advisory": {
+    "assumptions": [
+      "equal offered demand for TAC 1, 2, 3, and 4 as stated in the email",
+      "identical UPF capacity until C-DOT supplies calibrated envelopes",
+      "the UPF/TAC constraint CSV is authoritative",
+      "SMF normalizes global UPF weights across each TAC's eligible set"
+    ],
+    "effective_weights_after_tac_constraint_normalization": {
+      "tac-1": {
+        "upf-1": 0.3333388573543761,
+        "upf-4": 0.6666611426456239
+      },
+      "tac-2": {
+        "upf-1": 0.3333388573543761,
+        "upf-2": 0.6666611426456239
+      },
+      "tac-3": {
+        "upf-1": 0.16666573767561255,
+        "upf-2": 0.3333231895031605,
+        "upf-3": 0.5000110728212269
+      },
+      "tac-4": {
+        "upf-1": 0.16666573767561255,
+        "upf-3": 0.5000110728212269,
+        "upf-4": 0.3333231895031605
+      }
+    },
+    "normalized_global_weights": {
+      "upf-1": 0.12500025424272238,
+      "upf-2": 0.24999429405211768,
+      "upf-3": 0.3750111576530423,
+      "upf-4": 0.24999429405211768
+    },
+    "projected_equal_tac_load_units_by_upf": {
+      "upf-1": 1.0000091900599772,
+      "upf-2": 0.9999843321487845,
+      "upf-3": 1.0000221456424538,
+      "upf-4": 0.9999843321487845
+    },
+    "recommended_global_weight_ratio": {
+      "upf-1": 1.0,
+      "upf-2": 2.0,
+      "upf-3": 3.0,
+      "upf-4": 2.0
+    }
+  },
+  "created_at": "2026-08-21T15:06:33.964927+05:30",
+  "data_quality": {
+    "identity": {
+      "best_metric_to_constraint_label_permutation": {
+        "upf-1": "upf-1",
+        "upf-2": "upf-3",
+        "upf-3": "upf-4",
+        "upf-4": "upf-2"
+      },
+      "best_permutation_violation_fraction": 0.0,
+      "literal_violation_fraction": 0.42758703771537226,
+      "permutation_is_inference_not_confirmed_mapping": true
+    },
+    "missing_expected_files": [
+      "smf.yaml"
+    ],
+    "session_resets": {
+      "contradicts_no_detach_description": true,
+      "per_file": {
+        "UPF-file-0": {
+          "largest_single_sample_drop": -1065.0,
+          "maximum": 5105.0,
+          "minimum": 1563.0,
+          "negative_changes": 47
+        },
+        "UPF-file-1": {
+          "largest_single_sample_drop": -588.0,
+          "maximum": 2651.0,
+          "minimum": 696.0,
+          "negative_changes": 35
+        },
+        "UPF-file-2": {
+          "largest_single_sample_drop": -576.0,
+          "maximum": 1991.0,
+          "minimum": 84.0,
+          "negative_changes": 38
+        },
+        "UPF-file-3": {
+          "largest_single_sample_drop": -604.0,
+          "maximum": 2781.0,
+          "minimum": 782.0,
+          "negative_changes": 35
+        }
+      }
+    },
+    "zero_traffic_tacs": [
+      1
+    ]
+  },
+  "forecaster": {
+    "backtest_wape": {
+      "last": 0.2308715721217119,
+      "ma3": 0.18971385794785117,
+      "ma6": 0.1977845843973026,
+      "seasonal3": 0.133005206723677
+    },
+    "forecasts_by_group": {
+      "tac-1|ims|dscp-0": {
+        "dl_pps": {
+          "p50": 0.0,
+          "p90": 0.0,
+          "p95": 0.0
+        },
+        "quality_flags": [
+          "pps_proxy",
+          "session_arrivals_unavailable"
+        ],
+        "ul_pps": {
+          "p50": 0.0,
+          "p90": 0.0,
+          "p95": 0.0
+        }
+      },
+      "tac-1|internet|dscp-0": {
+        "dl_pps": {
+          "p50": 0.0,
+          "p90": 0.0,
+          "p95": 0.0
+        },
+        "quality_flags": [
+          "pps_proxy",
+          "session_arrivals_unavailable"
+        ],
+        "ul_pps": {
+          "p50": 0.0,
+          "p90": 0.0,
+          "p95": 0.0
+        }
+      },
+      "tac-2|ims|dscp-0": {
+        "dl_pps": {
+          "p50": 10829.99333333333,
+          "p90": 15865.41066666667,
+          "p95": 19039.427833333335
+        },
+        "quality_flags": [
+          "pps_proxy",
+          "session_arrivals_unavailable"
+        ],
+        "ul_pps": {
+          "p50": 8162.333333333334,
+          "p90": 11939.258333333339,
+          "p95": 14315.503166666667
+        }
+      },
+      "tac-2|internet|dscp-0": {
+        "dl_pps": {
+          "p50": 26999.333333333332,
+          "p90": 47336.284666666674,
+          "p95": 49447.398333333345
+        },
+        "quality_flags": [
+          "pps_proxy",
+          "session_arrivals_unavailable"
+        ],
+        "ul_pps": {
+          "p50": 21064.333333333332,
+          "p90": 26369.12866666667,
+          "p95": 29213.428
+        }
+      },
+      "tac-3|ims|dscp-0": {
+        "dl_pps": {
+          "p50": 10917.666666666666,
+          "p90": 15989.133333333339,
+          "p95": 19217.699999999997
+        },
+        "quality_flags": [
+          "pps_proxy",
+          "session_arrivals_unavailable"
+        ],
+        "ul_pps": {
+          "p50": 8152.0,
+          "p90": 11926.400000000003,
+          "p95": 14320.5
+        }
+      },
+      "tac-3|internet|dscp-0": {
+        "dl_pps": {
+          "p50": 32933.333333333336,
+          "p90": 52779.70000000001,
+          "p95": 60327.100000000006
+        },
+        "quality_flags": [
+          "pps_proxy",
+          "session_arrivals_unavailable"
+        ],
+        "ul_pps": {
+          "p50": 21036.0,
+          "p90": 31320.54666666667,
+          "p95": 34854.216666666674
+        }
+      },
+      "tac-4|ims|dscp-0": {
+        "dl_pps": {
+          "p50": 7540.016666666666,
+          "p90": 11061.489000000005,
+          "p95": 13250.419333333333
+        },
+        "quality_flags": [
+          "pps_proxy",
+          "session_arrivals_unavailable"
+        ],
+        "ul_pps": {
+          "p50": 8152.676666666665,
+          "p90": 11935.486333333336,
+          "p95": 14279.221333333335
+        }
+      },
+      "tac-4|internet|dscp-0": {
+        "dl_pps": {
+          "p50": 27869.666666666668,
+          "p90": 47636.14000000001,
+          "p95": 55045.850000000006
+        },
+        "quality_flags": [
+          "pps_proxy",
+          "session_arrivals_unavailable"
+        ],
+        "ul_pps": {
+          "p50": 21108.0,
+          "p90": 31536.408000000007,
+          "p95": 34848.69
+        }
+      }
+    },
+    "issued_at": "2026-08-20T15:00:00+00:00",
+    "limitations": [
+      "forecasts carried PPS, not new-session arrivals",
+      "replay is only descriptive because it uses the same short trace used to choose the 30-minute lag",
+      "TAC 1 has zero classified traffic in this drop"
+    ],
+    "model_version": "seasonal-naive/3",
+    "selection_basis": "email-declared 30-minute loop plus descriptive rolling replay",
+    "target_window": {
+      "end": "2026-08-20T15:20:00+00:00",
+      "start": "2026-08-20T15:10:00+00:00"
+    }
+  },
+  "highs_optimizer": {
+    "capacity_values_are_unit_normalizers_not_measured_capacity": true,
+    "cold_start_assumption": true,
+    "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+    "projected_dl_pps_by_upf": {
+      "upf-1": 55035.23116666667,
+      "upf-2": 55035.23116666667,
+      "upf-3": 55035.23116666667,
+      "upf-4": 51222.202000000005
+    },
+    "projected_ul_pps_by_upf": {
+      "upf-1": 35381.56427114977,
+      "upf-2": 32976.824199441435,
+      "upf-3": 36627.23719607547,
+      "upf-4": 36845.9335
+    },
+    "status": "optimal",
+    "weights_by_group": {
+      "tac-2|ims|dscp-0": {
+        "upf-1": 0.75,
+        "upf-2": 0.25
+      },
+      "tac-2|internet|dscp-0": {
+        "upf-1": 0.75,
+        "upf-2": 0.25
+      },
+      "tac-3|ims|dscp-0": {
+        "upf-1": 0.19097558717571128,
+        "upf-2": 0.05902441282428867,
+        "upf-3": 0.75
+      },
+      "tac-3|internet|dscp-0": {
+        "upf-1": 0.0,
+        "upf-2": 0.609663172383003,
+        "upf-3": 0.39033682761699706
+      },
+      "tac-4|ims|dscp-0": {
+        "upf-1": 0.0,
+        "upf-3": 0.25,
+        "upf-4": 0.75
+      },
+      "tac-4|internet|dscp-0": {
+        "upf-1": 0.0,
+        "upf-3": 0.25,
+        "upf-4": 0.75
+      }
+    }
+  },
+  "input": {
+    "aggregate_samples": 961,
+    "aggregate_trace_end": "2026-08-20T20:35:45+05:30",
+    "aggregate_trace_hours": 4.0,
+    "aggregate_trace_start": "2026-08-20T16:35:45+05:30",
+    "complete_ten_minute_windows": 23,
+    "csv_count": 41,
+    "directory": "/home/abharadwaj/Projects/5g-simulation/cdot-upf-metrics/metrics",
+    "per_class_cadence_seconds": 20.0,
+    "source_hashes": {
+      "DNN Mapping-data-2026-08-20 20_31_13.csv": "76a67cb1550963d5c808c48bf2ccbe46999edca40a5dd28b90b13b176db20cf5",
+      "GnodeB Loc Mapping-data-2026-08-20 20_30_50.csv": "dd4f8e8c68d6747bb3c6ed68bdaf65117c2caa21fc03aa94ec21eb2ca973fa2e",
+      "Session Classes-data-2026-08-20 20_31_28.csv": "c132e03a1417f648a01edbc341a3cad7a47dbb0f2dd0b4d95e6cebf3e5e7d372",
+      "UPF - tac constrain-data-2026-08-20 20_31_44.csv": "964ff9c46ed3ec41b4a0920ae67175fa204b329028c3f1870def17c3d8708fd5",
+      "UPF Mapping-data-2026-08-20 20_30_01.csv": "4cc3879e9e3f1142ede0eae30d9abc5a65991d3ef3ea63759623ac378d7c136c",
+      "UPF wise Downlink \u2014 N3 (in PPS)-data-as-joinbyfield-2026-08-20 20_36_58.csv": "238df559f73b982b4fe019e7bebe1c8db2328586806229a6d47d2a42edd7ed61",
+      "UPF wise Uplink \u2014 N3 (in PPS)-data-as-joinbyfield-2026-08-20 20_36_34.csv": "1335e8d25587acfa0d0e917663b74ad73cde9d699bcdc9b90a3f2384567894e2",
+      "UPF-0-CPU-data-2026-08-20 20_39_25.csv": "ef7dfe11a945ecbb7c9010f8166bbca012b2754693b5daa5d0a383b3e9130a5e",
+      "UPF-0-DL Forwarding Efficiency-data-2026-08-20 20_38_51.csv": "c4ed464f783557d021e7cb3f486908fc37bf2e9a497f29258a378a7fedb6d3d5",
+      "UPF-0-Downlink Drop Rate Percentage-data-2026-08-20 20_39_06.csv": "54064446a4da730464eff60e8d33719c8d5dc4ea3705b539469de88f70941d8c",
+      "UPF-0-Memory-data-2026-08-20 20_39_38.csv": "8befedc91e2439f34b53031b1a582e9aaf7900261fcde242781adb910cec7b43",
+      "UPF-0-Rx Packet Rate-data-as-joinbyfield-2026-08-20 20_37_51.csv": "f85b3d4f8d7dc77d9fb198e2f05aff0ba081546c7838cdd9cec3fb6c129ce7b8",
+      "UPF-0-TSI GAUGE-data-2026-08-20 20_39_49.csv": "282a879ec47c2103e834846019ea22a324f1b20e7aa105075e1329d8d85990c1",
+      "UPF-0-Total Active Sessions-data-2026-08-20 20_38_34.csv": "75601860dd4235199ab7fc29f4b15b93a03db1cbd9c91db217be72dcd0a33eae",
+      "UPF-0-Total Traffic Rate(UL+DL)-data-2026-08-20 20_38_14.csv": "f982c5216df03c64b4131a9e06cf3a906344519799d3a5d962b9bcc5fe481ff4",
+      "UPF-1-CPU-data-2026-08-20 20_42_24.csv": "33a888fe36da396c30fd296c89bfaa9d34b712bd3a641208f981b9728d30c5a8",
+      "UPF-1-DL Forwarding Efficiency-data-2026-08-20 20_41_48.csv": "ea01167c238cd6811f6d84a4f246f8c99dbe62bad7b6830d5324c3e66aa952ae",
+      "UPF-1-Downlink Drop Rate Percentage-data-2026-08-20 20_42_05.csv": "5ade221e7d760d1af8140c64347a6b50cd8d8ac2121834e3d3413e25ef226dca",
+      "UPF-1-Memory-data-2026-08-20 20_42_40.csv": "3b5f216cb57793e0592cc9d75b940cbd294af942670660dd2fccee9e6efd3dba",
+      "UPF-1-Rx Packet Rate-data-as-joinbyfield-2026-08-20 20_40_16.csv": "afed399853a6684398597d2910f4c7db862d4f70983be79571c287cb1f7d961d",
+      "UPF-1-TSI GAUGE-data-2026-08-20 20_42_55.csv": "aa547f0708dae392c22a84e5a5a0500792dd1c6fdfdc8b7b192cc28f11753b3f",
+      "UPF-1-Total Active Sessions-data-2026-08-20 20_41_23.csv": "2da637d06bd7e0332bf04ef533e5d73fa7ebd8b08079d95aceb0848485b58772",
+      "UPF-1-Total Traffic Rate(UL+DL)-data-2026-08-20 20_40_58.csv": "6996b5594061fba444da0b4632d2c83801d3d163d4909132f16e7a96f89a0177",
+      "UPF-2-CPU-data-2026-08-20 20_44_45.csv": "9c7db5d591519dc11e5821d360f1a0d12fc0b99f87268e7ebdb102cbf7874d89",
+      "UPF-2-DL Forwarding Efficiency-data-2026-08-20 20_44_16.csv": "ce94be54def3af2755c11362ce5066606d6295bcb3ea7075e9be391b5b99ecf6",
+      "UPF-2-Downlink Drop Rate Percentage-data-2026-08-20 20_44_31.csv": "00e073b625907b01dc3a62372418dcf130ccc080c639d7ec53adb07f69273702",
+      "UPF-2-Memory-data-2026-08-20 20_44_58.csv": "b5006164bcb4942a1798f9c1a1f94b55c37ef0da0611f6051d6d666d9e8691e4",
+      "UPF-2-Rx Packet Rate-data-as-joinbyfield-2026-08-20 20_43_26.csv": "3dc7506e0ff8f54be776182d60f2116b4852c7d767f070f1149f996df2c82c02",
+      "UPF-2-TSI GAUGE-data-2026-08-20 20_45_11.csv": "4e7e35e4b6efc50f708f5924bd9ae524f7b2fe6b4aeacc2400421ccad73d67ba",
+      "UPF-2-Total Active Sessions-data-2026-08-20 20_43_59.csv": "0b2bc15860160c6d7947d6dd4ae3d99d3457c71ec2ca09bbe351b99e35ee2966",
+      "UPF-2-Total Traffic Rate(UL+DL)-data-2026-08-20 20_43_44.csv": "87c319ed0ae74c75e1de0d64b5f6bf6d78c358c355ce148a4534a79d8981eb45",
+      "UPF-3-CPU-data-2026-08-20 20_46_49.csv": "432c59ea0c615de574519acc16ac504d1b504e6332ba03e159081ca437bbf80e",
+      "UPF-3-DL Forwarding Efficiency-data-2026-08-20 20_46_20.csv": "795101f70f24df4e292e0b7b867b00ad4bee10b3895b7b518ac36518ece91cfc",
+      "UPF-3-Downlink Drop Rate Percentage-data-2026-08-20 20_46_32.csv": "36b7f42fef0a2e381a2e201ded97f3898221e4ef666e3813d298f6ebe6c80263",
+      "UPF-3-Rx Packet Rate-data-as-joinbyfield-2026-08-20 20_45_40.csv": "b12037a03292fe879e3a540dcc0a2fd6d10d561c4fc7b20f2b7521e20c82849d",
+      "UPF-3-TSI GAUGE-data-2026-08-20 20_47_35.csv": "078d2de12ccb73f90f7b40ed5c00c332e5e1fc237e7537231f182cd089135045",
+      "UPF-3-Total Active Sessions-data-2026-08-20 20_46_07.csv": "b80c81c61cf388a9ffb935f673fa165d9cfaf0e7a759117a982557163f22f277",
+      "UPF-3-Total Traffic Rate(UL+DL)-data-2026-08-20 20_45_53.csv": "d9e4b2f2d8bf0f2d67a7bfaf69706c6f1c45d19d511352baa3cfd5ad37600391",
+      "UPF3-Memory-data-2026-08-20 20_47_03.csv": "531f595ddc7ed4e70b391d5d54c8ac93faa5d1b08f37fd3097cbf8e88ce836b7",
+      "Uplink + Downlink (Agg in pps) for ._-data-as-joinbyfield-2026-08-20 20_33_54.csv": "026a1d8f6097f403731f0d68e5bd0c5281a542500a68628e914b1c8bd82b6f44",
+      "Uplink + Downlink (Agg in pps) for ._-data-as-joinbyfield-2026-08-20 20_36_07.csv": "b0716db5d5f023b809a803e0da7ea5998bee12dc2af59dc360db84b18de34c42"
+    },
+    "timezone_assumption": "Asia/Kolkata"
+  },
+  "mpc": {
+    "decision": "fail_closed_insufficient_real_state",
+    "reasons": [
+      "no per-class new-session counter",
+      "no session age, lifetime, or active cohort state",
+      "no calibrated directional PPS/Mbps and session capacities",
+      "packet size is absent, so PPS cannot be converted to Mbps",
+      "the referenced smf.yaml is absent",
+      "UPF metric identity is ambiguous"
+    ],
+    "run": false
+  },
+  "observed_last_complete_aggregate_window": {
+    "upf-1": {
+      "dl_pps": 59665.0,
+      "ul_pps": 37067.5
+    },
+    "upf-2": {
+      "dl_pps": 27242.5,
+      "ul_pps": 21307.5
+    },
+    "upf-3": {
+      "dl_pps": 8199.75,
+      "ul_pps": 4323.5
+    },
+    "upf-4": {
+      "dl_pps": 37730.0,
+      "ul_pps": 26875.0
+    },
+    "window": {
+      "end": "2026-08-20T20:30:00+05:30",
+      "start": "2026-08-20T20:20:00+05:30"
+    }
+  },
+  "schema_version": "cdot-real-advisory/0.1",
+  "status": "provisional_controlled_test_only"
+}

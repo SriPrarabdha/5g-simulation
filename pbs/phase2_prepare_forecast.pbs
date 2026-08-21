@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -N cdot-fc-prepare
+#PBS -q workq
+#PBS -l select=1:ncpus=2:mem=120gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+"$PYTHON_BIN" -m experiments.check_forecast_environment
+: "${PURPOSE:?set train or selection}"
+: "${CAMPAIGN_ROOT:?set immutable corpus root}"
+: "${MANIFEST:?set matching frozen manifest}"
+: "${CACHE_ROOT:?set output series cache}"
+"$PYTHON_BIN" -m experiments.prepare_forecast_series \
+  --campaign-root "$CAMPAIGN_ROOT" --manifest "$MANIFEST" \
+  --purpose "$PURPOSE" --output "$CACHE_ROOT"

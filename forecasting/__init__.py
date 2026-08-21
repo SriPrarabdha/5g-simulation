@@ -21,12 +21,18 @@ from .candidates import (
     CalendarRidgeV2Forecaster,
     CausalRegimeEnsemble,
     HistGradientBoostingQuantileForecaster,
+    LightGBMQuantileCandidate,
     causal_features,
 )
 from .evaluation import (
     ForecastEvaluationRecord,
     evaluate_forecast_records,
     forecast_promotion_gates,
+)
+from .metadata import TelemetryQualityReplay, causal_observation_metadata
+from .candidate_bundle import (
+    CandidateForecastBundle, load_forecaster_bundle,
+    merge_candidate_forecast_bundles, write_candidate_forecast_bundle,
 )
 
 __all__ = [
@@ -47,8 +53,15 @@ __all__ = [
     "CalendarRidgeV2Forecaster",
     "CausalRegimeEnsemble",
     "HistGradientBoostingQuantileForecaster",
+    "LightGBMQuantileCandidate",
     "causal_features",
     "ForecastEvaluationRecord",
     "evaluate_forecast_records",
     "forecast_promotion_gates",
+    "TelemetryQualityReplay",
+    "causal_observation_metadata",
+    "CandidateForecastBundle",
+    "load_forecaster_bundle",
+    "merge_candidate_forecast_bundles",
+    "write_candidate_forecast_bundle",
 ]

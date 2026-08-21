@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N cdot-phase3-day5
+#PBS -q workq
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=00:20:00
+#PBS -j oe
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${EVALUATION_ROOT:?set initial guarded-development root}"
+: "${TUNING_ROOT:?set scheduled solver-tuning root}"
+: "${INTERFACE_FREEZE:?set initial Phase-3 interface freeze}"
+: "${TUNING_INTERFACE_FREEZE:?set tuning Phase-3 interface freeze}"
+: "${SURVIVAL_BUNDLE:?set measured empirical survival bundle}"
+: "${MANIFEST:?set frozen development manifest}"
+: "${FORECAST_BUNDLE:?set frozen forecast bundle}"
+: "${OUTPUT_ROOT:?set new Day-5 decision root}"
+
+"$PYTHON_BIN" experiments/finalize_phase3_development.py \
+  --evaluation-root "$EVALUATION_ROOT" \
+  --tuning-root "$TUNING_ROOT" \
+  --interface-freeze "$INTERFACE_FREEZE" \
+  --tuning-interface-freeze "$TUNING_INTERFACE_FREEZE" \
+  --survival-bundle "$SURVIVAL_BUNDLE" \
+  --manifest "$MANIFEST" \
+  --forecast-bundle "$FORECAST_BUNDLE" \
+  --output-root "$OUTPUT_ROOT"

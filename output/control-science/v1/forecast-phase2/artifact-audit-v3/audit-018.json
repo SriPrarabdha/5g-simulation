@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "b4d6c3645a0a06b347cc9dd3fb93362bf176f4751d3db95d7e2f9355ea89dab7",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "646f86ede97dfaf532a82ef9b5fbe8d0e20c1498eadcac714f5eba87e63aca79",
+      "metric_file_sha256": "71f3003630f85b8fd26bdcf428a0470ea75fc482fda10917a971797890cfbb85",
+      "trained_bundle_sha256": "a4d81f478acf3f1f01ad9857faa7a2a05fd538cd7145dedf9d7816d91301329c"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "82aa07c40f52dba6f1c48d35756b2aff3aa3196cbe520d0fadefd3cb89ef524a",
+      "metric_file_sha256": "2339780bc4f1f95c4c38de261d28d31cf0010b5ea90fc4b613205610f20efd93",
+      "trained_bundle_sha256": "8f2b83b3af25c6e77fc396281cc89885685e96c4966c406091d6374151456e31"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "6b0cd4cff7d87c52876d1e79267215e26adb297ac5b07f4853b20afb004525ec",
+      "metric_file_sha256": "f4eb5d23b96ce8c346f5827b61c682a845634f0f6ef0c51110114ef1f1f604b2",
+      "trained_bundle_sha256": "cd932af2f0348d9c0f9648953b788f7fa5213768e97c417328a08dd98f6b082f"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "65d22f171f7b5e9397e61124d0f8723bdb719d7c46e2fb3e9e3c0a9c3b6dc09b",
+      "metric_file_sha256": "296dc1beded1e7c28e6bf95a3733797c28bdbf59e5968b838b6743039b4d1547",
+      "trained_bundle_sha256": "53c4a9f9cf1437673f075a0164f4d0c2b7406c41d392f1ed4e970269dfbea18d"
+    }
+  },
+  "group_id": "delhi-ncr|industry-telemetry|1-223344",
+  "group_index": 18,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

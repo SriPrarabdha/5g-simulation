@@ -8,6 +8,9 @@ from pathlib import Path
 
 from simulator.macro import BoundedMemorySink, ScenarioConfig, Simulator, load_scenario
 from simulator.macro.config import ScenarioEvent
+from simulator.macro.controllers import ControlContext, PreDrainFlowController
+from optimization import PreDrainFlowConfig
+from forecasting import ResidualObservation
 
 
 class SimulatorTests(unittest.TestCase):
@@ -169,6 +172,148 @@ class SimulatorTests(unittest.TestCase):
         )
         self.assertEqual(updates, [(3, 8), (6, 8), (8, 8)])
         self.assertEqual(result.step_count, 8)
+
+    def test_lifecycle_export_contains_only_observable_censored_records(self) -> None:
+        config = ScenarioConfig.from_dict(self._scenario(100.0))
+        simulator = Simulator(
+            config,
+            capture_session_lifecycle=True,
+            lifetime_sampler=lambda _group, _step, _rng: 6,
+        )
+        for _ in range(5):
+            simulator.advance()
+        rows = simulator.session_lifecycle_telemetry(observed_through_step=3)
+        self.assertTrue(rows)
+        allowed = {
+            "record_type", "schema_version", "session_id", "group_id",
+            "service_class", "started_step", "ended_step", "started_at", "ended_at",
+        }
+        self.assertTrue(all(set(row) == allowed for row in rows))
+        self.assertTrue(all(row["started_step"] <= 3 for row in rows))
+        self.assertTrue(all(row["ended_step"] is None for row in rows))
+        self.assertNotIn("lifetime", json.dumps(rows))
+
+    def test_lifecycle_capture_round_trips_through_checkpoint_state(self) -> None:
+        config = ScenarioConfig.from_dict(self._scenario(100.0))
+        first = Simulator(config, capture_session_lifecycle=True)
+        for _ in range(3):
+            first.advance()
+        state = json.loads(json.dumps(first.snapshot_state()))
+        resumed = Simulator(config, capture_session_lifecycle=True)
+        resumed.restore_state(state)
+        while first.current_step < config.steps:
+            first.advance()
+            resumed.advance()
+        self.assertEqual(
+            resumed.session_lifecycle_telemetry(),
+            first.session_lifecycle_telemetry(),
+        )
+
+    def test_predrain_flow_shifts_new_sessions_before_known_capacity_loss(self) -> None:
+        payload = self._scenario(100.0)
+        payload["upfs"].append({
+            **payload["upfs"][0],
+            "upf_id": "upf-b",
+        })
+        payload["groups"][0]["eligible_upfs"] = ["upf-a", "upf-b"]
+        payload["events"] = [{
+            "step": 4, "event_type": "capacity_factor", "upf_id": "upf-a",
+            "ul_factor": 0.1, "dl_factor": 0.1, "known_at_step": 0,
+        }]
+        simulator = Simulator(
+            ScenarioConfig.from_dict(payload),
+            PreDrainFlowController(flow_config=PreDrainFlowConfig(lead_windows=2)),
+        )
+        simulator.replan()
+        weights = simulator.current_policy.groups[0].weights
+        self.assertLess(weights["upf-a"], weights["upf-b"])
+        self.assertFalse(simulator.current_policy.fallback.used)
+
+        blended = Simulator(
+            ScenarioConfig.from_dict(payload),
+            PreDrainFlowController(
+                flow_config=PreDrainFlowConfig(
+                    lead_windows=2, action_blend_fraction=0.25
+                )
+            ),
+        )
+        blended.replan()
+        blended_weights = blended.current_policy.groups[0].weights
+        self.assertGreater(blended_weights["upf-a"], weights["upf-a"])
+        self.assertGreater(blended_weights["upf-a"], 0.0)
+        diagnostic = blended.controller.decision_diagnostics[-1]
+        self.assertIn("decision_runtime_ms", diagnostic)
+        self.assertEqual(diagnostic["action_blend_fraction"], 0.25)
+        self.assertIn("max_residual_utilization", diagnostic)
+
+        adaptive_controller = PreDrainFlowController(
+            flow_config=PreDrainFlowConfig(
+                lead_windows=2,
+                action_blend_fraction=0.5,
+                minimum_action_blend_fraction=0.25,
+                full_action_below_residual_utilization=0.5,
+                minimum_action_above_residual_utilization=0.75,
+            )
+        )
+        adaptive = Simulator(ScenarioConfig.from_dict(payload), adaptive_controller)
+        adaptive_controller.build_policy(
+            adaptive.config,
+            adaptive.config.groups,
+            adaptive._states(adaptive.config.start_time),
+            adaptive.config.start_time,
+            1,
+            ControlContext(residual_by_upf={
+                "upf-a": ResidualObservation(0, 60, 60),
+                "upf-b": ResidualObservation(0, 60, 60),
+            }),
+        )
+        adaptive_diagnostic = adaptive_controller.decision_diagnostics[-1]
+        self.assertEqual(adaptive_diagnostic["action_blend_fraction"], 0.25)
+        self.assertGreaterEqual(adaptive_diagnostic["max_residual_utilization"], 0.75)
+
+    def test_predrain_overflow_fails_closed_and_reports_resource_slack(self) -> None:
+        payload = self._scenario(100.0)
+        payload["upfs"].append({
+            **payload["upfs"][0],
+            "upf_id": "upf-b",
+        })
+        payload["groups"][0]["eligible_upfs"] = ["upf-a", "upf-b"]
+        payload["events"] = [{
+            "step": 4, "event_type": "capacity_factor", "upf_id": "upf-a",
+            "ul_factor": 0.1, "dl_factor": 0.1, "known_at_step": 0,
+        }]
+        controller = PreDrainFlowController(
+            flow_config=PreDrainFlowConfig(lead_windows=2)
+        )
+        simulator = Simulator(ScenarioConfig.from_dict(payload), controller)
+        policy = controller.build_policy(
+            simulator.config,
+            simulator.config.groups,
+            simulator._states(simulator.config.start_time),
+            simulator.config.start_time,
+            1,
+            ControlContext(residual_by_upf={
+                "upf-a": ResidualObservation(0, 80, 80),
+                "upf-b": ResidualObservation(0, 80, 80),
+            }),
+        )
+
+        self.assertTrue(policy.fallback.used)
+        self.assertEqual(policy.fallback.reason, "predicted_overflow_exceeds_tolerance")
+        self.assertEqual(policy.solver.status, "feasible_with_slack")
+        self.assertGreater(sum(policy.constraint_slack.ul_mbps_by_upf.values()), 0)
+        self.assertGreater(sum(policy.constraint_slack.dl_mbps_by_upf.values()), 0)
+        self.assertEqual(policy.constraint_slack.sessions_by_upf, {})
+        self.assertEqual(controller.certified_decision_count, 0)
+        self.assertEqual(controller.decision_funnel["proposed"], 1)
+        self.assertEqual(controller.decision_funnel["certified"], 0)
+        self.assertEqual(controller.decision_funnel["accepted"], 0)
+        diagnostic = controller.decision_diagnostics[-1]
+        self.assertGreater(diagnostic["overflow"], controller.flow_config.overflow_tolerance)
+        self.assertEqual(
+            diagnostic["constraint_slack"]["ul_mbps_by_upf"],
+            policy.constraint_slack.ul_mbps_by_upf,
+        )
 
     @staticmethod
     def _scenario(capacity: float) -> dict:

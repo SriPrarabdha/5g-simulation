@@ -6,9 +6,14 @@ from pathlib import Path
 
 from optimization import CohortMPCConfig
 from scripts.run_mpc_candidate_parallel import aggregate
+from scripts.run_mpc_release_once import release_tasks
 
 
 class ParallelMPCEvaluationTests(unittest.TestCase):
+    def test_dedicated_release_runner_covers_untouched_split_exactly_once(self) -> None:
+        tasks = release_tasks()
+        self.assertEqual(len(tasks), 30)
+        self.assertEqual(sorted(seed for _, seed in tasks), list(range(46301, 46331)))
     def test_aggregate_produces_promotion_compatible_gate_fields(self) -> None:
         records = []
         for index, kind in enumerate(("surge", "scheduled_fault", "unannounced_outage", "mixed_stress")):

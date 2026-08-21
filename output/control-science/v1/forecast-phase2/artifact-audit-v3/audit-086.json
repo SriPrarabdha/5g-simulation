@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "d97c4f418e703c39912e134bbdf8a6b705bf740d73de39da7513529deee12292",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "9acbffcc5e09d5c7a0d8d270892f2427fabfaf852cc7f39e7c2e3457a7d7f84d",
+      "metric_file_sha256": "f8960b29f7251ab9174bc7b6fc70ca7b77a79afbfa9a92dd8b843849de0b79f9",
+      "trained_bundle_sha256": "4089e6f52b26cbc97f2d004df2cbc9ff5764447561847bd9c96a894d4e0f0a0b"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "e3da9ce8bbf9551de6a679549c39cd072da762a8b73013d3ee2e04886ef8cee8",
+      "metric_file_sha256": "e70f1a0929afa09e5acafb8d0c5df0ef9ecc1d4c175ed364f276c6bd56594c91",
+      "trained_bundle_sha256": "e266fa515c72a4e1d6a18391d33580d6bf3bb5cb90deddad23817a2f6425a201"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "bffb9ddd61a25fcfe788d4b6a1b40ca1de0810c358801f8bf2ccc13a1af2de01",
+      "metric_file_sha256": "dba3b4102440c126aeca5f544d34bb342652ff94104167c81098c7bfb72c9cbf",
+      "trained_bundle_sha256": "7249d510b55b9e91256a49eeab58f308de35400f1ae1806a5bdd58a5ac831597"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "0fed0253161d549de3839cd69f2a0b636fd6f1e5dd5992a8ff74409d844eaf4b",
+      "metric_file_sha256": "2a42ac60c664689d32f4ab8cb419b65c1c8d7d93d459dea44d389040ac54c583",
+      "trained_bundle_sha256": "ef02cf1ad7c039bb633c3026d539c5e0fc7ba8b43dcf0c44e4dd183fdb8c8e32"
+    }
+  },
+  "group_id": "west|consumer-voice|1-010103",
+  "group_index": 86,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

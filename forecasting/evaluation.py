@@ -87,6 +87,7 @@ def evaluate_forecast_records(
 
 def forecast_promotion_gates(
     evaluation: dict[str, object], *,
+    baseline_wape: float,
     baseline_peak_underprediction: float,
     horizon_wape_baseline: dict[str, float],
     closed_loop_improved: bool,
@@ -96,8 +97,11 @@ def forecast_promotion_gates(
     by_horizon = evaluation["by_horizon"]
     assert isinstance(by_horizon, dict)
     coverage = float(overall["coverage_p90"])
+    overall_wape = overall["wape"]
     gates = {
-        "overall_wape_at_most_8_70_percent": float(overall["wape"] or 0.0) <= 0.087,
+        "wape_improves_15_percent_over_best_simple_baseline": (
+            overall_wape is not None and float(overall_wape) <= 0.85 * baseline_wape
+        ),
         "peak_underprediction_reduced_20_percent": float(overall["peak_underprediction"]) <= 0.8 * baseline_peak_underprediction,
         "p90_coverage_between_88_and_95_percent": 0.88 <= coverage <= 0.95,
         "no_horizon_wape_regression_over_5_percent": all(

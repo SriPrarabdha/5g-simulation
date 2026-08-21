@@ -1,0 +1,1463 @@
+{
+  "01_forecast_target_separated_wape": {
+    "candidates": [
+      "calendar-ridge",
+      "hist-gradient-quantile",
+      "lightgbm-quantile",
+      "regime-ensemble",
+      "ridge-v2"
+    ],
+    "pooled_percent": [
+      10.109119926065985,
+      11.63060515488437,
+      11.642726394970177,
+      -20.17621204376794,
+      9.278108737449008
+    ],
+    "promotion_threshold_percent": 15,
+    "series_percent": {
+      "DL Mbps": [
+        10.396079458491933,
+        12.57827668102417,
+        12.621814192335796,
+        -20.811971481902127,
+        9.760263500987621
+      ],
+      "Macro target": [
+        10.037008244413327,
+        11.168256402663754,
+        11.167722723968946,
+        -18.819182374024063,
+        9.201899342648627
+      ],
+      "Sessions": [
+        9.875133841280428,
+        11.097304712355,
+        11.088892609452241,
+        -20.936387282783276,
+        8.836954144682666
+      ],
+      "UL Mbps": [
+        9.858628524756902,
+        10.019014543124504,
+        9.987059103436401,
+        -15.43272322089825,
+        9.01449581330763
+      ]
+    }
+  },
+  "02_forecast_worst_slice_uncertainty": {
+    "bootstrap_95_interval_percent": [
+      -6.530184743386701,
+      50.93094534787986
+    ],
+    "contributing_groups": 8,
+    "model": "lightgbm-quantile",
+    "regression_percent": 14.701586496427499,
+    "scored_observations": 9
+  },
+  "03_survival_calibration_convergence": {
+    "exposure_error_percent": [
+      4.249929155344198,
+      1.5038632552774578,
+      0.41994554833089737
+    ],
+    "max_calibration_error_percent": [
+      18.803081222861795,
+      6.2332781778760555,
+      1.9278448648422541
+    ],
+    "mean_calibration_error_percent": [
+      3.097891024443355,
+      1.082252542903889,
+      0.3291614691198903
+    ],
+    "sample_sizes": [
+      100,
+      1000,
+      10000
+    ]
+  },
+  "04_survival_curves_consumed_by_mpc": {
+    "mean_curves": {
+      "empirical-n100": [
+        1.0,
+        0.9954889840912386,
+        0.9720119860116959,
+        0.9429282865929175,
+        0.9067524012786707,
+        0.8683130108514535,
+        0.8189216945826817,
+        0.7910195656183929,
+        0.7633109176216436,
+        0.7327896171133671,
+        0.6986593907208994,
+        0.6626667496015414
+      ],
+      "empirical-n1000": [
+        1.0,
+        0.9929861053084407,
+        0.9622817125195423,
+        0.9265763261446369,
+        0.8868134787150704,
+        0.8433884404290074,
+        0.7976497955696399,
+        0.7662628001383734,
+        0.7344174970028788,
+        0.7018833505655991,
+        0.6689524962804572,
+        0.635444890352488
+      ],
+      "empirical-n10000": [
+        1.0,
+        0.9915034030057864,
+        0.9588812197324269,
+        0.9208385074882934,
+        0.8787767680054439,
+        0.8336276419994574,
+        0.7883061083334698,
+        0.7560698793746173,
+        0.7236910673445215,
+        0.6912257695913117,
+        0.658104518253312,
+        0.6251731610150024
+      ],
+      "oracle": [
+        1.0,
+        0.9908068274790233,
+        0.9568626869511015,
+        0.9183140200761066,
+        0.8754826807398394,
+        0.8301812425996201,
+        0.7847536374142329,
+        0.7519438733856725,
+        0.7191341093571119,
+        0.6863243453285515,
+        0.6535145812999915,
+        0.6207048172714303
+      ],
+      "static-fallback": [
+        1.0,
+        0.9000000000000007,
+        0.810000000000001,
+        0.7289999999999993,
+        0.6561000000000007,
+        0.590490000000001,
+        0.5314410000000008,
+        0.478296899999999,
+        0.4304672100000006,
+        0.3874204890000001,
+        0.34867844009999965,
+        0.31381059609000045
+      ],
+      "uniform": [
+        1.0,
+        0.9090909090909075,
+        0.8181818181818178,
+        0.7272727272727274,
+        0.636363636363635,
+        0.5454545454545462,
+        0.4545454545454539,
+        0.3636363636363637,
+        0.2727272727272731,
+        0.1818181818181818,
+        0.09090909090909093,
+        0.0
+      ]
+    }
+  },
+  "05_survival_mpc_robustness_forest": {
+    "interval_percent": [
+      [
+        -0.9936143046051393,
+        27.229396776145936
+      ],
+      [
+        -0.4384390822591097,
+        27.557308696671406
+      ],
+      [
+        -0.5790749889126381,
+        27.293001071551682
+      ],
+      [
+        -2.935063786887049,
+        26.251708966238702
+      ],
+      [
+        2.3053412054780535,
+        25.57957160508504
+      ],
+      [
+        0.0,
+        0.0
+      ]
+    ],
+    "mean_percent": [
+      11.220229772090368,
+      11.590636698257002,
+      11.500061311405029,
+      9.905973604582535,
+      12.250545211930497,
+      0.0
+    ],
+    "order": [
+      "oracle",
+      "empirical-n100",
+      "empirical-n1000",
+      "empirical-n10000",
+      "uniform",
+      "stale-empirical"
+    ]
+  },
+  "06_survival_empirical_vs_oracle_pairs": {
+    "pairs": [
+      {
+        "empirical_percent": -7.992992149956121,
+        "oracle_percent": -3.021501630496106,
+        "scenario": "mixed_stress",
+        "seed": 46110
+      },
+      {
+        "empirical_percent": 3.4514818340688267,
+        "oracle_percent": 3.5109607362522453,
+        "scenario": "mixed_stress",
+        "seed": 46111
+      },
+      {
+        "empirical_percent": 5.96981252536064,
+        "oracle_percent": 5.589489347124218,
+        "scenario": "mixed_stress",
+        "seed": 46112
+      },
+      {
+        "empirical_percent": 50.97698883662114,
+        "oracle_percent": 51.77931836183875,
+        "scenario": "scheduled_fault",
+        "seed": 46104
+      },
+      {
+        "empirical_percent": 0.0,
+        "oracle_percent": 0.0,
+        "scenario": "scheduled_fault",
+        "seed": 46105
+      },
+      {
+        "empirical_percent": 82.3352538678269,
+        "oracle_percent": 82.34403418225938,
+        "scenario": "scheduled_fault",
+        "seed": 46106
+      },
+      {
+        "empirical_percent": 0.0,
+        "oracle_percent": 0.0,
+        "scenario": "surge",
+        "seed": 46101
+      },
+      {
+        "empirical_percent": 0.0,
+        "oracle_percent": 0.0,
+        "scenario": "surge",
+        "seed": 46102
+      },
+      {
+        "empirical_percent": 0.0,
+        "oracle_percent": 0.0,
+        "scenario": "surge",
+        "seed": 46103
+      },
+      {
+        "empirical_percent": -12.782760957086467,
+        "oracle_percent": -8.57669556583348,
+        "scenario": "unannounced_outage",
+        "seed": 46107
+      },
+      {
+        "empirical_percent": -10.20741243048132,
+        "oracle_percent": -4.389835327957424,
+        "scenario": "unannounced_outage",
+        "seed": 46108
+      },
+      {
+        "empirical_percent": 7.121311728636758,
+        "oracle_percent": 7.406987161896798,
+        "scenario": "unannounced_outage",
+        "seed": 46109
+      }
+    ]
+  },
+  "07_all_mpc_candidates_forest": {
+    "candidates": [
+      "existing-baseline",
+      "empirical-survival",
+      "scheduled-only",
+      "failure-domain",
+      "conservative-combined",
+      "calendar-optimistic-stale",
+      "calendar-conservative",
+      "scheduled-h2-t10",
+      "scheduled-h3-t10",
+      "scheduled-h6-t10",
+      "scheduled-h3-t30",
+      "scheduled-h6-t30",
+      "calendar-conservative-h3-t30"
+    ],
+    "interval_percent": [
+      [
+        -2.3449451824797896,
+        26.61605892071431
+      ],
+      [
+        -1.8945678343969565,
+        26.791692828272453
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        -3.585780305992229,
+        13.4694294594271
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        -1.010271583431709,
+        0.30181900964989844
+      ],
+      [
+        -0.5496991634627292,
+        0.02185527683462147
+      ],
+      [
+        -0.08764839155517853,
+        0.053724801183927626
+      ],
+      [
+        -0.5496991634627292,
+        0.02185527683462147
+      ],
+      [
+        -0.08764839155517853,
+        0.053724801183927626
+      ],
+      [
+        -0.537561539567789,
+        0.04602612131092924
+      ]
+    ],
+    "mean_percent": [
+      10.26056877872299,
+      10.631539727870255,
+      0.0,
+      3.7908903790447597,
+      0.0,
+      0.0,
+      0.0,
+      -0.22283234406269276,
+      -0.18556523915780165,
+      -0.007408265576123173,
+      -0.18556523915780165,
+      -0.007408265576123173,
+      -0.16384513941895323
+    ]
+  },
+  "08_mpc_scenario_improvement_heatmap": {
+    "candidates": [
+      "existing-baseline",
+      "empirical-survival",
+      "scheduled-only",
+      "failure-domain",
+      "conservative-combined",
+      "calendar-optimistic-stale",
+      "calendar-conservative",
+      "scheduled-h2-t10",
+      "scheduled-h3-t10",
+      "scheduled-h6-t10",
+      "scheduled-h3-t30",
+      "scheduled-h6-t30",
+      "calendar-conservative-h3-t30"
+    ],
+    "improvement_percent": [
+      [
+        0.0,
+        54.23649891072688,
+        2.249800208003458,
+        0.819482354959237
+      ],
+      [
+        0.0,
+        54.23649891072688,
+        2.0152226560292656,
+        1.6877823856945842
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        9.743216161792395,
+        -0.4877702131328066,
+        2.129736754914511
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        -3.6488586673297663,
+        0.0,
+        0.1671807680379378
+      ],
+      [
+        0.0,
+        -1.9526010591670868,
+        0.0,
+        0.0914461879667543
+      ],
+      [
+        0.0,
+        -0.060271200486810485,
+        0.0,
+        0.06641630020323826
+      ],
+      [
+        0.0,
+        -1.9526010591670868,
+        0.0,
+        0.0914461879667543
+      ],
+      [
+        0.0,
+        -0.060271200486810485,
+        0.0,
+        0.06641630020323826
+      ],
+      [
+        0.0,
+        -1.9597126691510536,
+        0.0,
+        0.12838740265881018
+      ]
+    ],
+    "scenarios": [
+      "surge",
+      "scheduled_fault",
+      "unannounced_outage",
+      "mixed_stress"
+    ]
+  },
+  "09_solver_status_and_static_fallback": {
+    "candidates": [
+      "existing-baseline",
+      "empirical-survival",
+      "scheduled-only",
+      "failure-domain",
+      "conservative-combined",
+      "calendar-optimistic-stale",
+      "calendar-conservative",
+      "scheduled-h2-t10",
+      "scheduled-h3-t10",
+      "scheduled-h6-t10",
+      "scheduled-h3-t30",
+      "scheduled-h6-t30",
+      "calendar-conservative-h3-t30"
+    ],
+    "status_fractions": [
+      {
+        "counts": {
+          "optimal": 514,
+          "skipped": 12,
+          "timeout": 1202
+        },
+        "failed": 0.6956018518518519,
+        "optimal": 0.2974537037037037,
+        "skipped": 0.006944444444444444
+      },
+      {
+        "counts": {
+          "optimal": 516,
+          "skipped": 12,
+          "timeout": 1200
+        },
+        "failed": 0.6944444444444444,
+        "optimal": 0.2986111111111111,
+        "skipped": 0.006944444444444444
+      },
+      {
+        "counts": {
+          "skipped": 1350,
+          "timeout": 378
+        },
+        "failed": 0.21875,
+        "optimal": 0.0,
+        "skipped": 0.78125
+      },
+      {
+        "counts": {
+          "optimal": 352,
+          "skipped": 12,
+          "timeout": 1364
+        },
+        "failed": 0.7893518518518519,
+        "optimal": 0.2037037037037037,
+        "skipped": 0.006944444444444444
+      },
+      {
+        "counts": {
+          "skipped": 1350,
+          "timeout": 378
+        },
+        "failed": 0.21875,
+        "optimal": 0.0,
+        "skipped": 0.78125
+      },
+      {
+        "counts": {
+          "skipped": 1350,
+          "timeout": 378
+        },
+        "failed": 0.21875,
+        "optimal": 0.0,
+        "skipped": 0.78125
+      },
+      {
+        "counts": {
+          "error": 3,
+          "skipped": 1350,
+          "timeout": 375
+        },
+        "failed": 0.21875,
+        "optimal": 0.0,
+        "skipped": 0.78125
+      },
+      {
+        "counts": {
+          "infeasible": 31,
+          "optimal": 280,
+          "skipped": 1417
+        },
+        "failed": 0.017939814814814815,
+        "optimal": 0.16203703703703703,
+        "skipped": 0.8200231481481481
+      },
+      {
+        "counts": {
+          "infeasible": 32,
+          "optimal": 287,
+          "skipped": 1409
+        },
+        "failed": 0.018518518518518517,
+        "optimal": 0.16608796296296297,
+        "skipped": 0.8153935185185185
+      },
+      {
+        "counts": {
+          "infeasible": 31,
+          "optimal": 311,
+          "skipped": 1386
+        },
+        "failed": 0.017939814814814815,
+        "optimal": 0.17997685185185186,
+        "skipped": 0.8020833333333334
+      },
+      {
+        "counts": {
+          "infeasible": 32,
+          "optimal": 287,
+          "skipped": 1409
+        },
+        "failed": 0.018518518518518517,
+        "optimal": 0.16608796296296297,
+        "skipped": 0.8153935185185185
+      },
+      {
+        "counts": {
+          "infeasible": 31,
+          "optimal": 311,
+          "skipped": 1386
+        },
+        "failed": 0.017939814814814815,
+        "optimal": 0.17997685185185186,
+        "skipped": 0.8020833333333334
+      },
+      {
+        "counts": {
+          "error": 1,
+          "infeasible": 37,
+          "optimal": 281,
+          "skipped": 1409
+        },
+        "failed": 0.02199074074074074,
+        "optimal": 0.16261574074074073,
+        "skipped": 0.8153935185185185
+      }
+    ]
+  },
+  "10_day5_gate_scorecard": {
+    "candidates": [
+      "existing-baseline",
+      "empirical-survival",
+      "scheduled-only",
+      "failure-domain",
+      "conservative-combined",
+      "calendar-optimistic-stale",
+      "calendar-conservative",
+      "scheduled-h2-t10",
+      "scheduled-h3-t10",
+      "scheduled-h6-t10",
+      "scheduled-h3-t30",
+      "scheduled-h6-t30",
+      "calendar-conservative-h3-t30"
+    ],
+    "gates": [
+      "mean_pair_ul_improvement_at_least_10_percent",
+      "bootstrap_lower_bound_above_zero",
+      "positive_severity_weighted_improvement",
+      "unknown_mixed_regression_no_worse_than_minus_2_percent",
+      "worst_pair_better_than_minus_10_percent",
+      "no_dl_overload_drop_or_establishment_regression",
+      "no_solver_timeout_or_error",
+      "unexpected_fallback_fraction_within_1_percent",
+      "skipped_decision_fraction_within_95_percent",
+      "normalized_churn_within_0_05_l1_per_group_decision",
+      "measured_empirical_survival_robustness"
+    ],
+    "pass_matrix": [
+      [
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    ]
+  },
+  "11_guarded_mpc_production_architecture": {
+    "fallback_triggers": [
+      "unknown outage",
+      "telemetry uncertainty",
+      "stale survival",
+      "solver timeout/error",
+      "failed same-state certificate"
+    ],
+    "static_default": true
+  },
+  "12_campaign_scale_and_release_discipline": {
+    "candidates": 13,
+    "passing_candidates": 0,
+    "release_consumed": false,
+    "stage_pairs": {
+      "Guarded\ncandidates": 84,
+      "Solver\nfeasibility": 72,
+      "Survival\ncomparison": 72
+    },
+    "total_pairs": 228,
+    "validation_consumed": false
+  },
+  "13_distribution_blind_survival_matrix": {
+    "drift_refreshed_mae_percent": 2.7454789664388755,
+    "mean_mae_percent": {
+      "drift": 4.17368623871163,
+      "heavy-tail-mixture": 2.9151259364083337,
+      "lognormal": 3.1805269769589937,
+      "uniform": 3.522481775183073,
+      "weibull": 2.9709837109467387
+    },
+    "worst_mae_percent": {
+      "drift": 4.402570740492273,
+      "heavy-tail-mixture": 3.1714407997344827,
+      "lognormal": 3.391237250498802,
+      "uniform": 3.699999442540773,
+      "weibull": 3.175521550569139
+    }
+  },
+  "14_all_session_candidates_forest": {
+    "mpc-h3-configured-survival-diagnostic": {
+      "ci": [
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "mechanism_exercised": false
+    },
+    "mpc-h3-lifecycle-lognormal": {
+      "ci": [
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "mechanism_exercised": false
+    },
+    "mpc-h3-ma6-configured-diagnostic": {
+      "ci": [
+        -0.8648322290302294,
+        0.13874313440536637
+      ],
+      "mean": -0.2802879544846561,
+      "mechanism_exercised": true
+    },
+    "mpc-h3-ma6-lifecycle-heavy-tail": {
+      "ci": [
+        -0.8923206334213636,
+        0.056245301548739565
+      ],
+      "mean": -0.2934483262347603,
+      "mechanism_exercised": true
+    },
+    "mpc-h3-ma6-lifecycle-lognormal": {
+      "ci": [
+        -0.4970664976589263,
+        0.06905869887397537
+      ],
+      "mean": -0.1615338977599721,
+      "mechanism_exercised": true
+    },
+    "mpc-h6-lifecycle-heavy-tail": {
+      "ci": [
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "mechanism_exercised": false
+    },
+    "predrain-adaptive-050-075": {
+      "ci": [
+        -1.1520302175257096,
+        17.186567910303182
+      ],
+      "mean": 6.6105008887993675,
+      "mechanism_exercised": true
+    },
+    "predrain-adaptive-060-085": {
+      "ci": [
+        -1.1520302175257096,
+        17.216506438169574
+      ],
+      "mean": 6.625470152732564,
+      "mechanism_exercised": true
+    },
+    "predrain-balanced": {
+      "ci": [
+        3.8856630424824297,
+        35.430307720226125
+      ],
+      "mean": 18.406261188431483,
+      "mechanism_exercised": true
+    },
+    "predrain-balanced-blend-025": {
+      "ci": [
+        0.6609833175378349,
+        14.19263961673812
+      ],
+      "mean": 6.346123690008408,
+      "mechanism_exercised": true
+    },
+    "predrain-balanced-blend-050": {
+      "ci": [
+        0.9880416458571079,
+        21.91704845002794
+      ],
+      "mean": 10.157327539261113,
+      "mechanism_exercised": true
+    },
+    "predrain-early-diverse": {
+      "ci": [
+        3.776954521923975,
+        36.63421270842523
+      ],
+      "mean": 18.96811271747642,
+      "mechanism_exercised": true
+    },
+    "predrain-fixed-035": {
+      "ci": [
+        -0.8391754789291969,
+        16.366494335598688
+      ],
+      "mean": 6.151815345355613,
+      "mechanism_exercised": true
+    },
+    "predrain-fixed-040": {
+      "ci": [
+        -0.9889196677222425,
+        16.740485623214347
+      ],
+      "mean": 6.392496396274136,
+      "mechanism_exercised": true
+    },
+    "predrain-fixed-045": {
+      "ci": [
+        -1.1157968838187302,
+        17.184564573258466
+      ],
+      "mean": 6.651682129906621,
+      "mechanism_exercised": true
+    }
+  },
+  "15_new_scenario_improvement_heatmap": {
+    "mpc-h3-configured-survival-diagnostic": {
+      "mixed_stress": 0.0,
+      "scheduled_fault": 0.0,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "mpc-h3-lifecycle-lognormal": {
+      "mixed_stress": 0.0,
+      "scheduled_fault": 0.0,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "mpc-h3-ma6-configured-diagnostic": {
+      "mixed_stress": 0.17630903466358216,
+      "scheduled_fault": -1.2974608526022064,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "mpc-h3-ma6-lifecycle-heavy-tail": {
+      "mixed_stress": 0.09490241956081029,
+      "scheduled_fault": -1.2686957244998516,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "mpc-h3-ma6-lifecycle-lognormal": {
+      "mixed_stress": 0.01209733059082884,
+      "scheduled_fault": -0.6582329216307172,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "mpc-h6-lifecycle-heavy-tail": {
+      "mixed_stress": 0.0,
+      "scheduled_fault": 0.0,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-adaptive-050-075": {
+      "mixed_stress": -5.086602401687255,
+      "scheduled_fault": 31.528605956884725,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-adaptive-060-085": {
+      "mixed_stress": -5.086602401687255,
+      "scheduled_fault": 31.58848301261751,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-balanced": {
+      "mixed_stress": -5.5783827926945255,
+      "scheduled_fault": 79.20342754642046,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-balanced-blend-025": {
+      "mixed_stress": -1.3711942728788753,
+      "scheduled_fault": 26.755689032912507,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-balanced-blend-050": {
+      "mixed_stress": -3.2652620831599313,
+      "scheduled_fault": 43.89457224020438,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-early-diverse": {
+      "mixed_stress": -7.181601877011798,
+      "scheduled_fault": 83.05405274691746,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-fixed-035": {
+      "mixed_stress": -3.7917844276779444,
+      "scheduled_fault": 28.3990458091004,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-fixed-040": {
+      "mixed_stress": -4.438115086121435,
+      "scheduled_fault": 30.00810067121798,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    },
+    "predrain-fixed-045": {
+      "mixed_stress": -4.987164898414446,
+      "scheduled_fault": 31.593893418040924,
+      "surge": 0.0,
+      "unannounced_outage": 0.0
+    }
+  },
+  "16_all_session_gate_scorecard": {
+    "mpc-h3-configured-survival-diagnostic": {
+      "bootstrap_lower_bound_above_zero": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": false,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": false,
+      "skipped_decision_fraction_within_95_percent": false,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": true
+    },
+    "mpc-h3-lifecycle-lognormal": {
+      "bootstrap_lower_bound_above_zero": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": false,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": false,
+      "skipped_decision_fraction_within_95_percent": false,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": true
+    },
+    "mpc-h3-ma6-configured-diagnostic": {
+      "bootstrap_lower_bound_above_zero": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": false,
+      "no_dl_overload_drop_or_establishment_regression": false,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": true
+    },
+    "mpc-h3-ma6-lifecycle-heavy-tail": {
+      "bootstrap_lower_bound_above_zero": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": false,
+      "no_dl_overload_drop_or_establishment_regression": false,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": true
+    },
+    "mpc-h3-ma6-lifecycle-lognormal": {
+      "bootstrap_lower_bound_above_zero": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": false,
+      "no_dl_overload_drop_or_establishment_regression": false,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": true
+    },
+    "mpc-h6-lifecycle-heavy-tail": {
+      "bootstrap_lower_bound_above_zero": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": false,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": false,
+      "skipped_decision_fraction_within_95_percent": false,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": true
+    },
+    "predrain-adaptive-050-075": {
+      "bootstrap_lower_bound_above_zero": false,
+      "end_to_end_decision_latency_within_candidate_deadline": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": false
+    },
+    "predrain-adaptive-060-085": {
+      "bootstrap_lower_bound_above_zero": false,
+      "end_to_end_decision_latency_within_candidate_deadline": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": false
+    },
+    "predrain-balanced": {
+      "bootstrap_lower_bound_above_zero": true,
+      "mean_pair_ul_improvement_at_least_10_percent": true,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": false,
+      "positive_severity_weighted_improvement": false,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": false
+    },
+    "predrain-balanced-blend-025": {
+      "bootstrap_lower_bound_above_zero": true,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": true
+    },
+    "predrain-balanced-blend-050": {
+      "bootstrap_lower_bound_above_zero": true,
+      "mean_pair_ul_improvement_at_least_10_percent": true,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": false
+    },
+    "predrain-early-diverse": {
+      "bootstrap_lower_bound_above_zero": true,
+      "mean_pair_ul_improvement_at_least_10_percent": true,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": false,
+      "positive_severity_weighted_improvement": false,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": false
+    },
+    "predrain-fixed-035": {
+      "bootstrap_lower_bound_above_zero": false,
+      "end_to_end_decision_latency_within_candidate_deadline": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": true
+    },
+    "predrain-fixed-040": {
+      "bootstrap_lower_bound_above_zero": false,
+      "end_to_end_decision_latency_within_candidate_deadline": true,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": false
+    },
+    "predrain-fixed-045": {
+      "bootstrap_lower_bound_above_zero": false,
+      "end_to_end_decision_latency_within_candidate_deadline": false,
+      "mean_pair_ul_improvement_at_least_10_percent": false,
+      "measured_empirical_survival_robustness": true,
+      "no_dl_overload_drop_or_establishment_regression": true,
+      "no_solver_timeout_or_error": true,
+      "normalized_churn_within_0_05_l1_per_group_decision": true,
+      "positive_severity_weighted_improvement": true,
+      "skipped_decision_fraction_within_95_percent": true,
+      "unexpected_fallback_fraction_within_1_percent": true,
+      "unknown_mixed_regression_no_worse_than_minus_2_percent": true,
+      "worst_pair_better_than_minus_10_percent": false
+    }
+  },
+  "17_predrain_benefit_tail_frontier": {
+    "predrain-adaptive-050-075": {
+      "churn": 0.0278029161150205,
+      "mean": 6.6105008887993675,
+      "worst": -11.871595180835524
+    },
+    "predrain-adaptive-060-085": {
+      "churn": 0.027888984667139235,
+      "mean": 6.625470152732564,
+      "worst": -11.871595180835524
+    },
+    "predrain-balanced": {
+      "churn": 0.06399614904927849,
+      "mean": 18.406261188431483,
+      "worst": -16.215715836081277
+    },
+    "predrain-balanced-blend-025": {
+      "churn": 0.014035461096568317,
+      "mean": 6.346123690008408,
+      "worst": -4.53749561172238
+    },
+    "predrain-balanced-blend-050": {
+      "churn": 0.02978501601516251,
+      "mean": 10.157327539261113,
+      "worst": -10.370195141938781
+    },
+    "predrain-early-diverse": {
+      "churn": 0.056525607291135274,
+      "mean": 18.96811271747642,
+      "worst": -20.194229935286035
+    },
+    "predrain-fixed-035": {
+      "churn": 0.020136544031213507,
+      "mean": 6.151815345355613,
+      "worst": -9.487558798004073
+    },
+    "predrain-fixed-040": {
+      "churn": 0.022957747867029202,
+      "mean": 6.392496396274136,
+      "worst": -10.57800351419796
+    },
+    "predrain-fixed-045": {
+      "churn": 0.026025865422024994,
+      "mean": 6.651682129906621,
+      "worst": -11.971671939654591
+    }
+  },
+  "18_mpc_action_funnel": {
+    "mpc-h3-configured-survival-diagnostic": {
+      "certified": 0,
+      "executed": 0,
+      "proposed": 0,
+      "requested": 3456
+    },
+    "mpc-h3-lifecycle-lognormal": {
+      "certified": 0,
+      "executed": 0,
+      "proposed": 0,
+      "requested": 3456
+    },
+    "mpc-h3-ma6-configured-diagnostic": {
+      "certified": 343,
+      "executed": 343,
+      "proposed": 566,
+      "requested": 3456
+    },
+    "mpc-h3-ma6-lifecycle-heavy-tail": {
+      "certified": 343,
+      "executed": 343,
+      "proposed": 565,
+      "requested": 3456
+    },
+    "mpc-h3-ma6-lifecycle-lognormal": {
+      "certified": 346,
+      "executed": 346,
+      "proposed": 566,
+      "requested": 3456
+    },
+    "mpc-h6-lifecycle-heavy-tail": {
+      "certified": 0,
+      "executed": 0,
+      "proposed": 0,
+      "requested": 3456
+    }
+  },
+  "19_end_to_end_latency_audit": {
+    "phase31_v2_mpc_max_ms": {
+      "MPC configured": 6150,
+      "MPC heavy-tail": 6182,
+      "MPC lognormal": 5395
+    },
+    "phase32_end_to_end_max_ms": {
+      "adaptive 50\u201375": 739.0,
+      "adaptive 60\u201385": 628.0,
+      "fixed 35%": 764.0,
+      "fixed 40%": 225.0,
+      "fixed 45%": 970.0
+    }
+  },
+  "20_adaptive_blend_causal_lag": {
+    "predrain-adaptive-050-075": {
+      "blend_max": 50.0,
+      "blend_mean": 46.997434859856334,
+      "blend_min": 25.0,
+      "util_max": 170.7914151514461,
+      "util_min": 30.12659229169613
+    },
+    "predrain-adaptive-060-085": {
+      "blend_max": 50.0,
+      "blend_mean": 47.49840249764956,
+      "blend_min": 25.0,
+      "util_max": 170.7914151514461,
+      "util_min": 30.12659229169613
+    }
+  },
+  "21_campaign_scale_seed_firewall": {
+    "campaign_counts": {
+      "Distribution-blind\nsurvival": 125,
+      "Original\nPhase 3": 228,
+      "Phase 3.1\nv1": 120,
+      "Phase 3.1\nv2": 120,
+      "Phase 3.2\nv1": 120
+    },
+    "paired_total": 588,
+    "protected_consumed": false,
+    "survival_trials": 125
+  },
+  "22_worked_vs_did_not_work": {
+    "decision": "retain_static",
+    "did_not_work": [
+      [
+        "Forecast promotion",
+        "Useful gains remained below the frozen 15% target"
+      ],
+      [
+        "MPC benefit",
+        "Exercised variants were neutral/slightly harmful"
+      ],
+      [
+        "Generalization",
+        "Scheduled benefit did not transfer safely to mixed stress"
+      ],
+      [
+        "Tail safety",
+        "Strong blends missed the \u221210% worst-pair gate"
+      ],
+      [
+        "Adaptive protection",
+        "Surprise demand arrived after persistent-session commitment began"
+      ],
+      [
+        "Operational latency",
+        "Solver status hid end-to-end outliers up to 970 ms / MPC >6 s"
+      ]
+    ],
+    "worked": [
+      [
+        "Reproducibility",
+        "29/29 frozen interfaces restored; content-addressed archives"
+      ],
+      [
+        "Lifecycle estimator",
+        "Observable export + Kaplan\u2013Meier calibrated across 5 hidden distributions"
+      ],
+      [
+        "Fail-closed behavior",
+        "Stale survival returned to Static in 100% of trials"
+      ],
+      [
+        "Mechanism visibility",
+        "Proposed \u2192 certified \u2192 accepted \u2192 executed funnel captured"
+      ],
+      [
+        "Scheduled headroom",
+        "Pre-drain repeatedly reduced scheduled-fault overload"
+      ],
+      [
+        "Release discipline",
+        "588 paired runs, 28 candidates, zero unsafe promotions"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "candidate_mode": "guarded_shadow_or_replay_only",
+  "corrections": {
+    "latency_context": "campaign_saturation_not_isolated_control_plane_benchmark",
+    "predrain_overflow": "fail_closed_to_static_with_resource_slack",
+    "promotion_gate": "zero_predicted_overflow",
+    "run_inventory": {
+      "controller_pairs_total": 588,
+      "declared_candidate_configurations": 28,
+      "declared_candidate_pairs": 516,
+      "survival_sensitivity_controller_pairs": 72
+    },
+    "unknown_mixed_label": "combined_severity_weighted_unknown_plus_mixed"
+  },
+  "created_at": "2026-08-21T13:21:00.310569Z",
+  "frozen": true,
+  "interfaces": {
+    "experiments/freeze_phase31.py": "1045d7a85a6f5b044ae73961c9fbf7aedb31f81d704d89e5063034c085f8b934",
+    "experiments/freeze_phase32.py": "b1185d88cccc07723c7b20e4a89266e3846f2387d1f97ca983b5657249b480d1",
+    "experiments/freeze_phase3_cdot_v6.py": "65530c106950cf2bdd933393e69978b9b7b0f7d91f2ade36452748f20a6321d2",
+    "optimization/predrain_flow.py": "6bf37f6774401a90e634af703c8955cc97a776e574666fd669c859882c9d03cf",
+    "schemas/policy.py": "b7f2afe9ec614b10838ae81fb3eb804591ac06e9f58602585256cb27d48b9ff5",
+    "scripts/build_phase3_cdot_showcase.py": "98dc076ce7f8eaf8b5b58b8dc57160b33f6896c1183eee1c693be54cb6970143",
+    "scripts/build_phase3_cdot_showcase_v5.py": "28116da54a357c994a2ef89786ff0958a180849fa90b92532d89b5ae9797a5da",
+    "scripts/build_phase3_cdot_showcase_v6.py": "cef1b34d81dc1e7c6406fcbe15571d2884c6575bb1ad4102de3e3a40966f2a52",
+    "scripts/run_phase31_candidate_matrix.py": "99bdde0150389d6ac7782d3fe1ddf4c32e574b116e70903eae964c254db43c41",
+    "simulator/macro/controllers.py": "89c69866b56967c1dad254ae66d38ab4a5b7249e9614fa92402f14e349482c85",
+    "tests/test_control_science.py": "d420e89080c49cce757778af3eba1344f1ae1d9d957c22bcd9fd39438d5fabd1",
+    "tests/test_simulator.py": "1fb06b5d14cc403dcd9795995b4eb79e90755005f03a1f4d5b3d3f069f9e120b"
+  },
+  "oracle_evidence": {
+    "path": "output/models/extreme-oracle-bound-evaluation-v1.json",
+    "sha256": "34d8b8b5d4f1b947e91d8327223c25cdef98f0bb5494cc340f9ca3a5e33d01da",
+    "source_job_output": "/home/abharadwaj/5g-stage1/overnight-20260817/oracle/evaluation/oracle-bound-evaluation-s036001-s036002.json"
+  },
+  "production_controller": "static-capacity-v1",
+  "protected_release_seeds_consumed": false,
+  "protected_validation_seeds_consumed": false,
+  "schema_version": "phase3-cdot-v6-interface-freeze/1.0"
+}

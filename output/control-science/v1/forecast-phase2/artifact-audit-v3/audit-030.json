@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "05c1ab14d6de92bf1849b705ab4c2fab08f9404e61e1fcdddb03fee170713a13",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "1756026b16ee68130ad55b592d6189cf3e5baae57dbb0c03dd8ac502232bb2b4",
+      "metric_file_sha256": "ca34d21034ec64276880d17e6396400ae3a133b98d9e3713f1d08c0bad9fa510",
+      "trained_bundle_sha256": "b677195f1d3ceea28540b58f419a7840cbd352ac618836aaad173cc3250a7127"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "9a84ef77c2b88a9797ab2c026df6b571dc7bd7c9e0852442d8f7bca5a41ee54f",
+      "metric_file_sha256": "057ab6377e636250978d359e41787de02ff67a59a747b18d1c86f5cc6bbabb99",
+      "trained_bundle_sha256": "6f2b41e10b3d6411471a337e639ddcec7b2d9ca3d63df2abfc4ce1b029dcf4d4"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "a181ff90758c123a9906b82b9842d97dea2e2e9d66f6019885ee4eaaa91be598",
+      "metric_file_sha256": "c11a381cd498ef64b21c0747e3ad2cf6a89cede8131a2df5eda9e148ca3ffb1b",
+      "trained_bundle_sha256": "39c78c3b99367196f9609f040a5edfe2c863b6aacf55763a91ddf83c49224348"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "d12e09fb2003ccff1ff6c25251fe1f1e4de98dd75e01008f0464f661a75ac1e3",
+      "metric_file_sha256": "902f6a183c4d6345d43ccebead5793070ada093fa612f5109aac2664319ab9d8",
+      "trained_bundle_sha256": "91c37e599cd6898a687611cc43797aab4363792719c3ba7e47a4a5e63b2ff2cf"
+    }
+  },
+  "group_id": "east|industry-telemetry|1-223344",
+  "group_index": 30,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

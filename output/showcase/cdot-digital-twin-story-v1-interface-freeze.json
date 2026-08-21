@@ -1,0 +1,23 @@
+{
+  "candidate_mode": "guarded_shadow_or_replay_only",
+  "created_at": "2026-08-21T13:49:55.409224Z",
+  "decision": "retain_static",
+  "frozen": true,
+  "historical_results_rescored": false,
+  "interfaces": {
+    "experiments/freeze_cdot_digital_twin_story_v1.py": "eb2e7af54dd0e7f381d38e4a1281ab36728487074b23050c0243b7cc1286ccc6",
+    "output/control-science/v1/phase3-cdot-showcase-v6/artifact-manifest.json": "ef582ec9052005d044b60a926576e4a0719d7ff705e1aa4c464e895a25c98464",
+    "output/control-science/v1/phase3-cdot-v6-interface-freeze.json": "9afdeaa0369e5d7827b1c2f6473c49acff0c4cac201605f191f0e820e9571fe7",
+    "output/showcase/cdot-production-final/metrics.json": "3223cbad08fe856a4a20b6114c4208c94b3473f4ef8d9511a1d78b96ce13d887",
+    "presentation/delhi/build-report.json": "4d187daeca7434acff759e8cce751948c27ab1f7749ae51ff92ccf41766655e9",
+    "presentation/delhi_evidence_manifest.json": "3b23051f8542c688d030f1730203d4b4cb820571d01c30d8235e7d76753957d4",
+    "scripts/build_cdot_digital_twin_story_v1.py": "f2f6c5ece3f610a8f41fafa3b010ef02c41661ce7794f631638dedbf8aef6d1b",
+    "scripts/build_phase3_cdot_showcase_v5.py": "28116da54a357c994a2ef89786ff0958a180849fa90b92532d89b5ae9797a5da",
+    "scripts/build_phase3_cdot_showcase_v6.py": "cef1b34d81dc1e7c6406fcbe15571d2884c6575bb1ad4102de3e3a40966f2a52"
+  },
+  "new_experiments_authorized": false,
+  "production_controller": "static-capacity-v1",
+  "protected_release_seeds_consumed": false,
+  "protected_validation_seeds_consumed": false,
+  "schema_version": "cdot-digital-twin-story-freeze/1.0"
+}

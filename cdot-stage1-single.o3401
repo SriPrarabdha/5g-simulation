@@ -1,7 +1,0 @@
-[env] root=/home/abharadwaj/Projects/5g-simulation
-[env] python=/home/abharadwaj/.conda/envs/penv/bin/python (Python 3.11.15)
-[env] host=x8000c0s0b0n0 job=3401.wlm array_index=none
-[stage1-single] host=x8000c0s0b0n0 scratch=/var/tmp/pbs.3401.wlm/cdot-stage1-single-3401.wlm.VL2pxn controller=static
-df: /home/abharadwaj/5g-stage1/extreme/shards: No such file or directory
-Filesystem      Size  Used Avail Use% Mounted on
-tmpfs            63G   15G   48G  24% /

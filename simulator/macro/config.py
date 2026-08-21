@@ -180,6 +180,10 @@ class StadiumPhaseV2:
     end_step: int
     group_ids: tuple[str, ...]
     arrival_multiplier: float
+    forecast_hint_multiplier: float = 1.0
+    known_at_step: int = 0
+    forecast_start_step: int | None = None
+    forecast_end_step: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -234,6 +238,18 @@ class TrafficModelV2:
                 raise ValueError("invalid correlated stadium phase")
             if phase.arrival_multiplier < 0 or not phase.group_ids:
                 raise ValueError("stadium phases require groups and a non-negative multiplier")
+            if phase.forecast_hint_multiplier <= 0:
+                raise ValueError("stadium calendar hints must be positive")
+            forecast_start = (
+                phase.start_step if phase.forecast_start_step is None
+                else phase.forecast_start_step
+            )
+            forecast_end = (
+                phase.end_step if phase.forecast_end_step is None
+                else phase.forecast_end_step
+            )
+            if not 0 <= phase.known_at_step <= forecast_start < forecast_end:
+                raise ValueError("stadium calendar timing is invalid")
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "TrafficModelV2":
@@ -250,6 +266,16 @@ class TrafficModelV2:
             stadium_phases=tuple(StadiumPhaseV2(
                 name=item["name"], start_step=int(item["start_step"]), end_step=int(item["end_step"]),
                 group_ids=tuple(item["group_ids"]), arrival_multiplier=float(item["arrival_multiplier"]),
+                forecast_hint_multiplier=float(item.get("forecast_hint_multiplier", 1.0)),
+                known_at_step=int(item.get("known_at_step", 0)),
+                forecast_start_step=(
+                    int(item["forecast_start_step"])
+                    if item.get("forecast_start_step") is not None else None
+                ),
+                forecast_end_step=(
+                    int(item["forecast_end_step"])
+                    if item.get("forecast_end_step") is not None else None
+                ),
             ) for item in data.get("stadium_phases", [])),
             telemetry=TelemetryPathologyV2(**data.get("telemetry", {})),
         )

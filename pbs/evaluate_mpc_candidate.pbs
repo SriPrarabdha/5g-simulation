@@ -16,11 +16,22 @@ source pbs/env.sh
 : "${MPC_PROFILE:?set development MPC candidate}"
 : "${EVALUATION_ROOT:?set durable shared evaluation root}"
 
+survival_args=()
+if [ -n "${SURVIVAL_BUNDLE:-}" ]; then
+  survival_args=(--survival-bundle "$SURVIVAL_BUNDLE")
+fi
+freeze_args=()
+if [ -n "${INTERFACE_FREEZE:-}" ]; then
+  freeze_args=(--interface-freeze "$INTERFACE_FREEZE")
+fi
+
 mkdir -p "$EVALUATION_ROOT/pairs"
 "$PYTHON_BIN" scripts/run_mpc_candidate_parallel.py \
   --manifest "$MANIFEST" \
   --forecast-bundle "$FORECAST_BUNDLE" \
   --mpc-profile "$MPC_PROFILE" \
+  "${survival_args[@]}" \
+  "${freeze_args[@]}" \
   --seed-start "${SEED_START:-33001}" \
   --total-seeds "${TOTAL_SEEDS:-30}" \
   --steps "${STEPS:-2880}" \

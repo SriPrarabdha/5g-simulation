@@ -8,9 +8,10 @@ or a conservative static prior without changing the optimizer.
 from __future__ import annotations
 
 import math
+import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Iterable, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
 
@@ -27,6 +28,58 @@ class SessionLifecycle:
     def __post_init__(self) -> None:
         if not self.group_id or self.duration_steps < 1:
             raise ValueError("lifecycle observations require a group and positive duration")
+
+
+@dataclass(frozen=True, slots=True)
+class SessionTelemetry:
+    """Deployment-facing start/end record used to derive censored lifecycles."""
+
+    session_id: str
+    group_id: str
+    started_step: int
+    ended_step: int | None = None
+    service_class: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.session_id or not self.group_id or self.started_step < 0:
+            raise ValueError("session telemetry requires identifiers and a non-negative start")
+        if self.ended_step is not None and self.ended_step < self.started_step:
+            raise ValueError("session end cannot precede session start")
+
+
+def extract_session_lifecycles(
+    records: Iterable[SessionTelemetry], *, observed_through_step: int,
+) -> tuple[SessionLifecycle, ...]:
+    """Convert ordinary start/end telemetry into completed/right-censored rows.
+
+    Records starting after the causal cutoff are excluded.  An absent end, or
+    an end after the cutoff, becomes a right-censored observation at the
+    cutoff.  No simulator duration parameters are needed by this operation.
+    """
+
+    if observed_through_step < 0:
+        raise ValueError("the lifecycle observation cutoff must be non-negative")
+    result: list[SessionLifecycle] = []
+    seen: set[str] = set()
+    for record in records:
+        if record.session_id in seen:
+            raise ValueError(f"duplicate session telemetry id: {record.session_id}")
+        seen.add(record.session_id)
+        if record.started_step > observed_through_step:
+            continue
+        completed = (
+            record.ended_step is not None
+            and record.ended_step <= observed_through_step
+        )
+        last = record.ended_step if completed else observed_through_step
+        assert last is not None
+        result.append(SessionLifecycle(
+            record.group_id,
+            max(1, last - record.started_step + 1),
+            completed,
+            record.service_class,
+        ))
+    return tuple(result)
 
 
 @dataclass(frozen=True, slots=True)
@@ -217,3 +270,87 @@ class EmpiricalSurvivalProvider:
                 )
             result[group_id] = table
         return result
+
+
+def write_survival_tables(
+    path: str,
+    tables: Mapping[str, SurvivalTable],
+    *,
+    guardrail_evidence: Mapping[str, Any] | None = None,
+    provenance: Mapping[str, Any] | None = None,
+) -> None:
+    if guardrail_evidence is not None:
+        required = {"measured", "passed", "comparison_sha256", "criteria"}
+        if not required.issubset(guardrail_evidence):
+            raise ValueError("survival guardrail evidence is incomplete")
+        if bool(guardrail_evidence["passed"]) and not bool(guardrail_evidence["measured"]):
+            raise ValueError("an unmeasured survival guardrail cannot pass")
+    payload = {
+        "schema_version": (
+            "survival-tables/2.0"
+            if guardrail_evidence is not None or provenance is not None
+            else "survival-tables/1.0"
+        ),
+        "groups": {
+            group_id: {
+                "probabilities": list(table.probabilities), "source": table.source,
+                "generated_at": table.generated_at.isoformat(), "sample_count": table.sample_count,
+                "confidence": table.confidence, "upper_confidence": table.upper_confidence,
+                "stale": table.stale,
+            }
+            for group_id, table in sorted(tables.items())
+        },
+    }
+    if guardrail_evidence is not None:
+        payload["guardrail_evidence"] = dict(guardrail_evidence)
+    if provenance is not None:
+        payload["provenance"] = dict(provenance)
+    with open(path, "w", encoding="utf-8") as stream:
+        json.dump(payload, stream, indent=2, sort_keys=True)
+        stream.write("\n")
+
+
+def load_survival_tables(path: str) -> dict[str, SurvivalTable]:
+    with open(path, encoding="utf-8") as stream:
+        payload = json.load(stream)
+    if payload.get("schema_version") not in {
+        "survival-tables/1.0", "survival-tables/2.0",
+    } or not payload.get("groups"):
+        raise ValueError("unsupported or empty survival table bundle")
+    return {
+        group_id: SurvivalTable(
+            tuple(float(value) for value in item["probabilities"]), str(item["source"]),
+            datetime.fromisoformat(str(item["generated_at"]).replace("Z", "+00:00")),
+            int(item["sample_count"]), str(item["confidence"]),
+            bool(item.get("upper_confidence", False)), bool(item.get("stale", False)),
+        )
+        for group_id, item in payload["groups"].items()
+    }
+
+
+def load_survival_guardrail_evidence(path: str) -> dict[str, Any]:
+    """Load fail-closed empirical-survival evidence from a v2 bundle."""
+
+    with open(path, encoding="utf-8") as stream:
+        payload = json.load(stream)
+    if payload.get("schema_version") != "survival-tables/2.0":
+        return {
+            "measured": False,
+            "passed": False,
+            "comparison_sha256": None,
+            "criteria": {},
+            "reason": "legacy_or_unversioned_bundle",
+        }
+    evidence = payload.get("guardrail_evidence")
+    required = {"measured", "passed", "comparison_sha256", "criteria"}
+    if not isinstance(evidence, dict) or not required.issubset(evidence):
+        return {
+            "measured": False,
+            "passed": False,
+            "comparison_sha256": None,
+            "criteria": {},
+            "reason": "missing_guardrail_evidence",
+        }
+    if bool(evidence["passed"]) and not bool(evidence["measured"]):
+        raise ValueError("survival bundle claims an unmeasured guardrail pass")
+    return dict(evidence)

@@ -1,0 +1,25 @@
+{
+  "schema_version": "cohort-mpc-profile/1.0",
+  "profile_id": "cohort-mpc-phase3-scheduled-h3-t10-v1",
+  "development_only": true,
+  "mpc": {
+    "horizon_windows": 3,
+    "timeout_seconds": 10.0,
+    "max_group_upf_weight": 0.75,
+    "overload_cost": 1.0,
+    "drop_cost": 10.0,
+    "terminal_exposure_cost": 1.0,
+    "static_deviation_cost": 0.0001,
+    "action_blend_fraction": 0.5,
+    "min_relative_improvement": 0.0001,
+    "min_ul_overload_relative_improvement": 0.0,
+    "max_ul_exposure_increase_fraction": 0.0,
+    "guardrail_margin_fraction": 0.0,
+    "guardrail_tolerance": 1e-7,
+    "require_known_future_capacity_event": true,
+    "fallback_on_unplanned_capacity_state": true,
+    "fallback_on_telemetry_uncertainty": true,
+    "fallback_on_stale_survival": true,
+    "minimum_survival_samples": 100
+  }
+}

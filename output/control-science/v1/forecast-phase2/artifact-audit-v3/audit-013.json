@@ -1,0 +1,33 @@
+{
+  "families": {
+    "calendar-ridge": {
+      "calibrated_bundle_sha256": null,
+      "metric_file_sha256": "c0dd71bb18b99d8064c59418f5f839f7363a4099b0a49cf4e6e17cc9d321a6d6",
+      "trained_bundle_sha256": "0f79aba70e5befdb931b2e8fc95911d09a208ebf312d5cd9b7f14669d918669e"
+    },
+    "hist-gradient-quantile": {
+      "calibrated_bundle_sha256": "fd9b6a940870556f4a49153e5d1d57c0040925f358e993c4f906b5374c6b62eb",
+      "metric_file_sha256": "7f060dfdd739850464b4a8418ad3dd8c6eae7247f20998dd64908e473a7f3c63",
+      "trained_bundle_sha256": "8b7291d9a8aab24976c11e3498ee62e8934ba4afd7fd831008ec845adefa9d3e"
+    },
+    "lightgbm-quantile": {
+      "calibrated_bundle_sha256": "a6bff57b04870e2d1d6c1cbe6c798a20e84cfe77286d0a80d06194ea7848ce1e",
+      "metric_file_sha256": "f30e229a09636203e65ff6075a665c1f24d02313cfcae11fda1bee30b080227f",
+      "trained_bundle_sha256": "186bfa0e85b82cbc358790f261b4142de37c35d3f51e37e7f6076948a367b454"
+    },
+    "regime-ensemble": {
+      "calibrated_bundle_sha256": "82566acdf87e56f385a716e79c56bd9d85c46573b1d85ef73cd9b6a81dfb79b0",
+      "metric_file_sha256": "ddf6e653341db168d66ad06548cf22a2813ae875f2ce169250b9f03e0127e9af",
+      "trained_bundle_sha256": "965537029700b50f1a0fc1bce1e156753e2e43cac12eb781c0b986916b227a45"
+    },
+    "ridge-v2": {
+      "calibrated_bundle_sha256": "4bc07bef2da5e4a5f7b43514bc636a456e973e8469794eed0b11d1bf3dc11c1c",
+      "metric_file_sha256": "b4f2317499c18b4567280f9825424a9661d324987f013fefba10f21e7b5ff05e",
+      "trained_bundle_sha256": "8451cd7b97a03dfbf1acffc41c907dfe9d2599eb217a5abaf66fe30b870544a0"
+    }
+  },
+  "group_id": "delhi-ncr|consumer-video|1-010102",
+  "group_index": 13,
+  "schema_version": "forecast-phase2-artifact-audit-shard/1.0",
+  "verified_production_load_path": true
+}

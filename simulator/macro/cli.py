@@ -4,8 +4,11 @@ import argparse
 import json
 from pathlib import Path
 
-from forecasting import TrainedForecastBundle
-from optimization import CohortMPCConfig, OptimizationConfig
+from forecasting import load_forecaster_bundle
+from optimization import (
+    CohortMPCConfig, OptimizationConfig, load_survival_guardrail_evidence,
+    load_survival_tables,
+)
 from steering import PolicyGateConfig
 from .config import load_scenario
 from .controllers import ForecastAdjustmentConfig, controller_by_name
@@ -27,13 +30,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--predictive-profile", type=Path)
     parser.add_argument("--mpc-profile", type=Path)
+    parser.add_argument("--survival-bundle", type=Path)
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
     forecaster = (
-        TrainedForecastBundle.load(args.forecast_bundle)
+        load_forecaster_bundle(args.forecast_bundle)
         if args.forecast_bundle is not None else None
     )
     scenario = load_scenario(args.manifest)
@@ -68,6 +72,14 @@ def main() -> int:
             mpc_config=(
                 CohortMPCConfig(**mpc_profile.get("mpc", {}))
                 if mpc_profile else None
+            ),
+            survival_by_group=(
+                load_survival_tables(str(args.survival_bundle))
+                if args.survival_bundle else None
+            ),
+            survival_guardrail_evidence=(
+                load_survival_guardrail_evidence(str(args.survival_bundle))
+                if args.survival_bundle else None
             ),
         ),
     )

@@ -1,0 +1,42 @@
+{
+  "schema_version": "phase3.2-candidate-matrix/1.0",
+  "development_only": true,
+  "candidate_count": 5,
+  "candidates": [
+    {
+      "candidate_id": "predrain-fixed-035",
+      "controller": "predrain",
+      "hypothesis": "A 35% action lies on the fresh-seed benefit/tail-risk frontier between the v2 25% and 50% blends.",
+      "end_to_end_decision_deadline_ms": 500,
+      "flow": {"lead_windows": 12, "timeout_seconds": 0.25, "max_group_upf_weight": 0.75, "event_risk_cost": 100.0, "latency_cost": 0.01, "utilization_cost": 0.1, "overflow_cost": 10000.0, "action_blend_fraction": 0.35}
+    },
+    {
+      "candidate_id": "predrain-fixed-040",
+      "controller": "predrain",
+      "hypothesis": "A 40% action preserves more scheduled-fault benefit while remaining below the v2 tail-failing 50% strength.",
+      "end_to_end_decision_deadline_ms": 500,
+      "flow": {"lead_windows": 12, "timeout_seconds": 0.25, "max_group_upf_weight": 0.75, "event_risk_cost": 100.0, "latency_cost": 0.01, "utilization_cost": 0.1, "overflow_cost": 10000.0, "action_blend_fraction": 0.4}
+    },
+    {
+      "candidate_id": "predrain-fixed-045",
+      "controller": "predrain",
+      "hypothesis": "A 45% action tests whether the v2 50% worst-pair miss was a narrow threshold effect or a persistent tail mechanism.",
+      "end_to_end_decision_deadline_ms": 500,
+      "flow": {"lead_windows": 12, "timeout_seconds": 0.25, "max_group_upf_weight": 0.75, "event_risk_cost": 100.0, "latency_cost": 0.01, "utilization_cost": 0.1, "overflow_cost": 10000.0, "action_blend_fraction": 0.45}
+    },
+    {
+      "candidate_id": "predrain-adaptive-050-075",
+      "controller": "predrain",
+      "hypothesis": "Causally tapering from 50% to 25% as observed residual utilization rises from 50% to 75% preserves low-pressure benefit and protects stressed tails.",
+      "end_to_end_decision_deadline_ms": 500,
+      "flow": {"lead_windows": 12, "timeout_seconds": 0.25, "max_group_upf_weight": 0.75, "event_risk_cost": 100.0, "latency_cost": 0.01, "utilization_cost": 0.1, "overflow_cost": 10000.0, "action_blend_fraction": 0.5, "minimum_action_blend_fraction": 0.25, "full_action_below_residual_utilization": 0.5, "minimum_action_above_residual_utilization": 0.75}
+    },
+    {
+      "candidate_id": "predrain-adaptive-060-085",
+      "controller": "predrain",
+      "hypothesis": "A later utilization taper tests whether adaptive protection should engage only under stronger observable load pressure.",
+      "end_to_end_decision_deadline_ms": 500,
+      "flow": {"lead_windows": 12, "timeout_seconds": 0.25, "max_group_upf_weight": 0.75, "event_risk_cost": 100.0, "latency_cost": 0.01, "utilization_cost": 0.1, "overflow_cost": 10000.0, "action_blend_fraction": 0.5, "minimum_action_blend_fraction": 0.25, "full_action_below_residual_utilization": 0.6, "minimum_action_above_residual_utilization": 0.85}
+    }
+  ]
+}
