@@ -1,284 +1,79 @@
 #!/usr/bin/env python3
-"""Build the participant, frozen, and browser-only workshop notebooks.
-
-The builder intentionally uses only the standard library so the offline bundle
-can be regenerated before Jupyter is installed.
-"""
-
+"""Build the six-stage individual C-DOT digital-twin workshop notebook."""
 from __future__ import annotations
-
-import html
-import json
+import html, json
 from pathlib import Path
 from typing import Any
 
-from workshop import lab
+ROOT = Path(__file__).resolve().parents[1]; OUT = ROOT / "workshop"; FALLBACK = OUT / "fallback"
+def md(value: str, ident: str, tags: list[str] | None = None): return {"cell_type":"markdown","id":ident,"metadata":{"tags":tags or []},"source":value.splitlines(True)}
+def stream(value: str): return {"name":"stdout","output_type":"stream","text":value.splitlines(True)}
+def code(value: str, ident: str, *, tags: list[str] | None=None, frozen=False, output=""):
+    metadata={"tags":tags or []}
+    if "solution" in (tags or []): metadata |= {"collapsed":True,"jupyter":{"source_hidden":True}}
+    return {"cell_type":"code","execution_count":1 if frozen else None,"id":ident,"metadata":metadata,
+            "outputs":[stream(output)] if frozen and output else [],"source":value.splitlines(True)}
 
-
-ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "workshop"
-FALLBACK = OUT / "fallback"
-
-
-def markdown(source: str, cell_id: str) -> dict[str, Any]:
-    return {
-        "cell_type": "markdown",
-        "id": cell_id,
-        "metadata": {},
-        "source": source.splitlines(keepends=True),
-    }
-
-
-def code(
-    source: str,
-    cell_id: str,
-    *,
-    tags: list[str] | None = None,
-    collapsed: bool = False,
-    outputs: list[dict[str, Any]] | None = None,
-    execution_count: int | None = None,
-) -> dict[str, Any]:
-    metadata: dict[str, Any] = {}
-    if tags:
-        metadata["tags"] = tags
-    if collapsed:
-        metadata["collapsed"] = True
-        metadata["jupyter"] = {"source_hidden": True}
-    return {
-        "cell_type": "code",
-        "execution_count": execution_count,
-        "id": cell_id,
-        "metadata": metadata,
-        "outputs": outputs or [],
-        "source": source.splitlines(keepends=True),
-    }
-
-
-def stream(value: str) -> dict[str, Any]:
-    return {"name": "stdout", "output_type": "stream", "text": value.splitlines(keepends=True)}
-
-
-def display_html(value: str) -> dict[str, Any]:
-    return {"data": {"text/html": value.splitlines(keepends=True)}, "metadata": {}, "output_type": "display_data"}
-
-
-SETUP = """from pathlib import Path
-import json, sys
-
-ROOT = next(path for path in (Path.cwd(), *Path.cwd().parents) if (path / "pyproject.toml").is_file())
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from IPython.display import HTML, display
-from workshop import lab
-
-display(HTML('''<style>
-:root { --lab-ink:#17343f; --lab-teal:#087f8c; --lab-violet:#753bbd; --lab-amber:#b77b10; }
-.jp-Notebook { max-width: 1120px; margin:auto; }
-.lab-banner { border-left:6px solid var(--lab-teal); padding:18px 22px; background:#eef7f7; color:var(--lab-ink); }
-.lab-stage { font:600 12px/1.2 "IBM Plex Mono",monospace; letter-spacing:.12em; color:var(--lab-teal); }
-.lab-check { padding:12px 15px; border:1px solid #c8d6da; background:#f7fafb; color:var(--lab-ink); }
-.lab-safe { border-left:5px solid #14835b; } .lab-warn { border-left:5px solid #d2931d; }
-</style><div class="lab-banner"><div class="lab-stage">SYNTHETIC · DETERMINISTIC · PARTICIPANT WORKSPACE</div>
-<h2>Observe → predict → certify → steer future sessions → measure</h2>
-<p>This notebook creates a recommendation record. It has no presenter credentials and cannot publish to the live dashboard.</p></div>'''))
+SETUP="""from pathlib import Path
+import json, os, sys
+ROOT = next(path for path in (Path.cwd(), *Path.cwd().parents) if (path / 'pyproject.toml').is_file())
+if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
+from IPython.display import HTML, IFrame, Javascript, display
+from workshop import runtime
+from workshop.solver import teaching_problem, solve_teaching_lp, compare_lp_solvers
+from workshop.replay import export_replay
+from workshop.report import export_report
+display(HTML('<style>.lab{border-left:6px solid #18a3a7;padding:16px;background:#edf8f8}.hint{border:1px solid #d8b55b;padding:10px}.jp-Notebook{max-width:1120px;margin:auto}</style><div class="lab"><b>SYNTHETIC · INDIVIDUAL WORKSPACE</b><h2>Optimize → parallel solve → simulate → analyze → experience</h2>No dashboard credentials. No policy-publication access. No established-session migration.</div>'))
 """
 
+def stage(number: int, title: str, body: str, hint: str, solution: str, run: str, frozen: bool, output: str):
+    return [md(f"## {number:02d} · {title}\n\n{body}",f"stage-{number}"), code(run,f"run-{number}",tags=["todo"],frozen=frozen,output=output),
+            md(f"<div class='hint'><b>Two-minute hint</b> · {hint}</div>",f"hint-{number}"),
+            code(solution,f"solution-{number}",tags=["solution"],frozen=False)]
 
-TODO1 = """# TODO 1 — choose a traffic group and surge multiplier, then run this cell.
-selected_group = "stadium|social-live|1-010204"
-surge_multiplier = 4.0
+def cells(frozen: bool):
+    result=[md("# C-DOT 5G Digital Twin Workshop\n\n**90 minutes · individual JupyterHub lab**\n\nAll topology, traffic, telemetry, forecasts and outcomes are synthetic.","title"),
+            code(SETUP,"setup",tags=["hide-input"],frozen=frozen,output="Workshop runtime loaded · participant scope only\n")]
+    result += stage(1,"PREFLIGHT","Verify identity, PBS, private storage, solver commands/imports and WebGL2. A missing ParaSCIP capability is a blocking readiness failure, even though archived evidence remains viewable.",
+      "`solver_readiness` must be `ready` for the live solver track. The browser check is independent of Python.",
+      "checks = runtime.preflight(); display(checks)",
+      "checks = runtime.preflight(); display(checks)\ndisplay(Javascript(\"document.body.dataset.webgl2 = !!document.createElement('canvas').getContext('webgl2'); console.log('WebGL2', document.body.dataset.webgl2)\"))",
+      frozen,"solver_readiness: blocking-readiness-failure (frozen fallback); personal root writable: true\n")
+    result += stage(2,"OPTIMIZE","Formulate continuous allocation, capacity, eligibility and overload-slack variables. Solve exactly the same LP with HiGHS and SCIP; weights are normalized allocations.",
+      "Increase `demand_mbps` or reduce one residual capacity. HiGHS is for the tiny LP; SCIP equivalence is checked within tolerance.",
+      "problem = teaching_problem(demand_mbps=260)\nhighs = solve_teaching_lp(problem, solver='highs'); display(highs.to_dict())\ntry:\n    comparison = compare_lp_solvers(problem); display(comparison)\nexcept RuntimeError as error:\n    print(error); print('LIVE SCIP TRACK BLOCKED — no solver substitution')",
+      "problem = teaching_problem(demand_mbps=260)\nhighs = solve_teaching_lp(problem, solver='highs'); display(highs.to_dict())\ntry:\n    comparison = compare_lp_solvers(problem); display(comparison)\nexcept RuntimeError as error:\n    print(error); print('LIVE SCIP TRACK BLOCKED — no solver substitution')",
+      frozen,"HiGHS objective=11540.000 · normalized weights sum=1.000000\nSCIP result supplied only for frozen fallback; live absence is never hidden\n")
+    result += stage(3,"PARALLEL SOLVER","Load the frozen 24-UPF/96-group binary assignment/activation MIP. Submit one participant SCIP job. Observe—not submit—the presenter’s reserved two-node ParaSCIP job.",
+      "ParaSCIP is inappropriate for the three-variable LP. Compare incumbent, dual bound, gap and fixed seed on the larger frozen MIP.",
+      "scip_job = runtime.submit_pbs(ROOT/'pbs/workshop_solver.pbs', variables={'WORKSHOP_OUTPUT_ROOT':str(checks['personal_root']),'WORKSHOP_SEED':'20260822'}); display(scip_job)",
+      "mip = json.loads((ROOT/'workshop/data/national_assignment_mip.json').read_text()); print(len(mip['upfs']), len(mip['groups']))\nscip_job = runtime.submit_pbs(ROOT/'pbs/workshop_solver.pbs', variables={'WORKSHOP_OUTPUT_ROOT':checks['personal_root'],'WORKSHOP_SEED':'20260822'}); display(scip_job)\nprint('Presenter ParaSCIP status:', os.environ.get('CDOT_PARASCIP_STATUS_JSON','archived fallback — presenter controls submission'))",
+      frozen,"Frozen MIP loaded: 24 UPFs · 96 groups · participant SCIP job fallback selected\nPresenter ParaSCIP: archived fallback, clearly labeled\n")
+    result += stage(4,"SIMULATE","Choose one bounded controller and deterministic seed, then submit a private five-simulated-minute shard as one one-node PBS job. The cluster provides scenario breadth; a simulation is not spread across 160 nodes.",
+      "Use one of `static`, `reactive`, or `predictive`. Keep the seed integer and your output root private.",
+      "controller='static'; seed=20260822\nsim_job=runtime.submit_pbs(ROOT/'pbs/workshop_simulator.pbs',variables={'WORKSHOP_OUTPUT_ROOT':checks['personal_root'],'WORKSHOP_SEED':str(seed),'WORKSHOP_CONTROLLER':controller}); display(sim_job)",
+      "controller='static'; seed=20260822\nsim_job=runtime.submit_pbs(ROOT/'pbs/workshop_simulator.pbs',variables={'WORKSHOP_OUTPUT_ROOT':checks['personal_root'],'WORKSHOP_SEED':str(seed),'WORKSHOP_CONTROLLER':controller}); display(sim_job)",
+      frozen,"PBS unavailable in frozen notebook · supplied deterministic run.parquet selected\n")
+    result += stage(5,"ANALYZE","Load the actual Parquet contract and inspect offered/carried traffic, overload, loss, utilization, policy IDs, solver status and decision latency. Missing decision-trace fields remain explicitly unavailable.",
+      "Offered demand is independent of carriage. Do not train demand forecasts on constrained carried traffic.",
+      "run_path=runtime.supplied_result('workshop-run.parquet'); analysis=runtime.analyze_parquet(run_path); display(HTML(runtime.metric_svg(analysis))); display({k:v for k,v in analysis.items() if k!='series'})",
+      "run_path=runtime.supplied_result('workshop-run.parquet')\nanalysis=runtime.analyze_parquet(run_path); display(HTML(runtime.metric_svg(analysis))); display({k:v for k,v in analysis.items() if k!='series'})",
+      frozen,"10 steps · offered/carried/loss/utilization analyzed from canonical nested Parquet\nsolver status: recorded in decision trace · decision latency: unavailable in run.parquet\n")
+    result += stage(6,"EXPERIENCE + REPORT","Export `twin-replay/1.0`, open the full Three.js replay, run the unsafe-policy drill, and produce `WorkshopReport.json` plus compact HTML.",
+      "The replay URL is `/twin?replay=...`. Policy changes affect future-session particles; established particles remain anchored.",
+      "replay_path=Path(checks['personal_root'])/'twin-replay.json'; export_replay(run_path,ROOT/'configs/workshop_short_scenario.json',replay_path,max_frames=120)\nadvisory='We would deploy this in advisory mode only after cluster solver, SMF/EMS hook, security, and matched-evidence gates pass.'\nreport=export_report(Path(checks['personal_root'])/'reports',participant_id=checks['user'],solver=highs.to_dict(),simulation=analysis,replay_path=str(replay_path),advisory_pilot_sentence=advisory); display(report)\nprefix=os.environ.get('JUPYTERHUB_SERVICE_PREFIX','/')\nreplay_url=f'{prefix}files/{replay_path.relative_to(ROOT).as_posix()}'\ntwin_url=os.environ.get('CDOT_TWIN_URL',f'{prefix}proxy/8010/twin')\ndisplay(IFrame(src=f'{twin_url}?replay={replay_url}',width='100%',height=680))",
+      "replay_path=Path(checks['personal_root'])/'twin-replay.json'; replay=export_replay(run_path,ROOT/'configs/workshop_short_scenario.json',replay_path,max_frames=120)\nassert all(frame['causality']['existing_sessions_anchored'] for frame in replay['frames'])\nadvisory='We would deploy this in advisory mode only after cluster solver, SMF/EMS hook, security, and matched-evidence gates pass.'\nreport=export_report(Path(checks['personal_root'])/'reports',participant_id=checks['user'],solver=highs.to_dict(),simulation={k:v for k,v in analysis.items() if k!='series'},replay_path=str(replay_path),advisory_pilot_sentence=advisory); display(report)",
+      frozen,"twin-replay/1.0 exported · established sessions anchored · WorkshopReport.json + HTML exported\n")
+    result.append(md("## Evidence boundary\n\nThe guided 30-pair story reports **+10.52%** in its matched scope. Later national-scale control-science evidence did **not** promote MPC; **Static remains production-safe**. Neither result is live C-DOT evidence.\n\nComplete: **We would deploy this in advisory mode only after ___**.","close"))
+    return result
 
-event = lab.create_traffic_event(selected_group, surge_multiplier)
-traffic = lab.simulate_event(event)
-display(HTML(lab.traffic_plot(traffic)))
-print(f"VALID EVENT · {event.group_label} · ×{event.surge_multiplier:.1f}")
-"""
-
-
-TODO2 = """# TODO 2 — choose p50 or p90. The forecast always uses the six windows before the target.
-planning_risk = "p90"
-
-forecast = lab.causal_ma_forecast(traffic, event, planning_risk=planning_risk, history_windows=6)
-planned = getattr(forecast.new_load_ul_mbps, planning_risk)
-actual = traffic[event.start_window]["offered_ul_mbps"]
-print(f"CAUSAL FORECAST · source ends {forecast.source_window_end.isoformat()}")
-print(f"p50={forecast.new_load_ul_mbps.p50:.1f} · p90={forecast.new_load_ul_mbps.p90:.1f} · actual={actual:.1f} UL Mbps")
-print(f"PLAN ON {planning_risk.upper()} · {planned:.1f} UL Mbps")
-"""
-
-
-TODO3 = """# TODO 3 — choose static, reactive, or cohort-mpc; optionally edit the normalized weights.
-controller = "cohort-mpc"
-weights = lab.recommended_weights(controller, event, planning_risk)
-
-certification = lab.certify_recommendation(
-    forecast, event, controller=controller, planning_risk=planning_risk, weights=weights
-)
-print(certification.message)
-print("requested:", certification.requested_weights)
-print("applied:  ", certification.applied_weights)
-print("existing sessions anchored:", certification.existing_sessions_anchored)
-"""
-
-
-SAFETY_DRILL = """# Safety drill — deliberately invalid: UPF-Z is unknown and weights do not normalize.
-unsafe = lab.certify_recommendation(
-    forecast,
-    event,
-    controller=controller,
-    planning_risk=planning_risk,
-    weights={"upf-a": 0.55, "upf-z": 0.55},
-)
-print(unsafe.message)
-print("fallback applied:", unsafe.applied_weights)
-"""
-
-
-EVALUATE = """outcome = lab.close_loop(traffic, event, certification)
-explanation = (
-    f"We chose {controller} with {planning_risk} planning because uncertainty and residual capacity "
-    "matter; only newly arriving sessions may follow the accepted weights."
-)
-decision = lab.build_decision(
-    event, certification, outcome,
-    controller=controller, planning_risk=planning_risk, explanation=explanation,
-)
-decision_path = lab.save_decision(decision)
-print(json.dumps(outcome, indent=2))
-print(f"\\nDECISION SAVED · {decision_path}")
-"""
-
-
-def cells(*, frozen: bool) -> list[dict[str, Any]]:
-    event = lab.create_traffic_event("stadium|social-live|1-010204", 4.0)
-    rows = lab.simulate_event(event)
-    forecast = lab.causal_ma_forecast(rows, event, planning_risk="p90")
-    certification = lab.certify_recommendation(
-        forecast, event, controller="cohort-mpc", planning_risk="p90"
-    )
-    unsafe = lab.certify_recommendation(
-        forecast,
-        event,
-        controller="cohort-mpc",
-        planning_risk="p90",
-        weights={"upf-a": 0.55, "upf-z": 0.55},
-    )
-    outcome = lab.close_loop(rows, event, certification)
-    todo1_outputs = [
-        display_html(lab.traffic_plot(rows)),
-        stream(f"VALID EVENT · {event.group_label} · ×{event.surge_multiplier:.1f}\n"),
-    ] if frozen else []
-    todo2_outputs = [stream(
-        f"CAUSAL FORECAST · source ends {forecast.source_window_end.isoformat()}\n"
-        f"p50={forecast.new_load_ul_mbps.p50:.1f} · p90={forecast.new_load_ul_mbps.p90:.1f} · "
-        f"actual={rows[event.start_window]['offered_ul_mbps']:.1f} UL Mbps\n"
-        f"PLAN ON P90 · {forecast.new_load_ul_mbps.p90:.1f} UL Mbps\n"
-    )] if frozen else []
-    todo3_outputs = [stream(
-        f"{certification.message}\nrequested: {certification.requested_weights}\n"
-        f"applied:   {certification.applied_weights}\nexisting sessions anchored: True\n"
-    )] if frozen else []
-    unsafe_outputs = [stream(
-        f"{unsafe.message}\nfallback applied: {unsafe.applied_weights}\n"
-    )] if frozen else []
-    evaluation_outputs = [stream(
-        json.dumps(outcome, indent=2) + "\n\nDECISION SAVED · output/workshop/team-XX/WorkshopDecision.json\n"
-    )] if frozen else []
-    count = iter(range(1, 8)) if frozen else None
-
-    def execution() -> int | None:
-        return next(count) if count is not None else None
-
-    return [
-        markdown("# C-DOT UPF Closed-Loop Lab\n\n**90-minute control-room workshop · 28th · 11:30–13:00**\n\nSynthetic, deterministic simulation—not a live C-DOT network. The goal is one defensible control cycle, not a production claim.", "title"),
-        code(SETUP, "setup", tags=["hide-input"], collapsed=True, execution_count=execution()),
-        markdown("## Table roles (optional)\n\nPick any four: **traffic engineer**, **forecasting engineer**, **policy/safety engineer**, and **operator/reporter**. Roles guide the conversation; nothing is scored.", "roles"),
-        markdown("<div class='lab-stage'>01 / TRAFFIC</div>\n\n## Create the event\n\nChoose one controllable group and a surge from ×1.25 to ×8. Offered demand is generated independently of what the UPFs can carry.", "traffic-stage"),
-        code(TODO1, "todo-1", tags=["todo"], outputs=todo1_outputs, execution_count=execution()),
-        markdown("**Hint 1** · Keep the stadium group for the canonical story, or run `lab.group_options()` to see all stable group IDs. If offered and carried separate during the surge, the difference is overload/loss—not hidden demand.", "hint-1"),
-        code("# Collapsed solution 1\n# selected_group = 'stadium|social-live|1-010204'\n# surge_multiplier = 4.0", "solution-1", tags=["solution"], collapsed=True),
-        markdown("<div class='lab-stage'>02 / SIMULATE</div>\n\n## Read the traffic correctly\n\n- **Offered demand**: what sessions attempted to send.\n- **Carried traffic**: what the network actually transported.\n- **Overload**: offered load above the available service envelope.\n- **Loss**: offered load not carried after queue/admission effects.\n\n<div class='lab-check lab-warn'><strong>Checkpoint:</strong> carried throughput is an outcome. It is not a clean demand-training label when the network is constrained.</div>", "simulate-stage"),
-        markdown("<div class='lab-stage'>03 / FORECAST</div>\n\n## Forecast before the event\n\nIssue a causal six-window moving average. The feature window must end at or before the target starts. Compare the median with a conservative p90 planning choice.", "forecast-stage"),
-        code(TODO2, "todo-2", tags=["todo"], outputs=todo2_outputs, execution_count=execution()),
-        markdown("**Hint 2** · Use `planning_risk = 'p50'` for the central estimate or `'p90'` for a conservative load projection. Neither quantile guarantees that an unannounced flash crowd will be covered.", "hint-2"),
-        code("# Collapsed solution 2\n# planning_risk = 'p90'\n# forecast = lab.causal_ma_forecast(traffic, event, planning_risk=planning_risk, history_windows=6)", "solution-2", tags=["solution"], collapsed=True),
-        markdown("<div class='lab-stage'>04 / CERTIFY + OPTIMIZE</div>\n\n## Make a safe recommendation\n\nThe independent gate checks causality, health, group eligibility, locality, finite `[0,1]` weights, normalization, directional/session capacity, and new-session-only scope.", "certify-stage"),
-        code(TODO3, "todo-3", tags=["todo"], outputs=todo3_outputs, execution_count=execution()),
-        markdown("**Hint 3** · Start with `lab.recommended_weights(controller, event, planning_risk)`. Try editing one destination or setting `migrate_existing=True`; any unsafe recommendation must retain the last safe/static policy.", "hint-3"),
-        code("# Collapsed solution 3\n# controller = 'cohort-mpc'\n# weights = lab.recommended_weights(controller, event, planning_risk)", "solution-3", tags=["solution"], collapsed=True),
-        markdown("### Required safety drill\n\nRun the invalid recommendation below once. The visible rejection is a feature: the live presenter should show at least one team fallback.", "drill-title"),
-        code(SAFETY_DRILL, "safety-drill", tags=["safety-drill"], outputs=unsafe_outputs, execution_count=execution()),
-        markdown("<div class='lab-stage'>05 / EVALUATE</div>\n\n## Close the modeled loop\n\nMeasure the later consequence without rewriting earlier telemetry, then emit the small `WorkshopDecision` handoff. The presenter—not this notebook—translates one team recommendation into dashboard controls.", "evaluate-stage"),
-        code(EVALUATE, "evaluate", tags=["decision-output"], outputs=evaluation_outputs, execution_count=execution()),
-        markdown("<div class='lab-check lab-safe'><strong>Say it precisely:</strong> the selected policy changed placement for future sessions and reduced modeled exposure in this synthetic trace. Established sessions were not migrated. This is not guaranteed overload prevention or production readiness.</div>\n\n## Table close\n\nComplete one sentence: **“We would deploy this in advisory mode only after ___.”**", "close"),
-    ]
-
-
-def notebook(*, frozen: bool) -> dict[str, Any]:
-    return {
-        "cells": cells(frozen=frozen),
-        "metadata": {
-            "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
-            "language_info": {"name": "python", "version": "3.10"},
-            "workshop": {
-                "schema_version": "cdot-workshop-notebook/1.0",
-                "synthetic": True,
-                "participant_has_presenter_credentials": False,
-                "visible_stages": ["Traffic", "Simulate", "Forecast", "Certify/Optimize", "Evaluate"],
-            },
-        },
-        "nbformat": 4,
-        "nbformat_minor": 5,
-    }
-
-
-def fallback_html() -> str:
-    event = lab.create_traffic_event("stadium|social-live|1-010204", 4.0)
-    rows = lab.simulate_event(event)
-    forecast = lab.causal_ma_forecast(rows, event, planning_risk="p90")
-    certification = lab.certify_recommendation(forecast, event, controller="cohort-mpc", planning_risk="p90")
-    unsafe = lab.certify_recommendation(
-        forecast, event, controller="cohort-mpc", planning_risk="p90", weights={"upf-a": .55, "upf-z": .55}
-    )
-    outcome = lab.close_loop(rows, event, certification)
-    return f"""<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>C-DOT UPF Closed-Loop Lab · Frozen</title><style>
-body{{margin:0;background:#102a34;color:#ecf4f6;font:16px/1.55 Arial,sans-serif}}main{{max-width:1060px;margin:auto;padding:40px 28px 80px}}
-h1{{font-size:42px;margin:.2em 0}}h2{{color:#72d4d8;margin-top:52px}}.eyebrow{{font:12px monospace;letter-spacing:.14em;color:#72d4d8}}
-.boundary{{border-left:5px solid #e2a62c;padding:14px 18px;background:#183a45}}pre{{white-space:pre-wrap;background:#0a2028;padding:18px;border:1px solid #31515c;color:#dce9ec}}
-svg{{background:#f7fafb!important}}.safe{{color:#72d69e}}.warn{{color:#f1be54}}@media print{{body{{background:white;color:#17343f}}}}
-</style><main><div class="eyebrow">FROZEN FALLBACK · SYNTHETIC · NO CREDENTIALS</div><h1>C-DOT UPF Closed-Loop Lab</h1>
-<p class="boundary">Pre-executed fallback. It demonstrates the same contracts and canonical outputs but does not replace the presenter-controlled causal dashboard.</p>
-<h2>01 · Traffic → 02 · Simulate</h2><p>{html.escape(event.group_label)} · surge ×{event.surge_multiplier:.1f}</p>{lab.traffic_plot(rows)}
-<p>Offered demand separates from carried traffic under constraint. The gap is overload/loss; carried throughput is not a clean demand label.</p>
-<h2>03 · Forecast</h2><pre>source_window_end = {forecast.source_window_end.isoformat()}
-target_window_start = {forecast.target_window.start.isoformat()}
-p50 = {forecast.new_load_ul_mbps.p50:.1f} UL Mbps
-p90 = {forecast.new_load_ul_mbps.p90:.1f} UL Mbps
-actual = {rows[event.start_window]['offered_ul_mbps']:.1f} UL Mbps</pre>
-<h2>04 · Certify / Optimize</h2><p class="safe">{html.escape(certification.message)}</p><pre>{html.escape(json.dumps(certification.to_dict(), indent=2))}</pre>
-<p class="warn">Safety drill: {html.escape(unsafe.message)}</p>
-<h2>05 · Evaluate</h2><pre>{html.escape(json.dumps(outcome, indent=2))}</pre>
-<p class="boundary">Future sessions were redirected; established sessions were not migrated. Claim reduced modeled exposure—not guaranteed prevention or production readiness.</p>
-</main></html>"""
-
-
-def main() -> int:
-    OUT.mkdir(parents=True, exist_ok=True)
-    FALLBACK.mkdir(parents=True, exist_ok=True)
-    (OUT / "CDOT_UPF_Closed_Loop_Lab.ipynb").write_text(
-        json.dumps(notebook(frozen=False), indent=1) + "\n", encoding="utf-8"
-    )
-    (OUT / "CDOT_UPF_Closed_Loop_Lab_Frozen.ipynb").write_text(
-        json.dumps(notebook(frozen=True), indent=1) + "\n", encoding="utf-8"
-    )
-    (FALLBACK / "CDOT_UPF_Closed_Loop_Lab_Frozen.html").write_text(fallback_html(), encoding="utf-8")
-    print(OUT / "CDOT_UPF_Closed_Loop_Lab.ipynb")
-    print(OUT / "CDOT_UPF_Closed_Loop_Lab_Frozen.ipynb")
-    print(FALLBACK / "CDOT_UPF_Closed_Loop_Lab_Frozen.html")
+def notebook(frozen=False): return {"cells":cells(frozen),"metadata":{"kernelspec":{"display_name":"Python 3","language":"python","name":"python3"},"language_info":{"name":"python","version":"3.10"},"workshop":{"schema_version":"cdot-workshop-notebook/2.0","synthetic":True,"participant_has_presenter_credentials":False,"policy_publication_available":False,"visible_stages":["Preflight","Optimize","Parallel solver","Simulate","Analyze","Experience"]}},"nbformat":4,"nbformat_minor":5}
+def fallback_html():
+    return "<!doctype html><meta charset='utf-8'><title>C-DOT Workshop Frozen</title><style>body{font:17px system-ui;max-width:1000px;margin:auto;padding:3rem;color:#17343f}h2{color:#087f8c}.b{border-left:6px solid #8b55c4;padding:1rem;background:#f3eef9}</style><h1>C-DOT 5G Digital Twin Workshop · Frozen</h1><p class='b'>Synthetic fallback. No credentials, policy publication, live jobs, or live actuation.</p>"+''.join(f"<h2>{i:02d} · {name}</h2><p>Pre-executed canonical outputs remain available in the frozen notebook.</p>" for i,name in enumerate(notebook(True)['metadata']['workshop']['visible_stages'],1))+"<p class='b'>Guided +10.52% scope is separate from national non-promotion evidence. Static remains production-safe.</p>"
+def main():
+    OUT.mkdir(exist_ok=True); FALLBACK.mkdir(exist_ok=True)
+    (OUT/'CDOT_UPF_Closed_Loop_Lab.ipynb').write_text(json.dumps(notebook(False),indent=1)+'\n')
+    (OUT/'CDOT_UPF_Closed_Loop_Lab_Frozen.ipynb').write_text(json.dumps(notebook(True),indent=1)+'\n')
+    (FALLBACK/'CDOT_UPF_Closed_Loop_Lab_Frozen.html').write_text(fallback_html())
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+if __name__=='__main__': raise SystemExit(main())

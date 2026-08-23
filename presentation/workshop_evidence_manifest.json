@@ -1,0 +1,26 @@
+{
+  "schema_version": "cdot-workshop-evidence/1.0",
+  "synthetic": true,
+  "results_slides": [
+    {
+      "slide": 12,
+      "scope": "frozen guided three-UPF showcase; 30 matched pairs",
+      "claim": "+10.52% mean-pair UL overload-area improvement",
+      "source": "demo_api/data/cohort_mpc_full_campaign_evidence_v1.json",
+      "production_recommendation": false
+    },
+    {
+      "slide": 13,
+      "scope": "later national-scale control-science campaign",
+      "claim": "MPC did not pass promotion; Static remains production-safe",
+      "source": "configs/control_science_v1.json",
+      "production_recommendation": "static"
+    }
+  ],
+  "boundaries": {
+    "live_cdot_traffic": false,
+    "smf_actuation": false,
+    "established_session_migration": false,
+    "spatial_layout": "synthetic"
+  }
+}

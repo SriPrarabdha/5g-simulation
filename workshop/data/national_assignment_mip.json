@@ -1,0 +1,1666 @@
+{
+  "schema_version": "workshop-assignment-mip/1.0",
+  "synthetic": true,
+  "seed": 20260822,
+  "description": "Frozen national-scale teaching MIP: binary group assignment and UPF activation",
+  "upfs": [
+    {
+      "id": "upf-01",
+      "capacity_mbps": 680,
+      "activation_cost": 85
+    },
+    {
+      "id": "upf-02",
+      "capacity_mbps": 715,
+      "activation_cost": 89
+    },
+    {
+      "id": "upf-03",
+      "capacity_mbps": 750,
+      "activation_cost": 93
+    },
+    {
+      "id": "upf-04",
+      "capacity_mbps": 785,
+      "activation_cost": 97
+    },
+    {
+      "id": "upf-05",
+      "capacity_mbps": 820,
+      "activation_cost": 101
+    },
+    {
+      "id": "upf-06",
+      "capacity_mbps": 855,
+      "activation_cost": 85
+    },
+    {
+      "id": "upf-07",
+      "capacity_mbps": 680,
+      "activation_cost": 89
+    },
+    {
+      "id": "upf-08",
+      "capacity_mbps": 715,
+      "activation_cost": 93
+    },
+    {
+      "id": "upf-09",
+      "capacity_mbps": 750,
+      "activation_cost": 97
+    },
+    {
+      "id": "upf-10",
+      "capacity_mbps": 785,
+      "activation_cost": 101
+    },
+    {
+      "id": "upf-11",
+      "capacity_mbps": 820,
+      "activation_cost": 85
+    },
+    {
+      "id": "upf-12",
+      "capacity_mbps": 855,
+      "activation_cost": 89
+    },
+    {
+      "id": "upf-13",
+      "capacity_mbps": 680,
+      "activation_cost": 93
+    },
+    {
+      "id": "upf-14",
+      "capacity_mbps": 715,
+      "activation_cost": 97
+    },
+    {
+      "id": "upf-15",
+      "capacity_mbps": 750,
+      "activation_cost": 101
+    },
+    {
+      "id": "upf-16",
+      "capacity_mbps": 785,
+      "activation_cost": 85
+    },
+    {
+      "id": "upf-17",
+      "capacity_mbps": 820,
+      "activation_cost": 89
+    },
+    {
+      "id": "upf-18",
+      "capacity_mbps": 855,
+      "activation_cost": 93
+    },
+    {
+      "id": "upf-19",
+      "capacity_mbps": 680,
+      "activation_cost": 97
+    },
+    {
+      "id": "upf-20",
+      "capacity_mbps": 715,
+      "activation_cost": 101
+    },
+    {
+      "id": "upf-21",
+      "capacity_mbps": 750,
+      "activation_cost": 85
+    },
+    {
+      "id": "upf-22",
+      "capacity_mbps": 785,
+      "activation_cost": 89
+    },
+    {
+      "id": "upf-23",
+      "capacity_mbps": 820,
+      "activation_cost": 93
+    },
+    {
+      "id": "upf-24",
+      "capacity_mbps": 855,
+      "activation_cost": 97
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-001",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-01",
+        "upf-02",
+        "upf-05",
+        "upf-10"
+      ],
+      "latency_cost": {
+        "upf-01": 3,
+        "upf-02": 4,
+        "upf-05": 7,
+        "upf-10": 12
+      }
+    },
+    {
+      "id": "group-002",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-06",
+        "upf-07",
+        "upf-10",
+        "upf-15"
+      ],
+      "latency_cost": {
+        "upf-06": 11,
+        "upf-07": 12,
+        "upf-10": 15,
+        "upf-15": 3
+      }
+    },
+    {
+      "id": "group-003",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-11",
+        "upf-12",
+        "upf-15",
+        "upf-20"
+      ],
+      "latency_cost": {
+        "upf-11": 2,
+        "upf-12": 3,
+        "upf-15": 6,
+        "upf-20": 11
+      }
+    },
+    {
+      "id": "group-004",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-16",
+        "upf-17",
+        "upf-20",
+        "upf-01"
+      ],
+      "latency_cost": {
+        "upf-16": 10,
+        "upf-17": 11,
+        "upf-20": 14,
+        "upf-01": 12
+      }
+    },
+    {
+      "id": "group-005",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-21",
+        "upf-22",
+        "upf-01",
+        "upf-06"
+      ],
+      "latency_cost": {
+        "upf-21": 18,
+        "upf-22": 2,
+        "upf-01": 15,
+        "upf-06": 3
+      }
+    },
+    {
+      "id": "group-006",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-02",
+        "upf-03",
+        "upf-06",
+        "upf-11"
+      ],
+      "latency_cost": {
+        "upf-02": 2,
+        "upf-03": 3,
+        "upf-06": 6,
+        "upf-11": 11
+      }
+    },
+    {
+      "id": "group-007",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-07",
+        "upf-08",
+        "upf-11",
+        "upf-16"
+      ],
+      "latency_cost": {
+        "upf-07": 10,
+        "upf-08": 11,
+        "upf-11": 14,
+        "upf-16": 2
+      }
+    },
+    {
+      "id": "group-008",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-13",
+        "upf-14",
+        "upf-17",
+        "upf-22"
+      ],
+      "latency_cost": {
+        "upf-13": 2,
+        "upf-14": 3,
+        "upf-17": 6,
+        "upf-22": 11
+      }
+    },
+    {
+      "id": "group-009",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-18",
+        "upf-19",
+        "upf-22",
+        "upf-03"
+      ],
+      "latency_cost": {
+        "upf-18": 10,
+        "upf-19": 11,
+        "upf-22": 14,
+        "upf-03": 12
+      }
+    },
+    {
+      "id": "group-010",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-23",
+        "upf-24",
+        "upf-03",
+        "upf-08"
+      ],
+      "latency_cost": {
+        "upf-23": 18,
+        "upf-24": 2,
+        "upf-03": 15,
+        "upf-08": 3
+      }
+    },
+    {
+      "id": "group-011",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-04",
+        "upf-05",
+        "upf-08",
+        "upf-13"
+      ],
+      "latency_cost": {
+        "upf-04": 2,
+        "upf-05": 3,
+        "upf-08": 6,
+        "upf-13": 11
+      }
+    },
+    {
+      "id": "group-012",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-09",
+        "upf-10",
+        "upf-13",
+        "upf-18"
+      ],
+      "latency_cost": {
+        "upf-09": 10,
+        "upf-10": 11,
+        "upf-13": 14,
+        "upf-18": 2
+      }
+    },
+    {
+      "id": "group-013",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-14",
+        "upf-15",
+        "upf-18",
+        "upf-23"
+      ],
+      "latency_cost": {
+        "upf-14": 18,
+        "upf-15": 2,
+        "upf-18": 5,
+        "upf-23": 10
+      }
+    },
+    {
+      "id": "group-014",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-19",
+        "upf-20",
+        "upf-23",
+        "upf-04"
+      ],
+      "latency_cost": {
+        "upf-19": 9,
+        "upf-20": 10,
+        "upf-23": 13,
+        "upf-04": 11
+      }
+    },
+    {
+      "id": "group-015",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-01",
+        "upf-02",
+        "upf-05",
+        "upf-10"
+      ],
+      "latency_cost": {
+        "upf-01": 11,
+        "upf-02": 12,
+        "upf-05": 15,
+        "upf-10": 3
+      }
+    },
+    {
+      "id": "group-016",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-06",
+        "upf-07",
+        "upf-10",
+        "upf-15"
+      ],
+      "latency_cost": {
+        "upf-06": 2,
+        "upf-07": 3,
+        "upf-10": 6,
+        "upf-15": 11
+      }
+    },
+    {
+      "id": "group-017",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-11",
+        "upf-12",
+        "upf-15",
+        "upf-20"
+      ],
+      "latency_cost": {
+        "upf-11": 10,
+        "upf-12": 11,
+        "upf-15": 14,
+        "upf-20": 2
+      }
+    },
+    {
+      "id": "group-018",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-16",
+        "upf-17",
+        "upf-20",
+        "upf-01"
+      ],
+      "latency_cost": {
+        "upf-16": 18,
+        "upf-17": 2,
+        "upf-20": 5,
+        "upf-01": 3
+      }
+    },
+    {
+      "id": "group-019",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-21",
+        "upf-22",
+        "upf-01",
+        "upf-06"
+      ],
+      "latency_cost": {
+        "upf-21": 9,
+        "upf-22": 10,
+        "upf-01": 6,
+        "upf-06": 11
+      }
+    },
+    {
+      "id": "group-020",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-02",
+        "upf-03",
+        "upf-06",
+        "upf-11"
+      ],
+      "latency_cost": {
+        "upf-02": 10,
+        "upf-03": 11,
+        "upf-06": 14,
+        "upf-11": 2
+      }
+    },
+    {
+      "id": "group-021",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-07",
+        "upf-08",
+        "upf-11",
+        "upf-16"
+      ],
+      "latency_cost": {
+        "upf-07": 18,
+        "upf-08": 2,
+        "upf-11": 5,
+        "upf-16": 10
+      }
+    },
+    {
+      "id": "group-022",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-13",
+        "upf-14",
+        "upf-17",
+        "upf-22"
+      ],
+      "latency_cost": {
+        "upf-13": 10,
+        "upf-14": 11,
+        "upf-17": 14,
+        "upf-22": 2
+      }
+    },
+    {
+      "id": "group-023",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-18",
+        "upf-19",
+        "upf-22",
+        "upf-03"
+      ],
+      "latency_cost": {
+        "upf-18": 18,
+        "upf-19": 2,
+        "upf-22": 5,
+        "upf-03": 3
+      }
+    },
+    {
+      "id": "group-024",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-23",
+        "upf-24",
+        "upf-03",
+        "upf-08"
+      ],
+      "latency_cost": {
+        "upf-23": 9,
+        "upf-24": 10,
+        "upf-03": 6,
+        "upf-08": 11
+      }
+    },
+    {
+      "id": "group-025",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-04",
+        "upf-05",
+        "upf-08",
+        "upf-13"
+      ],
+      "latency_cost": {
+        "upf-04": 10,
+        "upf-05": 11,
+        "upf-08": 14,
+        "upf-13": 2
+      }
+    },
+    {
+      "id": "group-026",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-09",
+        "upf-10",
+        "upf-13",
+        "upf-18"
+      ],
+      "latency_cost": {
+        "upf-09": 18,
+        "upf-10": 2,
+        "upf-13": 5,
+        "upf-18": 10
+      }
+    },
+    {
+      "id": "group-027",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-14",
+        "upf-15",
+        "upf-18",
+        "upf-23"
+      ],
+      "latency_cost": {
+        "upf-14": 9,
+        "upf-15": 10,
+        "upf-18": 13,
+        "upf-23": 18
+      }
+    },
+    {
+      "id": "group-028",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-19",
+        "upf-20",
+        "upf-23",
+        "upf-04"
+      ],
+      "latency_cost": {
+        "upf-19": 17,
+        "upf-20": 18,
+        "upf-23": 4,
+        "upf-04": 2
+      }
+    },
+    {
+      "id": "group-029",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-01",
+        "upf-02",
+        "upf-05",
+        "upf-10"
+      ],
+      "latency_cost": {
+        "upf-01": 2,
+        "upf-02": 3,
+        "upf-05": 6,
+        "upf-10": 11
+      }
+    },
+    {
+      "id": "group-030",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-06",
+        "upf-07",
+        "upf-10",
+        "upf-15"
+      ],
+      "latency_cost": {
+        "upf-06": 10,
+        "upf-07": 11,
+        "upf-10": 14,
+        "upf-15": 2
+      }
+    },
+    {
+      "id": "group-031",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-11",
+        "upf-12",
+        "upf-15",
+        "upf-20"
+      ],
+      "latency_cost": {
+        "upf-11": 18,
+        "upf-12": 2,
+        "upf-15": 5,
+        "upf-20": 10
+      }
+    },
+    {
+      "id": "group-032",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-16",
+        "upf-17",
+        "upf-20",
+        "upf-01"
+      ],
+      "latency_cost": {
+        "upf-16": 9,
+        "upf-17": 10,
+        "upf-20": 13,
+        "upf-01": 11
+      }
+    },
+    {
+      "id": "group-033",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-21",
+        "upf-22",
+        "upf-01",
+        "upf-06"
+      ],
+      "latency_cost": {
+        "upf-21": 17,
+        "upf-22": 18,
+        "upf-01": 14,
+        "upf-06": 2
+      }
+    },
+    {
+      "id": "group-034",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-02",
+        "upf-03",
+        "upf-06",
+        "upf-11"
+      ],
+      "latency_cost": {
+        "upf-02": 18,
+        "upf-03": 2,
+        "upf-06": 5,
+        "upf-11": 10
+      }
+    },
+    {
+      "id": "group-035",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-07",
+        "upf-08",
+        "upf-11",
+        "upf-16"
+      ],
+      "latency_cost": {
+        "upf-07": 9,
+        "upf-08": 10,
+        "upf-11": 13,
+        "upf-16": 18
+      }
+    },
+    {
+      "id": "group-036",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-13",
+        "upf-14",
+        "upf-17",
+        "upf-22"
+      ],
+      "latency_cost": {
+        "upf-13": 18,
+        "upf-14": 2,
+        "upf-17": 5,
+        "upf-22": 10
+      }
+    },
+    {
+      "id": "group-037",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-18",
+        "upf-19",
+        "upf-22",
+        "upf-03"
+      ],
+      "latency_cost": {
+        "upf-18": 9,
+        "upf-19": 10,
+        "upf-22": 13,
+        "upf-03": 11
+      }
+    },
+    {
+      "id": "group-038",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-23",
+        "upf-24",
+        "upf-03",
+        "upf-08"
+      ],
+      "latency_cost": {
+        "upf-23": 17,
+        "upf-24": 18,
+        "upf-03": 14,
+        "upf-08": 2
+      }
+    },
+    {
+      "id": "group-039",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-04",
+        "upf-05",
+        "upf-08",
+        "upf-13"
+      ],
+      "latency_cost": {
+        "upf-04": 18,
+        "upf-05": 2,
+        "upf-08": 5,
+        "upf-13": 10
+      }
+    },
+    {
+      "id": "group-040",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-09",
+        "upf-10",
+        "upf-13",
+        "upf-18"
+      ],
+      "latency_cost": {
+        "upf-09": 9,
+        "upf-10": 10,
+        "upf-13": 13,
+        "upf-18": 18
+      }
+    },
+    {
+      "id": "group-041",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-14",
+        "upf-15",
+        "upf-18",
+        "upf-23"
+      ],
+      "latency_cost": {
+        "upf-14": 17,
+        "upf-15": 18,
+        "upf-18": 4,
+        "upf-23": 9
+      }
+    },
+    {
+      "id": "group-042",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-19",
+        "upf-20",
+        "upf-23",
+        "upf-04"
+      ],
+      "latency_cost": {
+        "upf-19": 8,
+        "upf-20": 9,
+        "upf-23": 12,
+        "upf-04": 10
+      }
+    },
+    {
+      "id": "group-043",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-01",
+        "upf-02",
+        "upf-05",
+        "upf-10"
+      ],
+      "latency_cost": {
+        "upf-01": 10,
+        "upf-02": 11,
+        "upf-05": 14,
+        "upf-10": 2
+      }
+    },
+    {
+      "id": "group-044",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-06",
+        "upf-07",
+        "upf-10",
+        "upf-15"
+      ],
+      "latency_cost": {
+        "upf-06": 18,
+        "upf-07": 2,
+        "upf-10": 5,
+        "upf-15": 10
+      }
+    },
+    {
+      "id": "group-045",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-11",
+        "upf-12",
+        "upf-15",
+        "upf-20"
+      ],
+      "latency_cost": {
+        "upf-11": 9,
+        "upf-12": 10,
+        "upf-15": 13,
+        "upf-20": 18
+      }
+    },
+    {
+      "id": "group-046",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-16",
+        "upf-17",
+        "upf-20",
+        "upf-01"
+      ],
+      "latency_cost": {
+        "upf-16": 17,
+        "upf-17": 18,
+        "upf-20": 4,
+        "upf-01": 2
+      }
+    },
+    {
+      "id": "group-047",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-21",
+        "upf-22",
+        "upf-01",
+        "upf-06"
+      ],
+      "latency_cost": {
+        "upf-21": 8,
+        "upf-22": 9,
+        "upf-01": 5,
+        "upf-06": 10
+      }
+    },
+    {
+      "id": "group-048",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-02",
+        "upf-03",
+        "upf-06",
+        "upf-11"
+      ],
+      "latency_cost": {
+        "upf-02": 9,
+        "upf-03": 10,
+        "upf-06": 13,
+        "upf-11": 18
+      }
+    },
+    {
+      "id": "group-049",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-07",
+        "upf-08",
+        "upf-11",
+        "upf-16"
+      ],
+      "latency_cost": {
+        "upf-07": 17,
+        "upf-08": 18,
+        "upf-11": 4,
+        "upf-16": 9
+      }
+    },
+    {
+      "id": "group-050",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-13",
+        "upf-14",
+        "upf-17",
+        "upf-22"
+      ],
+      "latency_cost": {
+        "upf-13": 9,
+        "upf-14": 10,
+        "upf-17": 13,
+        "upf-22": 18
+      }
+    },
+    {
+      "id": "group-051",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-18",
+        "upf-19",
+        "upf-22",
+        "upf-03"
+      ],
+      "latency_cost": {
+        "upf-18": 17,
+        "upf-19": 18,
+        "upf-22": 4,
+        "upf-03": 2
+      }
+    },
+    {
+      "id": "group-052",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-23",
+        "upf-24",
+        "upf-03",
+        "upf-08"
+      ],
+      "latency_cost": {
+        "upf-23": 8,
+        "upf-24": 9,
+        "upf-03": 5,
+        "upf-08": 10
+      }
+    },
+    {
+      "id": "group-053",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-04",
+        "upf-05",
+        "upf-08",
+        "upf-13"
+      ],
+      "latency_cost": {
+        "upf-04": 9,
+        "upf-05": 10,
+        "upf-08": 13,
+        "upf-13": 18
+      }
+    },
+    {
+      "id": "group-054",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-09",
+        "upf-10",
+        "upf-13",
+        "upf-18"
+      ],
+      "latency_cost": {
+        "upf-09": 17,
+        "upf-10": 18,
+        "upf-13": 4,
+        "upf-18": 9
+      }
+    },
+    {
+      "id": "group-055",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-14",
+        "upf-15",
+        "upf-18",
+        "upf-23"
+      ],
+      "latency_cost": {
+        "upf-14": 8,
+        "upf-15": 9,
+        "upf-18": 12,
+        "upf-23": 17
+      }
+    },
+    {
+      "id": "group-056",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-19",
+        "upf-20",
+        "upf-23",
+        "upf-04"
+      ],
+      "latency_cost": {
+        "upf-19": 16,
+        "upf-20": 17,
+        "upf-23": 3,
+        "upf-04": 18
+      }
+    },
+    {
+      "id": "group-057",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-01",
+        "upf-02",
+        "upf-05",
+        "upf-10"
+      ],
+      "latency_cost": {
+        "upf-01": 18,
+        "upf-02": 2,
+        "upf-05": 5,
+        "upf-10": 10
+      }
+    },
+    {
+      "id": "group-058",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-06",
+        "upf-07",
+        "upf-10",
+        "upf-15"
+      ],
+      "latency_cost": {
+        "upf-06": 9,
+        "upf-07": 10,
+        "upf-10": 13,
+        "upf-15": 18
+      }
+    },
+    {
+      "id": "group-059",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-11",
+        "upf-12",
+        "upf-15",
+        "upf-20"
+      ],
+      "latency_cost": {
+        "upf-11": 17,
+        "upf-12": 18,
+        "upf-15": 4,
+        "upf-20": 9
+      }
+    },
+    {
+      "id": "group-060",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-16",
+        "upf-17",
+        "upf-20",
+        "upf-01"
+      ],
+      "latency_cost": {
+        "upf-16": 8,
+        "upf-17": 9,
+        "upf-20": 12,
+        "upf-01": 10
+      }
+    },
+    {
+      "id": "group-061",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-21",
+        "upf-22",
+        "upf-01",
+        "upf-06"
+      ],
+      "latency_cost": {
+        "upf-21": 16,
+        "upf-22": 17,
+        "upf-01": 13,
+        "upf-06": 18
+      }
+    },
+    {
+      "id": "group-062",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-02",
+        "upf-03",
+        "upf-06",
+        "upf-11"
+      ],
+      "latency_cost": {
+        "upf-02": 17,
+        "upf-03": 18,
+        "upf-06": 4,
+        "upf-11": 9
+      }
+    },
+    {
+      "id": "group-063",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-07",
+        "upf-08",
+        "upf-11",
+        "upf-16"
+      ],
+      "latency_cost": {
+        "upf-07": 8,
+        "upf-08": 9,
+        "upf-11": 12,
+        "upf-16": 17
+      }
+    },
+    {
+      "id": "group-064",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-13",
+        "upf-14",
+        "upf-17",
+        "upf-22"
+      ],
+      "latency_cost": {
+        "upf-13": 17,
+        "upf-14": 18,
+        "upf-17": 4,
+        "upf-22": 9
+      }
+    },
+    {
+      "id": "group-065",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-18",
+        "upf-19",
+        "upf-22",
+        "upf-03"
+      ],
+      "latency_cost": {
+        "upf-18": 8,
+        "upf-19": 9,
+        "upf-22": 12,
+        "upf-03": 10
+      }
+    },
+    {
+      "id": "group-066",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-23",
+        "upf-24",
+        "upf-03",
+        "upf-08"
+      ],
+      "latency_cost": {
+        "upf-23": 16,
+        "upf-24": 17,
+        "upf-03": 13,
+        "upf-08": 18
+      }
+    },
+    {
+      "id": "group-067",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-04",
+        "upf-05",
+        "upf-08",
+        "upf-13"
+      ],
+      "latency_cost": {
+        "upf-04": 17,
+        "upf-05": 18,
+        "upf-08": 4,
+        "upf-13": 9
+      }
+    },
+    {
+      "id": "group-068",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-09",
+        "upf-10",
+        "upf-13",
+        "upf-18"
+      ],
+      "latency_cost": {
+        "upf-09": 8,
+        "upf-10": 9,
+        "upf-13": 12,
+        "upf-18": 17
+      }
+    },
+    {
+      "id": "group-069",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-14",
+        "upf-15",
+        "upf-18",
+        "upf-23"
+      ],
+      "latency_cost": {
+        "upf-14": 16,
+        "upf-15": 17,
+        "upf-18": 3,
+        "upf-23": 8
+      }
+    },
+    {
+      "id": "group-070",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-19",
+        "upf-20",
+        "upf-23",
+        "upf-04"
+      ],
+      "latency_cost": {
+        "upf-19": 7,
+        "upf-20": 8,
+        "upf-23": 11,
+        "upf-04": 9
+      }
+    },
+    {
+      "id": "group-071",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-01",
+        "upf-02",
+        "upf-05",
+        "upf-10"
+      ],
+      "latency_cost": {
+        "upf-01": 9,
+        "upf-02": 10,
+        "upf-05": 13,
+        "upf-10": 18
+      }
+    },
+    {
+      "id": "group-072",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-06",
+        "upf-07",
+        "upf-10",
+        "upf-15"
+      ],
+      "latency_cost": {
+        "upf-06": 17,
+        "upf-07": 18,
+        "upf-10": 4,
+        "upf-15": 9
+      }
+    },
+    {
+      "id": "group-073",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-11",
+        "upf-12",
+        "upf-15",
+        "upf-20"
+      ],
+      "latency_cost": {
+        "upf-11": 8,
+        "upf-12": 9,
+        "upf-15": 12,
+        "upf-20": 17
+      }
+    },
+    {
+      "id": "group-074",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-16",
+        "upf-17",
+        "upf-20",
+        "upf-01"
+      ],
+      "latency_cost": {
+        "upf-16": 16,
+        "upf-17": 17,
+        "upf-20": 3,
+        "upf-01": 18
+      }
+    },
+    {
+      "id": "group-075",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-21",
+        "upf-22",
+        "upf-01",
+        "upf-06"
+      ],
+      "latency_cost": {
+        "upf-21": 7,
+        "upf-22": 8,
+        "upf-01": 4,
+        "upf-06": 9
+      }
+    },
+    {
+      "id": "group-076",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-02",
+        "upf-03",
+        "upf-06",
+        "upf-11"
+      ],
+      "latency_cost": {
+        "upf-02": 8,
+        "upf-03": 9,
+        "upf-06": 12,
+        "upf-11": 17
+      }
+    },
+    {
+      "id": "group-077",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-07",
+        "upf-08",
+        "upf-11",
+        "upf-16"
+      ],
+      "latency_cost": {
+        "upf-07": 16,
+        "upf-08": 17,
+        "upf-11": 3,
+        "upf-16": 8
+      }
+    },
+    {
+      "id": "group-078",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-13",
+        "upf-14",
+        "upf-17",
+        "upf-22"
+      ],
+      "latency_cost": {
+        "upf-13": 8,
+        "upf-14": 9,
+        "upf-17": 12,
+        "upf-22": 17
+      }
+    },
+    {
+      "id": "group-079",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-18",
+        "upf-19",
+        "upf-22",
+        "upf-03"
+      ],
+      "latency_cost": {
+        "upf-18": 16,
+        "upf-19": 17,
+        "upf-22": 3,
+        "upf-03": 18
+      }
+    },
+    {
+      "id": "group-080",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-23",
+        "upf-24",
+        "upf-03",
+        "upf-08"
+      ],
+      "latency_cost": {
+        "upf-23": 7,
+        "upf-24": 8,
+        "upf-03": 4,
+        "upf-08": 9
+      }
+    },
+    {
+      "id": "group-081",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-04",
+        "upf-05",
+        "upf-08",
+        "upf-13"
+      ],
+      "latency_cost": {
+        "upf-04": 8,
+        "upf-05": 9,
+        "upf-08": 12,
+        "upf-13": 17
+      }
+    },
+    {
+      "id": "group-082",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-09",
+        "upf-10",
+        "upf-13",
+        "upf-18"
+      ],
+      "latency_cost": {
+        "upf-09": 16,
+        "upf-10": 17,
+        "upf-13": 3,
+        "upf-18": 8
+      }
+    },
+    {
+      "id": "group-083",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-14",
+        "upf-15",
+        "upf-18",
+        "upf-23"
+      ],
+      "latency_cost": {
+        "upf-14": 7,
+        "upf-15": 8,
+        "upf-18": 11,
+        "upf-23": 16
+      }
+    },
+    {
+      "id": "group-084",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-19",
+        "upf-20",
+        "upf-23",
+        "upf-04"
+      ],
+      "latency_cost": {
+        "upf-19": 15,
+        "upf-20": 16,
+        "upf-23": 2,
+        "upf-04": 17
+      }
+    },
+    {
+      "id": "group-085",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-01",
+        "upf-02",
+        "upf-05",
+        "upf-10"
+      ],
+      "latency_cost": {
+        "upf-01": 17,
+        "upf-02": 18,
+        "upf-05": 4,
+        "upf-10": 9
+      }
+    },
+    {
+      "id": "group-086",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-06",
+        "upf-07",
+        "upf-10",
+        "upf-15"
+      ],
+      "latency_cost": {
+        "upf-06": 8,
+        "upf-07": 9,
+        "upf-10": 12,
+        "upf-15": 17
+      }
+    },
+    {
+      "id": "group-087",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-11",
+        "upf-12",
+        "upf-15",
+        "upf-20"
+      ],
+      "latency_cost": {
+        "upf-11": 16,
+        "upf-12": 17,
+        "upf-15": 3,
+        "upf-20": 8
+      }
+    },
+    {
+      "id": "group-088",
+      "demand_mbps": 114,
+      "eligible_upfs": [
+        "upf-16",
+        "upf-17",
+        "upf-20",
+        "upf-01"
+      ],
+      "latency_cost": {
+        "upf-16": 7,
+        "upf-17": 8,
+        "upf-20": 11,
+        "upf-01": 9
+      }
+    },
+    {
+      "id": "group-089",
+      "demand_mbps": 121,
+      "eligible_upfs": [
+        "upf-21",
+        "upf-22",
+        "upf-01",
+        "upf-06"
+      ],
+      "latency_cost": {
+        "upf-21": 15,
+        "upf-22": 16,
+        "upf-01": 12,
+        "upf-06": 17
+      }
+    },
+    {
+      "id": "group-090",
+      "demand_mbps": 128,
+      "eligible_upfs": [
+        "upf-02",
+        "upf-03",
+        "upf-06",
+        "upf-11"
+      ],
+      "latency_cost": {
+        "upf-02": 16,
+        "upf-03": 17,
+        "upf-06": 3,
+        "upf-11": 8
+      }
+    },
+    {
+      "id": "group-091",
+      "demand_mbps": 72,
+      "eligible_upfs": [
+        "upf-07",
+        "upf-08",
+        "upf-11",
+        "upf-16"
+      ],
+      "latency_cost": {
+        "upf-07": 7,
+        "upf-08": 8,
+        "upf-11": 11,
+        "upf-16": 16
+      }
+    },
+    {
+      "id": "group-092",
+      "demand_mbps": 79,
+      "eligible_upfs": [
+        "upf-13",
+        "upf-14",
+        "upf-17",
+        "upf-22"
+      ],
+      "latency_cost": {
+        "upf-13": 16,
+        "upf-14": 17,
+        "upf-17": 3,
+        "upf-22": 8
+      }
+    },
+    {
+      "id": "group-093",
+      "demand_mbps": 86,
+      "eligible_upfs": [
+        "upf-18",
+        "upf-19",
+        "upf-22",
+        "upf-03"
+      ],
+      "latency_cost": {
+        "upf-18": 7,
+        "upf-19": 8,
+        "upf-22": 11,
+        "upf-03": 9
+      }
+    },
+    {
+      "id": "group-094",
+      "demand_mbps": 93,
+      "eligible_upfs": [
+        "upf-23",
+        "upf-24",
+        "upf-03",
+        "upf-08"
+      ],
+      "latency_cost": {
+        "upf-23": 15,
+        "upf-24": 16,
+        "upf-03": 12,
+        "upf-08": 17
+      }
+    },
+    {
+      "id": "group-095",
+      "demand_mbps": 100,
+      "eligible_upfs": [
+        "upf-04",
+        "upf-05",
+        "upf-08",
+        "upf-13"
+      ],
+      "latency_cost": {
+        "upf-04": 16,
+        "upf-05": 17,
+        "upf-08": 3,
+        "upf-13": 8
+      }
+    },
+    {
+      "id": "group-096",
+      "demand_mbps": 107,
+      "eligible_upfs": [
+        "upf-09",
+        "upf-10",
+        "upf-13",
+        "upf-18"
+      ],
+      "latency_cost": {
+        "upf-09": 7,
+        "upf-10": 8,
+        "upf-13": 11,
+        "upf-18": 16
+      }
+    }
+  ]
+}

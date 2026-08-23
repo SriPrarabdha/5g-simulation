@@ -107,16 +107,16 @@ class WorkshopLabTests(unittest.TestCase):
 
 
 class WorkshopMaterialTests(unittest.TestCase):
-    def test_participant_notebook_has_three_todos_and_five_visible_stages(self) -> None:
+    def test_participant_notebook_has_six_todos_and_six_visible_stages(self) -> None:
         payload = notebook(frozen=False)
         todos = [cell for cell in payload["cells"] if "todo" in cell.get("metadata", {}).get("tags", [])]
         solutions = [cell for cell in payload["cells"] if "solution" in cell.get("metadata", {}).get("tags", [])]
-        self.assertEqual(len(todos), 3)
-        self.assertEqual(len(solutions), 3)
+        self.assertEqual(len(todos), 6)
+        self.assertEqual(len(solutions), 6)
         self.assertTrue(all(cell["metadata"]["jupyter"]["source_hidden"] for cell in solutions))
         self.assertEqual(
             payload["metadata"]["workshop"]["visible_stages"],
-            ["Traffic", "Simulate", "Forecast", "Certify/Optimize", "Evaluate"],
+            ["Preflight", "Optimize", "Parallel solver", "Simulate", "Analyze", "Experience"],
         )
         self.assertFalse(payload["metadata"]["workshop"]["participant_has_presenter_credentials"])
 

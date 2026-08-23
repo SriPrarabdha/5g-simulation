@@ -1,0 +1,926 @@
+{
+  "schema_version": "twin-replay/1.0",
+  "metadata": {
+    "title": "C-DOT synthetic UPF digital twin replay",
+    "synthetic": true,
+    "spatial_layout": "synthetic",
+    "scenario_id": "workshop-three-upf-five-minute",
+    "seed": 20260822,
+    "generated_at": "2026-08-22T12:18:01.236990+00:00",
+    "source": "workshop/fallback/workshop-run.parquet",
+    "source_frame_count": 10,
+    "frame_count": 10,
+    "selection_audits": null,
+    "control_scope": "new_session_placement_only",
+    "established_session_migration": false
+  },
+  "topology": {
+    "nodes": [
+      {
+        "id": "zone:business",
+        "kind": "demand_zone",
+        "label": "Business",
+        "position": {
+          "x": 28.0,
+          "y": 0,
+          "z": 0.0
+        },
+        "zone": "business",
+        "synthetic": true
+      },
+      {
+        "id": "gnb:business",
+        "kind": "gnb",
+        "label": "gNB \u00b7 Business",
+        "position": {
+          "x": 18.0,
+          "y": 0,
+          "z": 0.0
+        },
+        "zone": "business",
+        "synthetic": true
+      },
+      {
+        "id": "zone:residential",
+        "kind": "demand_zone",
+        "label": "Residential",
+        "position": {
+          "x": -14.0,
+          "y": 0,
+          "z": 19.0526
+        },
+        "zone": "residential",
+        "synthetic": true
+      },
+      {
+        "id": "gnb:residential",
+        "kind": "gnb",
+        "label": "gNB \u00b7 Residential",
+        "position": {
+          "x": -9.0,
+          "y": 0,
+          "z": 12.1244
+        },
+        "zone": "residential",
+        "synthetic": true
+      },
+      {
+        "id": "zone:stadium",
+        "kind": "demand_zone",
+        "label": "Stadium",
+        "position": {
+          "x": -14.0,
+          "y": 0,
+          "z": -19.0526
+        },
+        "zone": "stadium",
+        "synthetic": true
+      },
+      {
+        "id": "gnb:stadium",
+        "kind": "gnb",
+        "label": "gNB \u00b7 Stadium",
+        "position": {
+          "x": -9.0,
+          "y": 0,
+          "z": -12.1244
+        },
+        "zone": "stadium",
+        "synthetic": true
+      },
+      {
+        "id": "upf-a",
+        "kind": "upf",
+        "label": "UPF-A",
+        "position": {
+          "x": 8.0,
+          "y": 0,
+          "z": 0.0
+        },
+        "zone": "zone-a",
+        "synthetic": true
+      },
+      {
+        "id": "upf-b",
+        "kind": "upf",
+        "label": "UPF-B",
+        "position": {
+          "x": -4.0,
+          "y": 0,
+          "z": 6.9282
+        },
+        "zone": "zone-b",
+        "synthetic": true
+      },
+      {
+        "id": "upf-c",
+        "kind": "upf",
+        "label": "UPF-C",
+        "position": {
+          "x": -4.0,
+          "y": 0,
+          "z": -6.9282
+        },
+        "zone": "central",
+        "synthetic": true
+      }
+    ],
+    "links": [
+      {
+        "source": "zone:business",
+        "target": "gnb:business",
+        "kind": "radio"
+      },
+      {
+        "source": "zone:residential",
+        "target": "gnb:residential",
+        "kind": "radio"
+      },
+      {
+        "source": "zone:stadium",
+        "target": "gnb:stadium",
+        "kind": "radio"
+      },
+      {
+        "source": "gnb:residential",
+        "target": "upf-a",
+        "kind": "user_plane"
+      },
+      {
+        "source": "gnb:residential",
+        "target": "upf-c",
+        "kind": "user_plane"
+      },
+      {
+        "source": "gnb:stadium",
+        "target": "upf-a",
+        "kind": "user_plane"
+      },
+      {
+        "source": "gnb:stadium",
+        "target": "upf-b",
+        "kind": "user_plane"
+      },
+      {
+        "source": "gnb:stadium",
+        "target": "upf-c",
+        "kind": "user_plane"
+      },
+      {
+        "source": "gnb:business",
+        "target": "upf-b",
+        "kind": "user_plane"
+      },
+      {
+        "source": "gnb:business",
+        "target": "upf-c",
+        "kind": "user_plane"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "id": "residential|internet|1-010203",
+      "zone": "residential",
+      "dnn": "internet",
+      "snssai": "1-010203",
+      "eligible_upfs": [
+        "upf-a",
+        "upf-c"
+      ]
+    },
+    {
+      "id": "stadium|social-live|1-010204",
+      "zone": "stadium",
+      "dnn": "social-live",
+      "snssai": "1-010204",
+      "eligible_upfs": [
+        "upf-a",
+        "upf-b",
+        "upf-c"
+      ]
+    },
+    {
+      "id": "business|enterprise|1-112233",
+      "zone": "business",
+      "dnn": "enterprise",
+      "snssai": "1-112233",
+      "eligible_upfs": [
+        "upf-b",
+        "upf-c"
+      ]
+    }
+  ],
+  "frames": [
+    {
+      "index": 0,
+      "start": "2026-08-22T06:00:00+00:00",
+      "end": "2026-08-22T06:00:30+00:00",
+      "source_steps": [
+        0,
+        0
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:1",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.004583333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 4.0,
+          "offered_mbps": 0.88,
+          "carried_mbps": 0.88,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.016666666666666666,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 2.0,
+          "offered_mbps": 4.0,
+          "carried_mbps": 4.0,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.03433333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 10.0,
+          "offered_mbps": 10.299999999999999,
+          "carried_mbps": 10.299999999999999,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [],
+      "aggregates": {
+        "offered_mbit": 455.4,
+        "carried_mbit": 455.4,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 1,
+      "start": "2026-08-22T06:00:30+00:00",
+      "end": "2026-08-22T06:01:00+00:00",
+      "source_steps": [
+        1,
+        1
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:1",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.03489583333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 7.0,
+          "offered_mbps": 6.699999999999999,
+          "carried_mbps": 6.699999999999999,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.06833333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 7.0,
+          "offered_mbps": 16.4,
+          "carried_mbps": 16.4,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.07326666666666667,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 19.0,
+          "offered_mbps": 21.98,
+          "carried_mbps": 21.98,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [],
+      "aggregates": {
+        "offered_mbit": 1352.3999999999999,
+        "carried_mbit": 1352.3999999999999,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 2,
+      "start": "2026-08-22T06:01:00+00:00",
+      "end": "2026-08-22T06:01:30+00:00",
+      "source_steps": [
+        2,
+        2
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:1",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.054062499999999986,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 12.0,
+          "offered_mbps": 10.379999999999997,
+          "carried_mbps": 10.379999999999997,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.10166666666666666,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 11.0,
+          "offered_mbps": 24.4,
+          "carried_mbps": 24.4,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.10200000000000001,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 23.0,
+          "offered_mbps": 30.6,
+          "carried_mbps": 30.6,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [],
+      "aggregates": {
+        "offered_mbit": 1961.3999999999999,
+        "carried_mbit": 1961.3999999999999,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 3,
+      "start": "2026-08-22T06:01:30+00:00",
+      "end": "2026-08-22T06:02:00+00:00",
+      "source_steps": [
+        3,
+        3
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:1",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.12812500000000002,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 18.0,
+          "offered_mbps": 24.6,
+          "carried_mbps": 24.6,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.15833333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 17.0,
+          "offered_mbps": 38.0,
+          "carried_mbps": 38.0,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.1535333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 33.0,
+          "offered_mbps": 46.05999999999999,
+          "carried_mbps": 46.05999999999999,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [],
+      "aggregates": {
+        "offered_mbit": 3259.7999999999997,
+        "carried_mbit": 3259.7999999999997,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 4,
+      "start": "2026-08-22T06:02:00+00:00",
+      "end": "2026-08-22T06:02:30+00:00",
+      "source_steps": [
+        4,
+        4
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:1",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.20333333333333328,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 25.0,
+          "offered_mbps": 39.03999999999999,
+          "carried_mbps": 39.03999999999999,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.2033333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 22.0,
+          "offered_mbps": 48.8,
+          "carried_mbps": 48.8,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.2323333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 45.0,
+          "offered_mbps": 69.69999999999999,
+          "carried_mbps": 69.69999999999999,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [
+        {
+          "group_id": "business|enterprise|1-112233",
+          "source": "gnb:business",
+          "target": "upf-b",
+          "demand_mbps": 9.6,
+          "routing_weight": 0.42105263157894735,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "business|enterprise|1-112233",
+          "source": "gnb:business",
+          "target": "upf-c",
+          "demand_mbps": 13.2,
+          "routing_weight": 0.5789473684210527,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "residential|internet|1-010203",
+          "source": "gnb:residential",
+          "target": "upf-a",
+          "demand_mbps": 2.64,
+          "routing_weight": 0.4444444444444444,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "residential|internet|1-010203",
+          "source": "gnb:residential",
+          "target": "upf-c",
+          "demand_mbps": 3.3,
+          "routing_weight": 0.5555555555555556,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "stadium|social-live|1-010204",
+          "source": "gnb:stadium",
+          "target": "upf-a",
+          "demand_mbps": 36.4,
+          "routing_weight": 0.2826086956521739,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "stadium|social-live|1-010204",
+          "source": "gnb:stadium",
+          "target": "upf-b",
+          "demand_mbps": 39.199999999999996,
+          "routing_weight": 0.30434782608695654,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "stadium|social-live|1-010204",
+          "source": "gnb:stadium",
+          "target": "upf-c",
+          "demand_mbps": 53.199999999999996,
+          "routing_weight": 0.41304347826086957,
+          "future_sessions_only": true
+        }
+      ],
+      "aggregates": {
+        "offered_mbit": 4726.199999999999,
+        "carried_mbit": 4726.199999999999,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 5,
+      "start": "2026-08-22T06:02:30+00:00",
+      "end": "2026-08-22T06:03:00+00:00",
+      "source_steps": [
+        5,
+        5
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:2",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.20677083333333324,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 28.0,
+          "offered_mbps": 39.69999999999998,
+          "carried_mbps": 39.69999999999998,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.23166666666666663,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 25.0,
+          "offered_mbps": 55.599999999999994,
+          "carried_mbps": 55.599999999999994,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.3281333333333332,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 64.0,
+          "offered_mbps": 98.43999999999997,
+          "carried_mbps": 98.43999999999997,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [],
+      "aggregates": {
+        "offered_mbit": 5812.199999999998,
+        "carried_mbit": 5812.199999999998,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 6,
+      "start": "2026-08-22T06:03:00+00:00",
+      "end": "2026-08-22T06:03:30+00:00",
+      "source_steps": [
+        6,
+        6
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:2",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.23822916666666658,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 32.0,
+          "offered_mbps": 45.73999999999998,
+          "carried_mbps": 45.73999999999998,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.2816666666666666,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 31.0,
+          "offered_mbps": 67.6,
+          "carried_mbps": 67.6,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.44293333333333285,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 81.0,
+          "offered_mbps": 132.87999999999985,
+          "carried_mbps": 132.87999999999985,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [],
+      "aggregates": {
+        "offered_mbit": 7386.599999999995,
+        "carried_mbit": 7386.599999999995,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 7,
+      "start": "2026-08-22T06:03:30+00:00",
+      "end": "2026-08-22T06:04:00+00:00",
+      "source_steps": [
+        7,
+        7
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:2",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.31572916666666645,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 41.0,
+          "offered_mbps": 60.61999999999996,
+          "carried_mbps": 60.61999999999996,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.2983333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 33.0,
+          "offered_mbps": 71.6,
+          "carried_mbps": 71.6,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.5083999999999996,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 91.0,
+          "offered_mbps": 152.5199999999999,
+          "carried_mbps": 152.5199999999999,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [],
+      "aggregates": {
+        "offered_mbit": 8542.199999999995,
+        "carried_mbit": 8542.199999999995,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 8,
+      "start": "2026-08-22T06:04:00+00:00",
+      "end": "2026-08-22T06:04:30+00:00",
+      "source_steps": [
+        8,
+        8
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:2",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.36062499999999975,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 45.0,
+          "offered_mbps": 69.23999999999995,
+          "carried_mbps": 69.23999999999995,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.3683333333333333,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 39.0,
+          "offered_mbps": 88.39999999999999,
+          "carried_mbps": 88.39999999999999,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.5455333333333331,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 102.0,
+          "offered_mbps": 163.6599999999999,
+          "carried_mbps": 163.6599999999999,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [],
+      "aggregates": {
+        "offered_mbit": 9638.999999999996,
+        "carried_mbit": 9638.999999999996,
+        "loss_mbit": 0.0,
+        "overload_mbit": 0.0
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    },
+    {
+      "index": 9,
+      "start": "2026-08-22T06:04:30+00:00",
+      "end": "2026-08-22T06:05:00+00:00",
+      "source_steps": [
+        9,
+        9
+      ],
+      "policy_id": "workshop-three-upf-five-minute:static:2",
+      "upfs": [
+        {
+          "upf_id": "upf-a",
+          "health": "healthy",
+          "utilization": 0.4504166666666663,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 53.0,
+          "offered_mbps": 86.47999999999993,
+          "carried_mbps": 86.47999999999993,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-b",
+          "health": "healthy",
+          "utilization": 0.40833333333333327,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 43.0,
+          "offered_mbps": 97.99999999999999,
+          "carried_mbps": 97.99999999999999,
+          "loss_mbps": 0.0
+        },
+        {
+          "upf_id": "upf-c",
+          "health": "healthy",
+          "utilization": 0.5783999999999997,
+          "safe_envelope_violation": false,
+          "queue_mbits": 0.0,
+          "active_sessions": 110.0,
+          "offered_mbps": 173.5199999999999,
+          "carried_mbps": 173.5199999999999,
+          "loss_mbps": 0.0
+        }
+      ],
+      "flows": [
+        {
+          "group_id": "business|enterprise|1-112233",
+          "source": "gnb:business",
+          "target": "upf-b",
+          "demand_mbps": 16.8,
+          "routing_weight": 0.2857142857142857,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "business|enterprise|1-112233",
+          "source": "gnb:business",
+          "target": "upf-c",
+          "demand_mbps": 31.2,
+          "routing_weight": 0.7142857142857143,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "residential|internet|1-010203",
+          "source": "gnb:residential",
+          "target": "upf-a",
+          "demand_mbps": 5.28,
+          "routing_weight": 0.36363636363636365,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "residential|internet|1-010203",
+          "source": "gnb:residential",
+          "target": "upf-c",
+          "demand_mbps": 7.92,
+          "routing_weight": 0.6363636363636364,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "stadium|social-live|1-010204",
+          "source": "gnb:stadium",
+          "target": "upf-a",
+          "demand_mbps": 81.19999999999999,
+          "routing_weight": 0.2537313432835821,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "stadium|social-live|1-010204",
+          "source": "gnb:stadium",
+          "target": "upf-b",
+          "demand_mbps": 81.19999999999999,
+          "routing_weight": 0.2537313432835821,
+          "future_sessions_only": true
+        },
+        {
+          "group_id": "stadium|social-live|1-010204",
+          "source": "gnb:stadium",
+          "target": "upf-c",
+          "demand_mbps": 134.39999999999998,
+          "routing_weight": 0.4925373134328358,
+          "future_sessions_only": true
+        }
+      ],
+      "aggregates": {
+        "offered_mbit": 10739.999999999995,
+        "carried_mbit": 10739.999999999995,
+        "loss_mbit": 0.0,
+        "overload_mbit": 2.399999999997817
+      },
+      "causality": {
+        "policy_applies_to": "future_sessions_only",
+        "existing_sessions_anchored": true,
+        "history_recomputed": false
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "event-1",
+      "step": 3,
+      "kind": "arrival_factor",
+      "label": "arrival_factor \u00b7 stadium|social-live|1-010204",
+      "details": {
+        "step": 3,
+        "event_type": "arrival_factor",
+        "group_id": "stadium|social-live|1-010204",
+        "arrival_factor": 4.0
+      }
+    },
+    {
+      "id": "event-2",
+      "step": 6,
+      "kind": "capacity_factor",
+      "label": "capacity_factor \u00b7 upf-a",
+      "details": {
+        "step": 6,
+        "event_type": "capacity_factor",
+        "upf_id": "upf-a",
+        "ul_factor": 0.45
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N cdot_ws_scip
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=00:05:00
+#PBS -q workq
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+SEED="${WORKSHOP_SEED:-20260822}"
+JOB_KEY="${PBS_JOBID%%.*}"
+OUTPUT_DIR="${WORKSHOP_OUTPUT_ROOT:?WORKSHOP_OUTPUT_ROOT is required}/${USER:?USER is required}/solver/${JOB_KEY}-seed-${SEED}"
+mkdir -p "$OUTPUT_DIR"
+"$PYTHON_BIN" -m workshop.jobs solve-mip --output-dir "$OUTPUT_DIR"

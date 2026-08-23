@@ -1,0 +1,9 @@
+"uepoolstart","uepoolprefix","dnnid","dnn"
+172.174.0.0,16,1,ims
+172.168.0.0,16,1,ims
+172.170.0.0,16,1,ims
+172.172.0.0,16,1,ims
+172.173.0.0,16,2,internet
+172.175.0.0,16,2,internet
+172.169.0.0,16,2,internet
+172.171.0.0,16,2,internet

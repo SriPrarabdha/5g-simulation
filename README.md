@@ -131,23 +131,23 @@ python scripts/build_delhi_evidence_manifest.py
 python presentation/build_delhi_deck.py
 ```
 
-Prepare and run the browser-hosted workshop on one rehearsed venue host:
+Prepare the individual PBS/JupyterHub workshop materials on the shared project filesystem:
 
 ```bash
-env/bin/pip install -e '.[workshop]'
-./scripts/start-workshop.sh
+env/bin/pip install -e ".[workshop]"
+env/bin/python -m workshop.build_notebooks
+env/bin/python -m workshop.prepare_teams --participants 35
 ```
 
-The launcher creates 4–6 team-specific notebook copies, starts a credential-free
-participant Jupyter service, and starts the presenter-authenticated dashboard on
-a separate port. The participant notebook is
-[`workshop/CDOT_UPF_Closed_Loop_Lab.ipynb`](workshop/CDOT_UPF_Closed_Loop_Lab.ipynb);
-the pre-executed notebook and standalone HTML in `workshop/fallback/` are the
-offline fallbacks. Participant notebooks emit `WorkshopDecision.json`; they do
-not publish a policy or receive presenter credentials.
+The participant notebook is
+[`workshop/CDOT_UPF_Closed_Loop_Lab.ipynb`](workshop/CDOT_UPF_Closed_Loop_Lab.ipynb).
+It uses private per-user paths and the bounded jobs in `pbs/workshop_*.pbs`; it
+contains no dashboard credentials or policy-publication capability. The supplied
+Parquet, frozen notebook, standalone replay, and recorded reveal form the ordered
+fallback chain. See [`workshop/OPERATIONS.md`](workshop/OPERATIONS.md) for the
+90-minute run, seven-day readiness gate, 35-user rehearsal, and evidence language.
 
-On a Conda-managed cluster where the login node has internet access, use the
-single login-node launcher after confirming that the cluster permits a
+For the separate presenter demo, use the login-node launcher only after confirming that the cluster permits a
 long-running demo process and outbound tunnel:
 
 ```bash

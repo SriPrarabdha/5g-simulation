@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -N cdot_ws_sim
+#PBS -l select=1:ncpus=1:mem=6gb
+#PBS -l walltime=00:10:00
+#PBS -q workq
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+SEED="${WORKSHOP_SEED:?WORKSHOP_SEED is required}"
+CONTROLLER="${WORKSHOP_CONTROLLER:-static}"
+JOB_KEY="${PBS_JOBID%%.*}"
+USER_ROOT="${WORKSHOP_OUTPUT_ROOT:?WORKSHOP_OUTPUT_ROOT is required}/${USER:?USER is required}/simulator/${JOB_KEY}-seed-${SEED}"
+mkdir -p "$USER_ROOT"
+"$PYTHON_BIN" -m workshop.simulation_job \
+  --manifest configs/workshop_short_scenario.json \
+  --campaign-id "workshop-${USER}-${JOB_KEY}" \
+  --seed "$SEED" \
+  --controller "$CONTROLLER" \
+  --output-dir "$USER_ROOT" \

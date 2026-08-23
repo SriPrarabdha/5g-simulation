@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N cdot_ws_parascip
+#PBS -l select=2:ncpus=1:mem=4gb
+#PBS -l walltime=00:10:00
+#PBS -q workq
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+[[ "${CDOT_WORKSHOP_PRESENTER:-0}" == "1" ]] || { echo "BLOCKED: presenter-only ParaSCIP demonstration" >&2; exit 64; }
+JOB_KEY="${PBS_JOBID%%.*}"
+OUTPUT_DIR="${WORKSHOP_OUTPUT_ROOT:?WORKSHOP_OUTPUT_ROOT is required}/${USER:?USER is required}/parascip/${JOB_KEY}-seed-20260822"
+mkdir -p "$OUTPUT_DIR"
+"$PYTHON_BIN" -m workshop.jobs solve-mip --parascip --output-dir "$OUTPUT_DIR"

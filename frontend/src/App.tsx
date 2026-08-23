@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { createRun, getRun, login, rewindStory, runAction, setControls } from './api'
 import type { Forecast, Policy, Snapshot, TraceEvent } from './types'
 import { Evidence, LiveStory, StoryOverview, TechnicalDetail } from './views'
+import { DigitalTwinWorld, StandaloneTwin } from './components/DigitalTwinWorld'
+import { snapshotToTwinReplay } from './twinAdapter'
 
-type Destination = 'Live Dashboard' | 'Evidence' | 'Technical Detail'
+type Destination = 'Live Dashboard' | '3D Twin' | 'Evidence' | 'Technical Detail'
 type ConnectionState = 'connecting' | 'live' | 'reconnecting'
 type Notice = { tone: 'success' | 'warning'; message: string } | null
 
-function App() {
+function DashboardApp() {
   const [token, setToken] = useState<string | null>(sessionStorage.getItem('cdot-token'))
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
   const [destination, setDestination] = useState<Destination>('Live Dashboard')
@@ -202,8 +204,9 @@ function App() {
 
   return <div className="guided-app">
     <AppHeader snapshot={snapshot} connection={connection} expert={expert} onExpert={() => setExpert(value => !value)} onHome={() => setOverview(true)} onSignOut={signOut} />
-    <nav className="primary-nav" aria-label="Primary navigation">{(['Live Dashboard', 'Evidence', 'Technical Detail'] as Destination[]).map((item, index) => <button key={item} className={destination === item ? 'active' : ''} aria-current={destination === item ? 'page' : undefined} onClick={() => setDestination(item)}><span>0{index + 1}</span>{item}</button>)}</nav>
+    <nav className="primary-nav" aria-label="Primary navigation">{(['Live Dashboard', '3D Twin', 'Evidence', 'Technical Detail'] as Destination[]).map((item, index) => <button key={item} className={destination === item ? 'active' : ''} aria-current={destination === item ? 'page' : undefined} onClick={() => setDestination(item)}><span>0{index + 1}</span>{item}</button>)}</nav>
     {destination === 'Live Dashboard' && <LiveStory payload={payload} busy={busy} onToggle={togglePlayback} onRestart={restartStory} onRewind={rewindTo} onBack={rewindBack} />}
+    {destination === '3D Twin' && <DigitalTwinWorld replay={snapshotToTwinReplay(payload)} mode="presenter" />}
     {destination === 'Evidence' && <Evidence payload={payload} />}
     {destination === 'Technical Detail' && <TechnicalDetail payload={payload} expertControls={expert ? <ExpertControls payload={payload} busy={busy} action={action} control={control} /> : undefined} />}
     {notice && <Toast notice={notice} />}
@@ -272,6 +275,11 @@ function BrandMark() {
 
 function Toast({ notice }: { notice: Exclude<Notice, null> }) {
   return <div className={`toast ${notice.tone}`} role="status"><i />{notice.message}</div>
+}
+
+function App() {
+  if (location.pathname === '/twin' || location.pathname === '/replay') return <StandaloneTwin />
+  return <DashboardApp />
 }
 
 export default App
