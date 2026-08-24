@@ -1,5 +1,6 @@
 import json
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -10,6 +11,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .audit import AuditStore
+from .cdot_live import CdotLiveService, LiveConfig
+from .cdot_live.service import LiveConflict, LiveRejected, UpstreamFailure
 from .runtime import CONTROLLERS, RunManager
 from .security import Identity, TokenService
 
@@ -45,15 +48,45 @@ class StoryRewindRequest(BaseModel):
     autoplay: bool = True
 
 
+class CdotLiveApplyRequest(BaseModel):
+    proposal_id: str
+    expected_smf_state_hash: str
+    confirmation: bool
+
+
+class CdotLiveRollbackRequest(BaseModel):
+    application_id: str
+    expected_smf_state_hash: str
+    confirmation: bool
+
+
 def create_app(
     *,
     scenario_path: str | Path | None = None,
     audit_path: str | Path = ":memory:",
 ) -> FastAPI:
+    manager = RunManager(scenario_path or ROOT / "configs" / "demo_mpc_scenario.json")
+    tokens = TokenService()
+    audit = AuditStore(audit_path)
+    live = CdotLiveService(
+        LiveConfig.from_env(),
+        audit_callback=lambda actor, action, payload: audit.append("cdot-live", actor, action, payload),
+    )
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        if os.environ.get("CDOT_LIVE_POLL_ENABLED", "1").lower() not in {"0", "false", "no"}:
+            await live.start()
+        try:
+            yield
+        finally:
+            await live.close()
+
     application = FastAPI(
         title="C-DOT Closed-Loop 5G Traffic Engineering Demonstrator",
         version="1.0.0",
         description="Synthetic, deterministic UPF forecasting and steering demonstration.",
+        lifespan=lifespan,
     )
     application.add_middleware(
         CORSMiddleware,
@@ -62,12 +95,10 @@ def create_app(
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    manager = RunManager(scenario_path or ROOT / "configs" / "demo_mpc_scenario.json")
-    tokens = TokenService()
-    audit = AuditStore(audit_path)
     application.state.manager = manager
     application.state.tokens = tokens
     application.state.audit = audit
+    application.state.cdot_live = live
 
     async def identity(authorization: Annotated[str | None, Header()] = None) -> Identity:
         if not authorization or not authorization.lower().startswith("bearer "):
@@ -262,6 +293,52 @@ def create_app(
             "validation_selection": "not release-calibrated", "synthetic_training_data": True,
         }]}
 
+    @application.get("/api/v1/cdot-live/status")
+    async def cdot_live_status(_: Annotated[Identity, Depends(identity)]) -> dict[str, Any]:
+        return await live.refresh_status()
+
+    @application.get("/api/v1/cdot-live/snapshot")
+    async def cdot_live_snapshot(_: Annotated[Identity, Depends(identity)]) -> dict[str, Any]:
+        return live.snapshot()
+
+    @application.post("/api/v1/cdot-live/evaluate")
+    async def cdot_live_evaluate(user: Annotated[Identity, Depends(presenter)]) -> dict[str, Any]:
+        return await live.evaluate(actor=user.subject)
+
+    @application.post("/api/v1/cdot-live/apply")
+    async def cdot_live_apply(
+        request: CdotLiveApplyRequest,
+        user: Annotated[Identity, Depends(presenter)],
+    ) -> dict[str, Any]:
+        try:
+            return await live.apply(
+                request.proposal_id, request.expected_smf_state_hash, request.confirmation,
+                actor=user.subject,
+            )
+        except LiveConflict as error:
+            raise HTTPException(status.HTTP_409_CONFLICT, str(error)) from error
+        except LiveRejected as error:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
+        except UpstreamFailure as error:
+            raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(error)) from error
+
+    @application.post("/api/v1/cdot-live/rollback")
+    async def cdot_live_rollback(
+        request: CdotLiveRollbackRequest,
+        user: Annotated[Identity, Depends(presenter)],
+    ) -> dict[str, Any]:
+        try:
+            return await live.rollback(
+                request.application_id, request.expected_smf_state_hash, request.confirmation,
+                actor=user.subject,
+            )
+        except LiveConflict as error:
+            raise HTTPException(status.HTTP_409_CONFLICT, str(error)) from error
+        except LiveRejected as error:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
+        except UpstreamFailure as error:
+            raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(error)) from error
+
     @application.get("/metrics", response_class=PlainTextResponse)
     async def metrics(run_id: str | None = None) -> str:
         if run_id is None:
@@ -289,6 +366,24 @@ def create_app(
             pass
         finally:
             run.unsubscribe(queue)
+
+    @application.websocket("/api/v1/ws/cdot-live")
+    async def cdot_live_websocket(websocket: WebSocket, token: str = Query(...)) -> None:
+        try:
+            tokens.verify(token)
+        except ValueError:
+            await websocket.close(code=4401)
+            return
+        await websocket.accept()
+        queue = live.subscribe()
+        try:
+            await websocket.send_json({"type": "snapshot", "payload": live.snapshot()})
+            while True:
+                await websocket.send_json(await queue.get())
+        except WebSocketDisconnect:
+            pass
+        finally:
+            live.unsubscribe(queue)
 
     static = ROOT / "demo_api" / "static"
     if static.exists():

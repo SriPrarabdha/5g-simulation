@@ -21,6 +21,7 @@ from .survival import (
     load_survival_tables, write_survival_tables,
 )
 from .predrain_flow import PreDrainFlowConfig, PreDrainFlowResult, solve_predrain_flow
+from .exposure_guard import ExposureGuardConfig, ExposureGuardDecision, guard_allocation
 from .oracle_bounds import (
     OracleBoundResult,
     OracleMetrics,
@@ -63,5 +64,6 @@ __all__ = [
     "write_survival_tables",
     "PreDrainFlowConfig",
     "PreDrainFlowResult",
+    "ExposureGuardConfig", "ExposureGuardDecision", "guard_allocation",
     "solve_predrain_flow",
 ]

@@ -360,6 +360,10 @@ class ScenarioConfig:
     steps: int
     step_seconds: int = 30
     decision_interval_steps: int = 20
+    # None is deliberately distinct from an explicitly configured value.  It
+    # selects the legacy tumbling-window implementation, preserving frozen
+    # campaign artifacts byte-for-byte.
+    observation_window_steps: int | None = None
     selection_audit_stride: int = 1
     primary_overload_metric: str = "overload_area_seconds.ul"
     groups: tuple[GroupProfile, ...] = field(default_factory=tuple)
@@ -373,6 +377,13 @@ class ScenarioConfig:
             raise ValueError("scenario identity, steps, and step_seconds must be positive")
         if self.decision_interval_steps <= 0:
             raise ValueError("decision_interval_steps must be positive")
+        observation_steps = self.effective_observation_window_steps
+        if observation_steps <= 0:
+            raise ValueError("observation_window_steps must be positive")
+        if observation_steps % self.decision_interval_steps:
+            raise ValueError(
+                "observation_window_steps must be divisible by decision_interval_steps"
+            )
         if self.selection_audit_stride <= 0:
             raise ValueError("selection_audit_stride must be positive")
         if self.primary_overload_metric not in {
@@ -450,9 +461,18 @@ class ScenarioConfig:
             scenario_id=data["scenario_id"], seed=data["seed"], start_time=data["start_time"],
             steps=data["steps"], step_seconds=data.get("step_seconds", 30),
             decision_interval_steps=data.get("decision_interval_steps", 20),
+            observation_window_steps=data.get("observation_window_steps"),
             selection_audit_stride=data.get("selection_audit_stride", 1),
             primary_overload_metric=data.get("primary_overload_metric", "overload_area_seconds.ul"),
             groups=groups, upfs=upfs, events=events, traffic_model=traffic_model,
+        )
+
+    @property
+    def effective_observation_window_steps(self) -> int:
+        return (
+            self.decision_interval_steps
+            if self.observation_window_steps is None
+            else self.observation_window_steps
         )
 
 

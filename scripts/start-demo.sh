@@ -4,6 +4,70 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
+usage() {
+  cat <<'EOF'
+Usage: ./scripts/start-demo.sh [--cloudflare yes|no]
+
+Options:
+  --cloudflare yes|no  Enable the Cloudflare Quick Tunnel (default: yes).
+  --no-cloudflare      Shorthand for --cloudflare no.
+  -h, --help           Show this help message.
+
+Environment:
+  CDOT_DEMO_CLOUDFLARE  yes/no equivalent of --cloudflare.
+  CDOT_DEMO_TUNNEL      Legacy 1/0 equivalent (still supported).
+
+Command-line options take precedence over environment variables.
+EOF
+}
+
+CLOUDFLARE_SETTING="${CDOT_DEMO_CLOUDFLARE:-${CDOT_DEMO_TUNNEL:-yes}}"
+while (( $# > 0 )); do
+  case "$1" in
+    --cloudflare)
+      if (( $# < 2 )); then
+        echo "--cloudflare requires yes or no" >&2
+        usage >&2
+        exit 2
+      fi
+      CLOUDFLARE_SETTING="$2"
+      shift 2
+      ;;
+    --cloudflare=*)
+      CLOUDFLARE_SETTING="${1#*=}"
+      shift
+      ;;
+    --no-cloudflare)
+      CLOUDFLARE_SETTING="no"
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+case "${CLOUDFLARE_SETTING,,}" in
+  y|yes|true|1|on)
+    TUNNEL_ENABLED=1
+    CLOUDFLARE_SETTING=yes
+    ;;
+  n|no|false|0|off)
+    TUNNEL_ENABLED=0
+    CLOUDFLARE_SETTING=no
+    ;;
+  *)
+    echo "Invalid Cloudflare setting '$CLOUDFLARE_SETTING'; expected yes or no." >&2
+    exit 2
+    ;;
+esac
+
 if [[ -n "${CDOT_DEMO_PYTHON:-}" ]]; then
   PYTHON_BIN="$CDOT_DEMO_PYTHON"
 elif [[ -x "$PROJECT_DIR/env/bin/python" ]]; then
@@ -19,7 +83,6 @@ if [[ -z "$PYTHON_BIN" || ! -x "$PYTHON_BIN" ]]; then
   exit 1
 fi
 
-TUNNEL_ENABLED="${CDOT_DEMO_TUNNEL:-1}"
 DEMO_HOST="${CDOT_DEMO_HOST:-127.0.0.1}"
 PREFERRED_PORT="${CDOT_DEMO_PORT:-8000}"
 TUNNEL_ORIGIN_HOST="${CDOT_DEMO_TUNNEL_ORIGIN_HOST:-127.0.0.1}"
@@ -64,7 +127,8 @@ fi
 
 if [[ "$TUNNEL_ENABLED" == "1" ]]; then
   if ! command -v cloudflared >/dev/null 2>&1; then
-    echo "cloudflared is required when CDOT_DEMO_TUNNEL=1" >&2
+    echo "cloudflared is required when --cloudflare yes (the default)" >&2
+    echo "On a cluster login node, use: ./scripts/start-demo.sh --cloudflare no" >&2
     exit 1
   fi
   if [[ -z "${CDOT_DEMO_PASSWORD:-}" ]]; then
@@ -81,6 +145,8 @@ fi
 export CDOT_DEMO_USER="$DEMO_USER"
 export CDOT_DEMO_PASSWORD
 export CDOT_DEMO_SECRET
+export CDOT_DEMO_CLOUDFLARE="$CLOUDFLARE_SETTING"
+export CDOT_DEMO_TUNNEL="$TUNNEL_ENABLED"
 
 if [[ "${CDOT_DEMO_SKIP_FRONTEND_BUILD:-0}" != "1" ]]; then
   if ! command -v npm >/dev/null 2>&1; then
@@ -93,6 +159,7 @@ fi
 "$PYTHON_BIN" scripts/preflight.py
 
 if [[ "$TUNNEL_ENABLED" != "1" ]]; then
+  echo "Cloudflare tunnel: disabled"
   echo "Local URL: http://$DEMO_HOST:$DEMO_PORT"
   echo "Presenter username: $CDOT_DEMO_USER"
   echo "Presenter password: $CDOT_DEMO_PASSWORD"

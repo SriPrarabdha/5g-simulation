@@ -72,9 +72,12 @@ def main() -> int:
             for cell in notebook.get("cells", [])
         )
         stages = notebook.get("metadata", {}).get("workshop", {}).get("visible_stages", [])
+        expected_stages = [
+            "Preflight", "Optimize", "Parallel solver", "Simulate", "Analyze", "Experience",
+        ]
         checks.append((
             "workshop notebook",
-            notebook.get("nbformat") == 4 and todo_count == 3 and len(stages) == 5,
+            notebook.get("nbformat") == 4 and todo_count == 6 and stages == expected_stages,
             f"{todo_count} TODOs / {len(stages)} stages",
         ))
     except (OSError, json.JSONDecodeError) as error:
@@ -99,7 +102,10 @@ def main() -> int:
     if failed:
         print(f"Preflight failed: {', '.join(failed)}", file=sys.stderr)
         return 1
-    print("Preflight passed. All displayed data remains explicitly synthetic.")
+    print(
+        "Preflight passed. Synthetic pages remain labelled; /live-cdot is the "
+        "isolated external-data plane."
+    )
     return 0
 
 

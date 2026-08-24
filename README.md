@@ -87,8 +87,13 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
 - Prometheus-compatible synthetic metrics and REST interfaces for topology,
   telemetry, forecasts, policy, decision traces, model metadata, and matched
   campaign comparisons.
-- A three-destination React operations console served offline by FastAPI, with
-  a routing-led Live Dashboard, frozen Evidence, and Technical Detail.
+- A five-destination React operations console served offline by FastAPI, with
+  a routing-led synthetic dashboard, 3D twin, frozen Evidence, Technical
+  Detail, and the isolated Live C-DOT console.
+- An isolated `/live-cdot` console and `/api/v1/cdot-live/*` plane that reads
+  closed Prometheus windows, forecasts carried traffic in explicitly
+  uncalibrated pps-proxy units, runs one-step HiGHS allocation, and requires
+  presenter review before verified h2c `/upf-admin` writes or exact rollback.
 
 The selected primary metric for the supplied demo is directional UL overload
 area (`overload_area_seconds.ul`). DL results are still reported separately and
@@ -121,6 +126,16 @@ npm --prefix frontend ci
 ./scripts/start-demo.sh
 ```
 
+The live plane defaults to Prometheus `http://192.168.218.8:29090` and SMF
+`http://192.168.218.8:30956`. Override them with
+`CDOT_PROMETHEUS_URL` and `CDOT_SMF_URL`; timeouts, poll/freshness intervals,
+queries, UPF/job/pod/SMF identities, and proxy limits are also configurable via
+the `CDOT_LIVE_*` variables in `demo_api/cdot_live/config.py` or a replacement
+`CDOT_LIVE_CONFIG`. The default limits in `configs/cdot_live.json` are frozen
+v02 p99 observations, not calibrated capacities. No live write occurs during
+status, snapshot, polling, or evaluation; only a confirmed presenter apply or
+rollback can POST to the SMF.
+
 Rebuild the additive Delhi traffic-model/2.0 evidence and presentation without
 changing the frozen v1 decks or campaign results:
 
@@ -147,27 +162,37 @@ Parquet, frozen notebook, standalone replay, and recorded reveal form the ordere
 fallback chain. See [`workshop/OPERATIONS.md`](workshop/OPERATIONS.md) for the
 90-minute run, seven-day readiness gate, 35-user rehearsal, and evidence language.
 
-For the separate presenter demo, use the login-node launcher only after confirming that the cluster permits a
-long-running demo process and outbound tunnel:
+For the separate presenter demo, use the login-node launcher only after confirming
+that the cluster permits a long-running demo process. Cloudflare is enabled by
+default; disable it explicitly on login nodes where Quick Tunnels are unavailable:
 
 ```bash
-./scripts/start-login-demo.sh
+./scripts/start-login-demo.sh --cloudflare no
 ```
 
 It creates and reuses `.conda/cdot-demo`, installs missing Python, Node/npm,
-frontend, and `cloudflared` dependencies without root access, then starts the
-demo and tunnel. Run it inside `tmux` if the demo must survive an SSH
-disconnect. Press `Ctrl+C` in that session to stop both processes.
+and frontend dependencies without root access. It skips the `cloudflared`
+download when Cloudflare is disabled. Run it inside `tmux` if the demo must
+survive an SSH disconnect. Press `Ctrl+C` in that session to stop the process.
 
 The launcher rebuilds the React dashboard, runs preflight, and starts the
 FastAPI API/WebSocket service that serves the production dashboard from the
 same origin. It selects the first free port at or above `CDOT_DEMO_PORT`
-(default `8000`), starts a Cloudflare Quick Tunnel, and prints the local URL,
-public `trycloudflare.com` URL, and presenter credentials. If no presenter
+(default `8000`), starts a Cloudflare Quick Tunnel when enabled, and prints the
+available URLs and presenter credentials. If no presenter
 password is supplied, tunnel mode generates a new password for that run. Press
-`Ctrl+C` to stop both processes. Set `CDOT_DEMO_TUNNEL=0` for local-only mode,
-or `CDOT_DEMO_SKIP_FRONTEND_BUILD=1` only when intentionally reusing an already
-verified bundle.
+`Ctrl+C` to stop both processes. Use `--cloudflare no` for local-only mode
+(`CDOT_DEMO_CLOUDFLARE=no` and the legacy `CDOT_DEMO_TUNNEL=0` are also
+supported), or `CDOT_DEMO_SKIP_FRONTEND_BUILD=1` only when intentionally reusing
+an already verified bundle.
+
+With Cloudflare disabled, the launcher binds to `127.0.0.1` by default. From a
+local workstation, reach a login-node process through SSH forwarding (replace
+the host and port with the values printed by the launcher):
+
+```bash
+ssh -N -L 8000:127.0.0.1:8000 <user>@<login-node>
+```
 
 Open the printed URL and sign in with the printed credentials. Local-only mode
 defaults to `presenter` / `demo`. Override them with `CDOT_DEMO_USER`,

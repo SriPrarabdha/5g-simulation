@@ -43,3 +43,23 @@ export async function rewindStory(token: string, runId: string, checkpointId: st
     method: 'POST', body: JSON.stringify({ checkpoint_id: checkpointId, autoplay }),
   }, token)
 }
+
+export async function getCdotLiveSnapshot(token: string) {
+  return request<any>('/api/v1/cdot-live/snapshot', {}, token)
+}
+
+export async function evaluateCdotLive(token: string) {
+  return request<any>('/api/v1/cdot-live/evaluate', { method: 'POST' }, token)
+}
+
+export async function applyCdotLive(token: string, proposalId: string, expectedHash: string, confirmation: boolean) {
+  return request<any>('/api/v1/cdot-live/apply', {
+    method: 'POST', body: JSON.stringify({ proposal_id: proposalId, expected_smf_state_hash: expectedHash, confirmation }),
+  }, token)
+}
+
+export async function rollbackCdotLive(token: string, applicationId: string, expectedHash: string, confirmation: boolean) {
+  return request<any>('/api/v1/cdot-live/rollback', {
+    method: 'POST', body: JSON.stringify({ application_id: applicationId, expected_smf_state_hash: expectedHash, confirmation }),
+  }, token)
+}

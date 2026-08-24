@@ -5,6 +5,47 @@ umask 077
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+START_DEMO_ARGS=("$@")
+CLOUDFLARE_SETTING="${CDOT_DEMO_CLOUDFLARE:-${CDOT_DEMO_TUNNEL:-yes}}"
+while (( $# > 0 )); do
+    case "$1" in
+        --cloudflare)
+            if (( $# < 2 )); then
+                echo "ERROR: --cloudflare requires yes or no" >&2
+                exit 2
+            fi
+            CLOUDFLARE_SETTING="$2"
+            shift 2
+            ;;
+        --cloudflare=*)
+            CLOUDFLARE_SETTING="${1#*=}"
+            shift
+            ;;
+        --no-cloudflare)
+            CLOUDFLARE_SETTING="no"
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+case "${CLOUDFLARE_SETTING,,}" in
+    y|yes|true|1|on)
+        TUNNEL_ENABLED=1
+        CLOUDFLARE_SETTING=yes
+        ;;
+    n|no|false|0|off)
+        TUNNEL_ENABLED=0
+        CLOUDFLARE_SETTING=no
+        ;;
+    *)
+        echo "ERROR: invalid Cloudflare setting '$CLOUDFLARE_SETTING'; expected yes or no." >&2
+        exit 2
+        ;;
+esac
+
 echo "[demo] host=$(hostname)"
 echo "[demo] project=$PROJECT_ROOT"
 
@@ -77,9 +118,9 @@ else
     echo "[deps] frontend dependencies are available"
 fi
 
-# cloudflared is distributed as a standalone binary. Keep it inside the Conda
-# prefix so no root access or system-wide installation is required.
-if ! command -v cloudflared >/dev/null 2>&1; then
+# cloudflared is optional on cluster login nodes. Only install it when the
+# requested launch mode actually needs a public Quick Tunnel.
+if [[ "$TUNNEL_ENABLED" == "1" ]] && ! command -v cloudflared >/dev/null 2>&1; then
     case "$(uname -m)" in
         x86_64) CLOUDFLARED_ARCH="amd64" ;;
         aarch64|arm64) CLOUDFLARED_ARCH="arm64" ;;
@@ -104,17 +145,22 @@ PY
     chmod 0755 "$CLOUDFLARED_TMP"
     mv "$CLOUDFLARED_TMP" "$CONDA_ENV_PREFIX/bin/cloudflared"
     trap - EXIT
-else
+elif [[ "$TUNNEL_ENABLED" == "1" ]]; then
     echo "[deps] cloudflared is available: $(command -v cloudflared)"
+else
+    echo "[deps] Cloudflare disabled; skipping cloudflared installation"
 fi
 
 export CDOT_DEMO_PYTHON="$CONDA_ENV_PREFIX/bin/python"
-export CDOT_DEMO_TUNNEL="${CDOT_DEMO_TUNNEL:-1}"
+export CDOT_DEMO_CLOUDFLARE="$CLOUDFLARE_SETTING"
+export CDOT_DEMO_TUNNEL="$TUNNEL_ENABLED"
 export CDOT_DEMO_HOST="${CDOT_DEMO_HOST:-127.0.0.1}"
 
 echo "[deps] python=$($CDOT_DEMO_PYTHON --version 2>&1)"
 echo "[deps] node=$(node --version) npm=$(npm --version)"
-echo "[deps] cloudflared=$(cloudflared --version)"
+if [[ "$TUNNEL_ENABLED" == "1" ]]; then
+    echo "[deps] cloudflared=$(cloudflared --version)"
+fi
 echo "[demo] starting on the login node; press Ctrl+C to stop"
 
-exec "$PROJECT_ROOT/scripts/start-demo.sh"
+exec "$PROJECT_ROOT/scripts/start-demo.sh" "${START_DEMO_ARGS[@]}"

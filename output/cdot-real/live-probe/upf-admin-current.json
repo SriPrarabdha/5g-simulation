@@ -1,0 +1,1 @@
+[{"dnn":"ims","tac":2,"weights":{"UPF1":1,"UPF2":3}},{"dnn":"internet","tac":2,"weights":{"UPF1":1,"UPF2":2}},{"dnn":"ims","tac":3,"weights":{"UPF1":1,"UPF2":2,"UPF3":2}},{"dnn":"internet","tac":3,"weights":{"UPF1":1,"UPF2":3,"UPF3":3}},{"dnn":"internet","tac":4,"weights":{"UPF1":1,"UPF4":4}}]

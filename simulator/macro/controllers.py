@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import time
 from collections import Counter
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timedelta
 from typing import Any, Protocol
 
@@ -12,12 +12,14 @@ from optimization import (
     ActiveCohort,
     CohortMPCConfig,
     CohortMPCResult,
+    ExposureGuardConfig,
     OptimizationConfig,
     PreDrainFlowConfig,
     PreDrainFlowResult,
     solve_allocation,
     solve_cohort_mpc,
     solve_predrain_flow,
+    guard_allocation,
     SurvivalTable,
 )
 
@@ -685,6 +687,7 @@ class CohortMPCController:
         forecast_adjustment: ForecastAdjustmentConfig | None = None,
         survival_by_group: dict[str, SurvivalTable] | None = None,
         survival_guardrail_evidence: dict[str, Any] | None = None,
+        exposure_guard_config: ExposureGuardConfig | None = None,
     ) -> None:
         self.forecaster = forecaster or MovingAverageForecaster(6)
         self.mpc_config = mpc_config or CohortMPCConfig()
@@ -697,6 +700,7 @@ class CohortMPCController:
             "criteria": {},
             "reason": "not_supplied",
         })
+        self.exposure_guard_config = exposure_guard_config
         self._fallback = StaticCapacityController()
         self._previous_policy: Policy | None = None
         self._last_applied_epoch: int | None = None
@@ -950,10 +954,49 @@ class CohortMPCController:
                 f"same_state_static_certificate:{reason}",
             )
 
+        first_allocation = result.first_allocation
+        if self.exposure_guard_config is not None:
+            # The MPC solver has already applied its configured maximum blend.
+            # Search from that candidate toward Static without applying the
+            # maximum a second time; diagnostics remain in absolute blend units.
+            relative_guard = replace(
+                self.exposure_guard_config,
+                minimum_blend_fraction=min(
+                    1.0,
+                    self.exposure_guard_config.minimum_blend_fraction
+                    / self.mpc_config.action_blend_fraction,
+                ),
+            )
+            guard = guard_allocation(
+                config, groups, upf_states, context.residual_by_upf,
+                {key: values[0] for key, values in demand_by_group.items()},
+                result.static_first_allocation, result.first_allocation,
+                current_step=current_step,
+                horizon_steps=self.mpc_config.horizon_windows * config.decision_interval_steps,
+                requested_blend=1.0,
+                settings=relative_guard,
+            )
+            requested_blend = self.mpc_config.action_blend_fraction
+            executed_blend = requested_blend * guard.executed_blend
+            if not guard.accepted:
+                self._record_diagnostic(version, created_at, f"guard_rejected:{guard.rejection_reason}", result)
+                self.decision_diagnostics[-1].update({
+                    "requested_blend": requested_blend,
+                    "executed_blend": executed_blend,
+                    "projected_ul_gain": guard.projected_ul_gain,
+                    "worst_continuation": guard.worst_continuation,
+                    "worst_exposure": guard.worst_exposure,
+                    "guard_rejection_reason": guard.rejection_reason,
+                })
+                return self._static_fallback(
+                    config, groups, upf_states, created_at, version,
+                    f"exposure_guard:{guard.rejection_reason}",
+                )
+            first_allocation = guard.allocation
         policy_groups = [
             PolicyGroup(
                 GroupKey(group.key.zone, group.key.dnn, group.key.snssai),
-                result.first_allocation[group.key.selection_id],
+                first_allocation[group.key.selection_id],
             )
             for group in groups
         ]
@@ -976,6 +1019,15 @@ class CohortMPCController:
         self._previous_policy = policy
         self._last_applied_epoch = version
         self._record_diagnostic(version, created_at, "accepted", result)
+        if self.exposure_guard_config is not None:
+            self.decision_diagnostics[-1].update({
+                "requested_blend": requested_blend,
+                "executed_blend": executed_blend,
+                "projected_ul_gain": guard.projected_ul_gain,
+                "worst_continuation": guard.worst_continuation,
+                "worst_exposure": guard.worst_exposure,
+                "guard_rejection_reason": None,
+            })
         return policy
 
     def _record_diagnostic(
@@ -1115,8 +1167,10 @@ class PreDrainFlowController:
     name = "event-predrain-flow-v1"
     required_history_windows = 1
 
-    def __init__(self, *, flow_config: PreDrainFlowConfig | None = None) -> None:
+    def __init__(self, *, flow_config: PreDrainFlowConfig | None = None,
+                 exposure_guard_config: ExposureGuardConfig | None = None) -> None:
         self.flow_config = flow_config or PreDrainFlowConfig()
+        self.exposure_guard_config = exposure_guard_config
         self._fallback = StaticCapacityController()
         self.last_flow_result: PreDrainFlowResult | None = None
         self.last_forecasts: list[Forecast] = []
@@ -1276,6 +1330,38 @@ class PreDrainFlowController:
                 upf_id: weight / total for upf_id, weight in weights.items()
                 if weight > 1e-12
             }
+        if self.exposure_guard_config is not None:
+            guard = guard_allocation(
+                config, groups, upf_states, context.residual_by_upf, demand,
+                static_by_group, result.allocation,
+                current_step=current_step,
+                horizon_steps=self.flow_config.lead_windows * config.decision_interval_steps,
+                requested_blend=blend,
+                settings=self.exposure_guard_config,
+            )
+            diagnostic.update({
+                "requested_blend": guard.requested_blend,
+                "executed_blend": guard.executed_blend,
+                "projected_ul_gain": guard.projected_ul_gain,
+                "worst_continuation": guard.worst_continuation,
+                "worst_exposure": guard.worst_exposure,
+                "guard_rejection_reason": guard.rejection_reason,
+            })
+            if not guard.accepted:
+                reason = f"exposure_guard:{guard.rejection_reason}"
+                diagnostic["disposition"] = f"static_fallback:{reason}"
+                self.decision_funnel[f"rejected:{reason}"] += 1
+                policy = static_policy
+                # The optimization itself completed successfully; the causal
+                # exposure guard rejected publication.  Rejection belongs in
+                # fallback.reason/diagnostics, not in the closed solver-status
+                # vocabulary.
+                policy.solver = SolverReport(self.name, "optimal", result.runtime_ms)
+                policy.fallback = Fallback(True, reason)
+                policy.validator_version = "causal-exposure-guard/1.0"
+                policy.validate()
+                return policy
+            blended_allocation = guard.allocation
         diagnostic["action_blend_fraction"] = blend
         diagnostic["maximum_action_blend_fraction"] = maximum_blend
         diagnostic["minimum_action_blend_fraction"] = minimum_blend
@@ -1554,6 +1640,7 @@ def controller_by_name(
     predrain_config: PreDrainFlowConfig | None = None,
     survival_by_group: dict[str, SurvivalTable] | None = None,
     survival_guardrail_evidence: dict[str, Any] | None = None,
+    exposure_guard_config: ExposureGuardConfig | None = None,
 ) -> Controller:
     if forecaster is not None and name not in {"forecast-capacity", "predictive", "mpc"}:
         raise ValueError("a forecast bundle can only be attached to a forecast controller")
@@ -1569,6 +1656,8 @@ def controller_by_name(
         raise ValueError("pre-drain settings can only be attached to the pre-drain controller")
     if survival_by_group is not None and name != "mpc":
         raise ValueError("survival tables can only be attached to the MPC controller")
+    if exposure_guard_config is not None and name not in {"mpc", "predrain"}:
+        raise ValueError("the exposure guard can only be attached to MPC or pre-drain")
     controllers: dict[str, Controller] = {
         "static": StaticCapacityController(),
         "reactive": ReactiveThresholdController(),
@@ -1587,12 +1676,13 @@ def controller_by_name(
             forecast_adjustment_config=forecast_adjustment_config,
         ),
         "oracle": OracleHiGHSController(),
-        "predrain": PreDrainFlowController(flow_config=predrain_config),
+        "predrain": PreDrainFlowController(flow_config=predrain_config, exposure_guard_config=exposure_guard_config),
         "mpc": CohortMPCController(
             forecaster=forecaster,
             mpc_config=mpc_config,
             survival_by_group=survival_by_group,
             survival_guardrail_evidence=survival_guardrail_evidence,
+            exposure_guard_config=exposure_guard_config,
         ),
     }
     try:

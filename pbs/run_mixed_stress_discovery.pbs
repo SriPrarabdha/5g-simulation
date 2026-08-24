@@ -1,0 +1,35 @@
+#!/bin/bash
+#PBS -N cdot-guard-discovery
+#PBS -q workq
+#PBS -J 0-159%120
+#PBS -l select=1:ncpus=125:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=12:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${CAMPAIGN_ROOT:?set durable campaign output root}"
+: "${BASE_MANIFEST:?set frozen base scenario manifest}"
+: "${FORECAST_BUNDLE:?set frozen forecast bundle}"
+available_cpus="$($PYTHON_BIN -c 'import os; print(len(os.sched_getaffinity(0)))')"
+if [ "$available_cpus" -lt 125 ]; then
+  echo "ERROR: expected at least 125 CPUs in affinity, got $available_cpus" >&2
+  exit 1
+fi
+
+arm_index="${CAMPAIGN_ARM_INDEX:-$PBS_ARRAY_INDEX}"
+node_root="$CAMPAIGN_ROOT/discovery/node-${arm_index}"
+mkdir -p "$node_root"
+"$PYTHON_BIN" -m experiments.mixed_stress_campaign \
+  --array-index "$arm_index" \
+  --output "$node_root/worklist.json"
+
+# The generated immutable worklist contains exactly 125 balanced cells.  The
+# production launcher consumes it with one single-threaded worker per CPU.
+exec "$PYTHON_BIN" scripts/run_mixed_stress_node.py \
+  --worklist "$node_root/worklist.json" --manifest "$BASE_MANIFEST" \
+  --forecast-bundle "$FORECAST_BUNDLE" --workers 125 --output-root "$node_root" \
+  --static-cache "$CAMPAIGN_ROOT/static-references"

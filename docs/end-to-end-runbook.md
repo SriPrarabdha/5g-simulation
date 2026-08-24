@@ -535,14 +535,21 @@ export CDOT_FORECAST_BUNDLE='<absolute-path>/forecaster-v1.json'
 ```
 
 The launcher chooses the first free port at or above `CDOT_DEMO_PORT` (default
-`8000`), waits for the API, starts `cloudflared`, and prints the local URL,
-public URL, and presenter credentials. `Ctrl+C` stops both processes.
+`8000`), waits for the API, starts `cloudflared` when enabled, and prints the
+available URLs and presenter credentials. `Ctrl+C` stops the launched processes.
 
 For a single-host rehearsal without a public tunnel, run:
 
 ```bash
-CDOT_DEMO_TUNNEL=0 ./scripts/start-demo.sh
+./scripts/start-demo.sh --cloudflare no
 ```
+
+Cloudflare defaults to `yes`. The equivalent environment setting is
+`CDOT_DEMO_CLOUDFLARE=no`; `CDOT_DEMO_TUNNEL=0` remains supported for backward
+compatibility. On a cluster login node, `./scripts/start-login-demo.sh
+--cloudflare no` also skips downloading `cloudflared`. Keep the default
+`127.0.0.1` bind and use SSH local port forwarding when accessing it from a
+workstation.
 
 Check service health and synthetic Prometheus exposition:
 

@@ -4,16 +4,17 @@ import type { Forecast, Policy, Snapshot, TraceEvent } from './types'
 import { Evidence, LiveStory, StoryOverview, TechnicalDetail } from './views'
 import { DigitalTwinWorld, StandaloneTwin } from './components/DigitalTwinWorld'
 import { snapshotToTwinReplay } from './twinAdapter'
+import { LiveCdot } from './LiveCdot'
 
-type Destination = 'Live Dashboard' | '3D Twin' | 'Evidence' | 'Technical Detail'
+type Destination = 'Live Dashboard' | '3D Twin' | 'Evidence' | 'Technical Detail' | 'Live C-DOT'
 type ConnectionState = 'connecting' | 'live' | 'reconnecting'
 type Notice = { tone: 'success' | 'warning'; message: string } | null
 
 function DashboardApp() {
   const [token, setToken] = useState<string | null>(sessionStorage.getItem('cdot-token'))
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
-  const [destination, setDestination] = useState<Destination>('Live Dashboard')
-  const [overview, setOverview] = useState(true)
+  const [destination, setDestination] = useState<Destination>(location.pathname === '/live-cdot' ? 'Live C-DOT' : 'Live Dashboard')
+  const [overview, setOverview] = useState(location.pathname !== '/live-cdot')
   const [expert, setExpert] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -26,10 +27,11 @@ function DashboardApp() {
     if (!token || !runId || snapshot) return
     getRun(token, runId).then(run => {
       setSnapshot(run)
-      setOverview(run.payload.runner.step === 0)
+      setOverview(location.pathname !== '/live-cdot' && run.payload.runner.step === 0)
     }).catch(() => {
       sessionStorage.removeItem('cdot-token')
       sessionStorage.removeItem('cdot-run-id')
+      sessionStorage.removeItem('cdot-role')
       setToken(null)
     })
   }, [token, snapshot])
@@ -79,9 +81,10 @@ function DashboardApp() {
     const handler = (event: KeyboardEvent) => {
       const tag = (event.target as HTMLElement | null)?.tagName
       if (tag && ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(tag)) return
-      if (event.key === '1') setDestination('Live Dashboard')
-      if (event.key === '2') setDestination('Evidence')
-      if (event.key === '3') setDestination('Technical Detail')
+      if (event.key === '1') chooseDestination('Live Dashboard')
+      if (event.key === '2') chooseDestination('Evidence')
+      if (event.key === '3') chooseDestination('Technical Detail')
+      if (event.key === '5') chooseDestination('Live C-DOT')
       if (event.key.toLowerCase() === 'e') setExpert(value => !value)
       if (event.key === 'ArrowLeft' && destination === 'Live Dashboard') {
         event.preventDefault()
@@ -102,9 +105,10 @@ function DashboardApp() {
       const run = await createRun(auth.access_token, 'mpc')
       sessionStorage.setItem('cdot-token', auth.access_token)
       sessionStorage.setItem('cdot-run-id', run.run_id)
+      sessionStorage.setItem('cdot-role', auth.role || 'presenter')
       setToken(auth.access_token)
       setSnapshot(run)
-      setOverview(true)
+      setOverview(location.pathname !== '/live-cdot')
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : 'Unable to sign in')
     } finally {
@@ -191,8 +195,16 @@ function DashboardApp() {
     socket.current?.close()
     sessionStorage.removeItem('cdot-token')
     sessionStorage.removeItem('cdot-run-id')
+    sessionStorage.removeItem('cdot-role')
     setToken(null)
     setSnapshot(null)
+  }
+
+  function chooseDestination(next: Destination) {
+    setDestination(next)
+    setOverview(false)
+    const path = next === 'Live C-DOT' ? '/live-cdot' : '/'
+    if (location.pathname !== path) history.pushState({}, '', path)
   }
 
   if (!token || !snapshot) return <LoginScreen onSubmit={signIn} busy={busy} error={loginError} loading={Boolean(token)} />
@@ -203,12 +215,13 @@ function DashboardApp() {
   </div>
 
   return <div className="guided-app">
-    <AppHeader snapshot={snapshot} connection={connection} expert={expert} onExpert={() => setExpert(value => !value)} onHome={() => setOverview(true)} onSignOut={signOut} />
-    <nav className="primary-nav" aria-label="Primary navigation">{(['Live Dashboard', '3D Twin', 'Evidence', 'Technical Detail'] as Destination[]).map((item, index) => <button key={item} className={destination === item ? 'active' : ''} aria-current={destination === item ? 'page' : undefined} onClick={() => setDestination(item)}><span>0{index + 1}</span>{item}</button>)}</nav>
+    <AppHeader snapshot={snapshot} connection={connection} expert={expert} live={destination === 'Live C-DOT'} onExpert={() => setExpert(value => !value)} onHome={() => { history.pushState({}, '', '/'); setOverview(true) }} onSignOut={signOut} />
+    <nav className="primary-nav" aria-label="Primary navigation">{(['Live Dashboard', '3D Twin', 'Evidence', 'Technical Detail', 'Live C-DOT'] as Destination[]).map((item, index) => <button key={item} className={destination === item ? 'active' : ''} aria-current={destination === item ? 'page' : undefined} onClick={() => chooseDestination(item)}><span>0{index + 1}</span>{item}</button>)}</nav>
     {destination === 'Live Dashboard' && <LiveStory payload={payload} busy={busy} onToggle={togglePlayback} onRestart={restartStory} onRewind={rewindTo} onBack={rewindBack} />}
     {destination === '3D Twin' && <DigitalTwinWorld replay={snapshotToTwinReplay(payload)} mode="presenter" />}
     {destination === 'Evidence' && <Evidence payload={payload} />}
     {destination === 'Technical Detail' && <TechnicalDetail payload={payload} expertControls={expert ? <ExpertControls payload={payload} busy={busy} action={action} control={control} /> : undefined} />}
+    {destination === 'Live C-DOT' && <LiveCdot token={token} role={sessionStorage.getItem('cdot-role') || 'presenter'} />}
     {notice && <Toast notice={notice} />}
   </div>
 }
@@ -230,12 +243,12 @@ function applyDelta(previous: Snapshot, event: { sequence: number; simulated_tim
   return { ...previous, sequence: event.sequence, simulated_time: event.simulated_time, wall_time: event.wall_time, payload }
 }
 
-function AppHeader({ snapshot, connection, expert, onExpert, onHome, onSignOut }: { snapshot: Snapshot; connection: ConnectionState; expert: boolean; onExpert: () => void; onHome: () => void; onSignOut: () => void }) {
+function AppHeader({ snapshot, connection, expert, live = false, onExpert, onHome, onSignOut }: { snapshot: Snapshot; connection: ConnectionState; expert: boolean; live?: boolean; onExpert: () => void; onHome: () => void; onSignOut: () => void }) {
   const runner = snapshot.payload.runner
   return <header className="app-header">
     <button className="brand" onClick={onHome} aria-label="Open dashboard overview"><BrandMark /><span><b>C-DOT</b><small>PREDICTIVE USER PLANE</small></span></button>
-    <div className="header-run"><span>PREDICTIVE UPF SIMULATION · SEED {runner.seed}</span><b>{new Date(snapshot.simulated_time).toISOString().slice(11, 19)} SIM</b></div>
-    <div className="synthetic-label"><i />SYNTHETIC DATA</div>
+    <div className="header-run"><span>{live ? 'PROMETHEUS → FORECAST → REVIEW → SMF' : `PREDICTIVE UPF SIMULATION · SEED ${runner.seed}`}</span><b>{live ? 'EXTERNAL' : `${new Date(snapshot.simulated_time).toISOString().slice(11, 19)} SIM`}</b></div>
+    <div className={live ? 'live-header-label' : 'synthetic-label'}><i />{live ? 'LIVE EXTERNAL DATA' : 'SYNTHETIC DATA'}</div>
     <div className={`link-state ${connection}`}><i />{connection === 'live' ? 'Connected' : 'Reconnecting'}</div>
     <button className={`expert-toggle ${expert ? 'active' : ''}`} aria-pressed={expert} onClick={onExpert}>Expert mode <kbd>E</kbd></button>
     <button className="exit-button" onClick={onSignOut}>Exit</button>

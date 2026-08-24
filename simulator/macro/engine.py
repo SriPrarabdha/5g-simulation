@@ -382,6 +382,15 @@ class Simulator:
         self._interval_arrivals: Counter[str] = Counter()
         self._interval_new_ul_by_group: Counter[str] = Counter()
         self._interval_new_dl_by_group: Counter[str] = Counter()
+        self._observation_arrivals: deque[Counter[str]] = deque(
+            maxlen=config.effective_observation_window_steps
+        )
+        self._observation_ul: deque[Counter[str]] = deque(
+            maxlen=config.effective_observation_window_steps
+        )
+        self._observation_dl: deque[Counter[str]] = deque(
+            maxlen=config.effective_observation_window_steps
+        )
         self._arrival_factors = {group.key.selection_id: 1.0 for group in config.groups}
         self._scheduled_forecast_multipliers = {
             group.key.selection_id: 1.0 for group in config.groups
@@ -655,7 +664,10 @@ class Simulator:
                     zone: self._path_latency_overrides.get((upf_id, zone), latency)
                     for zone, latency in runtime.profile.path_latency_ms_by_zone.items()
                 },
-                state_ttl_seconds=self.config.step_seconds * self.config.decision_interval_steps,
+                state_ttl_seconds=(
+                    self.config.step_seconds
+                    * self.config.effective_observation_window_steps
+                ),
                 calibration_version="scenario-config/0.1",
             )
             for upf_id, runtime in self._upfs.items()
@@ -680,21 +692,36 @@ class Simulator:
             self._interval_new_ul_by_group.clear()
             self._interval_new_dl_by_group.clear()
             return
-        duration = timedelta(seconds=self.config.step_seconds * self.config.decision_interval_steps)
+        if (
+            self.config.observation_window_steps is not None
+            and len(self._observation_arrivals)
+            < self.config.effective_observation_window_steps
+        ):
+            # Never label a partial warm-up bucket as a full observation.
+            return
+        observation_steps = self.config.effective_observation_window_steps
+        duration = timedelta(seconds=self.config.step_seconds * observation_steps)
         window = TimeWindow(window_end - duration, window_end)
         residual = self._residual_by_upf()
         bucket_end_step = self._step_index
-        bucket_start_step = max(0, bucket_end_step - self.config.decision_interval_steps)
-        arrivals_by_group = dict(self._interval_arrivals)
+        bucket_start_step = max(0, bucket_end_step - observation_steps)
+        rolling = self.config.observation_window_steps is not None
+        arrivals_counter = (
+            sum(self._observation_arrivals, Counter())
+            if rolling else self._interval_arrivals
+        )
+        ul_counter = sum(self._observation_ul, Counter()) if rolling else self._interval_new_ul_by_group
+        dl_counter = sum(self._observation_dl, Counter()) if rolling else self._interval_new_dl_by_group
+        arrivals_by_group = dict(arrivals_counter)
         telemetry_by_upf = {item.upf_id: item for item in self._latest_telemetry_v2}
         for group in self.config.groups:
-            arrivals = self._interval_arrivals[group.key.selection_id]
+            arrivals = arrivals_counter[group.key.selection_id]
             if self._realism_v2 is None:
                 new_ul_mbps = arrivals * group.offered_ul_mbps_per_session
                 new_dl_mbps = arrivals * group.offered_dl_mbps_per_session
             else:
-                new_ul_mbps = self._interval_new_ul_by_group[group.key.selection_id]
-                new_dl_mbps = self._interval_new_dl_by_group[group.key.selection_id]
+                new_ul_mbps = ul_counter[group.key.selection_id]
+                new_dl_mbps = dl_counter[group.key.selection_id]
             group_id = group.key.selection_id
             metadata = causal_observation_metadata(
                 self.config, group_id=group_id,
@@ -730,9 +757,10 @@ class Simulator:
                 existing_load_by_upf=residual,
                 **metadata,
             ))
-        self._interval_arrivals.clear()
-        self._interval_new_ul_by_group.clear()
-        self._interval_new_dl_by_group.clear()
+        if not rolling:
+            self._interval_arrivals.clear()
+            self._interval_new_ul_by_group.clear()
+            self._interval_new_dl_by_group.clear()
 
     def _control_context(
         self,
@@ -1317,6 +1345,10 @@ class Simulator:
                 del self._new_window_ul_mbps[upf_id]
             if abs(self._new_window_dl_mbps[upf_id]) < 1e-7:
                 del self._new_window_dl_mbps[upf_id]
+        if self.config.observation_window_steps is not None:
+            self._observation_arrivals.append(Counter(arrivals))
+            self._observation_ul.append(Counter(generated_ul_by_group))
+            self._observation_dl.append(Counter(generated_dl_by_group))
         self._step_index += 1
         if self._advance_sink is not None:
             self._advance_sink.accept_step(step_result)
@@ -1417,6 +1449,11 @@ class Simulator:
             "forecast_history": {
                 key: [self._observation_state(item) for item in values]
                 for key, values in sorted(self._history_by_group.items())
+            },
+            "rolling_observation": {
+                "arrivals": [self._counter_state(item) for item in self._observation_arrivals],
+                "ul": [self._counter_state(item) for item in self._observation_ul],
+                "dl": [self._counter_state(item) for item in self._observation_dl],
             },
             "arrival_factors": dict(self._arrival_factors),
             "scheduled_forecast_multipliers": dict(self._scheduled_forecast_multipliers),
@@ -1542,6 +1579,19 @@ class Simulator:
                     maxlen=self._required_history_windows or 1,
                 ) for key, values in state["forecast_history"].items()
             },
+        )
+        rolling = state.get("rolling_observation", {})
+        self._observation_arrivals = deque(
+            (self._restore_counter(item) for item in rolling.get("arrivals", [])),
+            maxlen=self.config.effective_observation_window_steps,
+        )
+        self._observation_ul = deque(
+            (self._restore_counter(item) for item in rolling.get("ul", [])),
+            maxlen=self.config.effective_observation_window_steps,
+        )
+        self._observation_dl = deque(
+            (self._restore_counter(item) for item in rolling.get("dl", [])),
+            maxlen=self.config.effective_observation_window_steps,
         )
         self._arrival_factors = {str(k): float(v) for k, v in state["arrival_factors"].items()}
         self._scheduled_forecast_multipliers = {

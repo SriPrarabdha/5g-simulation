@@ -1,0 +1,42 @@
+{
+  "observed_at": "2026-08-23T19:19:35.951168+00:00",
+  "probes": [
+    {
+      "elapsed_seconds": 0.00732,
+      "error": "<urlopen error [Errno 111] Connection refused>",
+      "error_type": "URLError",
+      "reachable": false,
+      "url": "http://192.168.218.8:29090/-/ready"
+    },
+    {
+      "elapsed_seconds": 0.000145,
+      "error": "<urlopen error [Errno 111] Connection refused>",
+      "error_type": "URLError",
+      "reachable": false,
+      "url": "http://192.168.218.8:29090/api/v1/status/buildinfo"
+    },
+    {
+      "elapsed_seconds": 7.2e-05,
+      "error": "<urlopen error [Errno 111] Connection refused>",
+      "error_type": "URLError",
+      "reachable": false,
+      "url": "http://192.168.218.8:29090/api/v1/query?query=up"
+    },
+    {
+      "elapsed_seconds": 5.6e-05,
+      "error": "<urlopen error [Errno 111] Connection refused>",
+      "error_type": "URLError",
+      "reachable": false,
+      "url": "http://192.168.218.8:29090/api/v1/label/__name__/values"
+    },
+    {
+      "elapsed_seconds": 5.8e-05,
+      "error": "<urlopen error [Errno 111] Connection refused>",
+      "error_type": "URLError",
+      "reachable": false,
+      "url": "http://192.168.218.8:30956/"
+    }
+  ],
+  "read_only": true,
+  "schema_version": "cdot-endpoint-probe/1.0"
+}

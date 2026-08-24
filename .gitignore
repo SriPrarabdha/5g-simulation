@@ -28,6 +28,10 @@ output/control-science/v1/forecast-phase2/selection-v3/
 output/control-science/v1/phase3.1-survival-v1/*/seed-*/
 output/control-science/v1/phase3-cdot-showcase-v[1-4]/
 
+# Resumable multi-node campaign shards and cached Static references. Aggregate
+# reports intended for publication should be copied outside this runtime tree.
+output/mixed-stress/
+
 # Batch-scheduler and runtime logs are local diagnostics, not source evidence.
 logs/
 *.log

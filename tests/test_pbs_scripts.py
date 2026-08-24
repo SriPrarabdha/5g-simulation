@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -114,8 +115,35 @@ class PBSScriptTests(unittest.TestCase):
         self.assertIn("npm --prefix frontend ci", content)
         self.assertIn("cloudflared", content)
         self.assertIn("scripts/start-demo.sh", content)
+        self.assertIn('[[ "$TUNNEL_ENABLED" == "1" ]]', content)
+        self.assertIn('"${START_DEMO_ARGS[@]}"', content)
         self.assertNotIn("qsub", content)
         self.assertNotIn("PBS_JOBID", content)
+
+    def test_demo_cloudflare_flag_defaults_on_and_accepts_explicit_no(self) -> None:
+        content = Path("scripts/start-demo.sh").read_text(encoding="utf-8")
+        self.assertIn("[--cloudflare yes|no]", content)
+        self.assertIn('CDOT_DEMO_TUNNEL:-yes', content)
+        self.assertIn('--no-cloudflare)', content)
+        self.assertIn('CLOUDFLARE_SETTING=no', content)
+
+        help_result = subprocess.run(
+            ["bash", "scripts/start-demo.sh", "--help"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(help_result.returncode, 0, help_result.stderr)
+        self.assertIn("default: yes", help_result.stdout)
+
+        invalid_result = subprocess.run(
+            ["bash", "scripts/start-demo.sh", "--cloudflare", "maybe"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(invalid_result.returncode, 2)
+        self.assertIn("expected yes or no", invalid_result.stderr)
 
     def test_demo_waits_for_registered_and_public_tunnel(self) -> None:
         content = Path("scripts/start-demo.sh").read_text(encoding="utf-8")
