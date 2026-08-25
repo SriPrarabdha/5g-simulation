@@ -1,0 +1,1342 @@
+{
+  "arm_count": 160,
+  "cadence": {
+    "mpc": {
+      "cadence": {
+        "10": {
+          "bootstrap_95pct_lower": 0.012565695690095345,
+          "churn_l1_per_group_hour": 0.004963143956233599,
+          "families": {
+            "declared_maintenance": 0.14154425872525284,
+            "maintenance_then_outage": -0.0001246214093736072,
+            "maintenance_then_stadium": 0.12964676806217634,
+            "surprise_demand": 0.0,
+            "surprise_outage": 0.0
+          },
+          "latency_fraction_within_500ms": 0.9516808084147791,
+          "latency_max_ms": 19346.6875,
+          "mean_pair_ul_gain": 0.028983283825089717,
+          "severity_weighted_ul_gain": 0.0021758168075563795,
+          "worst_pair_gain": -0.0071319825530067535
+        },
+        "2": {
+          "bootstrap_95pct_lower": 0.0,
+          "churn_l1_per_group_hour": 0.0027812917475626103,
+          "families": {
+            "declared_maintenance": 0.0,
+            "maintenance_then_outage": 0.0,
+            "maintenance_then_stadium": 0.0,
+            "surprise_demand": 0.0,
+            "surprise_outage": 0.0
+          },
+          "latency_fraction_within_500ms": 0.95,
+          "latency_max_ms": 87135.0,
+          "mean_pair_ul_gain": 0.0,
+          "severity_weighted_ul_gain": 0.0,
+          "worst_pair_gain": 0.0
+        }
+      },
+      "matched_profiles": 16,
+      "two_min_better_mean_count": 0
+    },
+    "predrain": {
+      "cadence": {
+        "10": {
+          "bootstrap_95pct_lower": 0.031312266916959784,
+          "churn_l1_per_group_hour": 0.031186352379159243,
+          "families": {
+            "declared_maintenance": 0.34580688780489244,
+            "maintenance_then_outage": -0.006515375563973606,
+            "maintenance_then_stadium": 0.3298970307430418,
+            "surprise_demand": 0.0,
+            "surprise_outage": 0.0
+          },
+          "latency_fraction_within_500ms": 0.99821875,
+          "latency_max_ms": 673.984375,
+          "mean_pair_ul_gain": 0.06651371652562761,
+          "severity_weighted_ul_gain": -0.0006051173325196598,
+          "worst_pair_gain": -0.5875130891190741
+        },
+        "2": {
+          "bootstrap_95pct_lower": 0.03209438682612251,
+          "churn_l1_per_group_hour": 0.11210088303982892,
+          "families": {
+            "declared_maintenance": 0.34466997272812133,
+            "maintenance_then_outage": -0.006191964712389522,
+            "maintenance_then_stadium": 0.3315093494897738,
+            "surprise_demand": 0.0,
+            "surprise_outage": 0.0
+          },
+          "latency_fraction_within_500ms": 0.9998072916666667,
+          "latency_max_ms": 646.453125,
+          "mean_pair_ul_gain": 0.06735263051107789,
+          "severity_weighted_ul_gain": -0.0003839537924645372,
+          "worst_pair_gain": -0.572645770848158
+        }
+      },
+      "matched_profiles": 64,
+      "two_min_better_mean_count": 43
+    }
+  },
+  "gate_pass_counts": {
+    "all_overload_metrics_finite": 0,
+    "bootstrap_95pct_lower_above_zero": 115,
+    "churn_within_0_30_l1_per_group_hour": 154,
+    "decision_latency_within_120s": 157,
+    "mean_pair_ul_gain_at_least_10pct": 56,
+    "no_family_aggregate_ul_regression": 72,
+    "no_invalid_capacity_slack": 160,
+    "no_secondary_aggregate_regression": 122,
+    "no_solver_timeout_or_error": 127,
+    "pure_surprise_exact_static": 160,
+    "severity_weighted_ul_gain_positive": 99,
+    "unexpected_fallback_below_1pct": 144,
+    "worst_pair_above_minus_10pct": 64
+  },
+  "input_inventory_sha256": "04258449c3e22de762ed20374afcd7cf58afb037a0e4b4e0c1cef7ad306782d0",
+  "pair_count": 20000,
+  "passing_arm_count": 0,
+  "selected_arms": {
+    "116": {
+      "arm": {
+        "cadence_minutes": 2,
+        "controller": "predrain",
+        "destination_reserve": 0.7,
+        "horizon_hours": 2,
+        "index": 116,
+        "maximum_blend": 0.75,
+        "surprise_capacity_factor": 0.45
+      },
+      "bootstrap_95pct_lower": 0.07552557128086212,
+      "churn_l1_per_group_hour": 0.3130983140813873,
+      "decision_funnel": {
+        "accepted": 4500,
+        "certified": 4500,
+        "executed": 1264,
+        "executed_admissions_first_tick": 19020108,
+        "proposed": 4500,
+        "rejected:exposure_guard:declared_event_no_ul_improvement": 3236,
+        "rejected:no_known_reduction_in_lead_horizon": 85500,
+        "requested": 90000,
+        "solver:optimal": 4500,
+        "solver:skipped": 85500
+      },
+      "fallback_reasons": {
+        "applied": 1264,
+        "exposure_guard:declared_event_no_ul_improvement": 3236,
+        "no_known_reduction_in_lead_horizon": 85500
+      },
+      "family": {
+        "declared_maintenance": {
+          "aggregate_gain": 0.8110185353381343,
+          "bootstrap_95pct_lower": 0.24,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.4256132279378872
+        },
+        "maintenance_then_outage": {
+          "aggregate_gain": -0.015485057900463301,
+          "bootstrap_95pct_lower": -0.23079417713555445,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": -0.08487880189919206
+        },
+        "maintenance_then_stadium": {
+          "aggregate_gain": 0.6672488419528274,
+          "bootstrap_95pct_lower": 0.20223216166775124,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.3673298152697642
+        },
+        "surprise_demand": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 0,
+          "mean_pair_gain": 0.0
+        },
+        "surprise_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        }
+      },
+      "gates": {
+        "all_overload_metrics_finite": false,
+        "bootstrap_95pct_lower_above_zero": true,
+        "churn_within_0_30_l1_per_group_hour": false,
+        "decision_latency_within_120s": true,
+        "mean_pair_ul_gain_at_least_10pct": true,
+        "no_family_aggregate_ul_regression": false,
+        "no_invalid_capacity_slack": true,
+        "no_secondary_aggregate_regression": true,
+        "no_solver_timeout_or_error": true,
+        "pure_surprise_exact_static": true,
+        "severity_weighted_ul_gain_positive": false,
+        "unexpected_fallback_below_1pct": true,
+        "worst_pair_above_minus_10pct": false
+      },
+      "invalid_slack_count": 0,
+      "latency_fraction_within_500ms": 0.9999222222222223,
+      "latency_max_ms": 511.0,
+      "mean_pair_ul_gain": 0.14161284826169188,
+      "nonfinite_pair_count": 25,
+      "pair_count": 125,
+      "passed": false,
+      "secondary_regressions": {
+        "dl_drop": -5322833610049768.0,
+        "dl_overload": -110940.0535178549,
+        "dl_rejection": 0.0,
+        "establishment_failures": 0,
+        "ul_drop": -1296834166311627.5,
+        "ul_rejection": 0.0
+      },
+      "severity_weighted_ul_gain": -0.0033381129126378406,
+      "solver_failure_count": 0,
+      "unexpected_fallback_fraction": 0.0,
+      "worst_pair_gain": -1.4197052459645065,
+      "worst_pairs": [
+        {
+          "baseline_ul": 112911.2122411866,
+          "candidate_ul": 273211.852588211,
+          "family": "maintenance_then_outage",
+          "gain": -1.4197052459645065,
+          "secondary": {
+            "dl_drop": -242522525741763.12,
+            "dl_overload": 149181.32129351818,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": -44331119944657.31,
+            "ul_rejection": 0.0
+          },
+          "seed": 47106
+        },
+        {
+          "baseline_ul": 77762.80271324885,
+          "candidate_ul": 143998.01153818428,
+          "family": "maintenance_then_outage",
+          "gain": -0.8517595368723843,
+          "secondary": {
+            "dl_drop": 89043756749145.9,
+            "dl_overload": 64857.612413884824,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 30324681899898.19,
+            "ul_rejection": 0.0
+          },
+          "seed": 47121
+        },
+        {
+          "baseline_ul": 112316.76620823104,
+          "candidate_ul": 141063.33056265413,
+          "family": "maintenance_then_outage",
+          "gain": -0.25594188049474326,
+          "secondary": {
+            "dl_drop": 45390189569538.69,
+            "dl_overload": 36880.00766839355,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 15353294062507.04,
+            "ul_rejection": 0.0
+          },
+          "seed": 47117
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47001
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47003
+        }
+      ]
+    },
+    "132": {
+      "arm": {
+        "cadence_minutes": 10,
+        "controller": "mpc",
+        "destination_reserve": 0.7,
+        "horizon_hours": 1,
+        "index": 132,
+        "maximum_blend": 0.5,
+        "surprise_capacity_factor": 0.45
+      },
+      "bootstrap_95pct_lower": 0.026104643343748256,
+      "churn_l1_per_group_hour": 0.004690907932625423,
+      "decision_funnel": {
+        "accepted": 59,
+        "certified": 845,
+        "executed": 59,
+        "executed_admissions_first_tick": 887977,
+        "proposed": 845,
+        "rejected:exposure_guard:continuation_regression:loss:upf-central-0": 61,
+        "rejected:exposure_guard:continuation_regression:loss:upf-central-1": 1,
+        "rejected:exposure_guard:continuation_regression:loss:upf-central-3": 1,
+        "rejected:exposure_guard:continuation_regression:loss:upf-regional-0": 4,
+        "rejected:exposure_guard:declared_event_no_ul_improvement": 719,
+        "rejected:no_known_future_capacity_event": 17100,
+        "rejected:same_state_static_certificate:infeasible": 55,
+        "requested": 18000,
+        "solver:infeasible": 55,
+        "solver:optimal": 845
+      },
+      "fallback_reasons": {
+        "applied": 59,
+        "exposure_guard:continuation_regression:loss:upf-central-0": 61,
+        "exposure_guard:continuation_regression:loss:upf-central-1": 1,
+        "exposure_guard:continuation_regression:loss:upf-central-3": 1,
+        "exposure_guard:continuation_regression:loss:upf-regional-0": 4,
+        "exposure_guard:declared_event_no_ul_improvement": 719,
+        "no_known_future_capacity_event": 17100,
+        "same_state_static_certificate:infeasible": 55
+      },
+      "family": {
+        "declared_maintenance": {
+          "aggregate_gain": 0.1557625683466567,
+          "bootstrap_95pct_lower": 0.08267830953067035,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.21741940152694497
+        },
+        "maintenance_then_outage": {
+          "aggregate_gain": -0.0011144349989668824,
+          "bootstrap_95pct_lower": -0.002129423199108974,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": -0.0004756168065295008
+        },
+        "maintenance_then_stadium": {
+          "aggregate_gain": 0.0447933168701826,
+          "bootstrap_95pct_lower": 0.008059435077893886,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.08575100413737431
+        },
+        "surprise_demand": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 0,
+          "mean_pair_gain": 0.0
+        },
+        "surprise_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        }
+      },
+      "gates": {
+        "all_overload_metrics_finite": false,
+        "bootstrap_95pct_lower_above_zero": true,
+        "churn_within_0_30_l1_per_group_hour": true,
+        "decision_latency_within_120s": true,
+        "mean_pair_ul_gain_at_least_10pct": false,
+        "no_family_aggregate_ul_regression": false,
+        "no_invalid_capacity_slack": true,
+        "no_secondary_aggregate_regression": false,
+        "no_solver_timeout_or_error": false,
+        "pure_surprise_exact_static": true,
+        "severity_weighted_ul_gain_positive": true,
+        "unexpected_fallback_below_1pct": true,
+        "worst_pair_above_minus_10pct": true
+      },
+      "invalid_slack_count": 0,
+      "latency_fraction_within_500ms": 0.9520919833918876,
+      "latency_max_ms": 10901.0,
+      "mean_pair_ul_gain": 0.06053895777155796,
+      "nonfinite_pair_count": 25,
+      "pair_count": 125,
+      "passed": false,
+      "secondary_regressions": {
+        "dl_drop": -458741666540125.9,
+        "dl_overload": 16434.867272519128,
+        "dl_rejection": 0.0,
+        "establishment_failures": 0,
+        "ul_drop": -74871947474081.78,
+        "ul_rejection": 0.0
+      },
+      "severity_weighted_ul_gain": 8.02527054104139e-05,
+      "solver_failure_count": 55,
+      "unexpected_fallback_fraction": 5.935512277876943e-05,
+      "worst_pair_gain": -0.01774519332590812,
+      "worst_pairs": [
+        {
+          "baseline_ul": 408335.90020334814,
+          "candidate_ul": 415581.8996943653,
+          "family": "maintenance_then_outage",
+          "gain": -0.01774519332590812,
+          "secondary": {
+            "dl_drop": 124028389286097.75,
+            "dl_overload": 34463.11059391394,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 13205778976134.875,
+            "ul_rejection": 0.0
+          },
+          "seed": 47101
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47001
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47003
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47004
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47005
+        }
+      ]
+    },
+    "143": {
+      "arm": {
+        "cadence_minutes": 10,
+        "controller": "mpc",
+        "destination_reserve": 0.8,
+        "horizon_hours": 2,
+        "index": 143,
+        "maximum_blend": 0.5,
+        "surprise_capacity_factor": 0.01
+      },
+      "bootstrap_95pct_lower": 0.008393931080642847,
+      "churn_l1_per_group_hour": 0.005929793838715358,
+      "decision_funnel": {
+        "accepted": 75,
+        "certified": 554,
+        "executed": 75,
+        "executed_admissions_first_tick": 1128767,
+        "proposed": 554,
+        "rejected:exposure_guard:continuation_regression:loss:upf-central-0": 185,
+        "rejected:exposure_guard:continuation_regression:loss:upf-central-1": 16,
+        "rejected:exposure_guard:continuation_regression:loss:upf-central-2": 44,
+        "rejected:exposure_guard:continuation_regression:loss:upf-central-3": 5,
+        "rejected:exposure_guard:continuation_regression:loss:upf-edge-airport-a": 2,
+        "rejected:exposure_guard:continuation_regression:loss:upf-edge-airport-b": 2,
+        "rejected:exposure_guard:continuation_regression:loss:upf-regional-0": 2,
+        "rejected:exposure_guard:continuation_regression:loss:upf-regional-2": 1,
+        "rejected:exposure_guard:continuation_regression:loss:upf-regional-3": 20,
+        "rejected:exposure_guard:declared_event_no_ul_improvement": 202,
+        "rejected:no_known_future_capacity_event": 17100,
+        "rejected:same_state_static_certificate:timeout": 346,
+        "requested": 18000,
+        "solver:optimal": 554,
+        "solver:timeout": 346
+      },
+      "fallback_reasons": {
+        "applied": 75,
+        "exposure_guard:continuation_regression:loss:upf-central-0": 185,
+        "exposure_guard:continuation_regression:loss:upf-central-1": 16,
+        "exposure_guard:continuation_regression:loss:upf-central-2": 44,
+        "exposure_guard:continuation_regression:loss:upf-central-3": 5,
+        "exposure_guard:continuation_regression:loss:upf-edge-airport-a": 2,
+        "exposure_guard:continuation_regression:loss:upf-edge-airport-b": 2,
+        "exposure_guard:continuation_regression:loss:upf-regional-0": 2,
+        "exposure_guard:continuation_regression:loss:upf-regional-2": 1,
+        "exposure_guard:continuation_regression:loss:upf-regional-3": 20,
+        "exposure_guard:declared_event_no_ul_improvement": 202,
+        "no_known_future_capacity_event": 17100,
+        "same_state_static_certificate:timeout": 346
+      },
+      "family": {
+        "declared_maintenance": {
+          "aggregate_gain": 0.2694689702519268,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.036219412860963966
+        },
+        "maintenance_then_outage": {
+          "aggregate_gain": 0.00019234483557470044,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.00038501937700403705
+        },
+        "maintenance_then_stadium": {
+          "aggregate_gain": 0.33031963050061935,
+          "bootstrap_95pct_lower": 0.02082447934812648,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.07632261121405753
+        },
+        "surprise_demand": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 0,
+          "mean_pair_gain": 0.0
+        },
+        "surprise_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        }
+      },
+      "gates": {
+        "all_overload_metrics_finite": false,
+        "bootstrap_95pct_lower_above_zero": true,
+        "churn_within_0_30_l1_per_group_hour": true,
+        "decision_latency_within_120s": true,
+        "mean_pair_ul_gain_at_least_10pct": false,
+        "no_family_aggregate_ul_regression": true,
+        "no_invalid_capacity_slack": true,
+        "no_secondary_aggregate_regression": true,
+        "no_solver_timeout_or_error": false,
+        "pure_surprise_exact_static": true,
+        "severity_weighted_ul_gain_positive": true,
+        "unexpected_fallback_below_1pct": true,
+        "worst_pair_above_minus_10pct": true
+      },
+      "invalid_slack_count": 0,
+      "latency_fraction_within_500ms": 0.9512960658044266,
+      "latency_max_ms": 21791.0,
+      "mean_pair_ul_gain": 0.022585408690405106,
+      "nonfinite_pair_count": 25,
+      "pair_count": 125,
+      "passed": false,
+      "secondary_regressions": {
+        "dl_drop": -2245500032344158.5,
+        "dl_overload": -28680.868681237764,
+        "dl_rejection": 0.0,
+        "establishment_failures": 0,
+        "ul_drop": -650656099635007.5,
+        "ul_rejection": 0.0
+      },
+      "severity_weighted_ul_gain": 0.0057193859091836585,
+      "solver_failure_count": 692,
+      "unexpected_fallback_fraction": 0.0002965248318121438,
+      "worst_pair_gain": 0.0,
+      "worst_pairs": [
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47001
+        },
+        {
+          "baseline_ul": 522.4771814535786,
+          "candidate_ul": 522.4771814535786,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47002
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47003
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47004
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47005
+        }
+      ]
+    },
+    "144": {
+      "arm": {
+        "cadence_minutes": 2,
+        "controller": "mpc",
+        "destination_reserve": 0.7,
+        "horizon_hours": 1,
+        "index": 144,
+        "maximum_blend": 0.25,
+        "surprise_capacity_factor": 0.45
+      },
+      "bootstrap_95pct_lower": 0.0,
+      "churn_l1_per_group_hour": 0.0027812917475626103,
+      "decision_funnel": {
+        "rejected:no_known_future_capacity_event": 85500,
+        "rejected:same_state_static_certificate:timeout": 4500,
+        "requested": 90000,
+        "solver:timeout": 4500
+      },
+      "fallback_reasons": {
+        "no_known_future_capacity_event": 85500,
+        "same_state_static_certificate:timeout": 4500
+      },
+      "family": {
+        "declared_maintenance": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.0
+        },
+        "maintenance_then_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        },
+        "maintenance_then_stadium": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.0
+        },
+        "surprise_demand": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 0,
+          "mean_pair_gain": 0.0
+        },
+        "surprise_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        }
+      },
+      "gates": {
+        "all_overload_metrics_finite": false,
+        "bootstrap_95pct_lower_above_zero": false,
+        "churn_within_0_30_l1_per_group_hour": true,
+        "decision_latency_within_120s": true,
+        "mean_pair_ul_gain_at_least_10pct": false,
+        "no_family_aggregate_ul_regression": true,
+        "no_invalid_capacity_slack": true,
+        "no_secondary_aggregate_regression": true,
+        "no_solver_timeout_or_error": false,
+        "pure_surprise_exact_static": true,
+        "severity_weighted_ul_gain_positive": false,
+        "unexpected_fallback_below_1pct": false,
+        "worst_pair_above_minus_10pct": true
+      },
+      "invalid_slack_count": 0,
+      "latency_fraction_within_500ms": 0.95,
+      "latency_max_ms": 53134.0,
+      "mean_pair_ul_gain": 0.0,
+      "nonfinite_pair_count": 25,
+      "pair_count": 125,
+      "passed": false,
+      "secondary_regressions": {
+        "dl_drop": 0.0,
+        "dl_overload": 0.0,
+        "dl_rejection": 0.0,
+        "establishment_failures": 0,
+        "ul_drop": 0.0,
+        "ul_rejection": 0.0
+      },
+      "severity_weighted_ul_gain": 0.0,
+      "solver_failure_count": 9000,
+      "unexpected_fallback_fraction": 0.024390243902439025,
+      "worst_pair_gain": 0.0,
+      "worst_pairs": [
+        {
+          "baseline_ul": 11706.699924142396,
+          "candidate_ul": 11706.699924142396,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47000
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47001
+        },
+        {
+          "baseline_ul": 522.4771814535786,
+          "candidate_ul": 522.4771814535786,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47002
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47003
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47004
+        }
+      ]
+    },
+    "3": {
+      "arm": {
+        "cadence_minutes": 10,
+        "controller": "predrain",
+        "destination_reserve": 0.8,
+        "horizon_hours": 1,
+        "index": 3,
+        "maximum_blend": 0.25,
+        "surprise_capacity_factor": 0.01
+      },
+      "bootstrap_95pct_lower": 0.0023623922949474714,
+      "churn_l1_per_group_hour": 0.005997992069450969,
+      "decision_funnel": {
+        "accepted": 450,
+        "certified": 450,
+        "executed": 35,
+        "executed_admissions_first_tick": 527041,
+        "proposed": 450,
+        "rejected:exposure_guard:continuation_regression:loss:upf-edge-airport-a": 110,
+        "rejected:exposure_guard:continuation_regression:loss:upf-edge-airport-b": 31,
+        "rejected:exposure_guard:continuation_regression:loss:upf-edge-rural-b": 12,
+        "rejected:exposure_guard:declared_event_no_ul_improvement": 262,
+        "rejected:no_known_reduction_in_lead_horizon": 17550,
+        "requested": 18000,
+        "solver:optimal": 450,
+        "solver:skipped": 17550
+      },
+      "fallback_reasons": {
+        "applied": 35,
+        "exposure_guard:continuation_regression:loss:upf-edge-airport-a": 110,
+        "exposure_guard:continuation_regression:loss:upf-edge-airport-b": 31,
+        "exposure_guard:continuation_regression:loss:upf-edge-rural-b": 12,
+        "exposure_guard:declared_event_no_ul_improvement": 262,
+        "no_known_reduction_in_lead_horizon": 17550
+      },
+      "family": {
+        "declared_maintenance": {
+          "aggregate_gain": 0.034608108616685306,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.026842827797902
+        },
+        "maintenance_then_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        },
+        "maintenance_then_stadium": {
+          "aggregate_gain": 0.10017893497292217,
+          "bootstrap_95pct_lower": 0.004688120834518223,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.02242295697816958
+        },
+        "surprise_demand": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 0,
+          "mean_pair_gain": 0.0
+        },
+        "surprise_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        }
+      },
+      "gates": {
+        "all_overload_metrics_finite": false,
+        "bootstrap_95pct_lower_above_zero": true,
+        "churn_within_0_30_l1_per_group_hour": true,
+        "decision_latency_within_120s": true,
+        "mean_pair_ul_gain_at_least_10pct": false,
+        "no_family_aggregate_ul_regression": true,
+        "no_invalid_capacity_slack": true,
+        "no_secondary_aggregate_regression": true,
+        "no_solver_timeout_or_error": true,
+        "pure_surprise_exact_static": true,
+        "severity_weighted_ul_gain_positive": true,
+        "unexpected_fallback_below_1pct": true,
+        "worst_pair_above_minus_10pct": true
+      },
+      "invalid_slack_count": 0,
+      "latency_fraction_within_500ms": 0.9968333333333333,
+      "latency_max_ms": 948.0,
+      "mean_pair_ul_gain": 0.009853156955214317,
+      "nonfinite_pair_count": 25,
+      "pair_count": 125,
+      "passed": false,
+      "secondary_regressions": {
+        "dl_drop": -584462510293774.6,
+        "dl_overload": -13520.2752623366,
+        "dl_rejection": 0.0,
+        "establishment_failures": 0,
+        "ul_drop": -159921016242559.28,
+        "ul_rejection": 0.0
+      },
+      "severity_weighted_ul_gain": 0.0015091537175968455,
+      "solver_failure_count": 0,
+      "unexpected_fallback_fraction": 0.0,
+      "worst_pair_gain": 0.0,
+      "worst_pairs": [
+        {
+          "baseline_ul": 11923.932817408695,
+          "candidate_ul": 11923.932817408695,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47000
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47001
+        },
+        {
+          "baseline_ul": 522.4771814535786,
+          "candidate_ul": 522.4771814535786,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47002
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47003
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47004
+        }
+      ]
+    },
+    "4": {
+      "arm": {
+        "cadence_minutes": 10,
+        "controller": "predrain",
+        "destination_reserve": 0.7,
+        "horizon_hours": 2,
+        "index": 4,
+        "maximum_blend": 0.25,
+        "surprise_capacity_factor": 0.45
+      },
+      "bootstrap_95pct_lower": 0.055761183629482944,
+      "churn_l1_per_group_hour": 0.02464653315966646,
+      "decision_funnel": {
+        "accepted": 900,
+        "certified": 900,
+        "executed": 331,
+        "executed_admissions_first_tick": 4982346,
+        "proposed": 900,
+        "rejected:exposure_guard:declared_event_no_ul_improvement": 569,
+        "rejected:no_known_reduction_in_lead_horizon": 17100,
+        "requested": 18000,
+        "solver:optimal": 900,
+        "solver:skipped": 17100
+      },
+      "fallback_reasons": {
+        "applied": 331,
+        "exposure_guard:declared_event_no_ul_improvement": 569,
+        "no_known_reduction_in_lead_horizon": 17100
+      },
+      "family": {
+        "declared_maintenance": {
+          "aggregate_gain": 0.38702918181008905,
+          "bootstrap_95pct_lower": 0.164477494134583,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.3125454685626952
+        },
+        "maintenance_then_outage": {
+          "aggregate_gain": 0.00033107453055797,
+          "bootstrap_95pct_lower": -0.09149974511238625,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": -0.03389782299594358
+        },
+        "maintenance_then_stadium": {
+          "aggregate_gain": 0.24652884928866708,
+          "bootstrap_95pct_lower": 0.10763326461124231,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.22931410250607928
+        },
+        "surprise_demand": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 0,
+          "mean_pair_gain": 0.0
+        },
+        "surprise_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        }
+      },
+      "gates": {
+        "all_overload_metrics_finite": false,
+        "bootstrap_95pct_lower_above_zero": true,
+        "churn_within_0_30_l1_per_group_hour": true,
+        "decision_latency_within_120s": true,
+        "mean_pair_ul_gain_at_least_10pct": true,
+        "no_family_aggregate_ul_regression": true,
+        "no_invalid_capacity_slack": true,
+        "no_secondary_aggregate_regression": true,
+        "no_solver_timeout_or_error": true,
+        "pure_surprise_exact_static": true,
+        "severity_weighted_ul_gain_positive": true,
+        "unexpected_fallback_below_1pct": true,
+        "worst_pair_above_minus_10pct": false
+      },
+      "invalid_slack_count": 0,
+      "latency_fraction_within_500ms": 0.9995,
+      "latency_max_ms": 520.0,
+      "mean_pair_ul_gain": 0.10159234961456619,
+      "nonfinite_pair_count": 25,
+      "pair_count": 125,
+      "passed": false,
+      "secondary_regressions": {
+        "dl_drop": -2393379004040254.0,
+        "dl_overload": -94376.34066343348,
+        "dl_rejection": 0.0,
+        "establishment_failures": 0,
+        "ul_drop": -608000517310807.9,
+        "ul_rejection": 0.0
+      },
+      "severity_weighted_ul_gain": 0.005116119245199168,
+      "solver_failure_count": 0,
+      "unexpected_fallback_fraction": 0.0,
+      "worst_pair_gain": -0.47457318596800496,
+      "worst_pairs": [
+        {
+          "baseline_ul": 80091.04352039746,
+          "candidate_ul": 118100.10521137463,
+          "family": "maintenance_then_outage",
+          "gain": -0.47457318596800496,
+          "secondary": {
+            "dl_drop": 49877002109977.81,
+            "dl_overload": 36534.50611109361,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 17357325974942.57,
+            "ul_rejection": 0.0
+          },
+          "seed": 47121
+        },
+        {
+          "baseline_ul": 117583.51461921552,
+          "candidate_ul": 163603.39691288356,
+          "family": "maintenance_then_outage",
+          "gain": -0.39138039411986975,
+          "secondary": {
+            "dl_drop": -110618448121469.5,
+            "dl_overload": 42427.42558004116,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": -28381394578898.188,
+            "ul_rejection": 0.0
+          },
+          "seed": 47106
+        },
+        {
+          "baseline_ul": 113808.85693624541,
+          "candidate_ul": 141965.0390104383,
+          "family": "maintenance_then_outage",
+          "gain": -0.2473988653621722,
+          "secondary": {
+            "dl_drop": 42874715324564.84,
+            "dl_overload": 34842.942810691224,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 15038975624996.89,
+            "ul_rejection": 0.0
+          },
+          "seed": 47117
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47001
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47003
+        }
+      ]
+    },
+    "60": {
+      "arm": {
+        "cadence_minutes": 10,
+        "controller": "predrain",
+        "destination_reserve": 0.7,
+        "horizon_hours": 4,
+        "index": 60,
+        "maximum_blend": 0.75,
+        "surprise_capacity_factor": 0.45
+      },
+      "bootstrap_95pct_lower": 0.07373138520854368,
+      "churn_l1_per_group_hour": 0.08033772061765677,
+      "decision_funnel": {
+        "accepted": 900,
+        "certified": 900,
+        "executed": 257,
+        "executed_admissions_first_tick": 3868475,
+        "proposed": 900,
+        "rejected:exposure_guard:declared_event_no_ul_improvement": 643,
+        "rejected:no_known_reduction_in_lead_horizon": 17100,
+        "requested": 18000,
+        "solver:optimal": 900,
+        "solver:skipped": 17100
+      },
+      "fallback_reasons": {
+        "applied": 257,
+        "exposure_guard:declared_event_no_ul_improvement": 643,
+        "no_known_reduction_in_lead_horizon": 17100
+      },
+      "family": {
+        "declared_maintenance": {
+          "aggregate_gain": 0.8147315709973616,
+          "bootstrap_95pct_lower": 0.24,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.4251936511562409
+        },
+        "maintenance_then_outage": {
+          "aggregate_gain": -0.017009751479050268,
+          "bootstrap_95pct_lower": -0.2403193282494255,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": -0.08727240911538152
+        },
+        "maintenance_then_stadium": {
+          "aggregate_gain": 0.6645257072276216,
+          "bootstrap_95pct_lower": 0.2046971785600976,
+          "informative_static_pairs": 11,
+          "mean_pair_gain": 0.3659799762679697
+        },
+        "surprise_demand": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 0,
+          "mean_pair_gain": 0.0
+        },
+        "surprise_outage": {
+          "aggregate_gain": 0.0,
+          "bootstrap_95pct_lower": 0.0,
+          "informative_static_pairs": 25,
+          "mean_pair_gain": 0.0
+        }
+      },
+      "gates": {
+        "all_overload_metrics_finite": false,
+        "bootstrap_95pct_lower_above_zero": true,
+        "churn_within_0_30_l1_per_group_hour": true,
+        "decision_latency_within_120s": true,
+        "mean_pair_ul_gain_at_least_10pct": true,
+        "no_family_aggregate_ul_regression": false,
+        "no_invalid_capacity_slack": true,
+        "no_secondary_aggregate_regression": true,
+        "no_solver_timeout_or_error": true,
+        "pure_surprise_exact_static": true,
+        "severity_weighted_ul_gain_positive": false,
+        "unexpected_fallback_below_1pct": true,
+        "worst_pair_above_minus_10pct": false
+      },
+      "invalid_slack_count": 0,
+      "latency_fraction_within_500ms": 0.9976666666666667,
+      "latency_max_ms": 544.0,
+      "mean_pair_ul_gain": 0.14078024366176584,
+      "nonfinite_pair_count": 25,
+      "pair_count": 125,
+      "passed": false,
+      "secondary_regressions": {
+        "dl_drop": -5526075119453649.0,
+        "dl_overload": -109268.97312817514,
+        "dl_rejection": 0.0,
+        "establishment_failures": 0,
+        "ul_drop": -1359745941931230.5,
+        "ul_rejection": 0.0
+      },
+      "severity_weighted_ul_gain": -0.004615307038667348,
+      "solver_failure_count": 0,
+      "unexpected_fallback_fraction": 0.0,
+      "worst_pair_gain": -1.5134980056136165,
+      "worst_pairs": [
+        {
+          "baseline_ul": 117583.51461921552,
+          "candidate_ul": 295545.9294884377,
+          "family": "maintenance_then_outage",
+          "gain": -1.5134980056136165,
+          "secondary": {
+            "dl_drop": -240963304946136.75,
+            "dl_overload": 162113.04171685924,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": -44519976941501.31,
+            "ul_rejection": 0.0
+          },
+          "seed": 47106
+        },
+        {
+          "baseline_ul": 80091.04352039746,
+          "candidate_ul": 141832.5608170814,
+          "family": "maintenance_then_outage",
+          "gain": -0.7708916575791611,
+          "secondary": {
+            "dl_drop": 84688363844178.97,
+            "dl_overload": 61684.17631348429,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 28285252987416.383,
+            "ul_rejection": 0.0
+          },
+          "seed": 47121
+        },
+        {
+          "baseline_ul": 113808.85693624541,
+          "candidate_ul": 149635.49388686492,
+          "family": "maintenance_then_outage",
+          "gain": -0.3147965625442423,
+          "secondary": {
+            "dl_drop": 55692524459418.81,
+            "dl_overload": 45179.86488698353,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 19170877387520.016,
+            "ul_rejection": 0.0
+          },
+          "seed": 47117
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47001
+        },
+        {
+          "baseline_ul": 0.0,
+          "candidate_ul": 0.0,
+          "family": "declared_maintenance",
+          "gain": 0.0,
+          "secondary": {
+            "dl_drop": 0.0,
+            "dl_overload": 0.0,
+            "dl_rejection": 0.0,
+            "establishment_failures": 0,
+            "ul_drop": 0.0,
+            "ul_rejection": 0.0
+          },
+          "seed": 47003
+        }
+      ]
+    }
+  },
+  "work_fingerprint": "f36fe39a3b5c3d54501c4b8389dd7fb8f9e310312df7b145d4b07b115d58ad34"
+}

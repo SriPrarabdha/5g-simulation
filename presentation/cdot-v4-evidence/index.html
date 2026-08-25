@@ -1,0 +1,555 @@
+<title>Steering Under Notice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+:root{
+  --ground:#F7F9FA; --surface:#FFFFFF; --surface-2:#EFF4F6;
+  --ink:#101A21; --ink-2:#47606E; --ink-3:#7A8F9B;
+  --rule:#DCE5EA; --rule-strong:#C3D2D9;
+  --accent:#0F6E8C; --accent-soft:#E2EEF2;
+  --removed:#1E6F9C; --added:#B0512A;
+  --pass:#1B6B4A; --pass-soft:#E3F0EA;
+  --tie:#7A8F9B; --tie-soft:#EAEFF2;
+  --ramp-1:#BBD6E4; --ramp-2:#8FBBD2; --ramp-3:#5E9CBD; --ramp-4:#3980A6; --ramp-5:#1E6F9C;
+  --shadow:0 1px 2px rgba(16,26,33,.05), 0 8px 24px -12px rgba(16,26,33,.14);
+  --measure:66ch;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C1419; --surface:#121C22; --surface-2:#182630;
+    --ink:#E4EDF2; --ink-2:#9DB2BE; --ink-3:#6C8492;
+    --rule:#22323C; --rule-strong:#31454F;
+    --accent:#4FB3CE; --accent-soft:#152A33;
+    --removed:#4A93C4; --added:#D07A4E;
+    --pass:#4FA37C; --pass-soft:#132A22;
+    --tie:#6C8492; --tie-soft:#1A2831;
+    --ramp-1:#23414F; --ramp-2:#2E5B72; --ramp-3:#377494; --ramp-4:#3F84AB; --ramp-5:#4A93C4;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C1419; --surface:#121C22; --surface-2:#182630;
+  --ink:#E4EDF2; --ink-2:#9DB2BE; --ink-3:#6C8492;
+  --rule:#22323C; --rule-strong:#31454F;
+  --accent:#4FB3CE; --accent-soft:#152A33;
+  --removed:#4A93C4; --added:#D07A4E;
+  --pass:#4FA37C; --pass-soft:#132A22;
+  --tie:#6C8492; --tie-soft:#1A2831;
+  --ramp-1:#23414F; --ramp-2:#2E5B72; --ramp-3:#377494; --ramp-4:#3F84AB; --ramp-5:#4A93C4;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:0 28px 96px}
+h1,h2,h3,.ui{font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.mono,td.num,th.num{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; font-variant-numeric:tabular-nums}
+p{max-width:var(--measure)}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+/* ---------- masthead ---------- */
+.mast{padding:72px 0 40px; border-bottom:1px solid var(--rule)}
+.eyebrow{
+  font-family:"IBM Plex Sans",sans-serif; font-size:11.5px; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin:0 0 18px
+}
+h1{
+  font-size:clamp(38px,6vw,60px); line-height:1.04; font-weight:600;
+  letter-spacing:-.022em; margin:0 0 22px; text-wrap:balance; max-width:16ch
+}
+.standfirst{font-size:20px; line-height:1.5; color:var(--ink-2); max-width:58ch; margin:0 0 30px}
+.standfirst strong{color:var(--ink); font-weight:600}
+.provenance{
+  display:flex; flex-wrap:wrap; gap:0 30px; font-family:"IBM Plex Mono",monospace;
+  font-size:12px; color:var(--ink-3); padding-top:6px
+}
+.provenance span{white-space:nowrap}
+.provenance b{color:var(--ink-2); font-weight:500}
+
+/* ---------- sections ---------- */
+section{padding-top:56px}
+h2{
+  font-size:13px; font-weight:600; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--accent); margin:0 0 6px
+}
+.sec-title{font-family:"IBM Plex Sans",sans-serif; font-size:29px; font-weight:600;
+  letter-spacing:-.016em; line-height:1.2; margin:0 0 18px; text-wrap:balance; max-width:24ch}
+h3{font-size:17px; font-weight:600; letter-spacing:-.005em; margin:30px 0 8px}
+
+/* ---------- verdict cards ---------- */
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:18px; margin:26px 0 0}
+.card{
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  padding:24px 24px 20px; box-shadow:var(--shadow); position:relative
+}
+.card.lead{border-color:var(--rule-strong)}
+.card-role{
+  font-family:"IBM Plex Sans",sans-serif; font-size:11px; font-weight:600; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--ink-3); margin:0 0 4px
+}
+.card-name{font-family:"IBM Plex Sans",sans-serif; font-size:20px; font-weight:600; margin:0 0 2px; letter-spacing:-.01em}
+.card-config{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3); margin:0 0 18px}
+.hero-num{
+  font-family:"IBM Plex Sans",sans-serif; font-size:52px; font-weight:600; line-height:1;
+  letter-spacing:-.03em; font-variant-numeric:tabular-nums; margin:0
+}
+.hero-cap{font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; color:var(--ink-2); margin:6px 0 18px}
+.kv{display:grid; grid-template-columns:1fr auto; gap:7px 14px; font-size:13.5px;
+  font-family:"IBM Plex Sans",sans-serif; border-top:1px solid var(--rule); padding-top:14px}
+.kv dt{color:var(--ink-2)}
+.kv dd{margin:0; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; text-align:right}
+.chip{
+  display:inline-flex; align-items:center; gap:6px; font-family:"IBM Plex Sans",sans-serif;
+  font-size:11px; font-weight:600; letter-spacing:.07em; text-transform:uppercase;
+  padding:4px 9px; border-radius:100px; background:var(--pass-soft); color:var(--pass);
+  border:1px solid color-mix(in srgb, var(--pass) 26%, transparent);
+  position:absolute; top:22px; right:22px
+}
+.chip::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor}
+
+/* ---------- three-state band ---------- */
+.states{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-top:24px}
+.state{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px 20px 18px}
+.state-head{display:flex; align-items:baseline; gap:9px; margin-bottom:10px}
+.dot{width:9px; height:9px; border-radius:2px; flex:none; transform:translateY(-1px)}
+.state h3{font-size:15.5px; margin:0; font-weight:600}
+.state-stat{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-3); margin:0 0 10px}
+.state p{font-size:14.5px; line-height:1.55; color:var(--ink-2); margin:0; max-width:none}
+.state p + p{margin-top:9px}
+
+/* ---------- charts ---------- */
+figure{margin:26px 0 0; background:var(--surface); border:1px solid var(--rule);
+  border-radius:10px; padding:24px 26px 20px}
+figcaption{font-family:"IBM Plex Sans",sans-serif; font-size:13px; color:var(--ink-2);
+  margin-top:16px; padding-top:14px; border-top:1px solid var(--rule); max-width:70ch}
+.fig-title{font-family:"IBM Plex Sans",sans-serif; font-size:16px; font-weight:600;
+  margin:0 0 3px; letter-spacing:-.005em}
+.fig-sub{font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; color:var(--ink-3); margin:0 0 22px}
+
+.notice-chart{display:grid; grid-template-columns:auto 1fr; gap:11px 16px; align-items:center}
+.notice-label{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-2);
+  text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums}
+.notice-track{display:flex; align-items:center; gap:10px}
+.notice-bar{height:22px; border-radius:0 4px 4px 0; min-width:2px; transition:width .5s cubic-bezier(.22,.61,.36,1)}
+.notice-val{font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:500;
+  color:var(--ink); font-variant-numeric:tabular-nums}
+
+.fam-chart{display:flex; flex-direction:column; gap:16px}
+.fam-row{display:grid; grid-template-columns:minmax(150px,190px) 1fr; gap:14px; align-items:center}
+.fam-name{font-family:"IBM Plex Sans",sans-serif; font-size:13.5px; line-height:1.3}
+.fam-name small{display:block; font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-3); margin-top:2px}
+.fam-bars{display:flex; flex-direction:column; gap:2px}
+.fam-bar{display:flex; align-items:center; gap:9px}
+.fam-fill{height:15px; border-radius:0 4px 4px 0; min-width:2px}
+.fam-num{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap}
+.legend{display:flex; gap:20px; margin-bottom:20px; font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.swatch{width:11px; height:11px; border-radius:2px; flex:none}
+
+/* ---------- tables ---------- */
+.scroll{overflow-x:auto; margin-top:22px; border:1px solid var(--rule); border-radius:10px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-family:"IBM Plex Sans",sans-serif; font-size:13.5px}
+caption{text-align:left; font-size:13px; color:var(--ink-3); padding:14px 18px 0; font-family:"IBM Plex Sans",sans-serif}
+th,td{padding:11px 16px; text-align:left; border-bottom:1px solid var(--rule); white-space:nowrap}
+thead th{
+  font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-3); background:var(--surface-2); border-bottom:1px solid var(--rule-strong)
+}
+tbody tr:last-child td{border-bottom:none}
+.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.up{color:var(--pass); font-weight:500}
+.down{color:var(--added); font-weight:500}
+td.strong{font-weight:600}
+
+/* ---------- callout ---------- */
+.callout{
+  background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:0 8px 8px 0;
+  padding:18px 22px; margin:26px 0 0; max-width:var(--measure)
+}
+.callout p{margin:0; font-size:15.5px; line-height:1.55}
+.callout p + p{margin-top:10px}
+.callout .lede{font-family:"IBM Plex Sans",sans-serif; font-weight:600; font-size:14px}
+
+/* ---------- limits ---------- */
+.limits{list-style:none; padding:0; margin:22px 0 0; max-width:var(--measure)}
+.limits li{padding:15px 0; border-top:1px solid var(--rule)}
+.limits li:last-child{border-bottom:1px solid var(--rule)}
+.limits b{font-family:"IBM Plex Sans",sans-serif; font-size:14px; display:block; margin-bottom:3px}
+.limits span{font-size:15px; color:var(--ink-2); line-height:1.55}
+
+footer{margin-top:64px; padding-top:24px; border-top:1px solid var(--rule);
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3); line-height:1.9}
+footer b{color:var(--ink-2); font-weight:500}
+
+@media (prefers-reduced-motion: reduce){*{transition:none !important; animation:none !important}}
+@media (max-width:640px){
+  body{font-size:16px} .wrap{padding:0 18px 64px} .mast{padding:48px 0 32px}
+  .fam-row{grid-template-columns:1fr; gap:8px}
+  .notice-chart{grid-template-columns:auto 1fr; gap:9px 10px}
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">C-DOT · 5G UPF traffic steering · evidence review</p>
+  <h1>Steering Under Notice</h1>
+  <p class="standfirst">
+    Predictive UPF steering beats the static controller — but only when the capacity loss is
+    <strong>declared in advance</strong>. On 5,000 paired simulations using seeds that played no part
+    in choosing the configuration, guarded pre-drain removed <strong>55%</strong> of uplink overload
+    on scheduled maintenance and never once lost a single case.
+  </p>
+  <div class="provenance">
+    <span><b>25,000</b> paired 24-hour simulations</span>
+    <span><b>160</b> configurations screened</span>
+    <span><b>96</b> selection groups · <b>24</b> UPFs</span>
+    <span><b>2026-08-25</b></span>
+  </div>
+</header>
+
+<section>
+  <h2>The result</h2>
+  <p class="sec-title">Two operating points, not one recommendation</p>
+  <p>
+    The campaign screened 160 controller configurations, then re-tested the survivors on a
+    fresh seed pool that had never been inspected. Three of four candidates held every
+    acceptance gate. They are not competitors — they are the two ends of a
+    risk-and-reward choice that C-DOT gets to make.
+  </p>
+
+  <div class="cards">
+    <article class="card lead">
+      <span class="chip">All gates pass</span>
+      <p class="card-role">Maximum benefit</p>
+      <p class="card-name">Guarded pre-drain</p>
+      <p class="card-config">arm 62 · 10-min cadence · 0.75 blend · 4 h horizon · 0.80 reserve</p>
+      <p class="hero-num" style="color:var(--removed)">+24.0%</p>
+      <p class="hero-cap">mean uplink overload removed, all five stress families</p>
+      <dl class="kv">
+        <dt>Where it may act</dt><dd>+40.1%</dd>
+        <dt>95% lower bound</dt><dd>+22.8%</dd>
+        <dt>Harm ratio</dt><dd>0.179</dd>
+        <dt>Routing churn</dt><dd>0.262</dd>
+        <dt>Decision latency</dt><dd>834 ms</dd>
+      </dl>
+    </article>
+
+    <article class="card">
+      <span class="chip">All gates pass</span>
+      <p class="card-role">Risk-managed</p>
+      <p class="card-name">Cohort MPC</p>
+      <p class="card-config">arm 142 · 10-min cadence · 0.50 blend · 2 h horizon · 0.80 reserve</p>
+      <p class="hero-num" style="color:var(--accent)">+16.3%</p>
+      <p class="hero-cap">mean uplink overload removed, all five stress families</p>
+      <dl class="kv">
+        <dt>Where it may act</dt><dd>+27.2%</dd>
+        <dt>95% lower bound</dt><dd>+25.4%</dd>
+        <dt>Harm ratio</dt><dd>0.016</dd>
+        <dt>Routing churn</dt><dd>0.028</dd>
+        <dt>Decision latency</dt><dd>38.3 s</dd>
+      </dl>
+    </article>
+  </div>
+
+  <div class="callout">
+    <p class="lede">The trade is legible.</p>
+    <p>
+      Pre-drain buys roughly half again as much overload reduction. MPC buys an
+      order of magnitude less collateral harm (0.016 against 0.179) and a tenth
+      the routing churn — at the cost of decisions that take 38 seconds instead
+      of under a second.
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>The honest shape of it</h2>
+  <p class="sec-title">Wins, ties, and one place it can lose</p>
+  <p>
+    A claim that predictive steering is simply better than static would not survive
+    scrutiny, and it is not what the data says. The result has three states, and the
+    third one matters most in a review.
+  </p>
+
+  <div class="states">
+    <article class="state">
+      <div class="state-head">
+        <span class="dot" style="background:var(--removed)"></span>
+        <h3>Declared capacity loss</h3>
+      </div>
+      <p class="state-stat">473 informative pairs · 0 regressions</p>
+      <p>
+        Scheduled maintenance, and maintenance followed by a stadium-scale demand
+        surge. Median case removes <strong>72%</strong> and <strong>67%</strong> of
+        uplink overload respectively.
+      </p>
+      <p>Not one pair out of 473 came out worse than static.</p>
+    </article>
+
+    <article class="state">
+      <div class="state-head">
+        <span class="dot" style="background:var(--tie)"></span>
+        <h3>Pure surprise</h3>
+      </div>
+      <p class="state-stat">500 pairs · bit-exact ties</p>
+      <p>
+        An unannounced brownout, or an unannounced demand surge. With no declared
+        event the controller publishes <em>exactly</em> the static policy.
+      </p>
+      <p>This is designed behaviour, and it is verified byte-for-byte rather than assumed.</p>
+    </article>
+
+    <article class="state">
+      <div class="state-head">
+        <span class="dot" style="background:var(--added)"></span>
+        <h3>Declared loss, then a surprise</h3>
+      </div>
+      <p class="state-stat">243 informative pairs · 74 regressions (30.5%)</p>
+      <p>
+        Maintenance is announced, the controller drains traffic onto healthy UPFs —
+        and then one of <em>those</em> browns out without warning.
+      </p>
+      <p>
+        Still net positive (+12.8% in aggregate, median case +20.5%), but the
+        worst cases are bad. MPC cuts this to <strong>6.6%</strong> of pairs.
+      </p>
+    </article>
+  </div>
+
+  <figure>
+    <p class="fig-title">Overload-seconds removed against overload-seconds added</p>
+    <p class="fig-sub">Guarded pre-drain (arm 62), 1,250 fresh-seed pairs, uplink</p>
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--removed)"></i> Removed</span>
+      <span><i class="swatch" style="background:var(--added)"></i> Added</span>
+    </div>
+    <div class="fam-chart">
+      <div class="fam-row">
+        <div class="fam-name">Declared maintenance<small>243 informative · 0 worse</small></div>
+        <div class="fam-bars">
+          <div class="fam-bar"><div class="fam-fill" style="width:92%;background:var(--removed)"></div><span class="fam-num">2,667,991 s removed</span></div>
+          <div class="fam-bar"><div class="fam-fill" style="width:0.3%;background:var(--added)"></div><span class="fam-num">0 s added</span></div>
+        </div>
+      </div>
+      <div class="fam-row">
+        <div class="fam-name">Maintenance, then stadium surge<small>230 informative · 0 worse</small></div>
+        <div class="fam-bars">
+          <div class="fam-bar"><div class="fam-fill" style="width:90.4%;background:var(--removed)"></div><span class="fam-num">2,623,954 s removed</span></div>
+          <div class="fam-bar"><div class="fam-fill" style="width:0.3%;background:var(--added)"></div><span class="fam-num">0 s added</span></div>
+        </div>
+      </div>
+      <div class="fam-row">
+        <div class="fam-name">Maintenance, then surprise brownout<small>243 informative · 74 worse</small></div>
+        <div class="fam-bars">
+          <div class="fam-bar"><div class="fam-fill" style="width:84.3%;background:var(--removed)"></div><span class="fam-num">2,441,693 s removed</span></div>
+          <div class="fam-bar"><div class="fam-fill" style="width:47.7%;background:var(--added)"></div><span class="fam-num">1,385,821 s added</span></div>
+        </div>
+      </div>
+      <div class="fam-row">
+        <div class="fam-name">Surprise brownout<small>243 informative · exact tie</small></div>
+        <div class="fam-bars">
+          <div class="fam-bar"><div class="fam-fill" style="width:0.3%;background:var(--tie)"></div><span class="fam-num">0 s — publishes static</span></div>
+        </div>
+      </div>
+    </div>
+    <figcaption>
+      All harm is concentrated in one family: an undeclared second failure landing on a
+      destination the controller has already loaded. Across every family the ratio is
+      7,733,638 seconds removed against 1,385,821 added — 5.6 to 1.
+    </figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The operational finding</h2>
+  <p class="sec-title">Advance notice is the resource that matters</p>
+  <p>
+    Gain scales with how much warning the maintenance window carries — and it keeps
+    scaling out to four hours. Thirty minutes of notice is worth a quarter of what four
+    hours is worth. This is a scheduling decision C-DOT already controls.
+  </p>
+
+  <figure>
+    <p class="fig-title">Uplink overload removed by advance notice</p>
+    <p class="fig-sub">Guarded pre-drain (arm 62), fresh-seed validation, aggregate within each notice band</p>
+    <div class="notice-chart">
+      <span class="notice-label">30 min</span>
+      <div class="notice-track"><div class="notice-bar" style="width:25.8%;background:var(--ramp-1)"></div><span class="notice-val">+10.9%</span></div>
+      <span class="notice-label">1 hour</span>
+      <div class="notice-track"><div class="notice-bar" style="width:38.8%;background:var(--ramp-2)"></div><span class="notice-val">+16.4%</span></div>
+      <span class="notice-label">2 hours</span>
+      <div class="notice-track"><div class="notice-bar" style="width:60.2%;background:var(--ramp-3)"></div><span class="notice-val">+25.4%</span></div>
+      <span class="notice-label">3 hours</span>
+      <div class="notice-track"><div class="notice-bar" style="width:79.2%;background:var(--ramp-4)"></div><span class="notice-val">+33.4%</span></div>
+      <span class="notice-label">4 hours</span>
+      <div class="notice-track"><div class="notice-bar" style="width:100%;background:var(--ramp-5)"></div><span class="notice-val">+42.2%</span></div>
+    </div>
+    <figcaption>
+      Roughly 190 informative pairs per band. Notice is a property of the scenario, drawn
+      from the seed, so every configuration faced the same schedule.
+    </figcaption>
+  </figure>
+
+  <h3>Faster control does not substitute for earlier warning</h3>
+  <p>
+    Running the controller every 2 minutes instead of every 10 was tested across all 160
+    configurations. For pre-drain it delivers <em>identical</em> benefit — 7.8% mean, 27.7%
+    best, matching 10-minute to two decimal places — at <strong>3.4&times; the routing
+    churn</strong>, which is why only 8 of 64 pass instead of 26. For MPC, holding the
+    optimisation to the same size means faster cadence buys less lookahead, and the benefit
+    halves. Both point the same way: with compute held constant, the binding resource is
+    forecast lookahead, not decision frequency.
+  </p>
+  <div class="scroll">
+    <table>
+      <caption>Discovery campaign, 160 configurations, 20,000 pairs. Arms 60 and 124 are the
+      same configuration at the two cadences: 27.67% at 0.192 churn (passes) against 27.69% at
+      0.702 churn (fails on churn alone).</caption>
+      <thead>
+        <tr><th>Controller</th><th>Cadence</th><th class="num">Arms</th><th class="num">Passing</th><th class="num">Mean gain</th><th class="num">Best gain</th><th class="num">Churn</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Pre-drain</td><td>10 min</td><td class="num">64</td><td class="num strong">26</td><td class="num">+7.8%</td><td class="num up">+27.7%</td><td class="num">0.057</td></tr>
+        <tr><td>Pre-drain</td><td>2 min</td><td class="num">64</td><td class="num">8</td><td class="num">+7.8%</td><td class="num">+27.7%</td><td class="num down">0.195</td></tr>
+        <tr><td>Cohort MPC</td><td>10 min</td><td class="num">16</td><td class="num strong">4</td><td class="num">+8.6%</td><td class="num up">+17.0%</td><td class="num">0.014</td></tr>
+        <tr><td>Cohort MPC</td><td>2 min</td><td class="num">16</td><td class="num">0</td><td class="num">+3.8%</td><td class="num">+5.7%</td><td class="num">0.015</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Why this supersedes the earlier review</h2>
+  <p class="sec-title">The previous campaign measured its own evaluator</p>
+  <p>
+    An earlier 160-configuration campaign concluded that no controller could beat static and
+    that static should remain the recommendation. That conclusion was an artifact. Three
+    defects sat in the scenario generator and the scoring code, not in the controllers.
+  </p>
+
+  <div class="scroll">
+    <table>
+      <caption>Same controllers, same simulator, same 24-hour scenarios</caption>
+      <thead>
+        <tr><th>Measure</th><th class="num">Earlier campaign</th><th class="num">This campaign</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Configurations passing every gate</td><td class="num">0 / 160</td><td class="num up strong">36 / 160</td></tr>
+        <tr><td>Validity failures</td><td class="num down">160 / 160</td><td class="num up strong">0 / 160</td></tr>
+        <tr><td>Maintenance-then-brownout family</td><td class="num down">−1.7%</td><td class="num up">+24.2%</td></tr>
+        <tr><td>MPC solver timeouts, 10-min cadence</td><td class="num down">40%</td><td class="num up strong">0</td></tr>
+        <tr><td>MPC solver timeouts, 2-min cadence</td><td class="num down">100%</td><td class="num up strong">0</td></tr>
+        <tr><td>Maintenance seeds producing any overload</td><td class="num">44%</td><td class="num up">93%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>What was actually wrong</h3>
+  <p>
+    <strong>The scored metric and the optimised metric disagreed.</strong> The simulator scores
+    overload as <span class="mono">load ÷ capacity − 1</span>, a relative quantity. The safety
+    guard and the pre-drain solver both worked in absolute Mbps. On a UPF cut to a tenth of its
+    envelope those differ tenfold, so the controller systematically undervalued the exact action
+    it exists to take. Correcting the units turned the worst family from −1.7% to positive.
+  </p>
+  <p>
+    <strong>One stress family produced infinite overload.</strong> An unavailable UPF has zero
+    capacity, so every such pair scored infinity for <em>both</em> controllers — an exact tie
+    that nonetheless failed a finite-metric gate on all 160 configurations. That single gate
+    made the contract unpassable before any controller ran.
+  </p>
+  <p>
+    <strong>The MPC horizon was sized in windows, not hours.</strong> Halving the cadence
+    quintupled the optimisation, and every 2-minute configuration hit a 2-second solver budget
+    that the acceptance contract allowed to be 120 seconds. The reported cadence finding was
+    measuring a sizing bug.
+  </p>
+</section>
+
+<section>
+  <h2>Method</h2>
+  <p class="sec-title">Selected on one set of seeds, judged on another</p>
+  <p>
+    Configurations that look good on the data that chose them are not evidence. The campaign
+    ran in two stages: 160 configurations screened on a development seed pool, then the
+    survivors frozen and re-run on a validation pool that was never inspected beforehand. The
+    selection rule was written down first, and ranks on the <em>lower confidence bound</em>
+    rather than the headline number.
+  </p>
+
+  <div class="scroll">
+    <table>
+      <caption>Shrinkage from screening to fresh seeds — the selection bias being removed</caption>
+      <thead>
+        <tr><th>Config</th><th>Controller</th><th class="num">Screening</th><th class="num">Fresh seeds</th><th class="num">Shrinkage</th><th class="num">Harm ratio</th><th>Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">arm 62</td><td>Pre-drain</td><td class="num">+27.6%</td><td class="num strong">+24.0%</td><td class="num">−3.6 pts</td><td class="num">0.179</td><td class="up">Pass</td></tr>
+        <tr><td class="mono">arm 56</td><td>Pre-drain</td><td class="num">+27.0%</td><td class="num strong">+23.3%</td><td class="num">−3.7 pts</td><td class="num">0.182</td><td class="up">Pass</td></tr>
+        <tr><td class="mono">arm 142</td><td>Cohort MPC</td><td class="num">+17.0%</td><td class="num strong">+16.3%</td><td class="num">−0.7 pts</td><td class="num">0.016</td><td class="up">Pass</td></tr>
+        <tr><td class="mono">arm 143</td><td>Cohort MPC</td><td class="num">+10.1%</td><td class="num">+9.8%</td><td class="num">−0.3 pts</td><td class="num">0.001</td><td class="down">Below 10% bar</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:20px">
+    Shrinkage of three to four points is what honest bias removal looks like. A candidate that
+    collapsed here would have been a screening artifact; none did. Validation seeds are disjoint
+    from the screening pool, from every earlier campaign, and from the protected seed set.
+  </p>
+
+  <h3>What every passing configuration had to clear</h3>
+  <p>
+    Mean gain at or above 10% across all five families; a bootstrap 95% lower bound above zero;
+    no aggregate regression in <em>any</em> family; overload added no more than a quarter of
+    overload removed; no regression in downlink overload, drops, rejections or session
+    establishment; no solver timeout or error; routing churn within 0.30 per group-hour;
+    decisions inside 120 seconds; and bit-exact static behaviour whenever no event is declared.
+  </p>
+</section>
+
+<section>
+  <h2>Limits</h2>
+  <p class="sec-title">What this evidence does not establish</p>
+  <ul class="limits">
+    <li>
+      <b>This is a shadow controller in simulation, not a production result.</b>
+      <span>No policy was applied to live traffic. The simulator models new-session placement only —
+      roughly 3% of offered load is controllable, because established sessions are never migrated.</span>
+    </li>
+    <li>
+      <b>One stress family produced no measurable stress.</b>
+      <span>The unannounced demand surge never overloaded any UPF even at 4× arrivals across a whole
+      zone, because standing sessions dominate. It contributes a guaranteed zero, which makes the
+      headline conservative but leaves that scenario genuinely untested.</span>
+    </li>
+    <li>
+      <b>The surprise-after-maintenance case still has a bad tail.</b>
+      <span>Pre-drain loses in 30.5% of those pairs and the worst are severe. MPC reduces this to
+      6.6% with a worst case near zero. If that exposure is unacceptable, MPC is the configuration
+      to take, not pre-drain.</span>
+    </li>
+    <li>
+      <b>Gains are measured against a capacity-proportional static controller.</b>
+      <span>That baseline is already capacity-aware and reacts once an event lands. The advantage
+      shown here comes entirely from acting before it lands.</span>
+    </li>
+  </ul>
+</section>
+
+<footer>
+  <div><b>Discovery</b> · 160 configurations × 125 cells · 20,000 paired simulations · 160/160 valid · 36 passing</div>
+  <div><b>Validation</b> · 4 frozen candidates × 1,250 fresh pairs · 5,000 paired simulations · 3 passing</div>
+  <div><b>Scenario</b> · extreme-optimizer-pilot-1d · 96 selection groups · 24 UPFs · 2,880 steps × 30 s</div>
+  <div><b>Artifacts</b> · output/mixed-stress-v4-analysis.json · output/mixed-stress-v4-validation.json · logs/v4/RUNBOOK.md</div>
+</footer>
+
+</div>

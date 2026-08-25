@@ -1,0 +1,27 @@
+{
+  "schema_version": "cdot-live-config/1.0",
+  "units": "pps-proxy",
+  "calibration": {
+    "status": "uncalibrated_proxy",
+    "source": "cdot-upf-metrics-v02 p99 observed directional rate",
+    "production_safety_claim": false
+  },
+  "upfs": {
+    "upf-1": {"job": "upf1", "pod": "upf-0", "smf": "UPF1", "ul_limit": 44300.0, "dl_limit": 79200.0},
+    "upf-2": {"job": "upf2", "pod": "upf1-0", "smf": "UPF2", "ul_limit": 26800.0, "dl_limit": 38500.0},
+    "upf-3": {"job": "upf3", "pod": "upf2-0", "smf": "UPF3", "ul_limit": 12400.0, "dl_limit": 24400.0},
+    "upf-4": {"job": "upf4", "pod": "upf3-0", "smf": "UPF4", "ul_limit": 29000.0, "dl_limit": 48500.0}
+  },
+  "dnn": {"1": "ims", "2": "internet"},
+  "synthetic_dnn": {"ims": "ims-voice", "internet": "internet-video"},
+  "queries": {
+    "ul": "upf_class_ul_packets_total",
+    "dl": "upf_class_dl_packets_total",
+    "sessions": "pfcp_sessions_total",
+    "cpu": "upf_cpu_usage_cores",
+    "memory": "upf_memory_usage_bytes",
+    "tsi": "upf_tsi",
+    "drop": "upf_downlink_drop_rate_percent",
+    "forwarding_efficiency": "upf_downlink_forwarding_efficiency_percent"
+  }
+}

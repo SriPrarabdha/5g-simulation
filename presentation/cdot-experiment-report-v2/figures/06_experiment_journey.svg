@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img">
+<title>Scientific experiment journey</title>
+<defs>
+<filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#000" flood-opacity=".32"/></filter>
+<linearGradient id="cyanBlue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#24d3c1"/><stop offset="1" stop-color="#5aa9ff"/></linearGradient>
+<linearGradient id="amberCoral" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffbd59"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient>
+<style>text{font-family:Inter,Segoe UI,Arial,sans-serif}.smallcaps{letter-spacing:2.4px;font-weight:700}</style>
+</defs>
+<rect width="1600" height="900" fill="#07111f"/>
+<text x="72.00" y="66.00" font-size="17" fill="#24d3c1" font-weight="700" text-anchor="start" opacity="1" class="smallcaps">EVIDENCE, NOT A SINGLE BENCHMARK</text>
+<text x="72.00" y="119.00" font-size="40" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">What each experiment taught us</text>
+<text x="72.00" y="158.00" font-size="20" fill="#9ab0c8" font-weight="400" text-anchor="start" opacity="1">Positive mechanism results, negative selection results and invalidated runs are kept distinct.</text>
+<rect x="72.00" y="218.00" width="704.00" height="137.00" rx="17.00" fill="#0d1b2d" stroke="#243a52" stroke-width="1" opacity="1" filter="url(#shadow)"/>
+<circle cx="117.00" cy="261.00" r="23.00" fill="#4ade80" stroke="none" stroke-width="1" opacity="1"/>
+<text x="117.00" y="269.00" font-size="20" fill="#07111f" font-weight="800" text-anchor="middle" opacity="1">1</text>
+<text x="156.00" y="256.00" font-size="22" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">Digital twin</text>
+<text x="752.00" y="256.00" font-size="14" fill="#4ade80" font-weight="800" text-anchor="end" opacity="1" class="smallcaps">PASS</text>
+<text x="156.00" y="294.00" font-size="16" fill="#9ab0c8" font-weight="500" text-anchor="start">
+<tspan x="156.00" dy="0.00">Accounting closes exactly; causal 30 s simulation; bounded streaming mem</tspan>
+<tspan x="156.00" dy="20.00">ory.</tspan>
+</text>
+<rect x="824.00" y="218.00" width="704.00" height="137.00" rx="17.00" fill="#0d1b2d" stroke="#243a52" stroke-width="1" opacity="1" filter="url(#shadow)"/>
+<circle cx="869.00" cy="261.00" r="23.00" fill="#ffbd59" stroke="none" stroke-width="1" opacity="1"/>
+<text x="869.00" y="269.00" font-size="20" fill="#07111f" font-weight="800" text-anchor="middle" opacity="1">2</text>
+<text x="908.00" y="256.00" font-size="22" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">Forecasting</text>
+<text x="1504.00" y="256.00" font-size="14" fill="#ffbd59" font-weight="800" text-anchor="end" opacity="1" class="smallcaps">NO PROMOTION</text>
+<text x="908.00" y="294.00" font-size="16" fill="#9ab0c8" font-weight="500" text-anchor="start">
+<tspan x="908.00" dy="0.00">Best challengers improved WAPE ≈11.6%, below the frozen 15% gate.</tspan>
+<tspan x="908.00" dy="20.00"></tspan>
+</text>
+<rect x="72.00" y="371.00" width="704.00" height="137.00" rx="17.00" fill="#0d1b2d" stroke="#243a52" stroke-width="1" opacity="1" filter="url(#shadow)"/>
+<circle cx="117.00" cy="414.00" r="23.00" fill="#4ade80" stroke="none" stroke-width="1" opacity="1"/>
+<text x="117.00" y="422.00" font-size="20" fill="#07111f" font-weight="800" text-anchor="middle" opacity="1">3</text>
+<text x="156.00" y="409.00" font-size="22" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">Survival</text>
+<text x="752.00" y="409.00" font-size="14" fill="#4ade80" font-weight="800" text-anchor="end" opacity="1" class="smallcaps">PASS</text>
+<text x="156.00" y="447.00" font-size="16" fill="#9ab0c8" font-weight="500" text-anchor="start">
+<tspan x="156.00" dy="0.00">Distribution-blind calibration converges; stale telemetry falls back exa</tspan>
+<tspan x="156.00" dy="20.00">ctly.</tspan>
+</text>
+<rect x="824.00" y="371.00" width="704.00" height="137.00" rx="17.00" fill="#0d1b2d" stroke="#243a52" stroke-width="1" opacity="1" filter="url(#shadow)"/>
+<circle cx="869.00" cy="414.00" r="23.00" fill="#5aa9ff" stroke="none" stroke-width="1" opacity="1"/>
+<text x="869.00" y="422.00" font-size="20" fill="#07111f" font-weight="800" text-anchor="middle" opacity="1">4</text>
+<text x="908.00" y="409.00" font-size="22" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">Oracle bounds</text>
+<text x="1504.00" y="409.00" font-size="14" fill="#5aa9ff" font-weight="800" text-anchor="end" opacity="1" class="smallcaps">HEADROOM</text>
+<text x="908.00" y="447.00" font-size="16" fill="#9ab0c8" font-weight="500" text-anchor="start">
+<tspan x="908.00" dy="0.00">Perfect causal arrivals recover ≈55%; fault knowledge is the dominant ax</tspan>
+<tspan x="908.00" dy="20.00">is.</tspan>
+</text>
+<rect x="72.00" y="524.00" width="704.00" height="137.00" rx="17.00" fill="#0d1b2d" stroke="#243a52" stroke-width="1" opacity="1" filter="url(#shadow)"/>
+<circle cx="117.00" cy="567.00" r="23.00" fill="#ff6b6b" stroke="none" stroke-width="1" opacity="1"/>
+<text x="117.00" y="575.00" font-size="20" fill="#07111f" font-weight="800" text-anchor="middle" opacity="1">5</text>
+<text x="156.00" y="562.00" font-size="22" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">MPC</text>
+<text x="752.00" y="562.00" font-size="14" fill="#ff6b6b" font-weight="800" text-anchor="end" opacity="1" class="smallcaps">REJECT</text>
+<text x="156.00" y="600.00" font-size="16" fill="#9ab0c8" font-weight="500" text-anchor="start">
+<tspan x="156.00" dy="0.00">Development gains did not transfer; 128-seed production result was −13.3</tspan>
+<tspan x="156.00" dy="20.00">%.</tspan>
+</text>
+<rect x="824.00" y="524.00" width="704.00" height="137.00" rx="17.00" fill="#0d1b2d" stroke="#243a52" stroke-width="1" opacity="1" filter="url(#shadow)"/>
+<circle cx="869.00" cy="567.00" r="23.00" fill="#24d3c1" stroke="none" stroke-width="1" opacity="1"/>
+<text x="869.00" y="575.00" font-size="20" fill="#07111f" font-weight="800" text-anchor="middle" opacity="1">6</text>
+<text x="908.00" y="562.00" font-size="22" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">Pre-drain</text>
+<text x="1504.00" y="562.00" font-size="14" fill="#24d3c1" font-weight="800" text-anchor="end" opacity="1" class="smallcaps">MECHANISM WIN</text>
+<text x="908.00" y="600.00" font-size="16" fill="#9ab0c8" font-weight="500" text-anchor="start">
+<tspan x="908.00" dy="0.00">Large declared-maintenance gains, but mixed-stress tail losses remain.</tspan>
+<tspan x="908.00" dy="20.00"></tspan>
+</text>
+<rect x="72.00" y="677.00" width="704.00" height="137.00" rx="17.00" fill="#0d1b2d" stroke="#243a52" stroke-width="1" opacity="1" filter="url(#shadow)"/>
+<circle cx="117.00" cy="720.00" r="23.00" fill="#ff6b6b" stroke="none" stroke-width="1" opacity="1"/>
+<text x="117.00" y="728.00" font-size="20" fill="#07111f" font-weight="800" text-anchor="middle" opacity="1">7</text>
+<text x="156.00" y="715.00" font-size="22" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">Exposure guard</text>
+<text x="752.00" y="715.00" font-size="14" fill="#ff6b6b" font-weight="800" text-anchor="end" opacity="1" class="smallcaps">REJECT</text>
+<text x="156.00" y="753.00" font-size="16" fill="#9ab0c8" font-weight="500" text-anchor="start">
+<tspan x="156.00" dy="0.00">20,000 pairs: 0/160 full-gate passes; exact surprise fallback proven.</tspan>
+<tspan x="156.00" dy="20.00"></tspan>
+</text>
+<rect x="824.00" y="677.00" width="704.00" height="137.00" rx="17.00" fill="#0d1b2d" stroke="#243a52" stroke-width="1" opacity="1" filter="url(#shadow)"/>
+<circle cx="869.00" cy="720.00" r="23.00" fill="#b48cff" stroke="none" stroke-width="1" opacity="1"/>
+<text x="869.00" y="728.00" font-size="20" fill="#07111f" font-weight="800" text-anchor="middle" opacity="1">8</text>
+<text x="908.00" y="715.00" font-size="22" fill="#ecf5ff" font-weight="750" text-anchor="start" opacity="1">2-minute cadence</text>
+<text x="1504.00" y="715.00" font-size="14" fill="#b48cff" font-weight="800" text-anchor="end" opacity="1" class="smallcaps">NO BENEFIT</text>
+<text x="908.00" y="753.00" font-size="16" fill="#9ab0c8" font-weight="500" text-anchor="start">
+<tspan x="908.00" dy="0.00">+0.08 pp mean gain for pre-drain, 3.6× churn; MPC timed out.</tspan>
+<tspan x="908.00" dy="20.00"></tspan>
+</text>
+<text x="800.00" y="858.00" font-size="20" fill="#ecf5ff" font-weight="800" text-anchor="middle" opacity="1" class="smallcaps">CURRENT PRODUCTION DECISION  ·  STATIC</text>
+</svg>

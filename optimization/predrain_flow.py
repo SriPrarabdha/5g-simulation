@@ -12,6 +12,7 @@ from scipy.optimize import linprog
 from scipy.sparse import coo_matrix
 
 from forecasting import ResidualObservation
+from optimization.exposure_guard import MINIMUM_CAPACITY_FRACTION
 from schemas import ConstraintSlack, UPFState
 
 if TYPE_CHECKING:
@@ -155,7 +156,25 @@ def solve_predrain_flow(
             + config.latency_cost * latency
             + config.utilization_cost * utilization
         )
-    objective[x_count:] = config.overflow_cost
+    # Overflow slack is expressed in absolute units (Mbps, sessions) but the
+    # campaign scores relative overload, ``load / safe_capacity - 1``.  Pricing
+    # each slack column by the reciprocal of that UPF's capacity converts the
+    # penalty into relative-overload units; multiplying by the directional mean
+    # capacity keeps the historical magnitude for an average-sized UPF, so a
+    # UPF that a declared event shrinks to a small fraction of nominal is
+    # penalised in proportion to the damage it actually causes.
+    for offset, capacities in enumerate((
+        [state.safe_capacity_mbps.ul for state in states],
+        [state.safe_capacity_mbps.dl for state in states],
+        [float(state.safe_session_capacity) for state in states],
+    )):
+        positive = [value for value in capacities if value > 0]
+        reference = sum(positive) / len(positive) if positive else 1.0
+        for upf, capacity in enumerate(capacities):
+            floor = reference * MINIMUM_CAPACITY_FRACTION
+            objective[x_count + offset * upf_count + upf] = (
+                config.overflow_cost * reference / max(capacity, floor)
+            )
 
     group_index = {group.key.selection_id: index for index, group in enumerate(groups)}
     eq_rows, eq_columns = [], []

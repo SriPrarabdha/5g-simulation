@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -N cdot-v4-analyze
+#PBS -q workq
+#PBS -l select=1:ncpus=125:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=02:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+
+: "${CAMPAIGN_ROOT:?set durable campaign output root}"
+: "${ANALYSIS_OUTPUT:?set the analysis destination path}"
+
+exec "$PYTHON_BIN" -m experiments.analyze_mixed_stress_v4 \
+  --root "$CAMPAIGN_ROOT" --output "$ANALYSIS_OUTPUT" \
+  --workers 100 --expected-arms 160

@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N cdot-v4-validate
+#PBS -q workq
+#PBS -l select=1:ncpus=125:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=12:00:00
+#PBS -j oe
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+: "${CAMPAIGN_ROOT:?}"; : "${BASE_MANIFEST:?}"; : "${FORECAST_BUNDLE:?}"
+
+INDEX="$CAMPAIGN_ROOT/validation/shard-index.json"
+read -r WORKLIST OUTPUT_ROOT < <("$PYTHON_BIN" -c "
+import json,sys
+s=json.load(open('$INDEX'))['shards'][$PBS_ARRAY_INDEX]
+print(s['worklist'], s['output_root'])")
+echo "[shard $PBS_ARRAY_INDEX] $WORKLIST -> $OUTPUT_ROOT"
+
+# Every shard of a candidate shares one pairs/ directory; filenames are
+# family+seed so shards never collide.
+exec "$PYTHON_BIN" scripts/run_mixed_stress_node_v4.py \
+  --worklist "$WORKLIST" --manifest "$BASE_MANIFEST" \
+  --forecast-bundle "$FORECAST_BUNDLE" --workers 125 \
+  --output-root "$OUTPUT_ROOT" --static-cache "$CAMPAIGN_ROOT/static-references"

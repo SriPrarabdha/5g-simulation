@@ -12,6 +12,15 @@ if TYPE_CHECKING:
     from simulator.macro.config import GroupProfile, ScenarioConfig
 
 
+# The engine scores overload as relative excess, ``load / safe_capacity - 1``
+# (simulator/macro/engine.py).  A UPF driven to a small capacity fraction is
+# therefore weighted by the reciprocal of that fraction.  Projections here use
+# the same units so the guard optimises what the campaign measures.  Zero
+# capacity is floored at this fraction of nominal so the comparison stays
+# finite and monotone in load instead of collapsing to ``inf == inf``.
+MINIMUM_CAPACITY_FRACTION = 1e-3
+
+
 @dataclass(frozen=True, slots=True)
 class ExposureGuardConfig:
     enabled: bool = True
@@ -152,7 +161,11 @@ def _project(groups, states, residual, demand, allocation, factors) -> tuple[flo
     metrics = [0.0, 0.0, 0.0]
     for state in states:
         factor = factors.get(state.upf_id, 1.0)
-        capacities = (state.safe_capacity_mbps.ul * factor, state.safe_capacity_mbps.dl * factor, state.safe_session_capacity * factor)
+        nominal = (state.safe_capacity_mbps.ul, state.safe_capacity_mbps.dl, float(state.safe_session_capacity))
         for index in range(3):
-            metrics[index] += max(0.0, loads[state.upf_id][index] - capacities[index])
+            floor = nominal[index] * MINIMUM_CAPACITY_FRACTION
+            capacity = max(nominal[index] * factor, floor)
+            if capacity <= 0:
+                continue
+            metrics[index] += max(0.0, loads[state.upf_id][index] / capacity - 1.0)
     return tuple(metrics)

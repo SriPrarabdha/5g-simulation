@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -N cdot-v4-valstatic
+#PBS -q workq
+#PBS -J 0-9
+#PBS -l select=1:ncpus=125:mem=120gb
+#PBS -l place=excl
+#PBS -l walltime=04:00:00
+#PBS -j oe
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+source pbs/env.sh
+: "${CAMPAIGN_ROOT:?}"; : "${BASE_MANIFEST:?}"
+: "${VAL_PER_FAMILY:=250}"; : "${VAL_CADENCES:=10}"
+exec "$PYTHON_BIN" scripts/precompute_static_references_v4.py \
+  --manifest "$BASE_MANIFEST" --static-cache "$CAMPAIGN_ROOT/static-references" \
+  --stage validation --per-family "$VAL_PER_FAMILY" --cadences "$VAL_CADENCES" \
+  --workers 125 --shard-index "$PBS_ARRAY_INDEX" --shard-count 10

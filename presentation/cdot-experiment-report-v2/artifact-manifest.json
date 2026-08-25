@@ -1,0 +1,72 @@
+{
+  "artifacts": [
+    {
+      "bytes": 4001,
+      "path": "PRESENTATION_GUIDE.md",
+      "sha256": "ab0a7e5d5454bd7ae12a3b905b2fcb760f574691e3ee2dae618031d90273ffc2"
+    },
+    {
+      "bytes": 878,
+      "path": "README.md",
+      "sha256": "c2a970228354966517086c14d77672a3d896a9c9327a93f9f73d5d890cba4105"
+    },
+    {
+      "bytes": 30264,
+      "path": "REPORT.md",
+      "sha256": "4e091da9ff79e841769161c35c65add68e2fb391d49b769b64a6247ead74d283"
+    },
+    {
+      "bytes": 45362,
+      "path": "data/mixed-stress-summary.json",
+      "sha256": "10fa6519ecbc1eaeddc16e96cd6f7ea9d5b64287aaa43f397566f9d6463973ef"
+    },
+    {
+      "bytes": 8493,
+      "path": "figures/01_campaign_verdict.svg",
+      "sha256": "c1246490d7f2d250d005ceba6e625a907fb07b51311443b7d557591138e1243c"
+    },
+    {
+      "bytes": 24924,
+      "path": "figures/02_gain_vs_tail_risk.svg",
+      "sha256": "697dfdf6eeb587eb77563d7f0862350c8d9b135112d32609e087016cf4c62db2"
+    },
+    {
+      "bytes": 13089,
+      "path": "figures/03_family_heatmap.svg",
+      "sha256": "500f67872157725c092501ca74b2e2a054a22ff3837f3ebc87d55bb48475e24c"
+    },
+    {
+      "bytes": 6120,
+      "path": "figures/04_cadence_comparison.svg",
+      "sha256": "4628c0fd4d8fc9a9f287e2bbce591b0fd27b3230074c1038eadf487f4e6e44fa"
+    },
+    {
+      "bytes": 6492,
+      "path": "figures/05_guard_action_funnel.svg",
+      "sha256": "2d1924cf68b8570cb803c64865856927ef330e378aaa8856c7cc882952bde035"
+    },
+    {
+      "bytes": 8640,
+      "path": "figures/06_experiment_journey.svg",
+      "sha256": "84a6bba0c866de864498edf43ac5ccedbca85ede7af9a68b390199cd26d775eb"
+    },
+    {
+      "bytes": 1866,
+      "path": "index.html",
+      "sha256": "6f94ba969bd7c32e58520fcaae0e46995f924fdd23b3a416e7484f7a57f30f9a"
+    }
+  ],
+  "schema_version": "cdot-experiment-report-manifest/1.0",
+  "sources": [
+    {
+      "bytes": 24328,
+      "path": "presentation/build_cdot_experiment_report.py",
+      "sha256": "41e06ea0fcc36d7d3cbdce7a142ca53dffa4c68fb35b59566c76ef9067a5964b"
+    },
+    {
+      "bytes": 638194,
+      "path": "output/mixed-stress-discovery-v3-analysis-v2.json",
+      "sha256": "b3a7ad7486d55076eba5d58f527ea19e7371645cb8f185ba5ac435b80b5f4dde"
+    }
+  ]
+}
