@@ -275,7 +275,9 @@ Open the printed URL and sign in with the printed credentials. Local-only mode
 defaults to `presenter` / `demo`. Override them with `CDOT_DEMO_USER`,
 `CDOT_DEMO_PASSWORD`, and `CDOT_DEMO_SECRET`. Run
 `./scripts/preflight.py` separately to verify the pinned registry, frontend
-bundle, service imports, and scenario before presentation.
+bundle, service imports, and scenario before presentation. This demo preflight
+does not require workshop materials; use `./scripts/preflight.py --scope workshop`
+when validating the participant notebook and workshop fallbacks.
 
 The traffic assumptions and citations are documented in
 [`docs/traffic-model-spec.md`](docs/traffic-model-spec.md); the exact frozen

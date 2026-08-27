@@ -178,7 +178,7 @@ if [[ "${CDOT_DEMO_SKIP_FRONTEND_BUILD:-0}" != "1" ]]; then
   npm --prefix frontend run build
 fi
 
-"$PYTHON_BIN" scripts/preflight.py
+"$PYTHON_BIN" scripts/preflight.py --scope demo
 
 if [[ "$TUNNEL_ENABLED" != "1" ]]; then
   echo "Cloudflare tunnel: disabled"

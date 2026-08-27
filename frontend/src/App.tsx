@@ -143,6 +143,13 @@ function DashboardApp() {
     await action(snapshot.payload.runner.state === 'running' ? 'pause' : 'resume')
   }
 
+  async function requestTwinFrames(): Promise<boolean> {
+    if (!snapshot) return false
+    if (snapshot.payload.runner.state === 'running') return true
+    const command = snapshot.payload.runner.state === 'paused' ? 'resume' : 'start'
+    return action(command)
+  }
+
   async function restartStory() {
     if (!token || !snapshot || busy) return
     setBusy(true)
@@ -175,16 +182,18 @@ function DashboardApp() {
     if (previous) await rewindTo(previous.id)
   }
 
-  async function action(name: string) {
-    if (!token || !snapshot || busy) return
+  async function action(name: string): Promise<boolean> {
+    if (!token || !snapshot || busy) return false
     setBusy(true)
     try {
       const next = await runAction(token, snapshot.run_id, name)
       setSnapshot(next)
       if (name === 'reset') { setOverview(true); setDestination('Live Dashboard') }
       setNotice({ tone: 'success', message: name === 'reset' ? 'Run returned to the deterministic baseline.' : `Runner ${name} command accepted.` })
+      return true
     } catch (error) {
       setNotice({ tone: 'warning', message: error instanceof Error ? error.message : 'Runner command failed.' })
+      return false
     } finally { setBusy(false) }
   }
 
@@ -236,7 +245,7 @@ function DashboardApp() {
     <AppHeader snapshot={snapshot} connection={connection} expert={expert} live={destination === 'Live C-DOT'} onExpert={() => setExpert(value => !value)} onHome={() => { history.pushState({}, '', '/'); setOverview(true) }} onSignOut={signOut} />
     <nav className="primary-nav" aria-label="Primary navigation">{(['Live Dashboard', '3D Twin', 'Evidence', 'Technical Detail', 'Live C-DOT'] as Destination[]).map((item, index) => <button key={item} className={destination === item ? 'active' : ''} aria-current={destination === item ? 'page' : undefined} onClick={() => chooseDestination(item)}><span>0{index + 1}</span>{item}</button>)}</nav>
     {destination === 'Live Dashboard' && <LiveStory payload={payload} busy={busy} onToggle={togglePlayback} onRestart={restartStory} onRewind={rewindTo} onBack={rewindBack} />}
-    {destination === '3D Twin' && <DigitalTwinWorld replay={snapshotToTwinReplay(payload)} mode="presenter" />}
+    {destination === '3D Twin' && <DigitalTwinWorld replay={snapshotToTwinReplay(payload)} mode="presenter" onRequestFrames={requestTwinFrames} />}
     {destination === 'Evidence' && <Evidence payload={payload} />}
     {destination === 'Technical Detail' && <TechnicalDetail payload={payload} expertControls={expert ? <ExpertControls payload={payload} busy={busy} action={action} control={control} /> : undefined} />}
     {destination === 'Live C-DOT' && <LiveCdot token={token} role={sessionStorage.getItem('cdot-role') || 'presenter'} />}

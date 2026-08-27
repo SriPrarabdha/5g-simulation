@@ -36,7 +36,7 @@ fi
 if [[ "${CDOT_WORKSHOP_SKIP_FRONTEND_BUILD:-0}" != "1" ]]; then
   npm --prefix frontend run build
 fi
-"$PYTHON_BIN" scripts/preflight.py
+"$PYTHON_BIN" scripts/preflight.py --scope workshop
 
 CDOT_DEMO_USER="${CDOT_DEMO_USER:-presenter}"
 CDOT_DEMO_PASSWORD="${CDOT_DEMO_PASSWORD:-$($PYTHON_BIN -c 'import secrets; print(secrets.token_urlsafe(12))')}"

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import os
@@ -13,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 
-def main() -> int:
+def main(scope: str = "demo") -> int:
     checks: list[tuple[str, bool, str]] = []
     registry_path = ROOT / "configs" / "traffic_model_registry.json"
     try:
@@ -64,37 +65,38 @@ def main() -> int:
         digest = hashlib.sha256(bundle.read_bytes()).hexdigest()[:12]
         checks.append(("bundle checksum", True, digest))
 
-    notebook_path = ROOT / "workshop" / "CDOT_UPF_Closed_Loop_Lab.ipynb"
-    try:
-        notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
-        todo_count = sum(
-            "todo" in cell.get("metadata", {}).get("tags", [])
-            for cell in notebook.get("cells", [])
-        )
-        stages = notebook.get("metadata", {}).get("workshop", {}).get("visible_stages", [])
-        expected_stages = [
-            "Preflight", "Optimize", "Parallel solver", "Simulate", "Analyze", "Experience",
-        ]
+    if scope == "workshop":
+        notebook_path = ROOT / "workshop" / "CDOT_UPF_Closed_Loop_Lab.ipynb"
+        try:
+            notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
+            todo_count = sum(
+                "todo" in cell.get("metadata", {}).get("tags", [])
+                for cell in notebook.get("cells", [])
+            )
+            stages = notebook.get("metadata", {}).get("workshop", {}).get("visible_stages", [])
+            expected_stages = [
+                "Preflight", "Optimize", "Parallel solver", "Simulate", "Analyze", "Experience",
+            ]
+            checks.append((
+                "workshop notebook",
+                notebook.get("nbformat") == 4 and todo_count == 6 and stages == expected_stages,
+                f"{todo_count} TODOs / {len(stages)} stages",
+            ))
+        except (OSError, json.JSONDecodeError) as error:
+            checks.append(("workshop notebook", False, str(error)))
+
+        frozen_html = ROOT / "workshop" / "fallback" / "CDOT_UPF_Closed_Loop_Lab_Frozen.html"
+        checks.append(("workshop fallback", frozen_html.is_file(), str(frozen_html.relative_to(ROOT))))
+
+        fallback_video = ROOT / "workshop" / "fallback" / "CDOT_UPF_Closed_Loop_Dashboard_Reveal.webm"
         checks.append((
-            "workshop notebook",
-            notebook.get("nbformat") == 4 and todo_count == 6 and stages == expected_stages,
-            f"{todo_count} TODOs / {len(stages)} stages",
+            "fallback recording",
+            fallback_video.is_file() and fallback_video.stat().st_size > 100_000,
+            f"{fallback_video.relative_to(ROOT)} / {fallback_video.stat().st_size if fallback_video.is_file() else 0} bytes",
         ))
-    except (OSError, json.JSONDecodeError) as error:
-        checks.append(("workshop notebook", False, str(error)))
 
-    frozen_html = ROOT / "workshop" / "fallback" / "CDOT_UPF_Closed_Loop_Lab_Frozen.html"
-    checks.append(("workshop fallback", frozen_html.is_file(), str(frozen_html.relative_to(ROOT))))
-
-    fallback_video = ROOT / "workshop" / "fallback" / "CDOT_UPF_Closed_Loop_Dashboard_Reveal.webm"
-    checks.append((
-        "fallback recording",
-        fallback_video.is_file() and fallback_video.stat().st_size > 100_000,
-        f"{fallback_video.relative_to(ROOT)} / {fallback_video.stat().st_size if fallback_video.is_file() else 0} bytes",
-    ))
-
-    canvas = ROOT / "workshop" / "decision_canvas.html"
-    checks.append(("decision canvas", canvas.is_file(), str(canvas.relative_to(ROOT))))
+        canvas = ROOT / "workshop" / "decision_canvas.html"
+        checks.append(("decision canvas", canvas.is_file(), str(canvas.relative_to(ROOT))))
 
     for name, passed, detail in checks:
         print(f"{'PASS' if passed else 'FAIL':4}  {name:20} {detail}")
@@ -110,4 +112,11 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    parser = argparse.ArgumentParser(description="Validate assets required by a C-DOT launcher")
+    parser.add_argument(
+        "--scope",
+        choices=("demo", "workshop"),
+        default="demo",
+        help="validate demo runtime assets only (default), or include workshop materials",
+    )
+    raise SystemExit(main(parser.parse_args().scope))

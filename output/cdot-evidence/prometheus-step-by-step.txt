@@ -1,0 +1,214 @@
+======================================================================
+  Why our optimiser is receiving no UPF data
+  A five-step check you can repeat yourself
+======================================================================
+
+Every command below is run against 192.168.218.8:29090 -- the address
+you gave us, and nothing else. Each step asks Prometheus one plain
+question. We show its exact answer.
+
+Checked on 27 Aug 2026, 17:41:18 UTC / 23:11:18 IST
+
+
+======================================================================
+STEP 1 -- "Prometheus, are you alive?"
+======================================================================
+
+  curl http://192.168.218.8:29090/-/healthy
+
+  ANSWER:
+    Prometheus Server is Healthy.
+
+  ==> Yes. Prometheus is running and we can reach it.
+      So this is NOT a network issue, NOT a firewall issue, and NOT a
+      wrong-port issue. Please rule those out; they are not the problem.
+
+
+======================================================================
+STEP 2 -- "Prometheus, give us the UPF traffic data."
+======================================================================
+
+  curl --get http://192.168.218.8:29090/api/v1/query \
+       --data-urlencode 'query=upf_n3_uplink_packets_session_class_total_byte'
+
+  ANSWER:
+    {"status":"success","data":{"resultType":"vector","result":[]}}
+
+  ==> Look at the very end:   "result":[]
+
+      Those empty square brackets mean ZERO readings.
+      Notice it still says "success" -- Prometheus understood the
+      question perfectly. It just has nothing to hand back.
+
+      The other two metrics answer the same way:
+        upf_n3_uplink_packets_session_class_total_byte
+            -> 0 readings
+        upf_n3_downlink_packets_session_class_total_byte
+            -> 0 readings
+        pfcp_sessions_total
+            -> 0 readings
+
+
+======================================================================
+STEP 3 -- "Did you EVER have this data?"
+======================================================================
+
+  Step 2 only looks at the last few minutes. Now we search backwards
+  through 14 days of stored history.
+
+  curl --get http://192.168.218.8:29090/api/v1/query_range \
+       --data-urlencode 'query=upf_n3_uplink_packets_session_class_total_byte' \
+       --data-urlencode 'start=<14 days ago>' \
+       --data-urlencode 'end=<now>' \
+       --data-urlencode 'step=3600'
+
+  ANSWER:
+    upf_n3_uplink_packets_session_class_total_byte
+        stored series      : 32
+        newest reading was : 04:08:18 UTC (27 Aug, 09:38:18 IST)
+        i.e.               : 13.6 hours ago
+    upf_n3_downlink_packets_session_class_total_byte
+        stored series      : 32
+        newest reading was : 04:08:18 UTC (27 Aug, 09:38:18 IST)
+        i.e.               : 13.6 hours ago
+    pfcp_sessions_total
+        stored series      : 8
+        newest reading was : 04:08:18 UTC (27 Aug, 09:38:18 IST)
+        i.e.               : 13.6 hours ago
+
+  ==> Yes -- the data IS there. 32 stored series for uplink, 32 for
+      downlink. That proves two things straight away:
+        * the metric names we use are correct
+        * your UPF exporters were publishing correctly
+
+      But the newest reading is from 09:38:18 IST this morning.
+      Nothing has arrived since. The data is frozen at that moment.
+
+      All three metrics stop at the SAME SECOND. That matters: if one
+      UPF had crashed, only that UPF's numbers would stop. Everything
+      stopping together, to the second, is the signature of a
+      configuration change -- not a hardware or exporter failure.
+
+
+======================================================================
+STEP 4 -- "Prometheus, what are you collecting FROM?"
+======================================================================
+
+  This is the important one.
+
+  Prometheus does not sit and wait for data to be sent to it. It goes
+  out every few seconds and fetches data from a list of machines it
+  keeps in its configuration. This command asks to see that list.
+
+  curl 'http://192.168.218.8:29090/api/v1/targets?state=active'
+
+  ANSWER (simplified):
+    machines on the list : 1
+      -> job 'prometheus'  at  http://localhost:9090/metrics   [up]
+    filtered-out entries : 0
+
+  ==> HERE IS THE PROBLEM.
+
+      The list contains 1 entry, and that entry is Prometheus
+      itself. ("localhost:9090" is Prometheus's own internal address --
+      it is collecting its own health statistics, nothing more.)
+
+      There are NO UPF machines on this list. Prometheus is not asking
+      any UPF for data, so naturally it has none to give us. That is
+      the entire explanation for the empty result in Step 2.
+
+      One more detail: filtered-out entries = 0. This rules out the
+      gentler explanation. If the UPF jobs were still written in
+      prometheus.yml but being excluded by a relabel rule, they would
+      appear here as filtered out. They do not appear at all -- so they
+      are simply no longer in the configuration file.
+
+
+======================================================================
+STEP 5 -- "When did this happen?"
+======================================================================
+
+  Prometheus keeps a record of its own restarts and config reloads.
+
+  curl --get http://192.168.218.8:29090/api/v1/query \
+       --data-urlencode 'query=process_start_time_seconds'
+  curl --get http://192.168.218.8:29090/api/v1/query \
+       --data-urlencode 'query=prometheus_config_last_reload_success_timestamp_seconds'
+  curl --get http://192.168.218.8:29090/api/v1/query \
+       --data-urlencode 'query=prometheus_config_last_reload_successful'
+
+  ANSWER:
+    Prometheus last restarted : 04:17:39 UTC (27 Aug, 09:47:39 IST)
+    Config file last loaded   : 04:20:36 UTC (27 Aug, 09:50:36 IST)
+    Did that load succeed?    : 1    (1 = yes, no errors)
+
+  ==> Now put the three times side by side:
+
+        09:38 IST   last UPF reading arrives
+        09:47 IST   Prometheus restarts
+        09:50 IST   Prometheus loads its config file -- successfully --
+                    and that file lists only one job: itself
+        since then  no UPF data at all
+
+      Note the reload SUCCEEDED. There is no error message to hunt for
+      in the logs. Prometheus did exactly what it was told; the file it
+      was told to read no longer mentions the UPF exporters.
+
+
+======================================================================
+STEP 4b -- "Which scrape job exactly is missing?"
+======================================================================
+
+  Prometheus still remembers the labels attached to yesterday's data.
+  Those labels record exactly which job and which machine the readings
+  came from -- which tells you precisely what to put back.
+
+  curl --get http://192.168.218.8:29090/api/v1/series \
+       --data-urlencode 'match[]=upf_n3_uplink_packets_session_class_total_byte' \
+       --data-urlencode 'start=<24 h ago>' --data-urlencode 'end=<now>'
+
+  ANSWER:
+    32 series remembered from the last 24 hours, for example:
+      {"__name__": "upf_n3_uplink_packets_session_class_total_byte", "dnn": "1", "dscp": "0", "env": "production", "instance": "192.168.147.80:9101", "job": "upf_exporter", "loc": "1", "upf": "upf-1"}
+      {"__name__": "upf_n3_uplink_packets_session_class_total_byte", "dnn": "1", "dscp": "0", "env": "production", "instance": "192.168.147.80:9101", "job": "upf_exporter", "loc": "1", "upf": "upf-2"}
+      {"__name__": "upf_n3_uplink_packets_session_class_total_byte", "dnn": "1", "dscp": "0", "env": "production", "instance": "192.168.147.80:9101", "job": "upf_exporter", "loc": "1", "upf": "upf-3"}
+      {"__name__": "upf_n3_uplink_packets_session_class_total_byte", "dnn": "1", "dscp": "0", "env": "production", "instance": "192.168.147.80:9101", "job": "upf_exporter", "loc": "1", "upf": "upf-4"}
+
+  ==> The missing scrape job is named, in your own configuration:
+
+        job      : upf_exporter
+        instance : 192.168.147.80:9101
+        covering : upf-1, upf-2, upf-3, upf-4
+
+      So all four UPFs were being scraped from a single exporter at
+      192.168.147.80:9101, under the job name 'upf_exporter'.
+      That is the entry that has disappeared from prometheus.yml.
+
+      We cannot reach that exporter ourselves to test it -- it sits on
+      your internal 192.168.147.x network and we are on 192.168.218.x.
+      Only Prometheus can reach it, which is why we need the scrape
+      job restored rather than being able to poll it directly.
+
+
+======================================================================
+THE WHOLE THING IN ONE PARAGRAPH
+======================================================================
+
+  Prometheus on 29090 is healthy and answering us normally. It still
+  holds all the older UPF data, which proves the metric names and the
+  exporters are fine. But when it restarted at 09:47 IST this morning
+  it came back with a configuration listing only itself as a source, so
+  it has collected nothing from any UPF since 09:38 IST.
+
+  WHAT WE ARE ASKING FOR
+    Please check prometheus.yml on the Prometheus host (Prometheus
+    reports its own hostname as 'dina') and restore the UPF exporter
+    scrape jobs, then reload. Step 4b above names the exact job and
+    exporter address to restore.
+
+  HOW WE WILL BOTH KNOW IT IS FIXED
+    Re-run STEP 4 -- the list should show the UPF machines instead of
+    only one entry. Then re-run STEP 2 -- it should return numbers
+    instead of []. Our system picks the data up automatically within
+    30 seconds of that. Nothing needs to change on our side.
+

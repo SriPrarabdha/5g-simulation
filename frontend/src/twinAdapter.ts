@@ -6,6 +6,15 @@ const circle = (index: number, count: number, radius: number) => ({
   z: Math.sin(2 * Math.PI * index / Math.max(1, count)) * radius,
 })
 
+function eventLabel(event: SnapshotPayload['scenario']['events'][number]) {
+  const target = event.group_id?.split('|').slice(0, 2).join(' · ') ?? event.upf_id?.toUpperCase() ?? event.zone ?? 'network'
+  if (event.event_type === 'arrival_factor') return `${target} demand ×${event.arrival_factor ?? 1}`
+  if (event.event_type === 'capacity_factor') return `${target} uplink capacity ${Math.round((event.ul_factor ?? 1) * 100)}%`
+  if (event.event_type === 'health') return `${target} ${event.health ?? 'health changed'}`
+  if (event.event_type === 'path_latency') return `${target} path latency ${event.latency_ms ?? 0} ms`
+  return `${event.event_type} · ${target}`
+}
+
 /** Client-side adapter: the authoritative REST/WebSocket payload remains unchanged. */
 export function snapshotToTwinReplay(payload: SnapshotPayload): TwinReplay {
   const zones = [...new Set(payload.topology.groups.map(group => group.zone))].sort()
@@ -32,8 +41,15 @@ export function snapshotToTwinReplay(payload: SnapshotPayload): TwinReplay {
         source: `gnb:${groupId.split('|')[0]}`, target: upf, demand_mbps: demand,
         routing_weight: total ? demand / total : 0, future_sessions_only: true }))
     })
+    const classes = payload.topology.groups.map(group => {
+      const admitted = Object.values(row.new_session_routing_mbps?.[group.id] ?? {}).reduce((sum, value) => sum + value, 0)
+      return { group_id: group.id, arrivals: row.class_arrivals?.[group.id] ?? 0,
+        rejected: row.class_rejections?.[group.id] ?? 0,
+        demand_mbps: row.class_arrival_mbps?.[group.id] ?? admitted, admitted_mbps: admitted }
+    })
     return { index, start: row.time, end: row.time, source_steps: [row.step, row.step] as [number, number],
       policy_id: payload.policy?.recommendation_id ?? 'static-baseline',
+      classes,
       upfs: row.upfs.map(upf => ({ upf_id: upf.id, health: upf.health, utilization: upf.utilization.operating,
         safe_envelope_violation: upf.utilization.operating > 1, queue_mbits: upf.queue_mbytes * 8,
         active_sessions: upf.sessions, offered_mbps: upf.traffic.offered, carried_mbps: upf.traffic.carried,
@@ -47,9 +63,11 @@ export function snapshotToTwinReplay(payload: SnapshotPayload): TwinReplay {
   return { schema_version: 'twin-replay/1.0', metadata: { title: 'Live guided synthetic digital twin', synthetic: true,
     spatial_layout: 'synthetic', scenario_id: payload.runner.scenario_id, seed: payload.runner.seed,
     generated_at: new Date().toISOString(), source: 'dashboard-snapshot-adapter', source_frame_count: frames.length,
-    frame_count: frames.length, control_scope: 'new_session_placement_only', established_session_migration: false },
+    frame_count: frames.length, total_steps: payload.runner.steps, step_seconds: payload.runner.step_seconds,
+    decision_interval_steps: payload.runner.decision_interval_steps,
+    control_scope: 'new_session_placement_only', established_session_migration: false },
     topology: { nodes, links }, groups: payload.topology.groups.map(group => ({ id: group.id, zone: group.zone,
-      dnn: group.dnn, snssai: group.snssai, eligible_upfs: group.eligible_upfs })), frames,
+      dnn: group.dnn, snssai: group.snssai, five_qi: group.five_qi, eligible_upfs: group.eligible_upfs })), frames,
     events: payload.scenario.events.map((event, index) => ({ id: `event-${index + 1}`, step: event.step,
-      kind: event.event_type, label: `${event.event_type} · ${event.upf_id ?? event.group_id ?? ''}`, details: event as unknown as Record<string, unknown> })) }
+      kind: event.event_type, label: eventLabel(event), details: event as unknown as Record<string, unknown> })) }
 }
