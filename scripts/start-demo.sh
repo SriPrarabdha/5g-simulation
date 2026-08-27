@@ -16,6 +16,10 @@ Options:
 Environment:
   CDOT_DEMO_CLOUDFLARE  yes/no equivalent of --cloudflare.
   CDOT_DEMO_TUNNEL      Legacy 1/0 equivalent (still supported).
+  CDOT_DEMO_PYTHON      Python executable to run the API with.
+  CDOT_DEMO_HOST        Bind address (default 127.0.0.1).
+  CDOT_DEMO_PORT        Preferred port (default 8000).
+  CDOT_LIVE_SOURCE      replay | prometheus for the C-DOT console.
 
 Command-line options take precedence over environment variables.
 EOF
@@ -123,6 +127,7 @@ fi
 
 if [[ "$DEMO_PORT" != "$PREFERRED_PORT" ]]; then
   echo "Port $PREFERRED_PORT is busy; using $DEMO_PORT for the C-DOT demo."
+  echo "If you are forwarding a port over SSH, forward $DEMO_PORT, not $PREFERRED_PORT."
 fi
 
 if [[ "$TUNNEL_ENABLED" == "1" ]]; then
@@ -161,6 +166,8 @@ fi
 if [[ "$TUNNEL_ENABLED" != "1" ]]; then
   echo "Cloudflare tunnel: disabled"
   echo "Local URL: http://$DEMO_HOST:$DEMO_PORT"
+  echo "C-DOT console: http://$DEMO_HOST:$DEMO_PORT/live-cdot"
+  echo "Telemetry source: ${CDOT_LIVE_SOURCE:-replay}"
   echo "Presenter username: $CDOT_DEMO_USER"
   echo "Presenter password: $CDOT_DEMO_PASSWORD"
   exec "$PYTHON_BIN" -m uvicorn demo_api.main:app --host "$DEMO_HOST" --port "$DEMO_PORT"
@@ -197,120 +204,60 @@ for _ in {1..80}; do
     exit 1
   fi
   if "$PYTHON_BIN" - "$TUNNEL_ORIGIN_HOST" "$DEMO_PORT" <<'PY'
-import json
+import socket
 import sys
-import urllib.error
-import urllib.request
 
+host, port = sys.argv[1], int(sys.argv[2])
 try:
-    with urllib.request.urlopen(
-        f"http://{sys.argv[1]}:{sys.argv[2]}/api/v1/health", timeout=0.5
-    ) as response:
-        payload = json.load(response)
-except (OSError, urllib.error.URLError):
-    raise SystemExit(1)
-if payload.get("status") != "ok":
+    with socket.create_connection((host, port), timeout=1):
+        pass
+except OSError:
     raise SystemExit(1)
 PY
   then
     READY=1
     break
   fi
-  sleep 0.25
-done
-
-if [[ "$READY" != "1" ]]; then
-  echo "The C-DOT API did not become ready on port $DEMO_PORT" >&2
-  exit 1
-fi
-
-cloudflared tunnel --config /dev/null --pidfile "$TUNNEL_PIDFILE" \
-  --url "http://$TUNNEL_ORIGIN_HOST:$DEMO_PORT" --no-autoupdate >"$TUNNEL_LOG" 2>&1 &
-TUNNEL_PID=$!
-
-PUBLIC_URL=""
-for _ in {1..240}; do
-  if ! kill -0 "$TUNNEL_PID" 2>/dev/null; then
-    cat "$TUNNEL_LOG" >&2
-    wait "$TUNNEL_PID"
-    exit 1
-  fi
-  PUBLIC_URL="$(sed -nE 's|.*(https://[-a-z0-9]+\.trycloudflare\.com).*|\1|p' "$TUNNEL_LOG" | head -n 1)"
-  # cloudflared writes --pidfile only after its first successful edge
-  # connection. A Quick Tunnel URL may be printed before that connection.
-  if [[ -n "$PUBLIC_URL" && -s "$TUNNEL_PIDFILE" ]]; then
-    break
-  fi
-  sleep 0.25
-done
-
-if [[ -z "$PUBLIC_URL" ]]; then
-  echo "cloudflared started but did not publish a tunnel URL" >&2
-  cat "$TUNNEL_LOG" >&2
-  exit 1
-fi
-
-if [[ ! -s "$TUNNEL_PIDFILE" ]]; then
-  echo "Cloudflare allocated $PUBLIC_URL, but cloudflared could not establish an edge connection." >&2
-  echo "Check outbound DNS and TCP/UDP port 7844 from this host." >&2
-  cat "$TUNNEL_LOG" >&2
-  exit 1
-fi
-
-PUBLIC_READY=0
-for _ in {1..40}; do
-  if ! kill -0 "$TUNNEL_PID" 2>/dev/null; then
-    cat "$TUNNEL_LOG" >&2
-    wait "$TUNNEL_PID"
-    exit 1
-  fi
-  if "$PYTHON_BIN" - "$PUBLIC_URL" <<'PY'
-import json
-import sys
-import urllib.error
-import urllib.request
-
-try:
-    with urllib.request.urlopen(
-        f"{sys.argv[1]}/api/v1/health", timeout=2
-    ) as response:
-        payload = json.load(response)
-except (OSError, ValueError, urllib.error.URLError):
-    raise SystemExit(1)
-if payload.get("status") != "ok":
-    raise SystemExit(1)
-PY
-  then
-    PUBLIC_READY=1
-    break
-  fi
   sleep 0.5
 done
 
-if [[ "$PUBLIC_READY" != "1" ]]; then
-  echo "The connector registered, but the public health check failed for $PUBLIC_URL" >&2
+if [[ "$READY" != "1" ]]; then
+  echo "The demo API did not become reachable on $TUNNEL_ORIGIN_HOST:$DEMO_PORT" >&2
+  exit 1
+fi
+
+cloudflared tunnel --no-autoupdate --url "http://$TUNNEL_ORIGIN_HOST:$DEMO_PORT" \
+  >"$TUNNEL_LOG" 2>&1 &
+TUNNEL_PID=$!
+echo "$TUNNEL_PID" >"$TUNNEL_PIDFILE"
+
+PUBLIC_URL=""
+for _ in {1..60}; do
+  if ! kill -0 "$TUNNEL_PID" 2>/dev/null; then
+    echo "cloudflared exited before publishing a URL:" >&2
+    cat "$TUNNEL_LOG" >&2
+    exit 1
+  fi
+  PUBLIC_URL="$(grep -Eo 'https://[a-z0-9-]+\.trycloudflare\.com' "$TUNNEL_LOG" | head -n1 || true)"
+  if [[ -n "$PUBLIC_URL" ]]; then
+    break
+  fi
+  sleep 1
+done
+
+if [[ -z "$PUBLIC_URL" ]]; then
+  echo "cloudflared did not publish a Quick Tunnel URL in time:" >&2
   cat "$TUNNEL_LOG" >&2
   exit 1
 fi
 
-echo
-echo "C-DOT demo is ready"
-echo "Local URL:  http://$TUNNEL_ORIGIN_HOST:$DEMO_PORT"
+echo "Cloudflare tunnel: enabled"
 echo "Public URL: $PUBLIC_URL"
+echo "C-DOT console: $PUBLIC_URL/live-cdot"
+echo "Local URL: http://$DEMO_HOST:$DEMO_PORT"
+echo "Telemetry source: ${CDOT_LIVE_SOURCE:-replay}"
 echo "Presenter username: $CDOT_DEMO_USER"
 echo "Presenter password: $CDOT_DEMO_PASSWORD"
-echo "Press Ctrl+C to stop both the API and Cloudflare tunnel."
-echo
+echo "Press Ctrl+C to stop the demo and close the tunnel."
 
-set +e
-wait -n "$SERVER_PID" "$TUNNEL_PID"
-EXIT_STATUS=$?
-set -e
-
-if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-  echo "The C-DOT API stopped." >&2
-elif ! kill -0 "$TUNNEL_PID" 2>/dev/null; then
-  echo "The Cloudflare tunnel stopped." >&2
-  cat "$TUNNEL_LOG" >&2
-fi
-exit "$EXIT_STATUS"
+wait "$SERVER_PID"

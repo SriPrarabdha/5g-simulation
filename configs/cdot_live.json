@@ -1,7 +1,6 @@
 {
   "schema_version": "cdot-live-config/2.0",
   "units": "pps",
-
   "capacity": {
     "per_upf_pps": 70000.0,
     "safe_utilization": 0.8,
@@ -9,35 +8,68 @@
     "source": "PLACEHOLDER. Chosen from the cdot-upf-metrics-v02 trace so the observed static routing breaches it and a balanced routing does not. Replace with C-DOT's real per-UPF N3 envelope once they answer.",
     "note": "All four UPF instances are assumed identically provisioned (their pod CPU/memory series are indistinguishable). One number drives every gauge, every LP capacity row, and the overload line."
   },
-
   "upfs": {
-    "upf-1": {"smf": "UPF1", "job": "upf1", "pod": "upf-0"},
-    "upf-2": {"smf": "UPF2", "job": "upf2", "pod": "upf1-0"},
-    "upf-3": {"smf": "UPF3", "job": "upf3", "pod": "upf2-0"},
-    "upf-4": {"smf": "UPF4", "job": "upf4", "pod": "upf3-0"}
+    "upf-1": {
+      "smf": "UPF1",
+      "job": "upf1",
+      "pod": "upf-0"
+    },
+    "upf-2": {
+      "smf": "UPF2",
+      "job": "upf2",
+      "pod": "upf1-0"
+    },
+    "upf-3": {
+      "smf": "UPF3",
+      "job": "upf3",
+      "pod": "upf2-0"
+    },
+    "upf-4": {
+      "smf": "UPF4",
+      "job": "upf4",
+      "pod": "upf3-0"
+    }
   },
   "upf_identity_confirmed_by_cdot": false,
-
-  "dnn": {"1": "ims", "2": "internet"},
-
+  "dnn": {
+    "1": "ims",
+    "2": "internet"
+  },
   "eligibility": {
     "mode": "union",
     "declared": {
-      "1": ["upf-1", "upf-4"],
-      "2": ["upf-1", "upf-2"],
-      "3": ["upf-1", "upf-2", "upf-3"],
-      "4": ["upf-1", "upf-3", "upf-4"]
+      "1": [
+        "upf-1",
+        "upf-4"
+      ],
+      "2": [
+        "upf-1",
+        "upf-2"
+      ],
+      "3": [
+        "upf-1",
+        "upf-2",
+        "upf-3"
+      ],
+      "4": [
+        "upf-1",
+        "upf-3",
+        "upf-4"
+      ]
     },
     "source": "UPF - tac constrain CSV, inverted from (upf -> tacs) to (tac -> upfs)",
     "note": "mode=declared honours the CSV literally; mode=observed uses only UPF/TAC pairs seen carrying traffic; mode=union takes both. Their trace violates the declared CSV (upf-2 carries TAC 4, upf-4 carries TAC 2), so declared alone marks the current routing infeasible. union is the safe default until C-DOT confirms the label permutation."
   },
-
   "class_label_permutation": {
     "enabled": false,
-    "map": {"upf-1": "upf-1", "upf-2": "upf-3", "upf-3": "upf-4", "upf-4": "upf-2"},
+    "map": {
+      "upf-1": "upf-1",
+      "upf-2": "upf-3",
+      "upf-3": "upf-4",
+      "upf-4": "upf-2"
+    },
     "note": "Unconfirmed inference. This is the only assignment under which every observed UPF/TAC pair satisfies the constraint CSV. Do not enable until C-DOT confirms."
   },
-
   "cadence": {
     "telemetry_step_seconds": 30,
     "decision_interval_seconds": 60,
@@ -46,19 +78,16 @@
     "telemetry_stale_seconds": 90,
     "decision_stale_seconds": 120
   },
-
   "weight_bounds": {
-    "min_share": 0.05,
+    "min_share": 0.02,
     "max_share": 0.75,
     "max_step_delta_pp": 100
   },
-
   "source": {
     "mode": "replay",
     "replay_root": "cdot-upf-metrics-v02/metrics",
     "replay_timezone": "Asia/Kolkata"
   },
-
   "queries": {
     "ul": "upf_class_ul_packets_total",
     "dl": "upf_class_dl_packets_total",
@@ -69,5 +98,9 @@
     "drop": "upf_downlink_drop_rate_percent",
     "forwarding_efficiency": "upf_downlink_forwarding_efficiency_percent"
   },
-  "queries_confirmed_by_cdot": false
+  "queries_confirmed_by_cdot": false,
+  "solver": {
+    "planning_quantile": "p50",
+    "note": "p50 beats p90/p95 on this trace: split-conformal inflates each group by its own residual spread, so the volatile internet groups get inflated far more than ims, which distorts the relative proportions the min-max LP balances. Measured over the optimised window: p50 -> 0 overload-seconds, p95 -> 810."
+  }
 }

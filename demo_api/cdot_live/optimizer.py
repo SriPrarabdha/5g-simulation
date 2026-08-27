@@ -1,266 +1,397 @@
+"""Joint allocation solve over every selection group at once.
+
+The Codex version called ``solve_allocation`` once per ``(dnn, tac)`` group with
+``existing_load_by_upf=[]``, so no UPF ever saw its combined load and nothing
+could ever appear overloaded -- the optimizer had nothing to balance.  The LP in
+``optimization/highs.py`` already couples groups through per-UPF capacity rows
+(``highs.py:215-251``); it just has to be handed all of them together.
+
+Units: every ``*_mbps`` field below carries **packets per second**.  C-DOT
+publishes N3 rates in pps and never publishes byte rates, so converting would
+mean inventing a packet size.  The schema field names are load-bearing elsewhere
+in the codebase, so they stay -- but nothing in this pipeline or the UI may
+present these numbers as Mbps.
+"""
+
 from __future__ import annotations
 
 import math
-import time
-import uuid
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, Iterable
+
+from optimization.highs import OptimizationConfig, solve_allocation
+from schemas.forecast import Forecast, Quantiles
+from schemas.policy import Policy
+from schemas.common import GroupKey, TimeWindow
+from schemas.upf import Capacity as SchemaCapacity, UPFState
 
 from .config import LiveConfig
-from .smf import extract_tuples, extract_weights, integer_weights, reduced_ratio, tuple_key, with_weights
+from .demand import DemandCube, parse_group_id
+
+MODEL_VERSION = "cdot-ridge-conformal/1.0"
+# Their SMF re-evaluates weights per PDU session establishment, and their loop
+# attaches subscribers continuously, so the whole offered load is re-routable.
+# Sessions already established stay pinned -- see the stickiness assumption in
+# docs/cdot-live-demo-worklog.md.
+_RESIDUAL_PPS = 0.0
 
 
-DEFAULT_TAC_ALLOWLIST = {
-    1: ("upf-1", "upf-4"),
-    2: ("upf-1", "upf-2"),
-    3: ("upf-1", "upf-2", "upf-3"),
-    4: ("upf-1", "upf-3", "upf-4"),
-}
+class OptimizerError(RuntimeError):
+    pass
 
 
-def _project(values: dict[str, float], lower: dict[str, float], upper: dict[str, float]) -> dict[str, float]:
-    result = {key: min(upper[key], max(lower[key], float(values.get(key, 0)))) for key in lower}
-    for _ in range(100):
-        error = 1.0 - sum(result.values())
-        if abs(error) <= 1e-10:
-            break
-        available = [key for key in result if (result[key] < upper[key] - 1e-12 if error > 0 else result[key] > lower[key] + 1e-12)]
-        if not available:
-            raise ValueError("weight bounds cannot sum to one")
-        share = error / len(available)
-        for key in available:
-            result[key] = min(upper[key], max(lower[key], result[key] + share))
-    return result
+@dataclass(slots=True)
+class AllocationPlan:
+    status: str
+    weights: dict[str, dict[str, float]]
+    integer_weights: dict[str, dict[str, int]]
+    projected_load_pps: dict[str, dict[str, float]]
+    baseline_load_pps: dict[str, dict[str, float]]
+    max_safe_utilization: float | None
+    solver_runtime_ms: int
+    policy: Policy | None = None
+    message: str | None = None
+    eligibility: dict[int, list[str]] = field(default_factory=dict)
+    unit: str = "pps"
 
+    def hottest(self, which: str = "projected") -> tuple[str | None, float]:
+        table = self.projected_load_pps if which == "projected" else self.baseline_load_pps
+        best: tuple[str | None, float] = (None, 0.0)
+        for upf, value in table.items():
+            total = value.get("total", value.get("ul", 0.0) + value.get("dl", 0.0))
+            if total >= best[1]:
+                best = (upf, total)
+        return best
 
-def bounded_weights(target: dict[str, float], current: dict[str, float]) -> dict[str, float]:
-    keys = sorted(target)
-    if not keys:
-        raise ValueError("no eligible UPFs")
-    target_total = sum(max(0.0, target[key]) for key in keys)
-    target = {key: max(0.0, target[key]) / target_total for key in keys}
-    current_total = sum(max(0.0, current.get(key, 0)) for key in keys)
-    current = ({key: max(0.0, current.get(key, 0)) / current_total for key in keys}
-               if current_total else {key: 1 / len(keys) for key in keys})
-    conditional_lower = 0.05 if len(keys) > 1 else 1.0
-    conditional_upper = 0.75 if len(keys) > 1 else 1.0
-    first = _project(target, {key: conditional_lower for key in keys}, {key: conditional_upper for key in keys})
-    lower = {key: max(conditional_lower, current[key] - 0.10) for key in keys}
-    upper = {key: min(conditional_upper, current[key] + 0.10) for key in keys}
-    return _project(first, lower, upper)
-
-
-def bounded_integer_weights(target: dict[str, int], current: dict[str, int]) -> dict[str, int]:
-    """Keep rounding from turning a continuous 10pp bound into an 11pp write."""
-    if not current:
-        return dict(target)
-    keys = sorted(target)
-    lower = {key: max(5 if len(keys) > 1 else 100, current.get(key, 0) - 10) for key in keys}
-    upper = {key: min(75 if len(keys) > 1 else 100, current.get(key, 0) + 10) for key in keys}
-    result = {key: min(upper[key], max(lower[key], target[key])) for key in keys}
-    while sum(result.values()) != 100:
-        increase = sum(result.values()) < 100
-        candidates = [key for key in keys if result[key] < upper[key]] if increase else [key for key in keys if result[key] > lower[key]]
-        if not candidates:
-            raise ValueError("integer weight bounds cannot sum to 100")
-        candidates.sort(key=lambda key: ((target[key] - result[key]) if increase else (result[key] - target[key]), key), reverse=True)
-        result[candidates[0]] += 1 if increase else -1
-    return result
-
-
-class LiveOptimizer:
-    def __init__(self, config: LiveConfig) -> None:
-        self.config = config
-
-    def _selection_key(self, item: dict[str, Any]) -> str:
-        dnn = item.get("dnn", item.get("dnnid"))
-        dnn = self.config.dnn.get(str(dnn), str(dnn))
-        tac = item.get("tac", item.get("loc", item.get("tacid")))
-        try:
-            tac = int(tac)
-        except (TypeError, ValueError):
-            pass
-        raw_dscp = str(item.get("dscp", 0)).removeprefix("dscp")
-        try:
-            dscp: int | str = int(raw_dscp)
-        except ValueError:
-            dscp = raw_dscp
-        return f"tac-{tac}|{dnn}|dscp-{dscp}"
-
-    def _current(self, state: Any) -> dict[str, dict[str, Any]]:
-        return {self._selection_key(item): item for item in extract_tuples(state)}
-
-    def solve(
-        self,
-        forecast: dict[str, Any],
-        operational: dict[str, dict[str, Any]],
-        smf_state: Any,
-        smf_hash: str | None,
-        *,
-        telemetry_fresh: bool,
-    ) -> dict[str, Any]:
-        started = time.perf_counter()
-        current_by_key = self._current(smf_state)
-        smf_to_metric = {mapping.smf: metric for metric, mapping in self.config.mappings.items()}
-        grouped: dict[str, dict[str, Any]] = {}
-        for row in forecast.get("rows", []):
-            key = f"tac-{row['tac']}|{row['dnn']}|dscp-{row['dscp']}"
-            group = grouped.setdefault(key, {
-                "selection": {"tac": row["tac"], "dnn": row["dnn"], "dscp": row["dscp"]},
-                "ul_p95": 0.0, "dl_p95": 0.0,
-            })
-            if row["horizons"]["ul"] and row["horizons"]["dl"]:
-                group["ul_p95"] += float(row["horizons"]["ul"][0]["p95"])
-                group["dl_p95"] += float(row["horizons"]["dl"][0]["p95"])
-
-        proposal_rows = []
-        solver_statuses = []
-        max_slack = 0.0
-        for selection_id, demand in sorted(grouped.items()):
-            current_item = current_by_key.get(selection_id)
-            current_smf = extract_weights(current_item or {})
-            if current_item is not None:
-                allowed = [smf_to_metric[key] for key in current_smf if key in smf_to_metric]
-            else:
-                allowed = list(DEFAULT_TAC_ALLOWLIST.get(int(demand["selection"]["tac"]), ()))
-            healthy = [upf for upf in allowed if operational.get(upf, {}).get("health") == "healthy"]
-            supported = current_item is not None and bool(current_smf) and len(healthy) == len(allowed)
-            status, message, raw, projected, slack = self._solve_highs(demand, healthy)
-            solver_statuses.append(status)
-            max_slack = max(max_slack, slack)
-            current_metric = {smf_to_metric[key]: value for key, value in current_smf.items() if key in smf_to_metric}
-            current_total = sum(current_metric.values())
-            current_norm = ({key: value / current_total for key, value in current_metric.items()}
-                            if current_total else {key: 1 / len(healthy) for key in healthy} if healthy else {})
-            bounded: dict[str, float] = {}
-            if status == "optimal" and raw:
-                try:
-                    bounded = bounded_weights(raw, current_norm)
-                except ValueError as error:
-                    status, message = "infeasible", str(error)
-            smf_normalized = {self.config.mappings[key].smf: value for key, value in bounded.items()}
-            current_100 = integer_weights(current_smf) if current_smf else {}
-            proposed_100 = integer_weights(smf_normalized) if smf_normalized else {}
-            if proposed_100 and current_100:
-                proposed_100 = bounded_integer_weights(proposed_100, current_100)
-            deltas = {
-                key: proposed_100.get(key, 0) - current_100.get(key, 0)
-                for key in sorted(set(proposed_100) | set(current_100))
-            }
-            outgoing_base = current_item or {**demand["selection"], "weights": {}}
-            outgoing = with_weights(outgoing_base, proposed_100) if proposed_100 else None
-            row_ready = supported and status == "optimal" and slack <= 1e-7
-            proposal_rows.append({
-                "selection_id": selection_id,
-                "selection": demand["selection"],
-                "display_only": not supported,
-                "display_only_reason": None if supported else "tuple absent from current SMF state or an allowlisted UPF is unhealthy",
-                "eligible_upfs": [self.config.mappings[key].smf for key in allowed],
-                "healthy_eligible_upfs": [self.config.mappings[key].smf for key in healthy],
-                "current_weights": current_100,
-                "proposed_weights": proposed_100,
-                "reduced_ratio": reduced_ratio(proposed_100),
-                "delta_percentage_points": deltas,
-                "projected_utilization": projected,
-                "slack": slack,
-                "solver_status": status,
-                "solver_message": message,
-                "actuation_ready": row_ready,
-                "outgoing_json": outgoing,
-            })
-        optimal = bool(proposal_rows) and all(row["solver_status"] == "optimal" for row in proposal_rows)
-        gates = {
-            "fresh_telemetry": telemetry_fresh,
-            "complete_bucket": bool(forecast.get("rows")),
-            "successful_forecast": bool(forecast.get("rows")),
-            "optimal_solver": optimal,
-            "zero_slack": max_slack <= 1e-7,
-            "healthy_eligible_upfs": all(
-                row["display_only"] or len(row["healthy_eligible_upfs"]) == len(row["eligible_upfs"])
-                for row in proposal_rows
-            ),
-            "conditional_weight_bounds_5_to_75_percent": all(
-                all(5 <= value <= 75 for value in row["proposed_weights"].values())
-                for row in proposal_rows if len(row["proposed_weights"]) > 1
-            ),
-            "maximum_change_10_percentage_points": all(
-                all(abs(value) <= 10 for value in row["delta_percentage_points"].values())
-                for row in proposal_rows if row["current_weights"]
-            ),
-        }
-        actuatable = [row for row in proposal_rows if not row["display_only"]]
+    def as_dict(self) -> dict[str, Any]:
+        hot_upf, hot_value = self.hottest("projected")
+        base_upf, base_value = self.hottest("baseline")
         return {
-            "proposal_id": f"proposal-{uuid.uuid4().hex}",
-            "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-            "forecast_id": forecast.get("forecast_id"),
-            "base_smf_state_hash": smf_hash,
-            "unit": self.config.units,
-            "calibration": self.config.calibration_status,
-            "assumption": "next-window +10 minute p95 carried rate is a cold-start steady-state allocation proxy",
-            "optimizer": "scipy.optimize.linprog(method=highs)",
-            "solver_status": "optimal" if optimal else next((value for value in solver_statuses if value != "optimal"), "skipped"),
-            "solver_runtime_ms": round((time.perf_counter() - started) * 1000),
-            "max_slack": max_slack,
-            "gates": gates,
-            "actuation_ready": bool(actuatable) and all(gates.values()) and all(row["actuation_ready"] for row in actuatable),
-            "rows": proposal_rows,
-            "warnings": [
-                "Uncalibrated pps-proxy limits cannot support production safety claims.",
-                "This optimizes carried traffic, not session arrivals; cohort MPC is disabled.",
-                "Only tuples returned by GET /upf-admin may be actuated.",
-            ],
+            "status": self.status,
+            "message": self.message,
+            "unit": self.unit,
+            "weights": self.weights,
+            "integer_weights": self.integer_weights,
+            "projected_load_pps": self.projected_load_pps,
+            "baseline_load_pps": self.baseline_load_pps,
+            "max_safe_utilization": self.max_safe_utilization,
+            "solver_runtime_ms": self.solver_runtime_ms,
+            "eligibility": {str(key): value for key, value in self.eligibility.items()},
+            "hottest_projected": {"upf": hot_upf, "pps": hot_value},
+            "hottest_baseline": {"upf": base_upf, "pps": base_value},
+            "peak_reduction": (
+                round(1.0 - hot_value / base_value, 4) if base_value > 0 else None
+            ),
         }
 
-    def _solve_highs(self, demand: dict[str, Any], upfs: list[str]) -> tuple[str, str, dict[str, float], dict[str, Any], float]:
-        if not upfs:
-            return "infeasible", "no healthy eligible UPF", {}, {}, 0.0
-        try:
-            from optimization.highs import OptimizationConfig, solve_allocation
-            from schemas import Capacity, Forecast, GroupKey, Quantiles, TimeWindow, UPFState
-        except ImportError as error:
-            return "error", f"HiGHS dependencies unavailable: {error}", {}, {}, 0.0
-        now = datetime.now(timezone.utc)
-        selection = demand["selection"]
-        group = GroupKey(f"tac-{selection['tac']}", selection["dnn"], f"dscp-{selection['dscp']}")
-        target = TimeWindow(now, now + timedelta(minutes=10))
-        zero = Quantiles(0, 0, 0)
-        forecast = Forecast(
-            forecast_id=f"live-opt-{uuid.uuid4().hex}", issued_at=now, source_window_end=now,
-            target_window=target, horizon_steps=1, group=group,
-            new_session_count=zero,
-            new_load_ul_mbps=Quantiles(demand["ul_p95"], demand["ul_p95"], demand["ul_p95"]),
-            new_load_dl_mbps=Quantiles(demand["dl_p95"], demand["dl_p95"], demand["dl_p95"]),
-            existing_load_by_upf=[], model_version="guarded-synthetic-transfer/live-baselines",
-            quality_flags=["pps_proxy", "carried_traffic_cold_start_proxy"],
+
+# ------------------------------------------------------------------- bounds
+
+
+def apply_bounds(
+    target: dict[str, float],
+    current: dict[str, float],
+    *,
+    min_share: float,
+    max_share: float,
+    max_step_delta: float,
+) -> dict[str, float]:
+    """Project a target weight vector onto the configured band, summing to one.
+
+    Clamping and then renormalising does not work: clamp {0.95, 0.05} to a 0.75
+    cap and renormalise and you get 0.9375, straight back over the cap.  This
+    water-fills instead -- clamp, redistribute the excess or deficit across the
+    entries that are still free, repeat -- so the band actually holds.
+
+    ``max_step_delta`` is a fraction, not percentage points.  The Codex default
+    of 0.10 meant four or more decisions to shift the ~40% of load this demo
+    needs to move; on stage that reads as "nothing happened".  The config
+    default is now a single unconstrained step.
+    """
+    upfs = sorted(set(target) | set(current))
+    if not upfs:
+        return {}
+    raw: dict[str, float] = {}
+    for upf in upfs:
+        want = max(0.0, float(target.get(upf, 0.0)))
+        have = float(current.get(upf, 0.0))
+        if want <= 0.0 and have <= 0.0:
+            continue
+        raw[upf] = min(max(want, have - max_step_delta), have + max_step_delta)
+    if not raw:
+        share = 1.0 / len(upfs)
+        return {upf: share for upf in upfs}
+
+    count = len(raw)
+    # A band that cannot contain a probability vector is a config error, but the
+    # demo must not die on it: widen just enough to stay feasible.
+    low = min(min_share, 1.0 / count)
+    high = max(max_share, 1.0 / count)
+
+    total = sum(raw.values())
+    values = (
+        {upf: value / total for upf, value in raw.items()}
+        if total > 0
+        else {upf: 1.0 / count for upf in raw}
+    )
+    for _ in range(count + 1):
+        clamped = {upf: min(max(value, low), high) for upf, value in values.items()}
+        excess = 1.0 - sum(clamped.values())
+        if abs(excess) < 1e-12:
+            return clamped
+        free = [
+            upf
+            for upf, value in clamped.items()
+            if (excess > 0 and value < high - 1e-12) or (excess < 0 and value > low + 1e-12)
+        ]
+        if not free:
+            return clamped
+        headroom = sum(
+            (high - clamped[upf]) if excess > 0 else (clamped[upf] - low) for upf in free
         )
-        states = []
-        for upf in upfs:
-            mapping = self.config.mappings[upf]
-            states.append(UPFState(
-                measurement_time=now, upf_id=upf,
-                capacity_mbps=Capacity(mapping.ul_limit, mapping.dl_limit),
-                safe_utilization=Capacity(1, 1), session_capacity=1, session_safe_utilization=1,
-                health="healthy", zone="cdot-live", eligible_groups=[group.selection_id],
-                path_latency_ms_by_zone={group.zone: 0}, state_ttl_seconds=self.config.stale_seconds,
-                calibration_version="v02-p99-uncalibrated-proxy",
-            ))
-        result = solve_allocation(
-            [forecast], states, created_at=now, policy_version=1,
-            config=OptimizationConfig(
-                planning_quantile="p95",
-                max_group_upf_weight=0.75 if len(upfs) > 1 else 1.0,
-            ),
+        if headroom <= 1e-12:
+            return clamped
+        values = dict(clamped)
+        for upf in free:
+            room = (high - clamped[upf]) if excess > 0 else (clamped[upf] - low)
+            values[upf] = clamped[upf] + excess * room / headroom
+    return {upf: min(max(value, low), high) for upf, value in values.items()}
+
+
+def integer_weights(weights: dict[str, float], *, total: int = 100) -> dict[str, int]:
+    """Largest-remainder rounding to integers summing to ``total``."""
+    clean = {key: max(0.0, float(value)) for key, value in weights.items() if value > 0}
+    scale = sum(clean.values())
+    if not clean or not math.isfinite(scale) or scale <= 0:
+        raise OptimizerError("weights must contain a positive finite value")
+    scaled = {key: value / scale * total for key, value in clean.items()}
+    result = {key: int(math.floor(value)) for key, value in scaled.items()}
+    order = sorted(scaled, key=lambda key: (-(scaled[key] - result[key]), key))
+    for key in order[: total - sum(result.values())]:
+        result[key] += 1
+    return {key: value for key, value in result.items() if value > 0}
+
+
+# --------------------------------------------------------- schema translation
+
+
+def build_forecasts(
+    predictions: dict[str, dict[str, Any]],
+    *,
+    issued_at: datetime,
+    horizon_seconds: int,
+    model_version: str = MODEL_VERSION,
+) -> list[Forecast]:
+    """Wrap demand predictions in ``Forecast`` objects for the LP.
+
+    ``horizon_steps`` is pinned to 1 because ``schemas/forecast.py`` restricts it
+    to 1..8 while our internal horizon is 20 telemetry samples.  One decision
+    window ahead is exactly what it means here; the sample count lives in the
+    forecaster, not the contract.
+    """
+    issued_at = issued_at.astimezone(timezone.utc)
+    target = TimeWindow(
+        start=issued_at + timedelta(seconds=horizon_seconds),
+        end=issued_at + timedelta(seconds=2 * horizon_seconds),
+    )
+    forecasts: list[Forecast] = []
+    for selection_id, per_direction in sorted(predictions.items()):
+        dnn, tac = parse_group_id(selection_id)
+        ul = per_direction["ul"]
+        dl = per_direction["dl"]
+        if _p50(ul) <= 0.0 and _p50(dl) <= 0.0:
+            continue  # a group with no traffic contributes nothing and only adds rows
+        forecasts.append(
+            Forecast(
+                forecast_id=f"cdot-{selection_id}-{int(issued_at.timestamp())}",
+                issued_at=issued_at,
+                source_window_end=issued_at,
+                target_window=target,
+                horizon_steps=1,
+                group=GroupKey(zone=f"tac-{tac}", dnn=dnn, snssai="dscp-0"),
+                new_session_count=Quantiles(p50=0.0, p95=0.0, p90=0.0),
+                new_load_ul_mbps=_quantiles(ul),
+                new_load_dl_mbps=_quantiles(dl),
+                existing_load_by_upf=[],
+                model_version=model_version,
+                quality_flags=["unit:pps"],
+            )
         )
-        if result.policy is None:
-            return result.status, result.message, {}, {}, math.inf if result.status == "feasible_with_slack" else 0.0
-        raw = result.policy.groups[0].weights
-        slack_values = list(result.policy.constraint_slack.ul_mbps_by_upf.values()) + list(result.policy.constraint_slack.dl_mbps_by_upf.values())
-        slack = max(slack_values, default=0.0)
-        projected = {
-            upf: {
-                "ul": result.projected_ul_mbps_by_upf.get(upf, 0) / self.config.mappings[upf].ul_limit,
-                "dl": result.projected_dl_mbps_by_upf.get(upf, 0) / self.config.mappings[upf].dl_limit,
-            }
-            for upf in upfs
+    if not forecasts:
+        raise OptimizerError("every selection group forecast is zero")
+    return forecasts
+
+
+def _p50(value: Any) -> float:
+    return float(getattr(value, "p50", value["p50"] if isinstance(value, dict) else value))
+
+
+def _quantiles(value: Any) -> Quantiles:
+    if isinstance(value, dict):
+        p50, p90, p95 = value["p50"], value.get("p90"), value.get("p95")
+    else:
+        p50, p90, p95 = value.p50, value.p90, value.p95
+    p50 = max(0.0, float(p50))
+    p95 = max(p50, float(p95 if p95 is not None else p50))
+    p90 = min(max(p50, float(p90 if p90 is not None else p50)), p95)
+    return Quantiles(p50=p50, p95=p95, p90=p90)
+
+
+def build_upf_states(
+    config: LiveConfig,
+    groups: Iterable[str],
+    *,
+    measurement_time: datetime,
+    observed_eligibility: dict[int, set[str]] | None = None,
+    health: dict[str, str] | None = None,
+) -> list[UPFState]:
+    """One state per UPF, with a **uniform** capacity.
+
+    Uniform is the whole point.  Codex set each UPF's capacity to its own
+    observed p99, which is circular -- it makes the idle upf-3 look as full as
+    the saturated upf-1 and inverts the entire result.  Until C-DOT gives a real
+    number, one placeholder ceiling applies to all four.
+    """
+    measurement_time = measurement_time.astimezone(timezone.utc)
+    eligible_by_tac = config.eligibility(observed_eligibility)
+    group_ids = list(groups)
+    per_upf: dict[str, list[str]] = {upf: [] for upf in config.upf_ids}
+    for selection_id in group_ids:
+        _, tac = parse_group_id(selection_id)
+        for upf in eligible_by_tac.get(tac, []):
+            if upf in per_upf:
+                per_upf[upf].append(selection_id)
+    zones = sorted({f"tac-{parse_group_id(item)[1]}" for item in group_ids})
+    capacity = config.capacity
+    states: list[UPFState] = []
+    for upf in config.upf_ids:
+        states.append(
+            UPFState(
+                measurement_time=measurement_time,
+                upf_id=upf,
+                capacity_mbps=SchemaCapacity(ul=capacity.per_upf_pps, dl=capacity.per_upf_pps),
+                safe_utilization=SchemaCapacity(
+                    ul=capacity.safe_utilization, dl=capacity.safe_utilization
+                ),
+                # Sessions are not a binding resource here: C-DOT publishes no
+                # trustworthy per-UPF session ceiling, and the session gauges
+                # reset downward mid-run.  A zero session forecast plus a
+                # nominal ceiling keeps that LP row slack.
+                session_capacity=1_000_000,
+                session_safe_utilization=capacity.safe_utilization,
+                health=(health or {}).get(upf, "healthy"),
+                zone=zones[0] if zones else "tac-0",
+                eligible_groups=sorted(per_upf[upf]),
+                # Uniform latency: we have no per-path measurement from C-DOT, and
+                # a uniform value makes the locality term a per-group constant,
+                # so it cannot bias the allocation.
+                path_latency_ms_by_zone={zone: 1.0 for zone in zones},
+                state_ttl_seconds=config.cadence.decision_stale_seconds,
+                calibration_version="cdot-live/2.0",
+            )
+        )
+    return states
+
+
+# ------------------------------------------------------------------- the solve
+
+
+def solve(
+    cube: DemandCube,
+    predictions: dict[str, dict[str, Any]],
+    config: LiveConfig,
+    *,
+    issued_at: datetime | None = None,
+    previous_policy: Policy | None = None,
+    policy_version: int = 1,
+    baseline_weights: dict[str, dict[str, float]] | None = None,
+) -> AllocationPlan:
+    """One joint LP over every selection group, then bound and round the result."""
+    issued_at = issued_at or cube.latest_time or datetime.now(timezone.utc)
+    forecasts = build_forecasts(
+        predictions,
+        issued_at=issued_at,
+        horizon_seconds=config.cadence.forecast_horizon_seconds,
+    )
+    states = build_upf_states(
+        config,
+        [item.group.selection_id for item in forecasts],
+        measurement_time=issued_at,
+        observed_eligibility=cube.observed_eligibility,
+    )
+    settings = OptimizationConfig(
+        planning_quantile=config.solver.planning_quantile,
+        max_group_upf_weight=config.weight_bounds.max_share,
+        timeout_seconds=max(1.0, config.timeout_seconds / 2.0),
+    )
+    result = solve_allocation(
+        forecasts,
+        states,
+        created_at=issued_at,
+        policy_version=policy_version,
+        previous_policy=previous_policy,
+        config=settings,
+    )
+
+    current = baseline_weights if baseline_weights is not None else cube.current_weights()
+    demand_p50 = {
+        item.group.selection_id: {
+            "ul": item.new_load_ul_mbps.p50,
+            "dl": item.new_load_dl_mbps.p50,
         }
-        return result.status, result.message, raw, projected, slack
+        for item in forecasts
+    }
+    baseline_load = _with_totals(cube.projected_upf_load(current, demand_p50))
+
+    if result.policy is None:
+        return AllocationPlan(
+            status=result.status,
+            weights=current,
+            integer_weights={
+                key: integer_weights(value) for key, value in current.items() if value
+            },
+            projected_load_pps=baseline_load,
+            baseline_load_pps=baseline_load,
+            max_safe_utilization=result.max_safe_utilization,
+            solver_runtime_ms=result.solver_runtime_ms if hasattr(result, "solver_runtime_ms") else 0,
+            message=result.message or "solver returned no policy",
+            eligibility=config.eligibility(cube.observed_eligibility),
+        )
+
+    bounds = config.weight_bounds
+    step = bounds.max_step_delta_pp / 100.0
+    weights: dict[str, dict[str, float]] = {}
+    integers: dict[str, dict[str, int]] = {}
+    for group in result.policy.groups:
+        selection_id = group.key.selection_id
+        bounded = apply_bounds(
+            group.weights,
+            current.get(selection_id, {}),
+            min_share=bounds.min_share,
+            max_share=bounds.max_share,
+            max_step_delta=step,
+        )
+        if not bounded:
+            continue
+        weights[selection_id] = bounded
+        integers[selection_id] = integer_weights(bounded)
+
+    return AllocationPlan(
+        status=result.status,
+        weights=weights,
+        integer_weights=integers,
+        projected_load_pps=_with_totals(cube.projected_upf_load(weights, demand_p50)),
+        baseline_load_pps=baseline_load,
+        max_safe_utilization=result.max_safe_utilization,
+        solver_runtime_ms=result.policy.solver.runtime_ms,
+        policy=result.policy,
+        eligibility=config.eligibility(cube.observed_eligibility),
+    )
+
+
+def _with_totals(table: dict[str, dict[str, float]]) -> dict[str, dict[str, float]]:
+    return {
+        upf: {"ul": value["ul"], "dl": value["dl"], "total": value["ul"] + value["dl"]}
+        for upf, value in table.items()
+    }

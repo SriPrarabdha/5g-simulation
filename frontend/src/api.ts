@@ -48,6 +48,14 @@ export async function getCdotLiveSnapshot(token: string) {
   return request<any>('/api/v1/cdot-live/snapshot', {}, token)
 }
 
+export async function preloadCdotLive(token: string, hours = 3) {
+  return request<any>(`/api/v1/cdot-live/preload?hours=${hours}`, { method: 'POST' }, token)
+}
+
+export async function setCdotLiveAct(token: string, act: string) {
+  return request<any>(`/api/v1/cdot-live/act?act=${encodeURIComponent(act)}`, { method: 'POST' }, token)
+}
+
 export async function evaluateCdotLive(token: string) {
   return request<any>('/api/v1/cdot-live/evaluate', { method: 'POST' }, token)
 }

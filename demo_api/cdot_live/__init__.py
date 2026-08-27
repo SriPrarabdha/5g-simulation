@@ -1,19 +1,29 @@
 """Isolated live C-DOT telemetry, forecast and reviewed-actuation plane."""
 
-from .adapter import CdotTelemetryAdapter, counter_rates, load_v02_replay
+from .cdot_forecaster import CdotForecaster, estimate_period, walk_forward_backtest
 from .config import LiveConfig
-from .forecast import GuardedTransferForecaster
+from .counterfactual import Counterfactual
+from .demand import DemandCube, build_demand_cube, group_id
 from .service import CdotLiveService
 from .smf import H2CSmfClient, canonical_state_hash, integer_weights
+from .sources import ClassRate, PrometheusSource, ReplaySource, build_source, parse_rate
 
 __all__ = [
+    "CdotForecaster",
     "CdotLiveService",
-    "CdotTelemetryAdapter",
-    "GuardedTransferForecaster",
+    "ClassRate",
+    "Counterfactual",
+    "DemandCube",
     "H2CSmfClient",
     "LiveConfig",
+    "PrometheusSource",
+    "ReplaySource",
+    "build_demand_cube",
+    "build_source",
     "canonical_state_hash",
-    "counter_rates",
+    "estimate_period",
+    "group_id",
     "integer_weights",
-    "load_v02_replay",
+    "parse_rate",
+    "walk_forward_backtest",
 ]

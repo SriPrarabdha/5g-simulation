@@ -303,7 +303,28 @@ def create_app(
 
     @application.post("/api/v1/cdot-live/evaluate")
     async def cdot_live_evaluate(user: Annotated[Identity, Depends(presenter)]) -> dict[str, Any]:
-        return await live.evaluate(actor=user.subject)
+        try:
+            return await live.evaluate(actor=user.subject)
+        except Exception as error:
+            raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(error)) from error
+
+    @application.post("/api/v1/cdot-live/preload")
+    async def cdot_live_preload(
+        user: Annotated[Identity, Depends(presenter)], hours: float = 3.0
+    ) -> dict[str, Any]:
+        try:
+            return await live.preload(hours=hours, actor=user.subject)
+        except Exception as error:
+            raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(error)) from error
+
+    @application.post("/api/v1/cdot-live/act")
+    async def cdot_live_act(
+        user: Annotated[Identity, Depends(presenter)], act: str
+    ) -> dict[str, Any]:
+        try:
+            return await live.set_act(act, actor=user.subject)
+        except LiveRejected as error:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
 
     @application.post("/api/v1/cdot-live/apply")
     async def cdot_live_apply(

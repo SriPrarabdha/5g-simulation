@@ -87,7 +87,6 @@ def with_weights(item: dict[str, Any], weights: dict[str, int]) -> dict[str, Any
         result[field] = [{"upf": key, "weight": value} for key, value in sorted(weights.items())]
     else:
         result[field] = dict(sorted(weights.items()))
-    result["weight_ratio"] = reduced_ratio(weights)
     return result
 
 
@@ -184,8 +183,20 @@ class H2CSmfClient:
             raise RuntimeError(f"SMF GET /upf-admin returned HTTP {response.status}")
         return response.json()
 
-    async def post_tuple(self, payload: dict[str, Any]) -> Any:
+    async def post_tuples(self, payload: list[dict[str, Any]]) -> Any:
+        """POST a batch of tuples.
+
+        Their API doc takes a JSON **array** of ``{"dnn","tac","weights"}``
+        objects; the previous client sent a bare object, which is why every
+        advisory apply failed.
+        """
+        if not isinstance(payload, list):
+            raise TypeError("SMF /upf-admin expects a JSON array of tuples")
         response = await self.request("POST", "/upf-admin", payload)
         if not 200 <= response.status < 300:
             raise RuntimeError(f"SMF POST /upf-admin returned HTTP {response.status}")
         return response.json() if response.body else None
+
+    async def post_tuple(self, payload: dict[str, Any]) -> Any:
+        """Single-tuple convenience wrapper -- still sends a one-element array."""
+        return await self.post_tuples([payload])

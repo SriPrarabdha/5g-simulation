@@ -40,6 +40,11 @@ class Cadence:
 
 
 @dataclass(frozen=True, slots=True)
+class Solver:
+    planning_quantile: str = "p50"
+
+
+@dataclass(frozen=True, slots=True)
 class WeightBounds:
     min_share: float = 0.05
     max_share: float = 0.75
@@ -67,6 +72,7 @@ class LiveConfig:
     capacity: Capacity
     cadence: Cadence
     weight_bounds: WeightBounds
+    solver: Solver
     mappings: dict[str, UpfMapping]
     dnn: dict[str, str]
     declared_eligibility: dict[int, list[str]]
@@ -145,6 +151,10 @@ class LiveConfig:
             max_step_delta_pp=int(bounds_raw.get("max_step_delta_pp", 100)),
         )
 
+        solver = Solver(
+            planning_quantile=str(raw.get("solver", {}).get("planning_quantile", "p50"))
+        )
+
         mappings = {
             metric: UpfMapping(
                 metric=metric,
@@ -173,6 +183,7 @@ class LiveConfig:
             capacity=capacity,
             cadence=cadence,
             weight_bounds=weight_bounds,
+            solver=solver,
             mappings=mappings,
             dnn={str(key): str(value) for key, value in raw.get("dnn", {}).items()},
             declared_eligibility=declared,

@@ -102,13 +102,21 @@ function DashboardApp() {
     const form = new FormData(event.currentTarget)
     try {
       const auth = await login(String(form.get('username')), String(form.get('password')))
-      const run = await createRun(auth.access_token, 'mpc')
+      const liveCdot = location.pathname === '/live-cdot'
       sessionStorage.setItem('cdot-token', auth.access_token)
-      sessionStorage.setItem('cdot-run-id', run.run_id)
       sessionStorage.setItem('cdot-role', auth.role || 'presenter')
       setToken(auth.access_token)
-      setSnapshot(run)
-      setOverview(location.pathname !== '/live-cdot')
+      // The C-DOT console runs on external data and needs no synthetic run.
+      // Creating one used to be mandatory, so a simulator failure made
+      // /live-cdot unreachable.
+      try {
+        const run = await createRun(auth.access_token, 'mpc')
+        sessionStorage.setItem('cdot-run-id', run.run_id)
+        setSnapshot(run)
+      } catch (error) {
+        if (!liveCdot) throw error
+      }
+      setOverview(!liveCdot)
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : 'Unable to sign in')
     } finally {
@@ -207,7 +215,17 @@ function DashboardApp() {
     if (location.pathname !== path) history.pushState({}, '', path)
   }
 
-  if (!token || !snapshot) return <LoginScreen onSubmit={signIn} busy={busy} error={loginError} loading={Boolean(token)} />
+  if (!token) return <LoginScreen onSubmit={signIn} busy={busy} error={loginError} loading={Boolean(token)} />
+  if (!snapshot) {
+    // Signed in but no synthetic run: the C-DOT console still works standalone.
+    if (destination === 'Live C-DOT' || location.pathname === '/live-cdot') {
+      return <div className="guided-app">
+        <nav className="primary-nav" aria-label="Primary navigation"><button className="active" aria-current="page"><span>05</span>Live C-DOT</button></nav>
+        <LiveCdot token={token} role={sessionStorage.getItem('cdot-role') || 'presenter'} />
+      </div>
+    }
+    return <LoginScreen onSubmit={signIn} busy={busy} error={loginError} loading />
+  }
   const payload = snapshot.payload
   if (overview) return <div className="guided-app"><AppHeader snapshot={snapshot} connection={connection} expert={expert} onExpert={() => setExpert(value => !value)} onHome={() => setOverview(true)} onSignOut={signOut} />
     <StoryOverview payload={payload} busy={busy} onStart={startStory} />
