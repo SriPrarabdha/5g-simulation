@@ -15,6 +15,7 @@ present these numbers as Mbps.
 
 from __future__ import annotations
 
+import logging
 import math
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -27,7 +28,10 @@ from schemas.common import GroupKey, TimeWindow
 from schemas.upf import Capacity as SchemaCapacity, UPFState
 
 from .config import LiveConfig
-from .demand import DemandCube, parse_group_id
+from .demand import DemandCube, group_id, parse_group_id
+
+
+LOGGER = logging.getLogger("cdot.autopilot")
 
 MODEL_VERSION = "cdot-ridge-conformal/1.0"
 # Their SMF re-evaluates weights per PDU session establishment, and their loop
@@ -176,12 +180,38 @@ def integer_weights(weights: dict[str, float], *, total: int = 100) -> dict[str,
 # --------------------------------------------------------- schema translation
 
 
+
+def recent_levels(cube: DemandCube, *, lookback: int = 20) -> dict[str, dict[str, float]]:
+    """Each group's recent non-zero demand, per direction.
+
+    Used as the floor for a group whose forecast collapsed to zero during a
+    lull.  The tail is preferred; if the tail is entirely idle we widen to the
+    whole window rather than call the group dead.
+    """
+    levels: dict[str, dict[str, float]] = {}
+    for group in cube.groups:
+        per: dict[str, float] = {}
+        for direction in ("ul", "dl"):
+            series = cube.group_series(group, direction)
+            if series.size == 0:
+                per[direction] = 0.0
+                continue
+            tail = series[-lookback:]
+            positive = tail[tail > 0]
+            if positive.size == 0:
+                positive = series[series > 0]
+            per[direction] = float(positive.mean()) if positive.size else 0.0
+        levels[group_id(*group)] = per
+    return levels
+
+
 def build_forecasts(
     predictions: dict[str, dict[str, Any]],
     *,
     issued_at: datetime,
     horizon_seconds: int,
     model_version: str = MODEL_VERSION,
+    fallback_level: dict[str, dict[str, float]] | None = None,
 ) -> list[Forecast]:
     """Wrap demand predictions in ``Forecast`` objects for the LP.
 
@@ -189,6 +219,14 @@ def build_forecasts(
     to 1..8 while our internal horizon is 20 telemetry samples.  One decision
     window ahead is exactly what it means here; the sample count lives in the
     forecaster, not the contract.
+
+    A group whose forecast is zero is only dropped when it also carried no
+    traffic anywhere in the window.  A few minutes of idle at the tail used to
+    be enough to zero the ridge fit and silently remove the group from the LP --
+    which, on 2026-08-27, quietly took the whole ``internet`` DNN (the larger
+    half of the traffic) out of one cycle while that cycle still reported
+    success.  ``fallback_level`` carries the group's recent non-zero level so a
+    lull parks it at its own historical demand instead of deleting it.
     """
     issued_at = issued_at.astimezone(timezone.utc)
     target = TimeWindow(
@@ -196,12 +234,26 @@ def build_forecasts(
         end=issued_at + timedelta(seconds=2 * horizon_seconds),
     )
     forecasts: list[Forecast] = []
+    # Accumulated and logged once at the end: this runs per group per solve, so
+    # a line each would drown the log (and did -- a test sweep once wrote 1298
+    # of them into the live loop's file).
+    idle: list[str] = []
+    held: list[str] = []
     for selection_id, per_direction in sorted(predictions.items()):
         dnn, tac = parse_group_id(selection_id)
         ul = per_direction["ul"]
         dl = per_direction["dl"]
         if _p50(ul) <= 0.0 and _p50(dl) <= 0.0:
-            continue  # a group with no traffic contributes nothing and only adds rows
+            level = (fallback_level or {}).get(selection_id) or {}
+            level_ul = max(0.0, float(level.get("ul", 0.0)))
+            level_dl = max(0.0, float(level.get("dl", 0.0)))
+            if level_ul + level_dl <= 0.0:
+                # Genuinely idle for the whole window: nothing to steer.
+                idle.append(selection_id)
+                continue
+            held.append(selection_id)
+            ul = {"p50": level_ul, "p90": level_ul, "p95": level_ul}
+            dl = {"p50": level_dl, "p90": level_dl, "p95": level_dl}
         forecasts.append(
             Forecast(
                 forecast_id=f"cdot-{selection_id}-{int(issued_at.timestamp())}",
@@ -217,6 +269,20 @@ def build_forecasts(
                 model_version=model_version,
                 quality_flags=["unit:pps"],
             )
+        )
+    if held:
+        LOGGER.warning(
+            "forecast: %d group(s) forecast zero but carried traffic earlier in "
+            "the window -- held at their recent level rather than dropped: %s",
+            len(held),
+            ", ".join(held),
+        )
+    if idle:
+        LOGGER.info(
+            "forecast: %d group(s) idle across the whole window, excluded from "
+            "this solve: %s",
+            len(idle),
+            ", ".join(idle),
         )
     if not forecasts:
         raise OptimizerError("every selection group forecast is zero")
@@ -313,6 +379,7 @@ def solve(
         predictions,
         issued_at=issued_at,
         horizon_seconds=config.cadence.forecast_horizon_seconds,
+        fallback_level=recent_levels(cube),
     )
     states = build_upf_states(
         config,

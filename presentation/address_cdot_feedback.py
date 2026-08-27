@@ -667,6 +667,128 @@ def rewrite_optimizer_flow(prs) -> None:
         tb(slide, left + 0.13, 5.94, vw - 0.26, 0.39, body, size=7.9, color=BODY, align=PP_ALIGN.CENTER)
 
 
+def deployment_architecture_slide(slide) -> None:
+    chrome(
+        slide,
+        "REAL-WORLD DEPLOYMENT · OPERATING MODEL",
+        "Deploy the evidence loop first; earn the right to automate",
+        "03 · THE OPTIMIZER",
+        "The production service runs continuously, but a recommendation changes the network only after an independent gate—and initially, an operator—accepts it.",
+        source="ADR-011/012/019/024 · C-DOT first-drop advisory",
+    )
+    steps = [
+        ("01", "OBSERVE", "UPF/SMF counters\nhealth · topology\nmaintenance notices", TEAL),
+        ("02", "CANONICALISE", "map labels → IDs\nclose 10-min bucket\nflag gaps/resets", BLUE),
+        ("03", "FORECAST", "p50/p90/p95\nnew-session demand\n10–80 min horizons", PURPLE),
+        ("04", "OPTIMISE", "weights by scope\nStatic comparison\nconstraints + churn", AMBER),
+        ("05", "CERTIFY", "freshness · capacity\neligibility · latency\nsolver + policy hash", GREEN),
+        ("06", "ADVISE / ACT", "operator console\nversioned API + TTL\nverify or rollback", RED),
+    ]
+    sw, gap = 1.82, 0.18
+    for index, (num, head, body, accent) in enumerate(steps):
+        left = M + index * (sw + gap)
+        rect(slide, left, 2.25, sw, 1.68, CARD, BORDER, radius=True)
+        rect(slide, left, 2.25, sw, 0.08, accent)
+        tb(slide, left + 0.12, 2.48, 0.30, 0.28, num, font=SERIF, size=16,
+           color=accent, align=PP_ALIGN.CENTER)
+        tb(slide, left + 0.43, 2.49, sw - 0.55, 0.20, head, font=MONO, size=7.8,
+           bold=True, color=accent)
+        tb(slide, left + 0.14, 2.91, sw - 0.28, 0.72, body, size=8.7,
+           color=BODY, align=PP_ALIGN.CENTER, spacing=1.08)
+        if index < len(steps) - 1:
+            arrow(slide, left + sw + 0.025, 2.93, 0.13, 0.25, TEAL)
+
+    # Closed-loop feedback strip.
+    rect(slide, 1.03, 4.12, 11.30, 0.47, SOFT_BLUE, BORDER, radius=True)
+    tb(slide, 1.20, 4.21, 10.96, 0.25,
+       "NEXT CLOSED BUCKET → compare predicted vs realised load, requested vs realised shares, benefit vs Static, and any fallback; update coverage/drift monitors—not the protected release result.",
+       size=9.2, bold=True, color=BLUE, align=PP_ALIGN.CENTER)
+
+    stages = [
+        (M, "1 · SHADOW", "No network write", "Generate signed JSON/CSV advisories, replay against recorded telemetry and score the counterfactual against Static.", TEAL),
+        (4.47, "2 · SUPERVISED CANARY", "Human approval + bounded scope", "Apply to one agreed TAC/DNN or maintenance window, cap the weight change, set a TTL, verify the read-back and keep one-click rollback.", AMBER),
+        (8.23, "3 · BOUNDED AUTOMATION", "Only after production gates", "Automatic apply requires confirmed IDs/semantics, calibrated envelopes, authenticated compare-and-swap, proven rollback, coverage/drift alarms and an audit trail.", GREEN),
+    ]
+    widths = [3.51, 3.51, 4.38]
+    for index, (left, label, head, body, accent) in enumerate(stages):
+        card(slide, left, 4.88, widths[index], 1.61, label, head, body,
+             accent=accent, body_size=8.8, heading_size=10.8)
+    rect(slide, M, 6.65, W, 0.18, SOFT_AMBER)
+    tb(slide, M, 6.64, W, 0.18,
+       "Production principle: advisory by default; actuation is a separately authorised capability.",
+       font=MONO, size=8.1, bold=True, color=AMBER, align=PP_ALIGN.CENTER)
+
+
+def risk_advisory_slide(slide) -> None:
+    chrome(
+        slide,
+        "REAL-WORLD DEPLOYMENT · 10-MINUTE ADVISORY",
+        "Publish weights with a risk envelope—not a naked recommendation",
+        "03 · THE OPTIMIZER",
+        "Risk is a vector of measurable quantities, not one opaque confidence score. The operator sees expected benefit, tail exposure, uncertainty, churn and data quality before choosing APPLY, HOLD or ROLLBACK.",
+        source="advisory.json · ADR-009/011/024",
+    )
+    # Left: advisory envelope.
+    rect(slide, M, 2.22, 4.00, 3.91, CARD, BORDER)
+    rect(slide, M, 2.22, 0.06, 3.91, TEAL)
+    tb(slide, 0.99, 2.40, 3.48, 0.22, "ADVISORY PACKET · EVERY 10 MINUTES", font=MONO,
+       size=8.6, bold=True, color=TEAL)
+    packet = [
+        ("IDENTITY", "issued_at · target window · valid_until/TTL\ntelemetry watermark · model/policy hashes"),
+        ("ACTION", "scope (TAC/DNN/slice) · current weights\nrecommended weights · maximum allowed change"),
+        ("RISK VECTOR", "p50/p90/p95 load · p95 headroom\nbenefit vs Static · churn · quality flags"),
+        ("DECISION", "RECOMMEND / HOLD / ROLLBACK\nreason codes · approvals · read-back status"),
+    ]
+    for index, (label, body) in enumerate(packet):
+        top = 2.79 + index * 0.76
+        tb(slide, 1.00, top, 0.91, 0.20, label, font=MONO, size=7.8, bold=True,
+           color=TEAL)
+        tb(slide, 1.93, top - 0.02, 2.49, 0.48, body, size=8.6, color=BODY,
+           spacing=1.05)
+        if index < len(packet) - 1:
+            line(slide, 1.00, top + 0.58, 4.43, top + 0.58, RULE, 0.8)
+
+    # Right: exact risk quantities.
+    metrics = [
+        ("TAIL HEADROOM", "min_u (C_u - L_u[p95]) / C_u", "How much capacity remains if demand reaches its p95 upper bound.", PURPLE),
+        ("BENEFIT VS STATIC", "risk(static) − risk(advisory)", "Same-state reduction in overload severity; negative means the advisory is worse.", GREEN),
+        ("FORECAST WIDTH", "(p95 - p50) / max(p50, eps)", "A dimensionless uncertainty band; wide forecasts demand more caution.", BLUE),
+        ("POLICY CHURN", "0.5 Sum_g,u |w_new - w_current|", "How much routing changes. Limit both total churn and the largest group shift.", AMBER),
+        ("DATA / MODEL HEALTH", "age · missing · resets · coverage · drift", "Publish components and reason codes; never hide them inside one score.", RED),
+        ("REVERSIBILITY", "TTL · read-back · rollback verified", "An action is safer when it expires, can be verified, and can be reversed quickly.", TEAL),
+    ]
+    for index, (label, formula, body, accent) in enumerate(metrics):
+        col, row = index % 2, index // 2
+        left = 5.03 + col * 3.83
+        top = 2.22 + row * 1.30
+        rect(slide, left, top, 3.60, 1.12, CARD, BORDER)
+        rect(slide, left, top, 0.045, 1.12, accent)
+        tb(slide, left + 0.18, top + 0.13, 1.25, 0.18, label, font=MONO, size=7.4,
+           bold=True, color=accent)
+        tb(slide, left + 1.42, top + 0.10, 1.98, 0.24, formula, font=SERIF,
+           size=10.4, color=INK, align=PP_ALIGN.RIGHT)
+        tb(slide, left + 0.18, top + 0.45, 3.20, 0.50, body, size=8.2,
+           color=BODY, spacing=1.05)
+
+    # Operator decision bands.
+    bands = [
+        (5.03, 6.22, 2.28, "GREEN · RECOMMEND", "fresh + feasible + positive p95 headroom", GREEN),
+        (7.43, 6.22, 2.28, "AMBER · APPROVE", "narrow margin or high churn; canary only", AMBER),
+        (9.83, 6.22, 2.78, "RED · HOLD / ROLLBACK", "stale, invalid, unconfirmed or worse than Static", RED),
+    ]
+    for left, top, width, label, body, accent in bands:
+        rect(slide, left, top, width, 0.48, CARD, BORDER)
+        rect(slide, left, top, 0.05, 0.48, accent)
+        tb(slide, left + 0.13, top + 0.08, width - 0.26, 0.15, label, font=MONO,
+           size=6.8, bold=True, color=accent, align=PP_ALIGN.CENTER)
+        tb(slide, left + 0.13, top + 0.25, width - 0.26, 0.14, body, size=6.9,
+           color=BODY, align=PP_ALIGN.CENTER)
+    rect(slide, M, 6.31, 4.00, 0.39, SOFT_RED, BORDER)
+    tb(slide, 0.92, 6.38, 3.60, 0.23,
+       "CURRENT FIRST DROP → RED / HOLD: mapping and SMF semantics unconfirmed; capacities uncalibrated; new-session arrivals absent.",
+       size=7.7, bold=True, color=RED, align=PP_ALIGN.CENTER)
+
+
 def add_notes(slide, text: str) -> None:
     slide.notes_slide.notes_text_frame.text = text
 
@@ -693,6 +815,8 @@ def audit(prs) -> None:
         "How error, safety coverage and release gates are calculated",
         "Past telemetry goes in; demand distributions come out",
         "The optimizer turns demand and capacity into routing percentages",
+        "Deploy the evidence loop first; earn the right to automate",
+        "Publish weights with a risk envelope",
     ]
     all_text = "\n".join(slide_text(slide) for slide in prs.slides)
     missing = [item for item in required if item not in all_text]
@@ -730,6 +854,8 @@ def main() -> int:
     rewrite_forecast_comparison(prs)
     rewrite_forecast_next_steps(prs)
     rewrite_optimizer_flow(prs)
+    add_after(prs, "What we recommend running, and why", "Deploy the evidence loop first", deployment_architecture_slide)
+    add_after(prs, "Deploy the evidence loop first", "Publish weights with a risk envelope", risk_advisory_slide)
 
     for title, note in {
         "Every equation has one job": "SAY: The generator is a pipeline. Scale and calendar determine expected arrivals; Poisson turns expectation into a count; lifetime creates persistence; summation creates UPF load; Little's Law and traffic conservation validate the output.",
@@ -737,6 +863,8 @@ def main() -> int:
         "A 16-week extreme shard is a ~9.5-hour job": "SAY: 9:31:46 is projected from a complete one-day measurement; reserve 12 hours. A single shard is not distributed across nodes. The 85.4-minute result is a measured 384-shard one-day campaign, not a 16-week timing.",
         "Five model families: what each one is trying to learn": "SAY: Ridge is a stable straight-line mapping. Boosted trees learn nonlinear thresholds. The regime ensemble switches models after a state becomes causally observable. Complexity must beat the moving-average baseline on every gate.",
         "How error, safety coverage and release gates are calculated": "SAY: 11.64% is a relative reduction in error. It is not forecast accuracy. The 15% threshold was frozen before selection, and LightGBM also failed the worst-slice guardrail, so retaining ridge follows the experiment contract.",
+        "Deploy the evidence loop first": "SAY: The service may run every ten minutes from day one, but production write authority is a separate capability. Start with signed advisories and counterfactual scoring, then a supervised canary with TTL/read-back/rollback, and automate only after C-DOT confirms identifiers, policy semantics and capacity envelopes.",
+        "Publish weights with a risk envelope": "SAY: Do not compress risk into one confidence percentage. Publish tail headroom, same-state benefit over Static, forecast width, policy churn, data/model health and reversibility. The existing first C-DOT drop is a useful RED/HOLD example because the identity mapping, capacity values, session arrivals and SMF semantics are not yet production-safe.",
     }.items():
         add_notes(find_slide(prs, title), note)
 

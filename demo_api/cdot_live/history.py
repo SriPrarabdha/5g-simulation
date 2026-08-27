@@ -194,6 +194,17 @@ class HistoryWriter:
             "weights": {key: dict(value) for key, value in (record.weights or {}).items()},
             "changed_selection_ids": list(record.changed_selection_ids or ()),
             "changed_count": len(record.changed_selection_ids or ()),
+            # Per-group forecast for one horizon ahead, and the demand actually
+            # flowing when this cycle ran.  Pair cycle N's "forecast" with cycle
+            # N+1's "observed_demand" to score the forecaster.
+            "forecast": {
+                key: {k: _round(v) for k, v in value.items()}
+                for key, value in (getattr(record, "forecast", None) or {}).items()
+            },
+            "observed_demand": {
+                key: _ul_dl_total(value)
+                for key, value in (getattr(record, "observed_demand", None) or {}).items()
+            },
             # Per-UPF share of the whole network, so a single stacked plot works
             # without re-deriving it from the per-tuple weights.
             "upf_share": _upf_share(record.weights or {}),

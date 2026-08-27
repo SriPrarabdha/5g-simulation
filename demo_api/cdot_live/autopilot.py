@@ -33,6 +33,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import logging.handlers
+import os
 import sys
 import time
 from collections import deque
@@ -42,7 +43,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from .config import LiveConfig
-from .demand import DemandCube, build_demand_cube, parse_group_id
+from .demand import DemandCube, build_demand_cube, group_id, parse_group_id
 from .history import HistoryWriter
 from .sources import ClassRate, SourceError
 
@@ -69,6 +70,14 @@ def configure_logging(config: LiveConfig) -> None:
     Called from ``create_app``.  Uvicorn owns the root handlers, so this only
     adds what is missing and never re-adds a handler on reload.
     """
+
+    # Never attach the rotating file handler under pytest.  ``create_app()``
+    # calls this at import time, so a test run would otherwise append its
+    # replay-mode cycles -- different units, fake SMF hashes -- straight into
+    # the log of a loop that is steering live traffic, where they are
+    # indistinguishable from real ones.
+    if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
+        return
     LOGGER.setLevel(logging.INFO)
     LOGGER.propagate = True
     fmt = logging.Formatter(
@@ -254,6 +263,12 @@ class CycleRecord:
     # history can plot what the solve was actually trying to fix.
     loads: dict[str, dict[str, float]] = field(default_factory=dict)
     changed_selection_ids: list[str] = field(default_factory=list)
+    # Per-group demand: what the forecaster predicted for one horizon ahead, and
+    # what was actually flowing when the cycle ran.  The control interval and the
+    # forecast horizon are both 600 s, so cycle N's forecast targets cycle N+1's
+    # observation -- that pairing is the forecaster's accuracy record.
+    forecast: dict[str, dict[str, float]] = field(default_factory=dict)
+    observed_demand: dict[str, dict[str, float]] = field(default_factory=dict)
     posted: list[dict[str, Any]] = field(default_factory=list)
     smf_state_hash: str | None = None
     verified: bool | None = None
@@ -273,6 +288,8 @@ class CycleRecord:
             "weights": {key: dict(value) for key, value in self.weights.items()},
             "loads": {key: dict(value) for key, value in self.loads.items()},
             "changed_selection_ids": list(self.changed_selection_ids),
+            "forecast": {k: dict(v) for k, v in self.forecast.items()},
+            "observed_demand": {k: dict(v) for k, v in self.observed_demand.items()},
             "posted": list(self.posted),
             "smf_state_hash": self.smf_state_hash,
             "verified": self.verified,
@@ -864,26 +881,29 @@ class Autopilot:
         # Read the SMF before solving: the proposal is bound to this exact state
         # hash, and apply() refuses to write if anything moved underneath it.
         await self.service.refresh_status()
+        smf_blocked: str | None = None
         if not self.service._smf_ready:
             self._smf_diagnosis = await self._diagnose_smf()
             detail = (self._smf_diagnosis or {}).get("detail")
             verdict = (self._smf_diagnosis or {}).get("verdict", "unreachable")
-            if not self.settings.dry_run:
-                record.outcome = "held"
-                record.reason = (
-                    f"SMF {verdict} at {self.config.smf_url}"
-                    + (f" -- {detail}" if detail else "")
-                )
-                LOGGER.error("cycle #%d HELD: %s", record.cycle, record.reason)
-                return
-            # A dry run exists to rehearse the Prometheus half before the SMF is
-            # even wired up, so an unreachable SMF must not stop it solving.
+            smf_blocked = (
+                f"SMF {verdict} at {self.config.smf_url}"
+                + (f" -- {detail}" if detail else "")
+            )
+            # Solve anyway, and hold only the write.
+            #
+            # Returning here used to throw away the forecast and the solve as
+            # well as the POST, so an SMF outage left no optimizer record at
+            # all -- and their /upf-admin is mute for long stretches, which
+            # would have starved the history of exactly the forecaster and
+            # solver evidence this loop exists to produce.  Nothing below
+            # writes to the SMF while ``smf_blocked`` is set, so this costs no
+            # actuation safety.
             LOGGER.warning(
-                "cycle #%d: SMF %s at %s (%s) -- continuing because this is a dry run",
+                "cycle #%d: %s -- solving anyway so the forecast and the "
+                "proposed weights are still recorded; the write is held",
                 record.cycle,
-                verdict,
-                self.config.smf_url,
-                detail or "no further detail",
+                smf_blocked,
             )
 
         cube = self.buffer.cube(self.config)
@@ -894,6 +914,32 @@ class Autopilot:
             record.error = "evaluate produced no proposal"
             LOGGER.error("cycle #%d: %s", record.cycle, record.error)
             return
+
+        record.forecast = {
+            str(row["selection_id"]): {
+                "ul_p50": float((row.get("ul") or {}).get("p50", 0.0)),
+                "dl_p50": float((row.get("dl") or {}).get("p50", 0.0)),
+                "total_p50": float(row.get("total_p50", 0.0)),
+            }
+            for row in ((snapshot.get("forecast") or {}).get("rows") or [])
+        }
+        record.observed_demand = {
+            group_id(*group): {
+                "ul": float(cube.group_series(group, "ul")[-1]),
+                "dl": float(cube.group_series(group, "dl")[-1]),
+            }
+            for group in cube.groups
+            if len(cube) > 0
+        }
+        missing = sorted(set(record.observed_demand) - set(record.forecast))
+        if missing:
+            LOGGER.warning(
+                "cycle #%d: %d group(s) carried traffic but are absent from the "
+                "forecast, so they were not steered: %s",
+                record.cycle,
+                len(missing),
+                ", ".join(missing),
+            )
 
         summary = proposal.get("summary", {})
         record.solver = {
@@ -916,14 +962,16 @@ class Autopilot:
             "projected": _totals(proposal.get("projected_load_pps") or {}),
         }
         LOGGER.info(
-            "cycle #%d solved (%s) in %s ms | hottest %s %s pps -> %s %s pps%s",
+            "cycle #%d solved (%s) in %s ms | hottest %s %s %s -> %s %s %s%s",
             record.cycle,
             proposal.get("status"),
             summary.get("solver_runtime_ms"),
             (summary.get("hottest_baseline") or {}).get("upf"),
             (summary.get("hottest_baseline") or {}).get("pps"),
+            self.config.traffic_unit,
             (summary.get("hottest_projected") or {}).get("upf"),
             (summary.get("hottest_projected") or {}).get("pps"),
+            self.config.traffic_unit,
             " [still over capacity]" if summary.get("projected_overloaded") else "",
         )
         for row in proposal["rows"]:
@@ -935,6 +983,14 @@ class Autopilot:
                 " ".join(f"{k}={v}" for k, v in sorted(row["proposed_weights"].items())) or "-",
                 "" if row["changed"] else "   (unchanged)",
             )
+
+        if smf_blocked is not None:
+            record.outcome = "held"
+            record.reason = smf_blocked
+            LOGGER.error(
+                "cycle #%d HELD (solved, not written): %s", record.cycle, smf_blocked
+            )
+            return
 
         if not record.changed_selection_ids:
             record.outcome = "no_change"
