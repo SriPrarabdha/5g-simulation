@@ -29,7 +29,7 @@ class WorkshopV2Tests(unittest.TestCase):
         for content in (solver,simulator,para): self.assertIn("${USER:?USER is required}",content); self.assertIn("PBS_JOBID",content)
     def test_notebook_has_six_stages_hints_and_solutions(self):
         data=json.loads(Path("workshop/CDOT_UPF_Closed_Loop_Lab.ipynb").read_text())
-        self.assertEqual(data["metadata"]["workshop"]["visible_stages"],["Preflight","Optimize","Parallel solver","Simulate","Analyze","Experience"])
+        self.assertEqual(data["metadata"]["workshop"]["visible_stages"],["Mission control","Make the bottleneck visible","Forecast without peeking","Prove the safety gate","Scale out on PBS","Make the operator call"])
         self.assertEqual(sum("todo" in c.get("metadata",{}).get("tags",[]) for c in data["cells"]),6)
         self.assertEqual(sum("solution" in c.get("metadata",{}).get("tags",[]) for c in data["cells"]),6)
         self.assertFalse(data["metadata"]["workshop"]["participant_has_presenter_credentials"])

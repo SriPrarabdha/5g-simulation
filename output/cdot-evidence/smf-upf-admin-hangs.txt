@@ -1,0 +1,57 @@
+SMF /upf-admin INTERMITTENTLY ACCEPTS TCP BUT NEVER RESPONDS
+==========================================================================
+endpoint : http://192.168.218.8:30956/upf-admin  (HTTP/2 cleartext, prior knowledge)
+date     : 2026-08-27
+
+SUMMARY
+-------
+The endpoint alternates between long healthy periods and long periods where
+it accepts the TCP connection and then sends nothing at all. A port check
+reports it UP in both states, so monitoring based on a TCP probe will not
+see this.
+
+OBSERVED TIMELINE (IST)
+-----------------------
+  13:47   HEALTHY   GET /upf-admin -> 200, body []            (empty table)
+  14:32   HANGING   TCP connect OK, zero bytes returned, 4 attempts, all timed out
+  17:22   HEALTHY   GET -> 200, 5 weight tuples returned, 12-33 ms
+  17:5x   HEALTHY   write test succeeded (see below), table empty again
+  18:11   HANGING   5 consecutive GETs, each timed out at 8 s
+  18:41   HANGING   20 consecutive probes over 100 s, all timed out at 4 s
+
+Note the weight table also changed from 5 tuples to empty between 17:22 and
+17:5x without us writing anything - worth checking whether the service is
+restarting and losing its table.
+
+EVIDENCE THAT IT IS NOT A NETWORK PROBLEM
+-----------------------------------------
+  $ TCP connect to 192.168.218.8:30956          -> succeeds immediately
+  $ send HTTP/2 preface + GET /upf-admin        -> zero bytes back within 10 s
+  $ (same code, same host, during a healthy window) -> 200 in 12 ms
+
+So the listener is accepting connections while the application behind it is
+not serving. Typical causes: the request handler is blocked, a worker pool is
+exhausted, or the process is up but not yet ready.
+
+WHAT THE WRITE TEST PROVED (during a healthy window)
+----------------------------------------------------
+  POST /upf-admin  [{"dnn":"ims","tac":2,"weights":{"UPF1":50,"UPF2":50}}]
+     -> {"applied":[{"dnn":"ims","tac":2,"weights":{"UPF1":50,"UPF2":50}}],
+         "deleted":[]}
+  GET  /upf-admin  -> tuple present, weights exactly as sent
+
+  POST /upf-admin  [{"dnn":"ims","tac":2,"weights":{}}]      (clear the entry)
+     -> {"applied":[],"deleted":[{"dnn":"ims","tac":2}]}
+  GET  /upf-admin  -> [] , byte-identical to the state before the test
+
+The API contract works exactly as documented. Weights were chosen to respect
+the constraint CSV (TAC 2 -> UPF1, UPF2). Nothing was left behind.
+
+WHAT WOULD HELP
+---------------
+  - Server-side logs from /upf-admin during one of the hanging windows.
+  - Whether the service restarts on a timer or under load (would explain both
+    the hangs and the table emptying).
+  - A readiness endpoint we can poll that reflects the application, not just
+    the socket.
+==========================================================================

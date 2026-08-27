@@ -1,43 +1,83 @@
 import { expect, test } from '@playwright/test'
 
+/**
+ * The presenter-reviewed apply path, on the replay-study half of the console.
+ *
+ * The fixture tracks ``cdot-live-snapshot/2.0``: the demand-cube rewrite renamed
+ * every field this page reads, and a 1.0 fixture renders a blank page rather
+ * than a failed assertion.
+ */
 function liveSnapshot() {
   const now = new Date().toISOString()
-  const tuple = { tuple_id: 'tac-2|ims|dscp-0|upf-1', tac: 2, dnn: 'ims', dscp: 0, upf: 'upf-1', ul_rate: 12000, dl_rate: 18000, unit: 'pps-proxy' }
-  const horizon = Array.from({ length: 8 }, (_, index) => ({ horizon_minutes: (index + 1) * 10, p50: 15000 + index * 200, p90: 17000 + index * 200, p95: 18000 + index * 200 }))
+  const quantiles = { p50: 15000, p90: 17000, p95: 18000 }
   return {
-    schema_version: 'cdot-live-snapshot/1.0', sequence: 1,
+    schema_version: 'cdot-live-snapshot/2.0', sequence: 1, wall_time: now,
+    act: 'preload', acts: ['preload', 'baseline', 'optimized', 'scorecard'],
     status: {
-      status: 'healthy', stage: 'presenter_review',
-      endpoints: { prometheus: { ready: true }, smf: { ready: true } },
-      freshness: { fresh: true, latest_closed_bucket_age_seconds: 24 },
+      schema_version: 'cdot-live-status/2.0', status: 'healthy', stage: 'presenter_review',
+      act: 'preload', source: { mode: 'replay', samples: 17280 },
+      endpoints: {
+        prometheus: { url: 'http://prom.test:29090', ready: true, in_use: false },
+        smf: { url: 'http://smf.test:30956', ready: true, protocol: 'h2c-prior-knowledge' },
+      },
+      freshness: { latest_sample_age_seconds: 24, stale_after_seconds: 90, fresh: true },
+      cadence: {
+        telemetry_step_seconds: 30, decision_interval_seconds: 60,
+        forecast_horizon_seconds: 600, history_seconds: 10800,
+      },
+      capacity: { per_upf_pps: 70000, safe_utilization: .8, safe_pps: 56000, confirmed_by_cdot: false },
+      assumptions: ['Uncalibrated proxy.', 'Carried traffic cold-start assumption.'],
+      // No autopilot block: the console opens on the replay study, which is
+      // what these tests exercise.
+      units: { traffic: 'pps', mbps: false },
+      current_smf_state_hash: 'state-hash', last_poll: now, last_error: null,
     },
-    pipeline: { stage: 'presenter_review', stages: ['prometheus_read', 'bucket_closed', 'forecast', 'highs_optimization', 'presenter_review', 'smf_apply', 'get_verify'] },
+    pipeline: {
+      stage: 'presenter_review',
+      stages: ['ingest', 'demand_cube', 'forecast', 'highs_optimization', 'presenter_review', 'smf_apply', 'get_verify'],
+    },
+    units: { traffic: 'pps', mbps: false },
     telemetry: {
-      buckets: [{ start: now, end: now, complete: true, tuples: [tuple] }],
+      series: null,
       upfs: Array.from({ length: 4 }, (_, index) => ({
-        upf: `upf-${index + 1}`, smf: `UPF${index + 1}`, health: 'healthy', sessions: 1200,
-        cpu: 3, memory_bytes: 300_000_000, tsi: .12, drop_rate_percent: 0,
-        forwarding_efficiency_percent: 100, observed: { ul: 12000, dl: 18000 },
-        proxy_safe_limit: { ul: 44300, dl: 79200 }, utilization: { ul: .27, dl: .23 },
+        upf: `upf-${index + 1}`, smf: `UPF${index + 1}`,
+        observed: { ul: 12000, dl: 18000, total: 30000 },
+        projected: { ul: 11000, dl: 17000, total: 28000 },
+        capacity_pps: 70000, safe_pps: 56000, utilization: .43,
+        headroom_pps: 40000, overloaded: false, unit: 'pps',
       })),
     },
     forecast: {
-      rows: [{ horizons: { ul: horizon, dl: horizon } }],
-      model_summary: { synthetic_transfer_contribution: .25, live_baseline_wape: .08, fallback_reasons: [], donor_absolute_scale_used: false, donor_band_width_used: false },
+      model: {
+        model: 'cdot-ridge-conformal/1.0', cycle_period_minutes: 31,
+        families: { ridge: 8 }, wape_select_mean: .08,
+        wape_select_persistence_mean: .12, fitted_series: 16, fitted_rows: 360, fallbacks: {},
+      },
+      issued_at: now, target_seconds_ahead: 600, unit: 'pps',
+      rows: [{ selection_id: 'tac-2|ims|dscp-0', dnn: 'ims', tac: 2, ul: quantiles, dl: quantiles, total_p50: 30000 }],
     },
     proposal: {
-      proposal_id: 'proposal-test', actuation_ready: true,
-      warnings: ['Uncalibrated proxy.', 'Carried traffic cold-start assumption.'],
+      proposal_id: 'proposal-test', created_at: now, status: 'optimal', message: null,
+      base_smf_state_hash: 'state-hash', unit: 'pps', actuation_ready: true,
+      summary: {
+        hottest_baseline: { upf: 'upf-1', pps: 71091.5 },
+        hottest_projected: { upf: 'upf-2', pps: 49119 },
+        peak_reduction: .309, capacity_pps: 70000,
+        baseline_overloaded: true, projected_overloaded: false,
+        max_safe_utilization: .87, solver_runtime_ms: 18,
+      },
+      projected_load_pps: {}, baseline_load_pps: {}, eligibility: {},
       rows: [{
-        selection_id: 'tac-2|ims|dscp-0', display_only: false, actuation_ready: true,
-        current_weights: { UPF1: 50, UPF2: 50 }, proposed_weights: { UPF1: 60, UPF2: 40 },
-        delta_percentage_points: { UPF1: 10, UPF2: -10 },
-        projected_utilization: { 'upf-1': { ul: .54, dl: .48 }, 'upf-2': { ul: .42, dl: .45 } },
-        slack: 0, solver_status: 'optimal',
+        selection_id: 'tac-2|ims|dscp-0', dnn: 'ims', tac: 2,
+        observed_share: { 'upf-1': .5, 'upf-2': .5 },
+        current_weights: { UPF1: 50, UPF2: 50 },
+        proposed_weights: { UPF1: 60, UPF2: 40 },
+        changed: true, actuation_ready: true,
         outgoing_json: { tac: 2, dnn: 'ims', dscp: 0, weights: { UPF1: 60, UPF2: 40 } },
       }],
     },
-    smf: { state_hash: 'state-hash', verification: null },
+    counterfactual: null,
+    smf: { state: null, state_hash: 'state-hash', verification: null },
     audit_events: [{ id: 1, wall_time: now, actor: 'presenter', action: 'cdot-live.evaluate', payload: { read_only: true } }],
     rollback: { available: false, application_id: null },
   }
@@ -47,6 +87,9 @@ async function openLive(page: import('@playwright/test').Page) {
   const fixture = liveSnapshot()
   await page.route('**/api/v1/cdot-live/snapshot', route => route.fulfill({ json: fixture }))
   await page.route('**/api/v1/cdot-live/evaluate', route => route.fulfill({ json: fixture }))
+  // The console also takes a snapshot down its websocket on open; unstubbed,
+  // the real server's snapshot lands on top of this fixture mid-test.
+  await page.routeWebSocket(/\/api\/v1\/ws\/cdot-live/, () => { /* fixture is the only source */ })
   await page.goto('/')
   await page.getByRole('button', { name: /sign in/i }).click()
   await page.getByRole('button', { name: /open live dashboard/i }).click()

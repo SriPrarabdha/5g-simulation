@@ -585,6 +585,59 @@ button:disabled { opacity: .48; cursor: not-allowed; }
 .review-actions button:last-child { border-color: rgba(194,65,59,.3); color: var(--actual-loss); }
 .review-drawer > small { display: block; margin-top: 18px; color: var(--control-ink-3); line-height: 1.5; }
 
+/* Unattended closed loop: live Prometheus -> optimizer -> SMF */
+.mode-switch { display: flex; gap: 8px; margin-top: 24px; padding: 5px; border: 1px solid var(--control-line); border-radius: 9px; background: var(--control-inset); }
+.mode-switch button { flex: 1; min-width: 0; padding: 11px 16px; border: 1px solid transparent; border-radius: 6px; background: transparent; text-align: left; cursor: pointer; }
+.mode-switch button.active { border-color: var(--control-line); background: var(--control-surface); box-shadow: 0 1px 2px rgba(18,33,43,.05); }
+.mode-switch b { display: block; color: var(--control-ink-3); font-size: 13px; }
+.mode-switch button.active b { color: var(--cdot-flow); }
+.mode-switch small { display: block; margin-top: 3px; color: var(--control-ink-3); font-size: 11px; }
+.autopilot-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 20px; padding: 16px 20px; border: 1px solid var(--control-line); border-radius: 9px; background: var(--control-surface); }
+.autopilot-lede b { display: block; font-size: 15px; }
+.autopilot-lede span { display: block; margin-top: 4px; overflow-wrap: anywhere; color: var(--control-ink-3); font: 10px/1.6 var(--mono); }
+.autopilot-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.autopilot-actions button { min-height: 42px; padding: 0 16px; border: 1px solid var(--control-line); border-radius: 5px; background: var(--control-surface); color: var(--control-ink-2); font-weight: 600; cursor: pointer; }
+.autopilot-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.autopilot-actions button.start { border-color: rgba(31,122,90,.4); background: var(--validated); color: #fff; }
+.autopilot-actions button.stop { border-color: rgba(194,65,59,.4); color: var(--actual-loss); }
+.health-ribbon { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 16px; border: 1px solid var(--control-line); border-radius: 8px; background: var(--control-surface); overflow: hidden; }
+.health-ribbon > div { min-width: 0; padding: 14px 16px; border-right: 1px solid var(--control-line-soft); }
+.health-ribbon > div:last-child { border-right: 0; }
+.health-ribbon b { display: block; color: var(--control-ink-3); font: 500 9px var(--mono); letter-spacing: .07em; text-transform: uppercase; }
+.health-ribbon strong { display: block; margin-top: 6px; overflow: hidden; font: 600 21px var(--mono); text-overflow: ellipsis; white-space: nowrap; }
+.health-ribbon span { display: block; margin-top: 5px; color: var(--control-ink-3); font-size: 11px; line-height: 1.45; }
+.health-ribbon .ok strong { color: var(--validated); }
+.health-ribbon .warn strong { color: var(--approach-risk); }
+.health-ribbon .bad strong { color: var(--actual-loss); }
+.health-ribbon .active strong { color: var(--cdot-flow); }
+.health-ribbon .active { box-shadow: inset 0 -3px var(--cdot-flow); }
+.cycle-list { margin-top: 6px; max-height: 560px; overflow-y: auto; }
+.cycle-list article { padding: 14px 0 14px 13px; border-top: 1px solid var(--control-line-soft); border-left: 3px solid var(--control-line); }
+.cycle-list article.ok { border-left-color: var(--validated); }
+.cycle-list article.warn { border-left-color: var(--approach-risk); }
+.cycle-list article.bad { border-left-color: var(--actual-loss); }
+.cycle-list header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; }
+.cycle-list header b { font: 600 13px var(--mono); }
+.cycle-list header time { color: var(--control-ink-2); font: 11px var(--mono); }
+.cycle-list header i { padding: 2px 7px; border-radius: 3px; background: var(--control-inset); color: var(--control-ink-2); font: 600 9px var(--mono); text-transform: uppercase; font-style: normal; }
+.cycle-list article.ok header i { background: rgba(31,122,90,.1); color: var(--validated); }
+.cycle-list article.warn header i { background: rgba(183,121,31,.1); color: var(--approach-risk); }
+.cycle-list article.bad header i { background: rgba(194,65,59,.09); color: var(--actual-loss); }
+.cycle-list header small { margin-left: auto; color: var(--control-ink-3); font: 9px var(--mono); }
+.cycle-list p { margin: 8px 0 0; color: var(--control-ink-2); font-size: 12px; line-height: 1.5; }
+.cycle-list .cycle-reason { color: var(--approach-risk); }
+.cycle-list .cycle-error { color: var(--actual-loss); overflow-wrap: anywhere; font: 10px var(--mono); }
+.cycle-list .cycle-verified { color: var(--validated); font: 10px var(--mono); }
+.cycle-json { margin-top: 9px; padding: 0; border: 0; background: none; color: var(--cdot-flow); font: 500 11px var(--mono); text-decoration: underline; cursor: pointer; }
+.poll-log { margin-top: 6px; max-height: 560px; overflow-y: auto; font: 10px var(--mono); }
+.poll-log > div { display: grid; grid-template-columns: 78px 92px 62px minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--control-line-soft); }
+.poll-log time, .poll-log > div > span { min-width: 0; overflow: hidden; color: var(--control-ink-3); text-overflow: ellipsis; white-space: nowrap; }
+.poll-log b { color: var(--validated); }
+.poll-log .bad b { color: var(--actual-loss); }
+.poll-log .bad > span:last-child { color: var(--actual-loss); white-space: normal; }
+.optimizer-table .applied-row { min-width: 0; grid-template-columns: minmax(160px, .5fr) minmax(0, 1fr); }
+.optimizer-panel .live-empty.compact, .traffic-panel .live-empty.compact { min-height: 140px; }
+
 @media (max-width: 1279px) {
   .app-header { grid-template-columns: 230px minmax(180px, 1fr) auto auto 56px; }
   .header-run span, .link-state { display: none; }
@@ -607,6 +660,9 @@ button:disabled { opacity: .48; cursor: not-allowed; }
   .ledger-pending { grid-column: 2 / -1; }
   .pipeline-ribbon { grid-template-columns: repeat(3, 1fr); }
   .pipeline-ribbon > div:nth-child(3) { border-right: 0; }
+  .health-ribbon { grid-template-columns: repeat(2, 1fr); }
+  .health-ribbon > div:nth-child(2n) { border-right: 0; }
+  .mode-switch, .autopilot-bar { flex-wrap: wrap; }
   .upf-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 900px) {

@@ -71,3 +71,26 @@ export async function rollbackCdotLive(token: string, applicationId: string, exp
     method: 'POST', body: JSON.stringify({ application_id: applicationId, expected_smf_state_hash: expectedHash, confirmation }),
   }, token)
 }
+
+// --- unattended closed loop -------------------------------------------------
+
+export async function getCdotAutopilot(token: string) {
+  return request<any>('/api/v1/cdot-live/autopilot', {}, token)
+}
+
+export async function startCdotAutopilot(token: string) {
+  return request<any>('/api/v1/cdot-live/autopilot/start', { method: 'POST' }, token)
+}
+
+export async function stopCdotAutopilot(token: string, reason = 'stopped from the console') {
+  return request<any>(`/api/v1/cdot-live/autopilot/stop?reason=${encodeURIComponent(reason)}`,
+    { method: 'POST' }, token)
+}
+
+export async function runCdotAutopilotCycle(token: string) {
+  return request<any>('/api/v1/cdot-live/autopilot/cycle', { method: 'POST' }, token)
+}
+
+export async function pollCdotAutopilot(token: string) {
+  return request<any>('/api/v1/cdot-live/autopilot/poll', { method: 'POST' }, token)
+}

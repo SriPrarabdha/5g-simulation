@@ -116,9 +116,21 @@ class WorkshopMaterialTests(unittest.TestCase):
         self.assertTrue(all(cell["metadata"]["jupyter"]["source_hidden"] for cell in solutions))
         self.assertEqual(
             payload["metadata"]["workshop"]["visible_stages"],
-            ["Preflight", "Optimize", "Parallel solver", "Simulate", "Analyze", "Experience"],
+            ["Mission control", "Make the bottleneck visible", "Forecast without peeking", "Prove the safety gate", "Scale out on PBS", "Make the operator call"],
         )
         self.assertFalse(payload["metadata"]["workshop"]["participant_has_presenter_credentials"])
+
+    def test_live_and_run_anywhere_tracks_are_distinct_and_current(self) -> None:
+        live = notebook(frozen=False)
+        local = notebook(frozen=True)
+        self.assertEqual(live["metadata"]["workshop"]["track"], "live-pbs-with-local-fallback")
+        self.assertEqual(local["metadata"]["workshop"]["track"], "run-anywhere")
+        live_source = "".join("".join(cell.get("source", [])) for cell in live["cells"])
+        local_source = "".join("".join(cell.get("source", [])) for cell in local["cells"])
+        self.assertIn("submit_pbs", live_source)
+        self.assertNotIn("submit_pbs", local_source)
+        self.assertIn("+24.0%", live_source)
+        self.assertIn("CDOT_Pilot_Readiness.json", live_source)
 
     def test_frozen_notebook_contains_preexecuted_outputs(self) -> None:
         payload = notebook(frozen=True)

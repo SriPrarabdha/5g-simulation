@@ -361,13 +361,29 @@ def solve(
 
     bounds = config.weight_bounds
     step = bounds.max_step_delta_pp / 100.0
+    eligibility = config.eligibility(cube.observed_eligibility)
     weights: dict[str, dict[str, float]] = {}
     integers: dict[str, dict[str, int]] = {}
     for group in result.policy.groups:
         selection_id = group.key.selection_id
+        # Eligibility has to gate the *written* vector, not just the LP.
+        #
+        # ``apply_bounds`` water-fills over ``set(target) | set(current)``, and
+        # ``current`` is the observed routing -- which under ``declared`` mode
+        # contains UPF/TAC pairs the constraint CSV forbids.  Without this
+        # filter the LP would correctly refuse to place load on such a pair and
+        # the min_share floor would then put it straight back at 2%, writing a
+        # weight for a (tac, upf) combination C-DOT says cannot carry it.
+        _, tac = parse_group_id(selection_id)
+        allowed = set(eligibility.get(tac, ()))
+        target = group.weights
+        observed = current.get(selection_id, {})
+        if allowed:
+            target = {upf: value for upf, value in target.items() if upf in allowed}
+            observed = {upf: value for upf, value in observed.items() if upf in allowed}
         bounded = apply_bounds(
-            group.weights,
-            current.get(selection_id, {}),
+            target,
+            observed,
             min_share=bounds.min_share,
             max_share=bounds.max_share,
             max_step_delta=step,
@@ -386,7 +402,7 @@ def solve(
         max_safe_utilization=result.max_safe_utilization,
         solver_runtime_ms=result.policy.solver.runtime_ms,
         policy=result.policy,
-        eligibility=config.eligibility(cube.observed_eligibility),
+        eligibility=eligibility,
     )
 
 

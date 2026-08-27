@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import math
+from contextlib import suppress
 from dataclasses import dataclass
 from functools import reduce
 from typing import Any, Awaitable, Callable, Iterable
@@ -176,6 +177,71 @@ class H2CSmfClient:
             return H2Response(int(response_headers.get(":status", "0")), response_headers, bytes(response_body))
 
         return await asyncio.wait_for(exchange(), timeout=self.timeout_seconds)
+
+    async def diagnose(self, *, connect_timeout: float = 5.0, read_timeout: float = 8.0) -> dict[str, Any]:
+        """Say *how* the SMF is failing, not just that it is.
+
+        Three outcomes that a plain "ready: false" cannot tell apart, and which
+        need three different things from C-DOT:
+
+        ``refused``      nothing is listening -- the service is down.
+        ``no_h2_response`` TCP connects but the server never speaks HTTP/2.  A
+                         port check calls this healthy, which is exactly how a
+                         hung SMF gets reported as up.
+        ``responding``   the endpoint answered; any failure is above transport.
+        """
+        result: dict[str, Any] = {"host": self.host, "port": self.port}
+        try:
+            reader, writer = await asyncio.wait_for(
+                self._connector(self.host, self.port), connect_timeout
+            )
+        except (asyncio.TimeoutError, OSError) as error:
+            result.update(tcp=False, verdict="refused",
+                          detail=f"{type(error).__name__}: {error}")
+            return result
+        result["tcp"] = True
+        try:
+            import h2.config
+            import h2.connection
+
+            connection = h2.connection.H2Connection(
+                config=h2.config.H2Configuration(client_side=True, header_encoding="utf-8")
+            )
+            connection.initiate_connection()
+            writer.write(connection.data_to_send())
+            stream_id = connection.get_next_available_stream_id()
+            connection.send_headers(
+                stream_id,
+                [(":method", "GET"), (":scheme", "http"),
+                 (":authority", f"{self.host}:{self.port}"),
+                 (":path", self.base_path.rstrip("/") + "/upf-admin"),
+                 ("accept", "application/json")],
+                end_stream=True,
+            )
+            writer.write(connection.data_to_send())
+            await writer.drain()
+            data = await asyncio.wait_for(reader.read(65535), read_timeout)
+            if data:
+                result.update(verdict="responding", bytes_returned=len(data))
+            else:
+                result.update(verdict="no_h2_response",
+                              detail="server closed the connection without a response")
+        except asyncio.TimeoutError:
+            result.update(
+                verdict="no_h2_response",
+                detail=(
+                    f"accepted the TCP connection but sent nothing back within "
+                    f"{read_timeout:.0f}s -- the service is listening but not serving, "
+                    "so a port check will wrongly report it healthy"
+                ),
+            )
+        except Exception as error:  # pragma: no cover - transport oddities
+            result.update(verdict="error", detail=f"{type(error).__name__}: {error}")
+        finally:
+            with suppress(Exception):
+                writer.close()
+                await writer.wait_closed()
+        return result
 
     async def get_state(self) -> Any:
         response = await self.request("GET", "/upf-admin")

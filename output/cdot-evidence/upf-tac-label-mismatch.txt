@@ -1,0 +1,98 @@
+UPF / TAC LABEL MISMATCH - EVIDENCE
+==========================================================================
+generated  : 2026-08-27T12:44:18+00:00
+data source: C-DOT Grafana export, /home/prarabdhas/5g-simulation/cdot-upf-metrics-v02/metrics
+window     : 2026-08-20 11:06 - 15:06 UTC (23,072 session-class samples)
+
+We agree the constraint CSV is correct. The evidence below says the problem
+is NOT the CSV - it is that the 'upf' label in the Prometheus session-class
+metrics does not refer to the same box as the UPF name in the SMF.
+
+--------------------------------------------------------------------------
+1. OBSERVED TRAFFIC PER (UPF, TAC), TAKEN FROM YOUR OWN EXPORT
+--------------------------------------------------------------------------
+
+upf      tac         mean pps    samples    % of window   per the CSV
+upf-1    2             2529.5       1442           100%   allowed
+upf-1    3            20387.3       1442           100%   allowed
+upf-1    4            13001.2       1442           100%   allowed
+upf-2    3            10590.9       1442           100%   allowed
+upf-2    4            10513.7       1442           100%   FORBIDDEN
+upf-3    4             3662.6       1442           100%   allowed
+upf-4    2            26975.3       1442           100%   FORBIDDEN
+
+Two pairs carry sustained traffic the CSV says cannot exist:
+   upf-2 on TAC 4: 10,514 pps mean, present in 1442/1442 samples (100% of the window).
+      CSV allows TAC 4 on ['upf-1', 'upf-3', 'upf-4']
+   upf-4 on TAC 2: 26,975 pps mean, present in 1442/1442 samples (100% of the window).
+      CSV allows TAC 2 on ['upf-1', 'upf-2']
+
+   These are not noise. upf-4/TAC-2 at ~27,000 pps is one of the largest
+   single flows in the entire export.
+
+--------------------------------------------------------------------------
+2. EXHAUSTIVE TEST: IS THERE A RELABELLING THAT FITS THE CSV?
+--------------------------------------------------------------------------
+
+We tested all 24 permutations of the four UPF labels against the CSV.
+Exactly 1 of 24 is fully consistent:
+
+      Prometheus label upf-1   ->   SMF UPF1  (upf-1)
+      Prometheus label upf-2   ->   SMF UPF3  (upf-3)
+      Prometheus label upf-3   ->   SMF UPF4  (upf-4)
+      Prometheus label upf-4   ->   SMF UPF2  (upf-2)
+
+   Under this relabelling every observed pair becomes CSV-legal:
+      upf-1 on TAC 2  ->  upf-1 on TAC 2   (CSV: ['upf-1', 'upf-2'])
+      upf-1 on TAC 3  ->  upf-1 on TAC 3   (CSV: ['upf-1', 'upf-2', 'upf-3'])
+      upf-1 on TAC 4  ->  upf-1 on TAC 4   (CSV: ['upf-1', 'upf-3', 'upf-4'])
+      upf-2 on TAC 3  ->  upf-3 on TAC 3   (CSV: ['upf-1', 'upf-2', 'upf-3'])
+      upf-2 on TAC 4  ->  upf-3 on TAC 4   (CSV: ['upf-1', 'upf-3', 'upf-4'])
+      upf-3 on TAC 4  ->  upf-4 on TAC 4   (CSV: ['upf-1', 'upf-3', 'upf-4'])
+      upf-4 on TAC 2  ->  upf-2 on TAC 2   (CSV: ['upf-1', 'upf-2'])
+
+   One consistent explanation out of 24 candidates is unlikely to be chance.
+
+--------------------------------------------------------------------------
+3. CORROBORATION ALREADY IN YOUR NAMING
+--------------------------------------------------------------------------
+
+The job/pod names we were given are themselves offset by one:
+
+metric label   job        pod        SMF name
+upf-1          upf1       upf-0      UPF1
+upf-2          upf2       upf1-0     UPF2
+upf-3          upf3       upf2-0     UPF3
+upf-4          upf4       upf3-0     UPF4
+
+   metric 'upf-1' maps to pod 'upf-0', 'upf-2' to pod 'upf1-0', and so on.
+   Identifiers already do not line up across your own systems, which is
+   consistent with a permutation existing between metrics and the SMF.
+
+--------------------------------------------------------------------------
+4. WHY THIS MATTERS TO THE CLOSED LOOP
+--------------------------------------------------------------------------
+
+We read per-UPF load from Prometheus and write per-UPF weights to the SMF,
+assuming 'upf-2' in the metrics is the box the SMF calls UPF2. If the
+permutation above is real, we would be reading one UPF's load and
+re-routing a different one. We have NOT written any optimizer output to
+your SMF, and will not until this is resolved.
+
+--------------------------------------------------------------------------
+5. WHAT WOULD SETTLE IT
+--------------------------------------------------------------------------
+
+Any one of these confirms or refutes the permutation:
+
+  a) Tell us, for one UPF, its pod name AND its session-class 'upf' label
+     AND its SMF name. One box pinned down resolves the whole mapping.
+
+  b) With the exporters running, put a known load on exactly one UPF and
+     tell us which. We will report which 'upf' label moved.
+
+  c) Restore the scrape config (see separate note) and we can correlate
+     per-pod upf_cpu_usage_cores against per-class traffic - that
+     identifies the mapping independently, with no manual test needed.
+
+==========================================================================

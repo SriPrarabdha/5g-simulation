@@ -21,6 +21,7 @@ import copy
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 
+from .autopilot import Autopilot
 from .cdot_forecaster import CdotForecaster, ForecastError
 from .config import LiveConfig
 from .counterfactual import Counterfactual
@@ -99,6 +100,7 @@ class CdotLiveService:
         self._verification: dict[str, Any] | None = None
         self._stage = "idle"
         self._act = "preload"
+        self.autopilot = Autopilot(self)
         if isinstance(self.source, ReplaySource):
             span = self.source.span()
             if span:
@@ -152,10 +154,19 @@ class CdotLiveService:
         self._subscribers.discard(queue)
 
     async def start(self) -> None:
+        """Begin whichever background loop this deployment is configured for.
+
+        The autopilot owns both clocks when it is on -- a second evaluate loop
+        underneath it would race it for the proposal and burn the solver twice.
+        """
+        if self.config.autopilot.enabled:
+            await self.autopilot.start(actor="system")
+            return
         if self._poll_task is None or self._poll_task.done():
             self._poll_task = asyncio.create_task(self._poll_loop(), name="cdot-live-poller")
 
     async def close(self) -> None:
+        await self.autopilot.stop(actor="system", reason="shutdown")
         if self._poll_task is not None:
             self._poll_task.cancel()
             try:
@@ -218,7 +229,11 @@ class CdotLiveService:
                 state = await self.smf.get_state()
                 return True, state, canonical_state_hash(state), None
             except Exception as error:
-                return False, None, None, str(error)
+                # Never bare str(): asyncio.TimeoutError stringifies to "", which
+                # is falsy, so a timed-out SMF read used to clear last_error and
+                # report "not ready" with no reason at all -- the single most
+                # common failure on this deployment, rendered invisible.
+                return False, None, None, f"{type(error).__name__}: {error}".rstrip(": ")
 
         async def source_read() -> bool:
             try:
@@ -240,10 +255,14 @@ class CdotLiveService:
 
     def status(self) -> dict[str, Any]:
         freshness = None
-        if self._cube is not None and self._cube.latest_time is not None:
-            freshness = max(
-                0.0, (self._now_trace() - self._cube.latest_time).total_seconds()
-            )
+        # When the autopilot is streaming, its buffer holds newer samples than
+        # the cube the last control cycle solved on; reporting cube age there
+        # would make a healthy 30 s poll look like a 10 min stall.
+        latest_sample = self.autopilot.buffer.latest
+        if latest_sample is None and self._cube is not None:
+            latest_sample = self._cube.latest_time
+        if latest_sample is not None:
+            freshness = max(0.0, (self._now_trace() - latest_sample).total_seconds())
         stale_after = self.config.cadence.telemetry_stale_seconds
         # A replay source can serve data with no live endpoint at all, so
         # readiness is about the *source in use*, not about Prometheus.
@@ -286,6 +305,7 @@ class CdotLiveService:
                 "confirmed_by_cdot": self.config.capacity.confirmed_by_cdot,
             },
             "assumptions": self.config.unconfirmed_assumptions(),
+            "autopilot": self.autopilot.status(),
             "units": {"traffic": "pps", "mbps": False},
             "current_smf_state_hash": self._smf_hash,
             "last_poll": self._last_poll,
@@ -402,7 +422,15 @@ class CdotLiveService:
 
     # -------------------------------------------------------------- evaluate
 
-    async def evaluate(self, *, actor: str, audit: bool = True) -> dict[str, Any]:
+    async def evaluate(
+        self, *, actor: str, audit: bool = True, cube: DemandCube | None = None
+    ) -> dict[str, Any]:
+        """Ingest, forecast, solve, and stage a proposal for review.
+
+        ``cube`` lets the autopilot hand in the rolling buffer it has already
+        streamed off Prometheus, so the control cycle re-solves without a second
+        ``query_range`` over the same three hours.
+        """
         async with self._lock:
             if self._proposal_frozen:
                 # A presenter has the review drawer open; overwriting the
@@ -411,13 +439,14 @@ class CdotLiveService:
                 return self.snapshot()
             self._stage = "ingest"
             await self._emit("pipeline.stage", {"stage": self._stage})
-            try:
-                cube = await self._load_window()
-            except (SourceError, ValueError) as error:
-                self._last_error = str(error)
-                self._stage = "degraded"
-                await self._emit("pipeline.degraded", {"error": str(error)})
-                raise
+            if cube is None:
+                try:
+                    cube = await self._load_window()
+                except (SourceError, ValueError) as error:
+                    self._last_error = str(error)
+                    self._stage = "degraded"
+                    await self._emit("pipeline.degraded", {"error": str(error)})
+                    raise
             self._cube = cube
             self._last_poll = _now()
 
@@ -550,6 +579,10 @@ class CdotLiveService:
             "rows": rows,
             "actuation_ready": any(row["changed"] for row in rows) and plan.policy is not None,
         }
+
+    @property
+    def proposal_frozen(self) -> bool:
+        return self._proposal_frozen
 
     def freeze_proposal(self, frozen: bool = True) -> None:
         """Hold the current proposal steady while a presenter reviews it."""

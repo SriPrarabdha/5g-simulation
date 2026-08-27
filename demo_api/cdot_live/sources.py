@@ -238,6 +238,10 @@ class PrometheusSource:
         self._client = client
         self._owned: Any | None = None
         self.last_error: str | None = None
+        # Per-window diagnostics.  The autopilot's health log needs to tell
+        # "Prometheus is down" apart from "Prometheus is up and answering with
+        # zero series", which is what a wrong metric name looks like.
+        self.last_stats: dict[str, Any] = {}
 
     async def _http(self) -> Any:
         if self._client is not None:
@@ -301,13 +305,23 @@ class PrometheusSource:
             self._range(self._rate_query("dl"), start, end, step),
         )
         merged: dict[tuple[datetime, tuple[str, int, str, int]], list[float]] = {}
-        for result, slot in ((ul_result, 0), (dl_result, 1)):
+        stats: dict[str, Any] = {
+            "series_returned": {"ul": len(ul_result), "dl": len(dl_result)},
+            "series_matched": {"ul": 0, "dl": 0},
+            "rejected_labels": [],
+        }
+        self.last_error = None
+        for result, slot, direction in ((ul_result, 0, "ul"), (dl_result, 1, "dl")):
             unmatched = 0
             for series in result:
-                key = self._key(dict(series.get("metric", {})))
+                labels = dict(series.get("metric", {}))
+                key = self._key(labels)
                 if key is None:
                     unmatched += 1
+                    if len(stats["rejected_labels"]) < 3:
+                        stats["rejected_labels"].append(labels)
                     continue
+                stats["series_matched"][direction] += 1
                 for point in series.get("values", []):
                     try:
                         stamp = datetime.fromtimestamp(float(point[0]), timezone.utc)
@@ -322,12 +336,112 @@ class PrometheusSource:
                     "every returned series failed label normalisation -- expected labels "
                     "upf/loc/dnn/dscp; check the metric names with C-DOT"
                 )
+            elif not result:
+                self.last_error = (
+                    f"Prometheus answered the {direction} query with zero series -- the metric "
+                    f"name {self.config.queries.get(direction)!r} probably does not exist"
+                )
         rows = [
             ClassRate(stamp, key[0], key[1], key[2], key[3], values[0], values[1])
             for (stamp, key), values in merged.items()
         ]
         rows.sort(key=lambda item: item.t)
+        stats["samples"] = len(rows)
+        stats["window"] = [
+            start.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
+            end.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
+        ]
+        stats["error"] = self.last_error
+        self.last_stats = stats
         return rows
+
+    async def diagnose(self) -> dict[str, Any]:
+        """Explain a zero-series answer: wrong name, or dead exporter?
+
+        Both look identical in a ``query_range`` result -- an empty list -- but
+        they need opposite responses from C-DOT: fix the config, or restart the
+        exporter.  ``/api/v1/series`` over a wide window separates them, and the
+        newest timestamp says how long the feed has been silent.
+        """
+        import httpx
+
+        out: dict[str, Any] = {}
+        try:
+            client = await self._http()
+            now = datetime.now(timezone.utc)
+            # Whether the UPF exporters are even being scraped.  A stale metric
+            # has three causes needing three different fixes: the exporter is
+            # down, the metric name is wrong, or -- as happened here --
+            # Prometheus restarted with a config that no longer lists the
+            # target at all.  The first two look identical without this.
+            out["scrape"] = await self._scrape_targets(client)
+            for direction in ("ul", "dl"):
+                name = self.config.queries.get(direction, "")
+                entry: dict[str, Any] = {"metric": name}
+                response = await client.get(
+                    self.config.prometheus_url + "/api/v1/series",
+                    params={
+                        "match[]": name,
+                        "start": (now - timedelta(days=14)).timestamp(),
+                        "end": now.timestamp(),
+                    },
+                )
+                series = response.json().get("data", []) if response.status_code == 200 else []
+                entry["known_series"] = len(series)
+                entry["metric_exists"] = bool(series)
+                if series:
+                    # A range query, not timestamp(last_over_time(...)): the
+                    # latter reports the *evaluation* time, so a dead exporter
+                    # comes back looking perfectly fresh.  The newest point in a
+                    # coarse 14-day scan is the real answer.
+                    last = await client.get(
+                        self.config.prometheus_url + "/api/v1/query_range",
+                        params={
+                            "query": name,
+                            "start": (now - timedelta(days=14)).timestamp(),
+                            "end": now.timestamp(),
+                            "step": 3600,
+                        },
+                    )
+                    result = last.json().get("data", {}).get("result", []) if last.status_code == 200 else []
+                    stamps = [
+                        float(point[0])
+                        for item in result
+                        for point in item.get("values", [])
+                    ]
+                    if stamps:
+                        newest = max(stamps)
+                        entry["last_sample"] = datetime.fromtimestamp(newest, timezone.utc).isoformat().replace("+00:00", "Z")
+                        entry["last_sample_age_hours"] = round((now.timestamp() - newest) / 3600.0, 2)
+                out[direction] = entry
+        except (httpx.HTTPError, ValueError, KeyError, OSError) as error:
+            out["error"] = f"{type(error).__name__}: {error}"
+        return out
+
+    async def _scrape_targets(self, client: Any) -> dict[str, Any]:
+        try:
+            response = await client.get(self.config.prometheus_url + "/api/v1/targets",
+                                        params={"state": "any"})
+            active = response.json().get("data", {}).get("activeTargets", [])
+        except Exception as error:  # pragma: no cover - diagnostic only
+            return {"error": f"{type(error).__name__}: {error}"}
+        jobs = sorted({str(item.get("labels", {}).get("job", "")) for item in active} - {""})
+        # Everything except Prometheus scraping itself.
+        external = [job for job in jobs if job != "prometheus"]
+        return {
+            "active_targets": len(active),
+            "jobs": jobs,
+            "scraping_anything_but_itself": bool(external),
+            "unhealthy": [
+                {
+                    "job": item.get("labels", {}).get("job"),
+                    "instance": item.get("labels", {}).get("instance"),
+                    "error": item.get("lastError"),
+                }
+                for item in active
+                if item.get("health") != "up"
+            ],
+        }
 
     async def ready(self) -> bool:
         import httpx
@@ -348,6 +462,7 @@ class PrometheusSource:
             "dl_query": self._rate_query("dl"),
             "queries_confirmed_by_cdot": self.config.queries_confirmed,
             "last_error": self.last_error,
+            "last_stats": dict(self.last_stats),
         }
 
 

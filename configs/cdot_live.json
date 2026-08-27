@@ -1,12 +1,18 @@
 {
   "schema_version": "cdot-live-config/2.0",
   "units": "pps",
+  "traffic_units": {
+    "replay": "pps",
+    "prometheus": "bytes/s"
+  },
   "capacity": {
     "per_upf_pps": 70000.0,
     "safe_utilization": 0.8,
     "confirmed_by_cdot": false,
     "source": "PLACEHOLDER. Chosen from the cdot-upf-metrics-v02 trace so the observed static routing breaches it and a balanced routing does not. Replace with C-DOT's real per-UPF N3 envelope once they answer.",
-    "note": "All four UPF instances are assumed identically provisioned (their pod CPU/memory series are indistinguishable). One number drives every gauge, every LP capacity row, and the overload line."
+    "note": "All four UPF instances are assumed identically provisioned (their pod CPU/memory series are indistinguishable). One number drives every gauge, every LP capacity row, and the overload line.",
+    "per_upf_bytes_per_second": 1000000000.0,
+    "source_bytes_per_second": "PLACEHOLDER, same rationale as per_upf_pps but derived from C-DOT's live Prometheus on 2026-08-27. Over a 3 h window the observed static routing put upf-1 at 547 MB/s mean / 1246 MB/s peak while a perfectly balanced split peaks at 750 MB/s, so 1.0e9 B/s (8 Gbps) is the round figure that separates the two arms. Replace with C-DOT's real per-UPF N3 envelope."
   },
   "upfs": {
     "upf-1": {
@@ -88,19 +94,41 @@
     "replay_root": "cdot-upf-metrics-v02/metrics",
     "replay_timezone": "Asia/Kolkata"
   },
+  "autopilot": {
+    "enabled": false,
+    "telemetry_poll_seconds": 30,
+    "control_interval_seconds": 600,
+    "poll_overlap_seconds": 120,
+    "require_fresh_seconds": 180,
+    "min_history_seconds": 1800,
+    "unhealthy_after_failures": 3,
+    "dry_run": false,
+    "log_file": "logs/cdot-autopilot.log",
+    "log_max_bytes": 10000000,
+    "log_backups": 5,
+    "history_enabled": true,
+    "history_dir": "logs/history",
+    "history_max_bytes": 50000000,
+    "history_backups": 3,
+    "history_telemetry_every_n_polls": 1,
+    "poll_log_limit": 240,
+    "cycle_log_limit": 120,
+    "note": "Unattended closed loop. Poll Prometheus every telemetry_poll_seconds; run the forecaster + HiGHS solve and POST the resulting weights to the SMF every control_interval_seconds. Actuation is held whenever the newest sample is older than require_fresh_seconds or the rolling buffer covers less than min_history_seconds. Turn on with CDOT_LIVE_AUTOPILOT=1, and rehearse with CDOT_LIVE_AUTOPILOT_DRY_RUN=1, which computes weights and logs them without writing to the SMF."
+  },
   "queries": {
-    "ul": "upf_class_ul_packets_total",
-    "dl": "upf_class_dl_packets_total",
+    "ul": "upf_n3_uplink_packets_session_class_total_byte",
+    "dl": "upf_n3_downlink_packets_session_class_total_byte",
     "sessions": "pfcp_sessions_total",
     "cpu": "upf_cpu_usage_cores",
     "memory": "upf_memory_usage_bytes",
-    "tsi": "upf_tsi",
-    "drop": "upf_downlink_drop_rate_percent",
-    "forwarding_efficiency": "upf_downlink_forwarding_efficiency_percent"
+    "tsi": "tsi_value",
+    "drop": "drop_rate_percentage",
+    "forwarding_efficiency": "dl_throughput_efficiency_rate"
   },
   "queries_confirmed_by_cdot": false,
   "solver": {
     "planning_quantile": "p50",
     "note": "p50 beats p90/p95 on this trace: split-conformal inflates each group by its own residual spread, so the volatile internet groups get inflated far more than ims, which distorts the relative proportions the min-max LP balances. Measured over the optimised window: p50 -> 0 overload-seconds, p95 -> 810."
-  }
+  },
+  "queries_note": "Read off C-DOT's live Prometheus on 2026-08-27, not supplied by them. ul/dl are the only per-(upf, loc, dnn, dscp) series they publish and they carry labels upf/loc/dnn/dscp exactly as this pipeline expects. Despite 'packets' in the name they are BYTE counters -- upf_sesssion_class_last_byte_counter_collection_time confirms it, and rate() over them returns 2-8e8, which is bytes/s, not packets/s. There is no per-class packet counter to switch to. The remaining entries are not read by the pipeline; they are recorded here for reference."
 }

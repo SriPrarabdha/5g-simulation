@@ -32,8 +32,52 @@ def submit_pbs(script: str | Path, *, variables: dict[str, str]) -> dict[str, An
     if not qsub:
         return {"submitted": False, "reason": "PBS unavailable; use the supplied personal result", "fallback": True}
     assignment = ",".join(f"{key}={value}" for key, value in sorted(variables.items()))
-    answer = subprocess.run([qsub, "-v", assignment, str(script)], check=True, capture_output=True, text=True)
+    try:
+        answer = subprocess.run([qsub, "-v", assignment, str(script)], check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as error:
+        detail = (error.stderr or error.stdout or str(error)).strip()
+        return {
+            "submitted": False,
+            "reason": f"PBS submission failed; continue with the labelled local path: {detail}",
+            "fallback": True,
+            "qsub_returncode": error.returncode,
+        }
     return {"submitted": True, "job_id": answer.stdout.strip(), "fallback": False}
+
+
+def execution_summary(checks: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Give a notebook-friendly, honest summary of the available execution paths."""
+    checks = checks or preflight()
+    commands = checks.get("commands", {})
+    imports = checks.get("python_imports", {})
+    return {
+        "local_teaching_path": "ready" if imports.get("scipy") else "missing scipy",
+        "pbs_submission": "ready" if commands.get("qsub") else "unavailable — local path remains runnable",
+        "scip_assignment_mip": "ready" if imports.get("pyscipopt") and commands.get("scip") else "cluster module required",
+        "parascip_presenter_demo": "ready" if commands.get("parascip") else "not available in this session",
+        "evidence_mode": "synthetic shadow only",
+    }
+
+
+def pbs_status(job_id: str) -> dict[str, Any]:
+    """Return one non-blocking PBS status snapshot; never busy-wait in a notebook."""
+    qstat = shutil.which("qstat")
+    if not qstat:
+        return {"job_id": job_id, "available": False, "state": "unknown", "reason": "qstat unavailable"}
+    answer = subprocess.run([qstat, "-f", str(job_id)], check=False, capture_output=True, text=True)
+    status_text = answer.stdout or answer.stderr
+    state = "unknown"
+    for line in status_text.splitlines():
+        if "job_state =" in line:
+            state = line.split("=", 1)[1].strip()
+            break
+    return {
+        "job_id": job_id,
+        "available": True,
+        "state": state,
+        "qstat_returncode": answer.returncode,
+        "terminal": answer.returncode != 0 or state in {"F", "C", "E"},
+    }
 
 
 def analyze_parquet(path: str | Path) -> dict[str, Any]:

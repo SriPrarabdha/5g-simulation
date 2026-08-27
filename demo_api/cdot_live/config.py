@@ -16,6 +16,13 @@ class LiveConfigError(RuntimeError):
     """Raised when the C-DOT live configuration is missing or malformed."""
 
 
+def _flag(env: str, default: bool) -> bool:
+    raw = os.environ.get(env)
+    if raw is None:
+        return bool(default)
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 @dataclass(frozen=True, slots=True)
 class UpfMapping:
     metric: str
@@ -52,6 +59,38 @@ class WeightBounds:
 
 
 @dataclass(frozen=True, slots=True)
+class Autopilot:
+    """Cadence and guardrails for the unattended closed loop.
+
+    Two clocks, deliberately different.  ``telemetry_poll_seconds`` is how often
+    the loop touches Prometheus -- fast, so an outage is visible within one
+    scrape rather than one control period.  ``control_interval_seconds`` is how
+    often the optimizer runs and weights are written to the SMF -- slow, because
+    every write re-steers live PDU-session establishment and C-DOT asked for a
+    ten-minute cadence.
+    """
+
+    enabled: bool = False
+    telemetry_poll_seconds: int = 30
+    control_interval_seconds: int = 600
+    poll_overlap_seconds: int = 120
+    require_fresh_seconds: int = 180
+    min_history_seconds: int = 1_800
+    unhealthy_after_failures: int = 3
+    dry_run: bool = False
+    log_file: str | None = None
+    log_max_bytes: int = 10_000_000
+    log_backups: int = 5
+    history_enabled: bool = True
+    history_dir: str = "logs/history"
+    history_max_bytes: int = 50_000_000
+    history_backups: int = 3
+    history_telemetry_every_n_polls: int = 1
+    poll_log_limit: int = 240
+    cycle_log_limit: int = 120
+
+
+@dataclass(frozen=True, slots=True)
 class Capacity:
     per_upf_pps: float
     safe_utilization: float
@@ -85,6 +124,8 @@ class LiveConfig:
     replay_timezone: str
     upf_identity_confirmed: bool
     queries_confirmed: bool
+    traffic_unit: str = "pps"
+    autopilot: Autopilot = field(default_factory=Autopilot)
     config_path: str = ""
     load_error: str | None = None
 
@@ -120,14 +161,34 @@ class LiveConfig:
                     else:
                         raw.setdefault(name, {})[key] = value
 
+        source_raw_early = dict(raw.get("source", {}))
+        source_mode = os.environ.get(
+            "CDOT_LIVE_SOURCE", str(source_raw_early.get("mode", "replay"))
+        )
+        # The two sources do not carry the same quantity.  The recorded Grafana
+        # export is packets/second; the only per-class series C-DOT's Prometheus
+        # publishes live is a *byte* counter, despite "packets" in its name.  So
+        # the unit -- and therefore the capacity line the LP is bounded by --
+        # follows the source, and nothing downstream may hardcode "pps".
+        units_raw = dict(raw.get("traffic_units", {}))
+        traffic_unit = str(units_raw.get(source_mode, units_raw.get("replay", "pps")))
+
         capacity_raw = dict(raw.get("capacity", {}))
+        default_capacity = (
+            capacity_raw.get("per_upf_bytes_per_second", 1.0e9)
+            if source_mode == "prometheus"
+            else capacity_raw.get("per_upf_pps", 70_000.0)
+        )
         capacity = Capacity(
-            per_upf_pps=float(os.environ.get("CDOT_LIVE_CAPACITY_PPS", capacity_raw.get("per_upf_pps", 70_000.0))),
+            per_upf_pps=float(os.environ.get("CDOT_LIVE_CAPACITY_PPS", default_capacity)),
             safe_utilization=float(
                 os.environ.get("CDOT_LIVE_SAFE_UTILIZATION", capacity_raw.get("safe_utilization", 0.8))
             ),
             confirmed_by_cdot=bool(capacity_raw.get("confirmed_by_cdot", False)),
-            source=str(capacity_raw.get("source", "unspecified")),
+            source=str(capacity_raw.get(
+                "source_bytes_per_second" if source_mode == "prometheus" else "source",
+                capacity_raw.get("source", "unspecified"),
+            )),
         )
 
         cadence_raw = dict(raw.get("cadence", {}))
@@ -171,7 +232,40 @@ class LiveConfig:
             for tac, upfs in eligibility_raw.get("declared", {}).items()
         }
         permutation_raw = dict(raw.get("class_label_permutation", {}))
-        source_raw = dict(raw.get("source", {}))
+        source_raw = source_raw_early
+        autopilot_raw = dict(raw.get("autopilot", {}))
+        autopilot = Autopilot(
+            enabled=_flag("CDOT_LIVE_AUTOPILOT", autopilot_raw.get("enabled", False)),
+            telemetry_poll_seconds=int(os.environ.get(
+                "CDOT_LIVE_AUTOPILOT_POLL_SECONDS",
+                autopilot_raw.get("telemetry_poll_seconds", cadence.telemetry_step_seconds),
+            )),
+            control_interval_seconds=int(os.environ.get(
+                "CDOT_LIVE_AUTOPILOT_CONTROL_SECONDS",
+                autopilot_raw.get("control_interval_seconds", 600),
+            )),
+            poll_overlap_seconds=int(autopilot_raw.get("poll_overlap_seconds", 120)),
+            require_fresh_seconds=int(autopilot_raw.get("require_fresh_seconds", 180)),
+            min_history_seconds=int(autopilot_raw.get("min_history_seconds", 1_800)),
+            unhealthy_after_failures=int(autopilot_raw.get("unhealthy_after_failures", 3)),
+            dry_run=_flag("CDOT_LIVE_AUTOPILOT_DRY_RUN", autopilot_raw.get("dry_run", False)),
+            log_file=os.environ.get("CDOT_LIVE_LOG_FILE", autopilot_raw.get("log_file")) or None,
+            log_max_bytes=int(autopilot_raw.get("log_max_bytes", 10_000_000)),
+            log_backups=int(autopilot_raw.get("log_backups", 5)),
+            history_enabled=_flag(
+                "CDOT_LIVE_HISTORY", autopilot_raw.get("history_enabled", True)
+            ),
+            history_dir=os.environ.get(
+                "CDOT_LIVE_HISTORY_DIR", autopilot_raw.get("history_dir", "logs/history")
+            ),
+            history_max_bytes=int(autopilot_raw.get("history_max_bytes", 50_000_000)),
+            history_backups=int(autopilot_raw.get("history_backups", 3)),
+            history_telemetry_every_n_polls=int(
+                autopilot_raw.get("history_telemetry_every_n_polls", 1)
+            ),
+            poll_log_limit=int(autopilot_raw.get("poll_log_limit", 240)),
+            cycle_log_limit=int(autopilot_raw.get("cycle_log_limit", 120)),
+        )
 
         return cls(
             prometheus_url=os.environ.get("CDOT_PROMETHEUS_URL", "http://192.168.218.8:29090").rstrip("/"),
@@ -193,7 +287,7 @@ class LiveConfig:
             permutation={str(k): str(v) for k, v in permutation_raw.get("map", {}).items()},
             permutation_enabled=bool(permutation_raw.get("enabled", False)),
             queries={str(key): str(value) for key, value in raw.get("queries", {}).items()},
-            source_mode=os.environ.get("CDOT_LIVE_SOURCE", str(source_raw.get("mode", "replay"))),
+            source_mode=source_mode,
             replay_root=os.environ.get(
                 "CDOT_LIVE_REPLAY_ROOT",
                 str(ROOT / source_raw.get("replay_root", "cdot-upf-metrics-v02/metrics")),
@@ -201,6 +295,8 @@ class LiveConfig:
             replay_timezone=str(source_raw.get("replay_timezone", "Asia/Kolkata")),
             upf_identity_confirmed=bool(raw.get("upf_identity_confirmed_by_cdot", False)),
             queries_confirmed=bool(raw.get("queries_confirmed_by_cdot", False)),
+            traffic_unit=traffic_unit,
+            autopilot=autopilot,
             config_path=str(path),
             load_error=load_error,
         )
@@ -270,13 +366,14 @@ class LiveConfig:
         return {
             "config_path": self.config_path,
             "load_error": self.load_error,
-            "units": "pps",
+            "units": self.traffic_unit,
             "capacity": {
                 "per_upf_pps": self.capacity.per_upf_pps,
                 "safe_utilization": self.capacity.safe_utilization,
                 "safe_pps": self.capacity.safe_pps,
                 "confirmed_by_cdot": self.capacity.confirmed_by_cdot,
                 "source": self.capacity.source,
+                "unit": self.traffic_unit,
             },
             "cadence": {
                 "telemetry_step_seconds": self.cadence.telemetry_step_seconds,
@@ -285,6 +382,14 @@ class LiveConfig:
                 "history_seconds": self.cadence.history_seconds,
             },
             "source_mode": self.source_mode,
+            "autopilot": {
+                "enabled": self.autopilot.enabled,
+                "telemetry_poll_seconds": self.autopilot.telemetry_poll_seconds,
+                "control_interval_seconds": self.autopilot.control_interval_seconds,
+                "require_fresh_seconds": self.autopilot.require_fresh_seconds,
+                "min_history_seconds": self.autopilot.min_history_seconds,
+                "dry_run": self.autopilot.dry_run,
+            },
             "eligibility_mode": self.eligibility_mode,
             "upf_to_smf": {key: item.smf for key, item in self.mappings.items()},
             "dnn": dict(self.dnn),
@@ -296,7 +401,14 @@ class LiveConfig:
         pending = []
         if not self.capacity.confirmed_by_cdot:
             pending.append(
-                f"Per-UPF capacity {self.capacity.per_upf_pps:,.0f} pps is a placeholder, not a C-DOT figure."
+                f"Per-UPF capacity {self.capacity.per_upf_pps:,.0f} {self.traffic_unit} is a "
+                "placeholder, not a C-DOT figure."
+            )
+        if self.source_mode == "prometheus" and self.traffic_unit != "pps":
+            pending.append(
+                f"Live telemetry is in {self.traffic_unit}, not packets/second: the only per-class "
+                "series C-DOT publishes is a byte counter, so every load figure here is bytes, and "
+                "it cannot be compared with the packets/second figures from the recorded trace."
             )
         if not self.upf_identity_confirmed:
             pending.append(

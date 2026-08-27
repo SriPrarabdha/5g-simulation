@@ -20,6 +20,11 @@ Environment:
   CDOT_DEMO_HOST        Bind address (default 127.0.0.1).
   CDOT_DEMO_PORT        Preferred port (default 8000).
   CDOT_LIVE_SOURCE      replay | prometheus for the C-DOT console.
+  CDOT_LIVE_AUTOPILOT   1 to run the unattended closed loop: poll Prometheus
+                        continuously, then optimise and write the SMF every
+                        ten minutes. Off by default.
+  CDOT_LIVE_AUTOPILOT_DRY_RUN
+                        1 to compute and log the weights without writing them.
 
 Command-line options take precedence over environment variables.
 EOF
@@ -97,6 +102,18 @@ if ! [[ "$PREFERRED_PORT" =~ ^[0-9]+$ ]] || (( PREFERRED_PORT < 1 || PREFERRED_P
   exit 1
 fi
 
+autopilot_state() {
+  case "${CDOT_LIVE_AUTOPILOT:-0}" in
+    1|true|yes|on|TRUE|YES|ON)
+      case "${CDOT_LIVE_AUTOPILOT_DRY_RUN:-0}" in
+        1|true|yes|on|TRUE|YES|ON) echo "on, DRY RUN (no SMF writes)" ;;
+        *) echo "on -- writing SMF weights every ${CDOT_LIVE_AUTOPILOT_CONTROL_SECONDS:-600}s" ;;
+      esac
+      ;;
+    *) echo "off (set CDOT_LIVE_AUTOPILOT=1 to run it)" ;;
+  esac
+}
+
 port_is_free() {
   "$PYTHON_BIN" - "$1" <<'PY'
 import socket
@@ -168,6 +185,7 @@ if [[ "$TUNNEL_ENABLED" != "1" ]]; then
   echo "Local URL: http://$DEMO_HOST:$DEMO_PORT"
   echo "C-DOT console: http://$DEMO_HOST:$DEMO_PORT/live-cdot"
   echo "Telemetry source: ${CDOT_LIVE_SOURCE:-replay}"
+  echo "Closed loop: $(autopilot_state)"
   echo "Presenter username: $CDOT_DEMO_USER"
   echo "Presenter password: $CDOT_DEMO_PASSWORD"
   exec "$PYTHON_BIN" -m uvicorn demo_api.main:app --host "$DEMO_HOST" --port "$DEMO_PORT"
@@ -256,6 +274,7 @@ echo "Public URL: $PUBLIC_URL"
 echo "C-DOT console: $PUBLIC_URL/live-cdot"
 echo "Local URL: http://$DEMO_HOST:$DEMO_PORT"
 echo "Telemetry source: ${CDOT_LIVE_SOURCE:-replay}"
+echo "Closed loop: $(autopilot_state)"
 echo "Presenter username: $CDOT_DEMO_USER"
 echo "Presenter password: $CDOT_DEMO_PASSWORD"
 echo "Press Ctrl+C to stop the demo and close the tunnel."

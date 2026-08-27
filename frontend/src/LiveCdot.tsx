@@ -5,6 +5,7 @@ import {
   preloadCdotLive, rollbackCdotLive, setCdotLiveAct,
 } from './api'
 import { Chart, chartGrid, chartText } from './components/Chart'
+import { LiveAutopilot, cadence } from './LiveAutopilot'
 
 type LiveSnapshot = any
 
@@ -34,6 +35,7 @@ export function LiveCdot({ token, role }: { token: string; role: string }) {
   const [frame, setFrame] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [manualAct, setManualAct] = useState<string | null>(null)
+  const [manualMode, setManualMode] = useState<'live' | 'replay' | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -45,7 +47,7 @@ export function LiveCdot({ token, role }: { token: string; role: string }) {
     socket.onmessage = message => {
       const event = JSON.parse(message.data)
       if (event.type === 'snapshot') setSnapshot(event.payload)
-      else if (['pipeline.proposal', 'demo.preloaded', 'demo.act', 'smf.apply_verified', 'smf.apply_failed', 'smf.rollback_verified'].includes(event.type)) {
+      else if (['pipeline.proposal', 'demo.preloaded', 'demo.act', 'smf.apply_verified', 'smf.apply_failed', 'smf.rollback_verified', 'autopilot.poll', 'autopilot.cycle', 'autopilot.state'].includes(event.type)) {
         getCdotLiveSnapshot(token).then(value => { if (!cancelled) setSnapshot(value) }).catch(() => {})
       }
     }
@@ -90,6 +92,13 @@ export function LiveCdot({ token, role }: { token: string; role: string }) {
   const capacity: number = status?.capacity?.per_upf_pps ?? 0
   const safe: number = status?.capacity?.safe_pps ?? 0
   const presenter = role === 'presenter'
+  // The console has two jobs now.  "Live" is the unattended loop actually
+  // steering C-DOT's SMF; "Replay study" is the three-hour recorded comparison
+  // that was the whole page before.  Default to whichever the backend is
+  // configured for, and let a presenter pin the other.
+  const autopilot = status?.autopilot
+  const mode: 'live' | 'replay' =
+    manualMode ?? (autopilot?.running || autopilot?.enabled ? 'live' : 'replay')
   // Act 1 shows the baseline curves alone; Act 2 overlays what the advisory
   // does to the same demand; Act 3 is the scorecard.
   const showAdvisory = act === 'optimized' || act === 'scorecard'
@@ -247,20 +256,53 @@ export function LiveCdot({ token, role }: { token: string; role: string }) {
   return <main className="live-cdot-page">
     <section className="live-title">
       <div>
-        <span className="live-badge">{status.source?.mode === 'replay' ? 'REPLAY — C-DOT RECORDING' : 'LIVE — C-DOT ENDPOINTS'}</span>
+        <span className="live-badge">
+          {mode === 'live'
+            ? (autopilot?.running ? 'LIVE — CLOSED LOOP RUNNING' : 'LIVE — CLOSED LOOP STOPPED')
+            : 'REPLAY STUDY — C-DOT RECORDING'}
+        </span>
         <h1>C-DOT UPF load-balancing console</h1>
         <p>
-          Rolling {number(status.cadence?.history_seconds / 3600, 1)} h window ·
-          decisions every {number(status.cadence?.decision_interval_seconds)} s ·
-          {' '}{number(status.cadence?.forecast_horizon_seconds / 60)} min lead time · packets/second
+          {mode === 'live'
+            ? <>
+                Streaming Prometheus every {cadence(autopilot?.settings?.telemetry_poll_seconds)} ·
+                {' '}forecasting, solving and writing the SMF every
+                {' '}{cadence(autopilot?.settings?.control_interval_seconds)} ·
+                {' '}{number(status.cadence?.forecast_horizon_seconds / 60)} min lead time · packets/second
+              </>
+            : <>
+                Rolling {number(status.cadence?.history_seconds / 3600, 1)} h window ·
+                decisions every {number(status.cadence?.decision_interval_seconds)} s ·
+                {' '}{number(status.cadence?.forecast_horizon_seconds / 60)} min lead time · packets/second
+              </>}
         </p>
       </div>
-      <button disabled={!presenter || Boolean(busy)} onClick={() => command('evaluate', () => evaluateCdotLive(token))}>
-        {busy === 'evaluate' ? 'Evaluating…' : 'Evaluate now'}
-      </button>
+      {mode === 'replay' && (
+        <button disabled={!presenter || Boolean(busy)} onClick={() => command('evaluate', () => evaluateCdotLive(token))}>
+          {busy === 'evaluate' ? 'Evaluating…' : 'Evaluate now'}
+        </button>
+      )}
     </section>
 
+    <nav className="mode-switch" aria-label="Console mode">
+      {[
+        { key: 'live', label: 'Live closed loop', hint: 'Real traffic, real writes, running now' },
+        { key: 'replay', label: 'Replay study', hint: 'Recorded 3 h window, baseline vs optimised' },
+      ].map(item => (
+        <button
+          key={item.key}
+          className={mode === item.key ? 'active' : ''}
+          aria-current={mode === item.key ? 'page' : undefined}
+          onClick={() => setManualMode(item.key as 'live' | 'replay')}
+        ><b>{item.label}</b><small>{item.hint}</small></button>
+      ))}
+    </nav>
+
     {error && <div className="live-error" role="alert">{error}</div>}
+
+    {mode === 'live' ? <LiveAutopilot
+      token={token} role={role} snapshot={snapshot} onSnapshot={setSnapshot}
+    /> : <>
 
     <section className="act-bar" aria-label="Demo running order">
       <p className="act-hint">
@@ -563,6 +605,8 @@ export function LiveCdot({ token, role }: { token: string; role: string }) {
         <small>One array POST for the whole batch, followed by GET verification, rejected if the SMF state hash changed.</small>
       </aside>
     </div>}
+
+    </>}
   </main>
 }
 

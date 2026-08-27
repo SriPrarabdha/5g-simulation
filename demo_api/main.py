@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 
 from .audit import AuditStore
 from .cdot_live import CdotLiveService, LiveConfig
+from .cdot_live.autopilot import configure_logging as configure_autopilot_logging
 from .cdot_live.service import LiveConflict, LiveRejected, UpstreamFailure
 from .runtime import CONTROLLERS, RunManager
 from .security import Identity, TokenService
@@ -68,8 +69,10 @@ def create_app(
     manager = RunManager(scenario_path or ROOT / "configs" / "demo_mpc_scenario.json")
     tokens = TokenService()
     audit = AuditStore(audit_path)
+    live_config = LiveConfig.from_env()
+    configure_autopilot_logging(live_config)
     live = CdotLiveService(
-        LiveConfig.from_env(),
+        live_config,
         audit_callback=lambda actor, action, payload: audit.append("cdot-live", actor, action, payload),
     )
 
@@ -359,6 +362,38 @@ def create_app(
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
         except UpstreamFailure as error:
             raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(error)) from error
+
+    @application.get("/api/v1/cdot-live/autopilot")
+    async def cdot_live_autopilot(_: Annotated[Identity, Depends(identity)]) -> dict[str, Any]:
+        return live.autopilot.status()
+
+    @application.post("/api/v1/cdot-live/autopilot/start")
+    async def cdot_live_autopilot_start(
+        user: Annotated[Identity, Depends(presenter)]
+    ) -> dict[str, Any]:
+        return await live.autopilot.start(actor=user.subject)
+
+    @application.post("/api/v1/cdot-live/autopilot/stop")
+    async def cdot_live_autopilot_stop(
+        user: Annotated[Identity, Depends(presenter)], reason: str = "operator stop"
+    ) -> dict[str, Any]:
+        return await live.autopilot.stop(actor=user.subject, reason=reason)
+
+    @application.post("/api/v1/cdot-live/autopilot/cycle")
+    async def cdot_live_autopilot_cycle(
+        user: Annotated[Identity, Depends(presenter)]
+    ) -> dict[str, Any]:
+        """Run one control cycle now, without waiting out the ten-minute timer."""
+        record = await live.autopilot.run_cycle(trigger="manual", actor=user.subject)
+        return {"cycle": record.as_dict(), "autopilot": live.autopilot.status()}
+
+    @application.post("/api/v1/cdot-live/autopilot/poll")
+    async def cdot_live_autopilot_poll(
+        user: Annotated[Identity, Depends(presenter)]
+    ) -> dict[str, Any]:
+        """Probe Prometheus once on demand -- the health check C-DOT can click."""
+        record = await live.autopilot.poll_once()
+        return {"poll": record.as_dict(), "autopilot": live.autopilot.status()}
 
     @application.get("/metrics", response_class=PlainTextResponse)
     async def metrics(run_id: str | None = None) -> str:

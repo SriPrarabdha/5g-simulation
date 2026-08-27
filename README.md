@@ -94,6 +94,11 @@ UPF envelopes, and an SMF selection hook still require a suitable privileged
   closed Prometheus windows, forecasts carried traffic in explicitly
   uncalibrated pps-proxy units, runs one-step HiGHS allocation, and requires
   presenter review before verified h2c `/upf-admin` writes or exact rollback.
+- An unattended closed loop (the autopilot) that streams C-DOT's live
+  Prometheus on a fast poll, logs the health of that API per scrape, and every
+  ten minutes forecasts, solves, and writes the resulting per-UPF weights to
+  their SMF with GET verification -- holding the write whenever the telemetry
+  is stale, the API is unhealthy, or a presenter is mid-review.
 
 The selected primary metric for the supplied demo is directional UL overload
 area (`overload_area_seconds.ul`). DL results are still reported separately and
@@ -135,6 +140,78 @@ the `CDOT_LIVE_*` variables in `demo_api/cdot_live/config.py` or a replacement
 v02 p99 observations, not calibrated capacities. No live write occurs during
 status, snapshot, polling, or evaluation; only a confirmed presenter apply or
 rollback can POST to the SMF.
+
+### Running the closed loop against C-DOT's live plane
+
+The autopilot is the background job that keeps running on this machine: it
+polls their Prometheus every `telemetry_poll_seconds` (30 s) and every
+`control_interval_seconds` (600 s) forecasts, solves, and POSTs new per-UPF
+weights to their SMF, verifying each write with a GET. Every poll is logged
+with its latency, how many series Prometheus returned, and how many survived
+label normalisation, so "the API is down" and "the API is up and answering
+with zero matching series" -- the failure their unconfirmed metric names invite
+-- never look alike.
+
+Inside the dashboard, so `/live-cdot` shows the loop as it runs:
+
+```bash
+CDOT_LIVE_SOURCE=prometheus CDOT_LIVE_AUTOPILOT=1 ./scripts/start-demo.sh
+```
+
+Headless, when the loop should outlive the console:
+
+```bash
+python -m demo_api.cdot_live.runner \
+    --prometheus http://192.168.218.8:29090 --smf http://192.168.218.8:30956
+```
+
+Supervised and detached, when it should also outlive the shell that started it
+and come back on its own if the process dies:
+
+```bash
+./scripts/start-autopilot.sh --detach \
+    --prometheus http://192.168.218.8:29090 --smf http://192.168.218.8:30956
+
+./scripts/start-autopilot.sh --status   # alive? plus the last 20 log lines
+./scripts/start-autopilot.sh --stop
+```
+
+A crash is restarted after ten seconds; a deliberate stop is not restarted.
+`logs/autopilot-supervisor.log` records only restarts and any traceback, and
+`logs/cdot-autopilot.log` holds the health stream, rotating at 10 MB.
+
+Run one of these three, never two -- two loops writing `/upf-admin` on different
+ten-minute phases fight over the weight table.
+
+Rehearse first. `--dry-run` (or `CDOT_LIVE_AUTOPILOT_DRY_RUN=1`) does the full
+poll, forecast and solve and logs the exact JSON array it *would* POST, without
+touching the SMF; `--once` runs a single cycle and exits. Cadence, freshness
+and history guards live under `autopilot` in `configs/cdot_live.json`, with
+`CDOT_LIVE_AUTOPILOT_POLL_SECONDS` and `CDOT_LIVE_AUTOPILOT_CONTROL_SECONDS`
+as overrides. The loop writes to `logs/cdot-autopilot.log` as well as stdout.
+
+Check it against their lab before trusting it with a write:
+
+```bash
+# does their Prometheus answer, and do the configured metric names exist?
+./scripts/start-autopilot.sh --once --dry-run
+```
+
+`--once` primes the three-hour buffer, runs one forecast-and-solve, logs the
+weights it would post, and exits non-zero if the loop could not get that far.
+The same evidence is available over HTTP at `GET /api/v1/cdot-live/autopilot`,
+with `POST /api/v1/cdot-live/autopilot/{start,stop,cycle,poll}` to drive it.
+
+The loop refuses to actuate -- and says why in the log and in the console --
+whenever Prometheus has failed three polls in a row, the newest sample is older
+than `require_fresh_seconds`, the buffer holds less than `min_history_seconds`
+of history, the SMF is unreachable, or a presenter has a proposal open for
+review. In each case it holds the weights already in the SMF rather than
+steering on a picture it does not trust.
+
+The presenter-reviewed apply path is unchanged and still available: the console
+switches between the live loop and the recorded replay study, and nothing but a
+confirmed apply, a rollback, or the autopilot itself ever POSTs to the SMF.
 
 Rebuild the additive Delhi traffic-model/2.0 evidence and presentation without
 changing the frozen v1 decks or campaign results:

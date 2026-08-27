@@ -1,0 +1,27 @@
+{
+  "controller": "cohort-mpc",
+  "expected_outcome": {
+    "actual_offered_ul_mbps": 774.14,
+    "claim_boundary": "Synthetic estimate; not guaranteed overload prevention or production readiness.",
+    "established_sessions_migrated": false,
+    "interpretation": "No modeled exposure reduction",
+    "modeled_exposure_change_percent": -4.93,
+    "selected_overload_area_mbps_seconds": 250037.76,
+    "static_overload_area_mbps_seconds": 238286.4
+  },
+  "explanation": "Use uncertainty, validate independently, and preserve anchored sessions.",
+  "fallback_used": false,
+  "forecast_risk": "p90",
+  "policy_status": "accepted",
+  "schema_version": "workshop-decision/1.0",
+  "selected_event": {
+    "duration_windows": 4,
+    "group_id": "stadium|social-live|1-010204",
+    "group_label": "Stadium \u00b7 social-live \u00b7 S-NSSAI 1-010204",
+    "start_window": 12,
+    "surge_multiplier": 4.0,
+    "synthetic": true
+  },
+  "synthetic": true,
+  "team_id": "unassigned"
+}

@@ -8,22 +8,27 @@ that survived the rewrite unchanged.
 from __future__ import annotations
 
 import asyncio
+import copy
+import dataclasses
 import json
 import unittest
-from datetime import timedelta
+from pathlib import Path
+from datetime import datetime, timedelta, timezone
 
 from demo_api.cdot_live.cdot_forecaster import (
     CdotForecaster,
     estimate_period,
     walk_forward_backtest,
 )
+from demo_api.cdot_live.autopilot import Autopilot, TelemetryBuffer
 from demo_api.cdot_live.config import LiveConfig
+from demo_api.cdot_live.history import HistoryWriter, _upf_share
 from demo_api.cdot_live.counterfactual import run as run_counterfactual
 from demo_api.cdot_live.demand import build_demand_cube, group_id, parse_group_id
 from demo_api.cdot_live.optimizer import apply_bounds, integer_weights, solve
 from demo_api.cdot_live.service import CdotLiveService
 from demo_api.cdot_live.smf import H2CSmfClient, canonical_state_hash
-from demo_api.cdot_live.sources import ReplaySource, parse_rate
+from demo_api.cdot_live.sources import ReplaySource, SourceError, parse_rate
 
 CONFIG = LiveConfig.from_env()
 _CUBE = None
@@ -123,6 +128,35 @@ class OptimizerTests(unittest.TestCase):
     def test_integer_weights_sum_to_one_hundred(self) -> None:
         weights = integer_weights({"upf-1": 0.3333, "upf-2": 0.3333, "upf-3": 0.3334})
         self.assertEqual(sum(weights.values()), 100)
+
+    def test_declared_eligibility_gates_the_written_weights_not_just_the_lp(self) -> None:
+        """A forbidden (tac, upf) pair must not reappear via the min_share floor.
+
+        ``apply_bounds`` water-fills over the union of the LP's target and the
+        *observed* routing.  C-DOT's trace carries traffic on pairs their
+        constraint CSV forbids, so under ``declared`` mode the bounds step used
+        to put every one of those pairs back at the 2% floor -- writing weights
+        for combinations they say cannot carry the traffic.
+        """
+        config = dataclasses.replace(CONFIG, eligibility_mode="declared")
+        cube = replay_cube()
+        forecaster = CdotForecaster.fit(cube, horizon=config.cadence.horizon_steps)
+        plan = solve(cube, forecaster.predict(cube), config, issued_at=cube.latest_time)
+        self.assertTrue(plan.integer_weights)
+        declared = config.declared_eligibility
+        for selection_id, weights in plan.integer_weights.items():
+            _, tac = parse_group_id(selection_id)
+            allowed = set(declared.get(tac, ()))
+            self.assertTrue(allowed, f"no declared eligibility for tac {tac}")
+            self.assertEqual(
+                set(weights) - allowed, set(),
+                f"{selection_id} was given weight on a UPF the constraint CSV forbids",
+            )
+        # The union default is unaffected: everything observed is eligible there.
+        union = solve(cube, forecaster.predict(cube), CONFIG, issued_at=cube.latest_time)
+        for selection_id, weights in union.integer_weights.items():
+            _, tac = parse_group_id(selection_id)
+            self.assertEqual(set(weights) - set(union.eligibility.get(tac, ())), set())
 
     def test_joint_solve_couples_every_group_through_one_upf_budget(self) -> None:
         """The bug this replaced: per-group solves meant no UPF saw its total."""
@@ -358,3 +392,415 @@ class H2cSmfContractTests(unittest.TestCase):
             await asyncio.gather(*tasks)
 
         asyncio.run(exercise())
+
+
+# --------------------------------------------------------------------- autopilot
+
+
+def _autopilot_config(**overrides):
+    """CONFIG with the closed loop switched on and its clocks compressed."""
+    config = copy.deepcopy(CONFIG)
+    settings = {
+        "enabled": True,
+        # Never the repo's real history: a test run would otherwise append
+        # replay/pps records into the file the live loop is writing, which is
+        # the evidence C-DOT's plots are built from.
+        "history_enabled": False,
+        "telemetry_poll_seconds": 1,
+        "control_interval_seconds": 3600,
+        "poll_overlap_seconds": 120,
+        "require_fresh_seconds": 180,
+        "min_history_seconds": 1_800,
+        "unhealthy_after_failures": 3,
+        "dry_run": False,
+        "log_file": None,
+    }
+    settings.update(overrides)
+    config.autopilot = dataclasses.replace(config.autopilot, **settings)
+    return config
+
+
+class FakePrometheus:
+    """The replay trace, re-stamped so its newest sample is 'now'.
+
+    Stands in for :class:`PrometheusSource` down to ``last_stats``, so the
+    autopilot's health verdicts are exercised for real rather than mocked.
+    """
+
+    def __init__(self, rows) -> None:
+        self.rows = rows
+        self.offset = datetime.now(timezone.utc) - rows[-1].t
+        self.fail: str | None = None
+        self.series_returned = {"ul": 32, "dl": 32}
+        self.reachable = True
+        self.calls: list[tuple[datetime, datetime]] = []
+        self.last_stats: dict = {}
+        self.last_error: str | None = None
+
+    async def window(self, start, end):
+        self.calls.append((start, end))
+        if self.fail:
+            raise SourceError(self.fail)
+        shifted = [
+            dataclasses.replace(row, t=row.t + self.offset)
+            for row in self.rows
+            if start <= row.t + self.offset <= end
+        ]
+        matched = self.series_returned if shifted else {"ul": 0, "dl": 0}
+        self.last_stats = {
+            "series_returned": dict(self.series_returned),
+            "series_matched": dict(matched),
+            "samples": len(shifted),
+            "rejected_labels": [],
+            "error": None,
+        }
+        return shifted
+
+    async def ready(self) -> bool:
+        return self.reachable
+
+    def describe(self) -> dict:
+        return {"mode": "prometheus", "url": "http://fake:9090", "last_stats": dict(self.last_stats)}
+
+
+def _live_rows():
+    source = ReplaySource(CONFIG)
+    start, end = source.span()
+    return asyncio.run(source.window(start, end))
+
+
+class AutopilotTests(unittest.TestCase):
+    """The unattended loop C-DOT asked for: stream, solve every N, write back."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.rows = _live_rows()
+
+    def _service(self, config=None, **overrides):
+        source = FakePrometheus(self.rows)
+        smf = FakeSmf()
+        service = CdotLiveService(config or _autopilot_config(**overrides), source=source, smf=smf)
+        return service, source, smf
+
+    def test_priming_poll_streams_prometheus_into_a_rolling_buffer(self) -> None:
+        async def exercise() -> None:
+            service, source, _ = self._service()
+            record = await service.autopilot.poll_once(prime=True)
+            self.assertTrue(record.ok, record.error)
+            self.assertEqual(record.verdict, "ok")
+            self.assertGreater(record.new_samples, 0)
+            self.assertGreater(
+                service.autopilot.buffer.coverage_seconds,
+                service.config.autopilot.min_history_seconds,
+            )
+            # The console's chart must move at poll cadence, not control cadence.
+            self.assertIsNotNone(service._cube)
+
+            # A second poll asks only for the tail plus the overlap, and the
+            # buffer must not double-count the re-fetched samples.
+            before = len(service.autopilot.buffer)
+            await service.autopilot.poll_once()
+            self.assertEqual(len(service.autopilot.buffer), before)
+            asked_start, _ = source.calls[-1]
+            self.assertGreater(asked_start, source.calls[0][0])
+            self.assertTrue(service.status()["autopilot"]["prometheus"]["healthy"])
+            await service.close()
+
+        asyncio.run(exercise())
+
+    def test_control_cycle_solves_and_writes_verified_weights_to_the_smf(self) -> None:
+        async def exercise() -> None:
+            service, _, smf = self._service()
+            await service.autopilot.poll_once(prime=True)
+            record = await service.autopilot.run_cycle(trigger="test")
+
+            self.assertEqual(record.outcome, "applied", record.error or record.reason)
+            self.assertTrue(record.verified)
+            self.assertTrue(record.changed_selection_ids)
+            # One array POST for the whole batch, as their /upf-admin contract requires.
+            self.assertEqual(len(smf.posts), 1)
+            self.assertEqual(len(smf.posts[0]), len(record.changed_selection_ids))
+            for weights in record.weights.values():
+                self.assertEqual(sum(weights.values()), 100)
+                self.assertTrue(set(weights) <= {"UPF1", "UPF2", "UPF3", "UPF4"})
+
+            status = service.autopilot.status()
+            self.assertEqual(status["control"]["cycles_run"], 1)
+            self.assertEqual(status["control"]["last_outcome"], "applied")
+            self.assertTrue(status["control"]["last_applied_weights"])
+            await service.close()
+
+        asyncio.run(exercise())
+
+    def test_a_prometheus_outage_is_reported_and_holds_actuation(self) -> None:
+        """The health signal has to fail loudly and stop the loop writing."""
+
+        async def exercise() -> None:
+            service, source, smf = self._service()
+            await service.autopilot.poll_once(prime=True)
+
+            source.fail = "connection refused"
+            source.reachable = False
+            for _ in range(3):
+                record = await service.autopilot.poll_once()
+            self.assertFalse(record.ok)
+            self.assertEqual(record.verdict, "unreachable")
+            self.assertFalse(record.endpoint_reachable)
+
+            health = service.autopilot.health()
+            self.assertEqual(health["state"], "down")
+            self.assertEqual(health["consecutive_failures"], 3)
+            self.assertIn("connection refused", health["last_error"])
+
+            cycle = await service.autopilot.run_cycle(trigger="test")
+            self.assertEqual(cycle.outcome, "held")
+            self.assertIn("unhealthy", cycle.reason)
+            self.assertEqual(smf.posts, [], "an unhealthy source must never actuate")
+
+            source.fail = None
+            source.reachable = True
+            recovered = await service.autopilot.poll_once()
+            self.assertTrue(recovered.ok)
+            self.assertEqual(service.autopilot.health()["state"], "up")
+            await service.close()
+
+        asyncio.run(exercise())
+
+    def test_a_live_api_answering_with_no_series_is_not_called_healthy(self) -> None:
+        """Their metric names are unconfirmed; 'up but empty' must not read as up."""
+
+        async def exercise() -> None:
+            service, source, _ = self._service()
+            source.rows = []
+            source.series_returned = {"ul": 0, "dl": 0}
+            record = await service.autopilot.poll_once(prime=True)
+            self.assertFalse(record.ok)
+            self.assertEqual(record.verdict, "no_series")
+            self.assertTrue(record.endpoint_reachable)
+            self.assertIn("no series", record.error)
+            await service.close()
+
+        asyncio.run(exercise())
+
+    def test_stale_telemetry_holds_the_write_instead_of_solving_on_it(self) -> None:
+        async def exercise() -> None:
+            service, source, smf = self._service()
+            # Re-stamp the trace an hour into the past: reachable, answering,
+            # and far too old to steer live traffic with.
+            source.offset -= timedelta(hours=1)
+            await service.autopilot.poll_once(prime=True)
+            cycle = await service.autopilot.run_cycle(trigger="test")
+            self.assertEqual(cycle.outcome, "held")
+            self.assertIn("freshness limit", cycle.reason)
+            self.assertEqual(smf.posts, [])
+            await service.close()
+
+        asyncio.run(exercise())
+
+    def test_dry_run_computes_the_weights_but_never_writes_them(self) -> None:
+        async def exercise() -> None:
+            service, _, smf = self._service(dry_run=True)
+            await service.autopilot.poll_once(prime=True)
+            record = await service.autopilot.run_cycle(trigger="test")
+            self.assertEqual(record.outcome, "dry_run")
+            self.assertTrue(record.posted)
+            self.assertTrue(record.weights)
+            self.assertEqual(smf.posts, [], "dry run must not touch the SMF")
+            await service.close()
+
+        asyncio.run(exercise())
+
+    def test_a_presenter_review_holds_the_cycle_off_their_proposal(self) -> None:
+        async def exercise() -> None:
+            service, _, smf = self._service()
+            await service.autopilot.poll_once(prime=True)
+            service.freeze_proposal(True)
+            cycle = await service.autopilot.run_cycle(trigger="test")
+            self.assertEqual(cycle.outcome, "held")
+            self.assertIn("review drawer", cycle.reason)
+            self.assertEqual(smf.posts, [])
+            await service.close()
+
+        asyncio.run(exercise())
+
+    def test_stopping_waits_for_an_in_flight_cycle_to_finish(self) -> None:
+        """Never tear down between the SMF POST and the GET that verifies it."""
+
+        async def exercise() -> None:
+            service, _, smf = self._service()
+            await service.autopilot.poll_once(prime=True)
+
+            released = asyncio.Event()
+            original = smf.post_tuples
+
+            async def slow_post(payload):
+                await asyncio.sleep(0.3)
+                await original(payload)
+                released.set()
+
+            smf.post_tuples = slow_post
+            cycle = asyncio.create_task(service.autopilot.run_cycle(trigger="test"))
+            await asyncio.sleep(0.05)
+            service.autopilot._running = True          # the loop is nominally up
+            await service.autopilot.stop(reason="test stop")
+            self.assertTrue(released.is_set(), "stop cancelled the cycle mid-write")
+            record = await cycle
+            self.assertEqual(record.outcome, "applied")
+            self.assertTrue(record.verified)
+            await service.close()
+
+        asyncio.run(exercise())
+
+    def test_start_and_stop_drive_both_loops(self) -> None:
+        async def exercise() -> None:
+            service, _, _ = self._service(telemetry_poll_seconds=1)
+            await service.start()
+            self.assertTrue(service.autopilot.running)
+            await asyncio.sleep(0.4)
+            status = service.autopilot.status()
+            self.assertGreaterEqual(status["prometheus"]["polls_total"], 1)
+            self.assertIsNotNone(status["control"]["next_run_at"])
+            await service.close()
+            self.assertFalse(service.autopilot.running)
+
+        asyncio.run(exercise())
+
+
+class TelemetryBufferTests(unittest.TestCase):
+    def test_overlapping_refetches_deduplicate_and_old_samples_are_evicted(self) -> None:
+        rows = _live_rows()
+        buffer = TelemetryBuffer(history_seconds=600)
+        first = buffer.ingest(rows[:400])
+        self.assertEqual(first, 400)
+        self.assertEqual(buffer.ingest(rows[:400]), 0, "a re-fetch must not duplicate")
+        buffer.ingest(rows)
+        self.assertLessEqual(buffer.coverage_seconds, 600)
+        self.assertLess(len(buffer), len(rows))
+
+    def test_an_empty_buffer_refuses_to_produce_a_cube(self) -> None:
+        with self.assertRaises(SourceError):
+            TelemetryBuffer(history_seconds=600).cube(CONFIG)
+
+
+# ----------------------------------------------------------------- jsonl history
+
+
+class HistoryTests(unittest.TestCase):
+    """The JSONL trail the loop leaves behind, which the plots are built from."""
+
+    def _read(self, path):
+        return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+
+    def test_a_run_writes_cycles_and_telemetry_a_plot_can_use(self) -> None:
+        import tempfile
+
+        async def exercise(directory: str) -> None:
+            config = _autopilot_config()
+            config.autopilot = dataclasses.replace(
+                config.autopilot, history_enabled=True, history_dir=directory
+            )
+            service, _, _ = self._service_for(config)
+            # Drive the real lifecycle, not just the two methods: the run
+            # markers only exist if start/stop actually happened.
+            await service.autopilot.start(actor="test")
+            await service.autopilot.poll_once(prime=True)
+            await service.autopilot.run_cycle(trigger="test")
+            await service.close()
+
+        with tempfile.TemporaryDirectory() as directory:
+            asyncio.run(exercise(directory))
+            root = Path(directory)
+
+            telemetry = self._read(root / "telemetry.jsonl")
+            self.assertTrue(telemetry)
+            sample = telemetry[-1]
+            self.assertTrue(sample["ok"])
+            self.assertEqual(sample["verdict"], "ok")
+            self.assertIn("upf_load", sample)
+            for load in sample["upf_load"].values():
+                self.assertAlmostEqual(load["total"], load["ul"] + load["dl"], places=1)
+
+            cycles = self._read(root / "cycles.jsonl")
+            self.assertEqual(len(cycles), 1)
+            cycle = cycles[0]
+            self.assertEqual(cycle["outcome"], "applied", cycle.get("error") or cycle.get("reason"))
+            self.assertEqual(cycle["cycle"], 1)
+            self.assertTrue(cycle["verified"])
+            # The headline C-DOT asked for: what each UPF was allocated.
+            self.assertTrue(cycle["weights"])
+            for allocation in cycle["weights"].values():
+                self.assertEqual(sum(allocation.values()), 100)
+            self.assertAlmostEqual(sum(cycle["upf_share"].values()), 1.0, places=3)
+            # Everything a plot needs, present and numeric.
+            for key in ("hottest_baseline_load", "hottest_projected_load",
+                        "solver_runtime_ms", "duration_ms"):
+                self.assertIsInstance(cycle[key], (int, float), key)
+            self.assertTrue(cycle["baseline_load"])
+            self.assertTrue(cycle["projected_load"])
+            self.assertEqual(set(cycle["observed_load"]), set(CONFIG.upf_ids))
+
+            runs = self._read(root / "runs.jsonl")
+            self.assertEqual([item["event"] for item in runs], ["started", "stopped"])
+            self.assertIn("unit", runs[0])
+
+    def _service_for(self, config):
+        source = FakePrometheus(AutopilotTests.rows)
+        smf = FakeSmf()
+        return CdotLiveService(config, source=source, smf=smf), source, smf
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        AutopilotTests.setUpClass()
+
+    def test_a_held_cycle_is_recorded_with_its_reason(self) -> None:
+        """A hold is evidence too -- the plots must show gaps, not silence."""
+        import tempfile
+
+        async def exercise(directory: str) -> None:
+            config = _autopilot_config()
+            config.autopilot = dataclasses.replace(
+                config.autopilot, history_enabled=True, history_dir=directory
+            )
+            service, source, _ = self._service_for(config)
+            source.offset -= timedelta(hours=1)
+            await service.autopilot.poll_once(prime=True)
+            await service.autopilot.run_cycle(trigger="test")
+            await service.close()
+
+        with tempfile.TemporaryDirectory() as directory:
+            asyncio.run(exercise(directory))
+            cycle = self._read(Path(directory) / "cycles.jsonl")[0]
+            self.assertEqual(cycle["outcome"], "held")
+            self.assertIn("freshness limit", cycle["reason"])
+            self.assertEqual(cycle["weights"], {})
+
+    def test_writes_never_raise_into_the_control_loop(self) -> None:
+        """A full disk must not stop the loop steering traffic."""
+        writer = HistoryWriter("/proc/nonexistent-cdot-history")
+        self.assertFalse(writer.enabled)
+        self.assertFalse(writer.write("cycles", {"cycle": 1}))
+        self.assertIsNotNone(writer.describe()["last_error"])
+
+    def test_records_are_one_valid_json_object_per_line(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as directory:
+            writer = HistoryWriter(directory)
+            for index in range(5):
+                writer.write("cycles", {"cycle": index, "weights": {"tac-2|ims|dscp-0": {"UPF1": 100}}})
+            lines = (Path(directory) / "cycles.jsonl").read_text().splitlines()
+            self.assertEqual(len(lines), 5)
+            for index, line in enumerate(lines):
+                record = json.loads(line)
+                self.assertEqual(record["cycle"], index)
+                self.assertEqual(record["stream"], "cycles")
+                self.assertTrue(record["ts"].endswith("Z"))
+
+    def test_upf_share_averages_every_tuple_to_one(self) -> None:
+        share = _upf_share({
+            "a": {"UPF1": 50, "UPF2": 50},
+            "b": {"UPF1": 100},
+        })
+        self.assertAlmostEqual(share["UPF1"], 0.75, places=4)
+        self.assertAlmostEqual(share["UPF2"], 0.25, places=4)
+        self.assertAlmostEqual(sum(share.values()), 1.0, places=4)

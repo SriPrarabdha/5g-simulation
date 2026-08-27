@@ -1,0 +1,10 @@
+{
+  "schema_version": "cdot-pilot-readiness/1.0",
+  "synthetic_evidence_only": true,
+  "smf_future_session_steering_key_confirmed": null,
+  "declared_maintenance_notice_minutes": null,
+  "upf_safe_capacity_and_session_envelopes_available": null,
+  "telemetry_freshness_and_counter_semantics_confirmed": null,
+  "recommended_mode": "shadow advisory",
+  "live_actuation_authorized": false
+}
