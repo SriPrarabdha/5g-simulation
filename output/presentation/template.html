@@ -99,11 +99,34 @@ th{color:var(--text-secondary);font-weight:600}
 </div>
 
 <div class="card">
-  <h2>Forecast accuracy</h2>
-  <p class="note">Each dot is one traffic group: what the forecaster predicted 10 minutes ahead against what actually arrived. Points on the diagonal are perfect. The two DNNs are drawn separately because <code>internet</code> carries roughly ten times the load of <code>ims</code>; on one shared scale the <code>ims</code> points collapse into the corner. <b>Held</b> points are the cases where the model predicted zero for a group that had been busy — the solver parks those at their recent level instead of dropping them, so they keep getting steered. They are excluded from the accuracy figure rather than quietly inflating it.</p>
-  <div class="legend" id="lg4"></div>
-  <div class="scroll"><svg id="c4" viewBox="0 0 1040 400" role="img" aria-label="Forecast versus actual demand per group"></svg></div>
-  <p class="cap" id="cap4"></p>
+  <h2>Weights the optimiser wrote, per traffic group</h2>
+  <p class="note">The core output of the loop. Each panel is one (DNN, TAC) group; the bands show what share of that group's traffic each UPF was told to take. Every panel sums to 100 at all times. Flat stretches mean the solver saw no reason to move traffic; steps are re-allocations. Ticks under a panel mark the cycles that actually reached the SMF.</p>
+  <div class="legend" id="lg6"></div>
+  <div class="scroll"><svg id="c6" viewBox="0 0 1040 560" role="img" aria-label="Per-UPF weight allocation over time for each traffic group"></svg></div>
+  <p class="cap" id="cap6"></p>
+  <details><summary>Latest weights as a table</summary><div class="scroll"><table id="tblw"></table></div></details>
+</div>
+
+<div class="card">
+  <h2>How much the allocation moved each cycle</h2>
+  <p class="note">Total weight shifted between UPFs, in weight-points, from one cycle to the next. Large early moves are the optimiser correcting a skewed network; small later moves are it holding a good allocation against drifting traffic. A controller that thrashes would show a flat high line here.</p>
+  <div class="scroll"><svg id="c7" viewBox="0 0 1040 260" role="img" aria-label="Weight churn per cycle"></svg></div>
+  <p class="cap" id="cap7"></p>
+</div>
+
+<div class="card">
+  <h2>Forecast vs. what actually arrived</h2>
+  <p class="note">The forecaster predicts each group's demand 10&nbsp;minutes ahead; the solver allocates against that prediction. Solid line is what actually arrived, dashed is what was predicted for that moment. The closer the two lines, the better the allocation was aimed. Green markers are <b>held</b> points — the model returned zero for a group that had been busy, so the solver parked it at its recent level rather than dropping it.</p>
+  <div class="legend" id="lg8"></div>
+  <div class="scroll"><svg id="c8" viewBox="0 0 1040 560" role="img" aria-label="Forecast versus actual demand over time for each traffic group"></svg></div>
+  <p class="cap" id="cap8"></p>
+</div>
+
+<div class="card">
+  <h2>How far off were the forecasts?</h2>
+  <p class="note">Every modelled prediction, bucketed by how far it missed. Held points are excluded — they are not predictions. The tall left-hand bar is the story: most forecasts land within a couple of percent. The grey bars are the misses — a real tail worth showing rather than cropping.</p>
+  <div class="scroll"><svg id="c9" viewBox="0 0 1040 300" role="img" aria-label="Distribution of forecast error"></svg></div>
+  <p class="cap" id="cap9"></p>
 </div>
 
 <div class="card">
@@ -313,60 +336,110 @@ const hideTT=()=>tt.style.opacity=0;
   `${ap.length} of ${d.length} solved cycles reached the SMF. Mean reduction on written cycles ${fmt(ap.reduce((a,c)=>a+c.cut,0)/ap.length,1)}%.`;
 })();
 
-/* =============== 4. forecast vs actual (faceted by DNN) =============== */
+/* =============== 8. forecast vs actual, per group over time =============== */
 (function(){
- const svg=document.getElementById('c4'),W=1040,H=400;
- const d=D.fa;if(!d.length)return;
- const panels=[['ims','ims — signalling traffic'],['internet','internet — bulk traffic']];
- const pw=(W-40)/2, M={t:34,r:16,b:52,l:62};
- panels.forEach(([dnn,title],pi)=>{
-  const rows=d.filter(p=>p.dnn===dnn); if(!rows.length)return;
-  const ox=pi*(pw+40);
-  const iw=pw-M.l-M.r, ih=H-M.t-M.b;
-  const max=Math.max(...rows.flatMap(p=>[p.fc,p.act]))*1.08||1;
-  const X=v=>ox+M.l+v/max*iw, Y=v=>M.t+ih-v/max*ih;
-  const ttl=el('text',{x:ox+M.l,y:18,fill:cv('--text-primary'),'font-size':13,'font-weight':620});
-  ttl.textContent=title;svg.appendChild(ttl);
-  for(let k=0;k<=4;k++){
-   const v=max*k/4;
+ const svg=document.getElementById('c8'),W=1040,H=560;
+ const G=D.groups; if(!G||!D.fa.length)return;
+ const tOf={}; D.cycles.forEach(c=>tOf[c.n]=c.t);
+ const byG={}; D.fa.forEach(p=>{(byG[p.group]=byG[p.group]||[]).push(p);});
+ Object.values(byG).forEach(a=>a.sort((x,y)=>x.cycle-y.cycle));
+ const cols=2, rows=Math.ceil(G.length/cols), gapx=40;
+ const pw=(W-gapx)/cols, ph=(H-20)/rows, M={t:22,r:30,b:26,l:46};
+ const ACT=cv('--s1'), FC=cv('--s2'), HELD=cv('--s3');
+
+ G.forEach((g,gi)=>{
+  const d=byG[g]||[]; if(!d.length)return;
+  const ox=(gi%cols)*(pw+gapx), oy=Math.floor(gi/cols)*ph;
+  const iw=pw-M.l-M.r, ih=ph-M.t-M.b-26;
+  const max=Math.max(...d.flatMap(p=>[p.fc,p.act]))*1.12||1;
+  const X=i=>ox+M.l+(d.length===1?iw/2:i/(d.length-1)*iw);
+  const Y=v=>oy+M.t+ih-Math.min(v,max)/max*ih;
+
+  const ttl=el('text',{x:ox+M.l,y:oy+13,fill:cv('--text-primary'),'font-size':12.5,'font-weight':620});
+  ttl.textContent=g.replace('|dscp-0','').replace('|',' · ');svg.appendChild(ttl);
+
+  [0,max/2,max].forEach(v=>{
    svg.appendChild(el('line',{x1:ox+M.l,y1:Y(v),x2:ox+M.l+iw,y2:Y(v),stroke:cv('--grid'),'stroke-width':1}));
-   svg.appendChild(el('line',{x1:X(v),y1:M.t,x2:X(v),y2:M.t+ih,stroke:cv('--grid'),'stroke-width':1}));
-   const t=el('text',{x:ox+M.l-8,y:Y(v)+4,'text-anchor':'end',fill:cv('--text-muted'),'font-size':11});
-   t.textContent=fmt(v);svg.appendChild(t);
-   const t2=el('text',{x:X(v),y:H-30,'text-anchor':'middle',fill:cv('--text-muted'),'font-size':11});
-   t2.textContent=fmt(v);svg.appendChild(t2);}
-  svg.appendChild(el('line',{x1:X(0),y1:Y(0),x2:X(max),y2:Y(max),
-    stroke:cv('--text-muted'),'stroke-width':1.5,'stroke-dasharray':'6 5'}));
-  const dl=el('text',{x:X(max)-4,y:Y(max)+16,'text-anchor':'end',fill:cv('--text-muted'),'font-size':11});
-  dl.textContent='perfect';svg.appendChild(dl);
-  rows.forEach(p=>{
-   const col=p.held?cv('--s3'):(p.dnn==='ims'?cv('--s1'):cv('--s2'));
-   const c=el('circle',{cx:X(p.act),cy:Y(p.fc),r:p.held?5.5:4.2,fill:col,
-     opacity:p.held?.95:.6,stroke:cv('--surface-1'),'stroke-width':2});
-   c.addEventListener('mousemove',e=>showTT(e,
-    `<b>${p.group}</b>
-     <div class="r"><i>cycle</i><span>#${p.cycle}</span></div>
-     <div class="r"><i>forecast</i><span>${fmt(p.fc,1)} MB/s</span></div>
-     <div class="r"><i>actual</i><span>${fmt(p.act,1)} MB/s</span></div>
-     <div class="r"><i>error</i><span>${p.err>0?'+':''}${fmt(p.err,1)}%</span></div>`
-     +(p.held?'<div class="r" style="margin-top:5px;border-top:1px solid var(--border);padding-top:5px"><i>model said zero — held</i><span></span></div>':'')));
-   c.addEventListener('mouseleave',hideTT);
-   svg.appendChild(c);});
-  const xl=el('text',{x:ox+M.l+iw/2,y:H-10,'text-anchor':'middle',fill:cv('--text-secondary'),'font-size':12});
-  xl.textContent='actual demand, MB/s';svg.appendChild(xl);
+   const t=el('text',{x:ox+M.l-7,y:Y(v)+4,'text-anchor':'end',fill:cv('--text-muted'),'font-size':10.5});
+   t.textContent=fmt(v);svg.appendChild(t);});
+
+  const path=key=>d.map((p,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${Y(p[key]).toFixed(1)}`).join(' ');
+  svg.appendChild(el('path',{d:path('act'),fill:'none',stroke:ACT,'stroke-width':2,'stroke-linejoin':'round'}));
+  svg.appendChild(el('path',{d:path('fc'),fill:'none',stroke:FC,'stroke-width':2,
+    'stroke-dasharray':'5 4','stroke-linejoin':'round'}));
+
+  d.forEach((p,i)=>{ if(!p.held) return;
+   svg.appendChild(el('circle',{cx:X(i),cy:Y(p.fc),r:4,fill:HELD,
+     stroke:cv('--surface-1'),'stroke-width':1.6}));});
+
+  [0,Math.floor(d.length/2),d.length-1].forEach(i=>{
+   const t=el('text',{x:X(i),y:oy+M.t+ih+18,'text-anchor':'middle',fill:cv('--text-muted'),'font-size':10.5});
+   t.textContent=tOf[d[i].cycle]||('#'+d[i].cycle);svg.appendChild(t);});
+
+  const hit=el('rect',{x:ox+M.l,y:oy+M.t,width:iw,height:ih,fill:'transparent'});svg.appendChild(hit);
+  hit.addEventListener('mousemove',e=>{
+   const r=svg.getBoundingClientRect(),sx=(e.clientX-r.left)*(W/r.width);
+   let i=Math.round((sx-ox-M.l)/iw*(d.length-1));i=Math.max(0,Math.min(d.length-1,i));
+   const p=d[i];
+   showTT(e,`<b>${g.replace('|dscp-0','')} · ${tOf[p.cycle]||''}</b>
+    <div class="r"><i><span class="sw" style="background:${ACT}"></span>actual</i><span>${fmt(p.act,1)} MB/s</span></div>
+    <div class="r"><i><span class="sw" style="background:${FC}"></span>forecast</i><span>${fmt(p.fc,1)} MB/s</span></div>
+    <div class="r"><i>error</i><span>${p.err>0?'+':''}${fmt(p.err,1)}%</span></div>`
+    +(p.held?`<div class="r" style="margin-top:5px;border-top:1px solid var(--border);padding-top:5px"><i>held — model said zero</i><span></span></div>`:''));});
+  hit.addEventListener('mouseleave',hideTT);
  });
- const yl=el('text',{x:-(34+(H-86)/2),y:14,'text-anchor':'middle',fill:cv('--text-secondary'),
-   'font-size':12,transform:'rotate(-90)'});
- yl.textContent='forecast demand, MB/s';svg.appendChild(yl);
- legend('lg4',[[cv('--s1'),'ims (modelled)'],[cv('--s2'),'internet (modelled)'],
-               [cv('--s3'),'held — model said zero, parked at recent level']]);
- const mk=rows=>{const e=rows.filter(p=>!p.held).map(p=>Math.abs(p.err)).sort((a,b)=>a-b);
-   return e.length?`${fmt(e[Math.floor(e.length/2)],1)}% median`:'n/a';};
- const mod=d.filter(p=>!p.held).map(p=>Math.abs(p.err)).sort((a,b)=>a-b);
- document.getElementById('cap4').textContent=
-  `ims ${mk(d.filter(p=>p.dnn==='ims'))} · internet ${mk(d.filter(p=>p.dnn==='internet'))}. `+
-  `Across all ${mod.length} modelled predictions: median error ${fmt(mod[Math.floor(mod.length/2)],1)}%, `+
-  `${fmt(100*mod.filter(e=>e<=10).length/mod.length,0)}% within 10%. ${d.length-mod.length} held points excluded.`;
+ legend('lg8',[[ACT,'actual demand'],[FC,'forecast (dashed)'],[HELD,'held — model said zero']]);
+ const mod=D.fa.filter(p=>!p.held).map(p=>Math.abs(p.err)).sort((a,b)=>a-b);
+ document.getElementById('cap8').textContent=
+  `Unit MB/s, each panel on its own scale. ${mod.length} modelled predictions across ${G.length} groups; `+
+  `median error ${fmt(mod[Math.floor(mod.length/2)],1)}%. ${D.fa.length-mod.length} held points shown but excluded from that figure.`;
+})();
+
+/* =============== 9. error distribution =============== */
+(function(){
+ const svg=document.getElementById('c9'),W=1040,H=300,
+       M={t:20,r:24,b:56,l:56}, iw=W-M.l-M.r, ih=H-M.t-M.b;
+ const e=D.fa.filter(p=>!p.held).map(p=>Math.abs(p.err));
+ if(!e.length)return;
+ const edges=[0,1,2,5,10,25,50,100,Infinity];
+ const lab=['0–1%','1–2%','2–5%','5–10%','10–25%','25–50%','50–100%','>100%'];
+ const cnt=edges.slice(0,-1).map((lo,i)=>e.filter(v=>v>=lo&&v<edges[i+1]).length);
+ const max=Math.max(...cnt)*1.12||1;
+ const bw=iw/cnt.length*0.72, gap=iw/cnt.length;
+ const X=i=>M.l+i*gap+(gap-bw)/2, Y=v=>M.t+ih-v/max*ih;
+ for(let k=0;k<=4;k++){const v=max*k/4,y=Y(v);
+  svg.appendChild(el('line',{x1:M.l,y1:y,x2:M.l+iw,y2:y,stroke:cv('--grid'),'stroke-width':1}));
+  const t=el('text',{x:M.l-9,y:y+4,'text-anchor':'end',fill:cv('--text-muted'),'font-size':11.5});
+  t.textContent=fmt(v);svg.appendChild(t);}
+ const yl=el('text',{x:M.l,y:M.t-5,'text-anchor':'start',fill:cv('--text-muted'),'font-size':11});
+ yl.textContent='predictions';svg.appendChild(yl);
+ cnt.forEach((c,i)=>{
+  const good=i<=3;
+  const r=el('rect',{x:X(i),y:Y(c),width:bw,height:Math.max(1.5,M.t+ih-Y(c)),
+    fill:good?cv('--s1'):cv('--neutral'),rx:4});
+  r.addEventListener('mousemove',ev=>showTT(ev,
+   `<b>${lab[i]} off</b><div class="r"><i>predictions</i><span>${c}</span></div>`
+   +`<div class="r"><i>share</i><span>${fmt(100*c/e.length,1)}%</span></div>`));
+  r.addEventListener('mouseleave',hideTT); svg.appendChild(r);
+  if(c>0){const t=el('text',{x:X(i)+bw/2,y:Y(c)-7,'text-anchor':'middle',
+    fill:cv('--text-secondary'),'font-size':11.5,'font-weight':600});
+   t.textContent=c;svg.appendChild(t);}
+  const t2=el('text',{x:X(i)+bw/2,y:H-32,'text-anchor':'middle',fill:cv('--text-muted'),'font-size':11.5});
+  t2.textContent=lab[i];svg.appendChild(t2);});
+ const xl=el('text',{x:M.l+iw/2,y:H-10,'text-anchor':'middle',fill:cv('--text-secondary'),'font-size':12.5});
+ xl.textContent='absolute error of the 10-minute-ahead forecast';svg.appendChild(xl);
+ const srt=e.slice().sort((a,b)=>a-b);
+ const within=t=>fmt(100*e.filter(v=>v<=t).length/e.length,0);
+ const per=dnn=>{const a=D.fa.filter(p=>!p.held&&p.dnn===dnn).map(p=>Math.abs(p.err)).sort((x,y)=>x-y);
+   return a.length?`${dnn} median ${fmt(a[Math.floor(a.length/2)],1)}% (${fmt(100*a.filter(v=>v<=10).length/a.length,0)}% within 10%)`:'';};
+ const big=D.fa.filter(p=>!p.held&&Math.abs(p.err)>10);
+ const bigNet=big.filter(p=>p.dnn==='internet').length;
+ document.getElementById('cap9').textContent=
+  `${e.length} modelled predictions. Median ${fmt(srt[Math.floor(srt.length/2)],1)}%, `+
+  `${within(5)}% within 5%, ${within(10)}% within 10%, 90th percentile `+
+  `${fmt(srt[Math.floor(.9*srt.length)],1)}%. Split by DNN: ${per('ims')}, ${per('internet')}. `+
+  `The tail leans toward internet — ${fmt(100*bigNet/big.length,0)}% of the misses over 10% come from it, `+
+  `though it is only ${fmt(100*D.fa.filter(p=>!p.held&&p.dnn==='internet').length/e.length,0)}% of predictions.`;
 })();
 
 /* =============== 5. availability =============== */
@@ -389,6 +462,112 @@ const hideTT=()=>tt.style.opacity=0;
  const up=d.filter(p=>p.prom).length;
  document.getElementById('cap5').textContent=
   `${up} of ${d.length} sampled polls answered. The outage window was a relay process on our host, which was restarted at 10:41 IST; the loop resumed and wrote on its next cycle without intervention.`;
+})();
+
+
+/* =============== 6. weights per group (small multiples) =============== */
+(function(){
+ const svg=document.getElementById('c6'),W=1040,H=560;
+ const d=D.W, G=D.groups; if(!d.length)return;
+ const names=['UPF1','UPF2','UPF3','UPF4'];
+ const cols=2, rows=Math.ceil(G.length/cols);
+ const gapx=40, gapy=26;
+ const pw=(W-gapx)/cols, ph=(H-20)/rows;
+ // r must clear the last x-label, which is centred on the panel's right edge
+ const M={t:22,r:30,b:26,l:40};
+
+ G.forEach((g,gi)=>{
+  const ox=(gi%cols)*(pw+gapx), oy=Math.floor(gi/cols)*ph;
+  const iw=pw-M.l-M.r, ih=ph-M.t-M.b-gapy;
+  const X=i=>ox+M.l+(d.length===1?iw/2:i/(d.length-1)*iw);
+  const Y=v=>oy+M.t+ih-v/100*ih;
+
+  const ttl=el('text',{x:ox+M.l,y:oy+13,fill:cv('--text-primary'),'font-size':12.5,'font-weight':620});
+  ttl.textContent=g.replace('|dscp-0','').replace('|',' · ');svg.appendChild(ttl);
+
+  [0,50,100].forEach(v=>{
+   svg.appendChild(el('line',{x1:ox+M.l,y1:Y(v),x2:ox+M.l+iw,y2:Y(v),
+     stroke:cv('--grid'),'stroke-width':1}));
+   const t=el('text',{x:ox+M.l-7,y:Y(v)+4,'text-anchor':'end',fill:cv('--text-muted'),'font-size':10.5});
+   t.textContent=v;svg.appendChild(t);});
+
+  // stacked bands, bottom-up, with a 2px surface gap between segments
+  const base=new Array(d.length).fill(0);
+  names.forEach((u,k)=>{
+   const lo=base.slice();
+   const hi=d.map((x,i)=>{const v=(x.w[g]||{})[u]||0; base[i]+=v; return base[i];});
+   const up=d.map((_,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${Y(hi[i]).toFixed(1)}`).join(' ');
+   const dn=d.map((_,i)=>`L${X(d.length-1-i).toFixed(1)} ${Y(lo[d.length-1-i]).toFixed(1)}`).join(' ');
+   svg.appendChild(el('path',{d:up+' '+dn+' Z',fill:cv(CV[k]),opacity:.9,
+     stroke:cv('--surface-1'),'stroke-width':2,'stroke-linejoin':'round'}));});
+
+  // ticks for cycles that reached the SMF
+  d.forEach((x,i)=>{ if(!x.written) return;
+   svg.appendChild(el('line',{x1:X(i),y1:oy+M.t+ih+3,x2:X(i),y2:oy+M.t+ih+8,
+     stroke:cv('--text-muted'),'stroke-width':1.2}));});
+
+  [0,Math.floor(d.length/2),d.length-1].forEach(i=>{
+   const t=el('text',{x:X(i),y:oy+M.t+ih+22,'text-anchor':'middle',
+     fill:cv('--text-muted'),'font-size':10.5});
+   t.textContent=d[i].t;svg.appendChild(t);});
+
+  const hit=el('rect',{x:ox+M.l,y:oy+M.t,width:iw,height:ih,fill:'transparent'});
+  svg.appendChild(hit);
+  hit.addEventListener('mousemove',e=>{
+   const r=svg.getBoundingClientRect(),sx=(e.clientX-r.left)*(W/r.width);
+   let i=Math.round((sx-ox-M.l)/iw*(d.length-1));i=Math.max(0,Math.min(d.length-1,i));
+   const w=d[i].w[g]||{};
+   showTT(e,`<b>${g.replace('|dscp-0','')} · cycle #${d[i].n} · ${d[i].t}</b>`
+    +names.map((u,k)=>`<div class="r"><i><span class="sw" style="background:${cv(CV[k])}"></span>${u}</i><span>${w[u]||0}</span></div>`).join('')
+    +`<div class="r" style="margin-top:5px;border-top:1px solid var(--border);padding-top:5px"><i>${d[i].written?'written to SMF':'solved, held'}</i><span></span></div>`);});
+  hit.addEventListener('mouseleave',hideTT);
+ });
+ legend('lg6',names.map((u,k)=>[cv(CV[k]),u]).concat([[cv('--text-muted'),'tick = written to the SMF']]));
+ const written=d.filter(x=>x.written).length;
+ document.getElementById('cap6').textContent=
+  `${d.length} solved cycles across ${G.length} groups; ${written} reached the SMF. `+
+  `Empty slots in a panel are UPFs the constraint CSV forbids for that TAC — the optimiser never places load there.`;
+
+ // latest weights table
+ const last=d[d.length-1];
+ document.getElementById('tblw').innerHTML=
+  '<tr><th>group</th>'+names.map(u=>`<th>${u}</th>`).join('')+'</tr>'
+  +G.map(g=>`<tr><td>${g.replace('|dscp-0','')}</td>`
+    +names.map(u=>`<td>${(last.w[g]||{})[u]??'—'}</td>`).join('')+'</tr>').join('');
+})();
+
+/* =============== 7. churn =============== */
+(function(){
+ const svg=document.getElementById('c7'),W=1040,H=260,
+       M={t:18,r:24,b:46,l:56}, iw=W-M.l-M.r, ih=H-M.t-M.b;
+ const d=D.churn; if(!d.length)return;
+ const max=Math.max(...d.map(c=>c.d))*1.1||1;
+ const bw=Math.max(3,iw/d.length-3);
+ const X=i=>M.l+i*(iw/d.length)+(iw/d.length-bw)/2, Y=v=>M.t+ih-v/max*ih;
+ for(let k=0;k<=4;k++){const v=max*k/4,y=Y(v);
+  svg.appendChild(el('line',{x1:M.l,y1:y,x2:M.l+iw,y2:y,stroke:cv('--grid'),'stroke-width':1}));
+  const t=el('text',{x:M.l-9,y:y+4,'text-anchor':'end',fill:cv('--text-muted'),'font-size':11.5});
+  t.textContent=fmt(v);svg.appendChild(t);}
+ const yl=el('text',{x:M.l,y:M.t-5,'text-anchor':'start',fill:cv('--text-muted'),'font-size':11});
+ yl.textContent='weight-points moved';svg.appendChild(yl);
+ d.forEach((c,i)=>{
+  const r=el('rect',{x:X(i),y:Y(c.d),width:bw,height:Math.max(1.5,M.t+ih-Y(c.d)),
+    fill:c.written?cv('--s1'):cv('--neutral'),rx:Math.min(4,bw/2)});
+  r.addEventListener('mousemove',e=>showTT(e,
+   `<b>cycle #${c.n} · ${c.t} IST</b>
+    <div class="r"><i>weight moved</i><span>${c.d} pts</span></div>
+    <div class="r"><i>outcome</i><span>${c.written?'written':'held'}</span></div>`));
+  r.addEventListener('mouseleave',hideTT);svg.appendChild(r);});
+ const step=Math.max(1,Math.ceil(d.length/12));
+ d.forEach((c,i)=>{if(i%step)return;
+  const t=el('text',{x:X(i)+bw/2,y:H-26,'text-anchor':'middle',fill:cv('--text-muted'),'font-size':11});
+  t.textContent='#'+c.n;svg.appendChild(t);
+  const t2=el('text',{x:X(i)+bw/2,y:H-11,'text-anchor':'middle',fill:cv('--text-muted'),'font-size':11});
+  t2.textContent=c.t;svg.appendChild(t2);});
+ const w=d.filter(c=>c.written);
+ document.getElementById('cap7').textContent=
+  `Median move ${fmt(d.map(c=>c.d).sort((a,b)=>a-b)[Math.floor(d.length/2)],0)} weight-points per cycle`
+  +(w.length?`, ${fmt(w.map(c=>c.d).sort((a,b)=>a-b)[Math.floor(w.length/2)],0)} on cycles that were written.`:'.');
 })();
 
 /* =============== table view =============== */
